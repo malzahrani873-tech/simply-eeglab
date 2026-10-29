@@ -151,6 +151,11 @@ for (const lang of ['ar', 'en']) {
       if (!where.includes(slugOf(file))) continue;
       for (const m of body.matchAll(new RegExp(`<${demo}\\b([^>]*)>`, 'g'))) if (!/\bpipeline="[^"]+"/.test(m[1])) err(file, `سطر ${lineOf(body, m[0])}: <${demo}> بلا pipeline، وافتراضيه يختلف عن مسار الدرس`);
     }
+    // The idea (first paragraph of "why") is shown whole; past 60 words it reads long (writing warning only).
+    const whyBody = body.split(/^## /m).find((x, i) => i === 1) ?? '';
+    const idea = whyBody.split('\n').slice(1).join('\n').trim().split(/\n\s*\n/)[0] ?? '';
+    const ideaWords = idea.replace(/<[^>]+>/g, ' ').trim().split(/\s+/).filter(Boolean).length;
+    if (ideaWords > 60) warn(file, `فقرة الفكرة ${ideaWords} كلمة (المستحسن 60 أو أقل)`);
     // Methods (§23.1)
     const methods = body.match(/<Methods>\s*([\s\S]*?)\s*<\/Methods>/)?.[1];
     if (methods) {

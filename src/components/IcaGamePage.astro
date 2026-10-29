@@ -64,6 +64,7 @@ const btnList = (daily: boolean) => classes.filter((c) => !daily || c !== 'other
           <div class="gq" data-q>
             <p class="gchoose">{L('game.choose')}</p>
             <div class="gimg"><img data-img alt="" width="720" height="280" /><div class="ierr" data-ierr hidden><p>{L('game.imgError')}</p><button type="button" class="btn sec" data-skip>{L('game.skip')}</button></div></div>
+            <button type="button" class="btn sec small zoom-btn" data-zoom hidden><Icon name="search" class="ico s20" />{L('game.zoom')}</button>
             <div class="panels muted small" aria-hidden="true"><span>{panels.topo}</span><span>{panels.spectrum}</span><span>{panels.time}</span></div>
             <p class="sign muted small" data-sign hidden>{L('game.signFlip')}</p>
             <div class="abs" data-btns>{btnList(false).map((c, i) => <button type="button" class="ab" data-c={c}><span class="k" aria-hidden="true">{i + 1}</span><span class="an">{names[c]}</span><span class="at" lang="en">{terms[c]}</span></button>)}</div>
@@ -93,6 +94,10 @@ const btnList = (daily: boolean) => classes.filter((c) => !daily || c !== 'other
     )}
     <p class="muted small">{L('game.colormap')}</p>
   </div>
+  <dialog class="zoomd" data-zoomd aria-label={L('game.zoom')}>
+    <button type="button" class="zx" data-zclose aria-label={t(lang, 'common.close')}><Icon name="close" class="ico s20" /></button>
+    <div class="zbox"><img alt="" /></div>
+  </dialog>
   <script>
     import '../scripts/ica-game.ts';
   </script>

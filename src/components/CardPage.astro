@@ -8,6 +8,7 @@ import { roadmap, type Lesson } from '../lib/site-data';
 import { cardFrom, cardTooLong } from '../lib/card';
 import { mdInline } from '../lib/mini-md';
 import { iso } from '../lib/bidi';
+import { createHash } from 'node:crypto';
 
 interface Props { lang: Lang; entry: Lesson; slug: string }
 const { lang, entry, slug } = Astro.props;
@@ -17,9 +18,13 @@ const c = cardFrom(entry.body ?? '');
 if (cardTooLong(c)) console.log(`card on 2 pages: ${slug} (${lang})`);
 const lessonUrl = new URL(url(`lesson/${slug}/`, lang), Astro.site).href;
 const x = (s: string) => mdInline(s, lang);
+// The lesson title at the top of every printed page; its hash goes into this page's style-src.
+const runHead = `@media print{@page{@top-center{content:${JSON.stringify(d.title)}}}}`;
+Astro.csp?.insertStyleHash(`sha256-${createHash('sha256').update(runHead).digest('base64')}`);
 ---
 <Base lang={lang} title={t(lang, 'card.pageTitle', { title: d.title })} path={`lesson/${slug}/card/`} noindex bodyClass="card-page">
   <div class="wrap card-wrap">
+    <style is:inline set:html={runHead} />
     <div class="card-bar">
       <a href={url(`lesson/${slug}/`, lang)}>{t(lang, 'card.back')}</a>
       <button type="button" class="btn pri" data-print hidden><Icon name="print" class="ico s20" />{t(lang, 'card.print')}</button>
@@ -40,9 +45,11 @@ const x = (s: string) => mdInline(s, lang);
               {s.values.length > 0 && <> <span aria-hidden="true">←</span> {s.values.map((v) => <code dir="ltr">{v}</code>)}</>}
             </li>
           ))}</ol>
+          {c.warnings.map((w) => <p class="cwarn"><Icon name="warn" class="ico s20" /><span set:html={x(w)} /></p>)}
         </section>
       )}
       {c.script && <section><h2>{t(lang, 'card.script')}</h2><pre dir="ltr"><code>{c.script}</code></pre></section>}
+      {c.scriptInLesson && <section><h2>{t(lang, 'card.script')}</h2><p>{t(lang, 'card.scriptInLesson')}</p></section>}
       {c.table && (
         <section><h2>{t(lang, 'card.values')}</h2>
           <table><thead><tr>{c.table[0].map((h) => <th set:html={x(h)} />)}</tr></thead>
@@ -54,7 +61,7 @@ const x = (s: string) => mdInline(s, lang);
           <ul class="checks">{c.checks.map((k) => <li><span class="box" aria-hidden="true"></span><span set:html={x(k)} /></li>)}</ul>
         </section>
       )}
-      {c.methods && <section><h2>{t(lang, 'card.methods')}</h2><p class="mq" lang="en" dir="ltr">{c.methods}</p></section>}
+      {c.methods && <section class="cmeth"><h2>{t(lang, 'card.methods')}</h2><p class="mq" lang="en" dir="ltr">{c.methods}</p></section>}
       <footer>
         <p>{t(lang, 'card.footer', { url: '{url}' }).split('{url}').map((part, i) => <>{i > 0 && <span dir="ltr">{lessonUrl}</span>}{part}</>)}</p>
         <p>{t(lang, 'footer.license')}: <span dir="ltr">CC BY-NC-SA 4.0 · MIT (code)</span></p>

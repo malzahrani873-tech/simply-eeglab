@@ -1,137 +1,137 @@
 {
   "classes": {
     "brain": {
-      "name": "",
-      "term": "",
-      "signature": ""
+      "name": "Brain",
+      "term": "Brain",
+      "signature": "The map is smooth and broad, often with two clear poles, as if its source were a point inside the head. The spectrum falls with frequency and has a peak, usually alpha near 10 Hz, or theta or beta. The activity over time is an ongoing oscillation without large jumps."
     },
     "eye": {
-      "name": "",
-      "term": "",
-      "signature": ""
+      "name": "Eye",
+      "term": "Eye",
+      "signature": "The map is focused at the front of the head near the eyes. The spectrum is very high at the lowest frequencies and falls quickly. The activity over time has large, slow deflections: short, spaced-out peaks for blinks, or level jumps for horizontal eye movements."
     },
     "muscle": {
-      "name": "",
-      "term": "",
-      "signature": ""
+      "name": "Muscle",
+      "term": "Muscle",
+      "signature": "The map is a small spot at the edge of the head, often at the temple, forehead, or neck. The spectrum falls until about 10 Hz, then rises and stays high above 20 Hz. The activity over time is dense and fast, and it may come in bursts."
     },
     "heart": {
-      "name": "",
-      "term": "",
-      "signature": ""
+      "name": "Heart",
+      "term": "Heart",
+      "signature": "The activity over time has sharp, similar peaks that repeat regularly at the pulse rate, about once a second. The map is often broad or tilted, or at the edge of the head. The spectrum does not set it apart much, so the rhythm is the main clue."
     },
     "line": {
-      "name": "",
-      "term": "",
-      "signature": ""
+      "name": "Line noise",
+      "term": "Line Noise",
+      "signature": "The spectrum has a very tall, narrow peak at 50 or 60 Hz, depending on the mains frequency where the data were recorded, and it is the highest point of the spectrum. The map is often patchy and irregular. The activity over time is a dense band of fast oscillation."
     },
     "chan": {
-      "name": "",
-      "term": "",
-      "signature": ""
+      "name": "Channel noise",
+      "term": "Channel Noise",
+      "signature": "The map is a sharp point at one electrode, and the rest of the head shows almost no activity. The spectrum has no clear brain peak. The activity over time is irregular noise or jumps that belong to that electrode."
     },
     "other": {
-      "name": "",
-      "term": "",
-      "signature": ""
+      "name": "Other",
+      "term": "Other",
+      "signature": "The signs of no class fit clearly: a scattered map, a spectrum with neither an alpha peak nor the muscle rise, and mixed activity over time. ICLabel puts here what it cannot explain, and many of these components mix more than one source."
     }
   },
   "confusions": {
-    "brain>eye": "",
-    "brain>muscle": "",
-    "brain>other": "",
-    "eye>chan": "",
-    "muscle>chan": "",
-    "muscle>line": "",
-    "heart>brain": "",
-    "heart>other": "",
-    "chan>other": "",
-    "line>other": ""
+    "brain>eye": "An eye map is very frontal and focused above the eyes, and its spectrum is high at the lowest frequencies and falls quickly. A brain component, even a frontal one, has a broader map that is less focused at the eyes, and its spectrum has a peak such as theta or alpha.",
+    "brain>muscle": "Look at the spectrum above 20 Hz: for muscle it rises or stays high, for brain it falls. A muscle map is a small spot at the edge of the head, while a brain map is smooth and broad.",
+    "brain>other": "A brain component has a smooth map with two clear poles and a spectral peak at alpha, theta, or beta. When these signs are missing and the map is scattered, the component most likely belongs to Other.",
+    "eye>chan": "Both can show a focused spot. The eye spot is at the front of the head above the eyes, often on both sides, with large slow deflections. Channel noise is a point at one electrode that can be anywhere, without those deflections.",
+    "muscle>chan": "Both are a small spot, and the spectrum tells them apart. A muscle spectrum rises above 20 Hz, and its activity is dense and fast. Channel noise is a point at one electrode only, and its spectrum does not rise like that.",
+    "muscle>line": "Both have fast activity. But a muscle spectrum is high over a broad band above 20 Hz, while line noise is one very narrow peak at 50 or 60 Hz with low values around it.",
+    "heart>brain": "A heart component is known by its rhythm: sharp, similar peaks that repeat regularly, about once a second. A brain component is an ongoing oscillation without those peaks, and its spectrum has an alpha, theta, or beta peak. If you are unsure, count the peaks in the five seconds.",
+    "heart>other": "If you see sharp peaks with a regular rhythm close to the pulse, it is most likely the heart, even when the map is unclear. Other has no such rhythm.",
+    "chan>other": "Channel noise is one sharp point at one electrode. When the activity is spread over scattered spots rather than one electrode, it most likely belongs to Other.",
+    "line>other": "Line noise is known by a very tall, narrow peak at 50 or 60 Hz. A small peak at that frequency appears in many components, so it is not enough on its own: what decides it is that the peak is the highest point of the spectrum."
   },
   "eye_subtypes": {
-    "blink": "",
-    "saccade": ""
+    "blink": "Blink",
+    "saccade": "Horizontal eye movement"
   },
   "items": {
     "c002": {
-      "note": "",
-      "alt": ""
+      "note": "A smooth map with two poles and an alpha peak near 10 Hz: the typical shape of a brain component. The small peak at 50 Hz is leftover line noise that appears in most components, and it does not change the class.",
+      "alt": "Scalp map: a strong color at the front of the head and a broad spot of the opposite color over the center and back, with a smooth transition between them. Spectrum: a clear peak near 10 Hz, then a fall with frequency, and a small narrow peak at 50 Hz. Activity over time: an ongoing irregular oscillation, slightly larger in the first second."
     },
     "c004": {
-      "note": "",
-      "alt": ""
+      "note": "The sharp peaks about every 1.2 seconds, around 50 beats per minute, are the heart rhythm. The component's correlation with the heart channel (ECG) is 0.61. ICLabel was not sure, 62% heart and 35% brain, because the background activity is strong. Here the rhythm is the strongest clue.",
+      "alt": "Scalp map: a strong spot at the edge of the head at the back on the left, and a calm gradient over the rest of the head. Spectrum: falls with frequency, with small peaks below 10 Hz and a narrow peak at 50 Hz. Activity over time: sharp, similar peaks that repeat about every 1.2 seconds over an irregular background."
     },
     "c005": {
-      "note": "",
-      "alt": ""
+      "note": "A symmetric frontal map and large, short, spaced-out deflections: a blink. Its correlation with the eye channel (EOG) is 0.74. The downward direction of the deflections does not matter here, because the sign of an ICA component is arbitrary.",
+      "alt": "Scalp map: a strong focus at the front of the head over the forehead, equal on both sides. Spectrum: very high at the lowest frequencies and falling quickly until 10 Hz, with a narrow peak at 50 Hz. Activity over time: a large, sharp downward deflection near 0.4 s and two close deflections near 3.6 s; the rest is calm."
     },
     "c007": {
-      "note": "",
-      "alt": ""
+      "note": "The peak at 50 Hz is the highest point of the spectrum, and that settles the class: line noise. The mains frequency where these data were recorded is 50 Hz. A patchy map is common in this class.",
+      "alt": "Scalp map: small scattered spots, the strongest at the lower back of the head, with the rest of the head calm. Spectrum: a very tall, narrow peak at 50 Hz above the whole spectrum, and two small peaks near 10 and 20 Hz. Activity over time: a dense, fast oscillation with no clear shape."
     },
     "c010": {
-      "note": "",
-      "alt": ""
+      "note": "The narrow peak at 50 Hz rises more than 30 dB above the rest of the spectrum. The dense band in the activity over time is that same oscillation, 50 times a second.",
+      "alt": "Scalp map: scattered spots of opposite colors at the back of the head, with the front calm. Spectrum: a narrow peak at 50 Hz far above the rest of the spectrum, and a small peak near 10 Hz. Activity over time: a very dense band of fast oscillation that rises a little near the first second, then settles."
     },
     "c012": {
-      "note": "",
-      "alt": ""
+      "note": "The map and the spectrum say brain: a smooth transition between two poles and an alpha peak. The large pulse near 0.7 s is a single event that hides the background activity, so do not judge from the activity over time alone. That is why this is not the clearest brain example.",
+      "alt": "Scalp map: a strong spot at the front of the head on the left, and a broad spot of the opposite color over the center and back on the right. Spectrum: a clear peak near 9 Hz, then a fall with frequency, and a small peak at 50 Hz. Activity over time: one large, sharp pulse near 0.7 s, followed by small, calm activity."
     },
     "c015": {
-      "note": "",
-      "alt": ""
+      "note": "A typical blink: a symmetric frontal map and two large, spaced-out deflections. Its correlation with the eye channel (EOG) is 0.83, the highest among the eye examples in this game.",
+      "alt": "Scalp map: a strong focus at the front edge of the head over the forehead, equal on both sides, with the rest of the head calm. Spectrum: very high at the lowest frequencies and falling quickly, with a small peak near 10 Hz and a narrow one at 50 Hz. Activity over time: two large upward deflections near 0.5 and 3.6 s, each lasting less than half a second."
     },
     "c016": {
-      "note": "",
-      "alt": ""
+      "note": "A smooth posterior map and a strong alpha peak at 10 Hz: alpha activity from the back of the head. Amplitude changing over time is normal for alpha, which waxes and wanes.",
+      "alt": "Scalp map: a strong color at the back of the head and the opposite color over the front and center, with a smooth transition between them. Spectrum: a tall, sharp peak near 10 Hz, then a fall with frequency, and a small peak at 50 Hz. Activity over time: an ongoing oscillation whose amplitude grows in the last two seconds."
     },
     "c018": {
-      "note": "",
-      "alt": ""
+      "note": "A small spot at the edge of the head and a spectrum that rises above 20 Hz: muscle, most likely from the forehead or temple muscles on the left. Note that the spectrum is lowest at alpha, the opposite of brain.",
+      "alt": "Scalp map: a small strong spot at the edge of the head at the front left, next to a small spot of the opposite color at the left temple, with the rest of the head calm. Spectrum: falls until about 8 Hz, rises to a broad peak near 25 Hz, and stays high until 80 Hz. Activity over time: very dense, fast activity."
     },
     "c019": {
-      "note": "",
-      "alt": ""
+      "note": "Two peaks near 10 and 20 Hz, and a smooth map over the motor area on one side: this looks like the mu motor rhythm, which is brain activity.",
+      "alt": "Scalp map: a strong spot over the center and back on the right, and a spot of the opposite color at the front of the midline, with a smooth transition. Spectrum: two peaks near 10 and 18 Hz, then a fall, and a small peak at 50 Hz. Activity over time: an ongoing irregular oscillation."
     },
     "c020": {
-      "note": "",
-      "alt": ""
+      "note": "A large blink near 4 s and a small one near 0.7 s, with a symmetric frontal map. Its correlation with the eye channel (EOG) is 0.60, lower than the others, but the whole shape is that of a blink.",
+      "alt": "Scalp map: a strong focus at the front edge of the head over the forehead, equal on both sides. Spectrum: very high at the lowest frequencies and falling quickly until about 10 Hz, with a small peak at 50 Hz. Activity over time: a large, sharp downward deflection near 4 s and a smaller one near 0.7 s; the rest changes slowly."
     },
     "c024": {
-      "note": "",
-      "alt": ""
+      "note": "The small spot at the edge of the head and the spectrum that stays high above 20 Hz are the signs of muscle. The burst after the third second is the muscle activity itself: it comes and goes, so you may see a calm stretch before it.",
+      "alt": "Scalp map: a small strong spot at the edge of the head at the front left, with the rest of the head calm. Spectrum: falls until about 8 Hz, then a clear peak near 23 Hz, and stays high until 80 Hz. Activity over time: calm for the first 3 seconds, then a dense, fast burst of large activity."
     },
     "c026": {
-      "note": "",
-      "alt": ""
+      "note": "Two opposite poles at the front of the head, left and right: a horizontal eye movement. When the eyes look to one side, one side turns positive and the other negative. Its correlation with the eye channel (EOG) is 0.67. The jumps in the activity over time are less clear than in a typical example, so rely on the map first.",
+      "alt": "Scalp map: two strong spots at the front of the head, one on the left and one on the right in the opposite color, with a dividing line down the middle. Spectrum: high at the lowest frequencies and falling gradually, with no clear peak. Activity over time: irregular activity with a jump at the start and a level change between 2.4 and 2.8 s."
     },
     "c029": {
-      "note": "",
-      "alt": ""
+      "note": "All the activity is at one electrode, and the rest of the head shows none: channel noise. A source inside the brain never shows up at a single electrode only, because its activity reaches the neighboring electrodes.",
+      "alt": "Scalp map: a small, sharp point at one electrode behind the center of the head, with the rest of the head almost one color. Spectrum: falls steadily with frequency with no peak near 10 Hz, and a narrow peak at 50 Hz. Activity over time: an irregular oscillation."
     },
     "c030": {
-      "note": "",
-      "alt": ""
+      "note": "A broad, smooth spot over the center and back of the head and an alpha peak: brain. The small peak at 50 Hz does not make it line noise, because it is far below the alpha peak.",
+      "alt": "Scalp map: a broad, strong spot over the center and back of the head, surrounded by the opposite color, with a smooth transition. Spectrum: a sharp peak near 10 Hz, smaller peaks near 6 and 18 Hz, then a fall, and a small peak at 50 Hz. Activity over time: an ongoing irregular oscillation."
     },
     "c032": {
-      "note": "",
-      "alt": ""
+      "note": "The activity is concentrated at one electrode on the right: channel noise. The 50 Hz peak is clearer here than in many examples, because an electrode with poor contact often picks up more line noise. But it is not the highest point of the spectrum, so the class is not line noise.",
+      "alt": "Scalp map: a strong, sharp point at one electrode on the right side of the center of the head, a weaker point in the middle, and the rest of the head one color. Spectrum: falls with frequency, with a small peak near 10 Hz and a tall, narrow peak at 50 Hz. Activity over time: a large, irregular oscillation."
     },
     "c033": {
-      "note": "",
-      "alt": ""
+      "note": "A small spot at the front right and a spectrum that is high above 20 Hz: muscle, most likely from the forehead or jaw muscles on the right.",
+      "alt": "Scalp map: a small strong spot near the edge of the head at the front right, next to a small spot of the opposite color, with the rest of the head calm. Spectrum: falls until about 10 Hz, rises to a peak near 22 Hz, and stays high until 80 Hz. Activity over time: dense, fast activity throughout the five seconds."
     },
     "c035": {
-      "note": "",
-      "alt": ""
+      "note": "A blink: a symmetric frontal map and large, short deflections. The small rise between 20 and 30 Hz in the spectrum is most likely a slight trace of forehead muscle mixed into this component, and it does not change the class.",
+      "alt": "Scalp map: a strong focus at the front of the head over the forehead, equal on both sides. Spectrum: very high at the lowest frequencies and falling quickly, then a small broad rise between 20 and 30 Hz, and a narrow peak at 50 Hz. Activity over time: a large upward deflection near 0.5 s and two close deflections near 3.2 and 3.6 s."
     },
     "c036": {
-      "note": "",
-      "alt": ""
+      "note": "A clear example of alpha activity from the back of the head: a smooth posterior map and a strong peak at 10 Hz. The small peak near 20 Hz is twice the alpha frequency and often comes with it.",
+      "alt": "Scalp map: a strong spot at the back of the head and a faint opposite color at the front, with a smooth transition. Spectrum: a tall, sharp peak at 10 Hz, a smaller peak near 20 Hz, then a fall, and a small peak at 50 Hz. Activity over time: an ongoing oscillation, slightly larger near the fourth second."
     },
     "c037": {
-      "note": "",
-      "alt": ""
+      "note": "The clearest muscle example in this game: a spectrum that rises with frequency to the end of the plot, and a small spot at the right temple. That is the opposite of brain, whose spectrum falls with frequency.",
+      "alt": "Scalp map: a small strong spot at the edge of the head at the front right near the temple, with the rest of the head calm. Spectrum: falls until about 8 Hz, then rises steadily until 80 Hz. Activity over time: a dense band of very fast activity."
     }
   }
 }

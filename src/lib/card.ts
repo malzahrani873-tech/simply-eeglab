@@ -7,7 +7,12 @@ export interface CardData {
   table: string[][] | null;
   checks: string[];
   methods: string | null;
+  warnings: string[];
+  scriptInLesson: boolean;
 }
+
+// A script longer than this stays in the lesson; the card points to it (keeps the card within two A4 pages).
+const SCRIPT_MAX_LINES = 18;
 
 // Plain text for the card: lesson component tags (<UiLabel>, <En>, <MenuPath>…) keep only their text.
 const strip = (s: string) => s.replace(/<\/?[A-Z][A-Za-z]*\b[^>]*>/g, '').replace(/\[([^\]]+)\]\([^)]+\)/g, '$1');
@@ -33,7 +38,9 @@ export function cardFrom(body: string): CardData {
   // 2. Script: the first code block of the script section, without comment and blank lines;
   // the code itself is never cut.
   const code = sec.script.match(/```[a-z]*\n([\s\S]*?)```/)?.[1];
-  const script = code ? code.split('\n').filter((l) => l.trim() && !/^\s*%/.test(l)).join('\n') : null;
+  const lines = code ? code.split('\n').filter((l) => l.trim() && !/^\s*%/.test(l)) : [];
+  const scriptInLesson = lines.length > SCRIPT_MAX_LINES;
+  const script = lines.length && !scriptInLesson ? lines.join('\n') : null;
   // 3. The values table as written.
   const rows = sec.values.split('\n').filter((l) => /^\|.*\|\s*$/.test(l) && !/^\|[\s|:-]+\|\s*$/.test(l));
   let table = rows.length ? rows.map((r) => r.trim().slice(1, -1).split('|').map((c) => strip(c.trim()))) : null;
@@ -47,7 +54,12 @@ export function cardFrom(body: string): CardData {
   }).slice(0, 5);
   const raw_m = body.match(/<Methods>\s*([\s\S]*?)\s*<\/Methods>/)?.[1].trim();
   const methods = raw_m ? strip(raw_m) : null;
-  return { steps, script, table, checks, methods };
+  // 5. Warnings inside the GUI steps print as one line each: the bold lead, else the first sentence.
+  const warnings = [...sec.gui.matchAll(/<Callout\b[^>]*type="warning"[^>]*>\s*([\s\S]*?)<\/Callout>/g)].map((m) => {
+    const t = strip(m[1].trim());
+    return (t.match(/^\*\*(.+?)\*\*/)?.[1] ?? t.split(/(?<=[.؟])\s/)[0]).replace(/[.:]$/, '').trim();
+  }).filter(Boolean);
+  return { steps, script, table, checks, methods, warnings, scriptInLesson };
 }
 
 // Rough height check against the smaller of A4 and Letter (279mm tall, 24mm margins), from line counts at the card's type sizes.

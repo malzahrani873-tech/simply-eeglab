@@ -188,17 +188,10 @@ export default function rehypeLesson() {
     };
 
     if (LESSON_LAYOUT === 'questions') {
-      // 1. The idea in brief: the first paragraphs of "why", up to about 60 words (at least one).
+      // 1. The idea: the first paragraph of "why", always in full (DESIGN.md §6.4); the rest stays in the fold.
       const why = sec.why?.body ?? [];
-      let words = 0, cut = 0;
-      for (let i = 0; i < why.length; i++) {
-        const n = why[i];
-        if (n.type === 'text') continue;
-        if (!isEl(n, 'p')) break;
-        const w = textOf(n).trim().split(/\s+/).length;
-        if (cut > 0 && words + w > 60) break;
-        words += w; cut = i + 1;
-      }
+      const first = why.findIndex((n) => isEl(n, 'p'));
+      const cut = first < 0 ? 0 : first + 1;
       out.push(el('h2', { id: 'idea', className: ['sr'] }, [text(copy[lang]['section.idea.sr'])]), ...why.slice(0, cut));
       // 2. The exercise: instructions and the first demo stay open; what follows folds as notes.
       if (sec['before-after']) {

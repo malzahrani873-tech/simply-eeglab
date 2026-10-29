@@ -287,3 +287,17 @@ if (root) {
   loadDaily();
   }
 }
+
+// "Enlarge": the current component image at full size in a dialog; it scrolls, and pinch-zooms on touch screens.
+{
+  const btn = document.querySelector<HTMLButtonElement>('[data-zoom]');
+  const dlg = document.querySelector<HTMLDialogElement>('[data-zoomd]');
+  const src = document.querySelector<HTMLImageElement>('[data-img]');
+  if (btn && dlg && src && dlg.showModal) {
+    btn.hidden = false;
+    const big = dlg.querySelector('img')!;
+    btn.addEventListener('click', () => { big.src = src.currentSrc || src.src; big.alt = src.alt; dlg.showModal(); });
+    dlg.querySelector('[data-zclose]')!.addEventListener('click', () => dlg.close());
+    dlg.addEventListener('click', (e) => { if (e.target === dlg) dlg.close(); });
+  }
+}

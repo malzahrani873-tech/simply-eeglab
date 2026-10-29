@@ -68,3 +68,15 @@ if (all) {
   all.addEventListener('click', () => { const open = !folds().every((d) => d.open); folds().forEach((d) => (d.open = open)); sync(); });
   document.addEventListener('toggle', sync, true);
 }
+
+// A link to a folded section (#gui, #verify…) opens the fold before the page scrolls to it.
+const openTarget = () => {
+  const el = location.hash.length > 1 ? document.getElementById(decodeURIComponent(location.hash.slice(1))) : null;
+  if (el instanceof HTMLDetailsElement && !el.open) { el.open = true; el.scrollIntoView(); }
+};
+addEventListener('hashchange', openTarget);
+openTarget();
+document.addEventListener('click', (e) => {
+  const a = (e.target as Element).closest?.('a[href^="#"]');
+  if (a) setTimeout(openTarget);
+});

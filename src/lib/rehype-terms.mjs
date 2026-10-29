@@ -14,6 +14,16 @@ const esc = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 const AR_PREFIX = '(?:[وف])?(?:[بلك])?(?:ال|لل)?';
 const NOT_LETTER = '[\\p{L}\\p{M}\\p{N}_]';
 
+// Phrases that contain a glossary word but mean something else; the word inside them gets no hint.
+const PROTECTED = ['power line', 'power lines', 'power-line', 'power supply', 'خط الكهرباء', 'خطوط الكهرباء'];
+// Every form of every term, plus the protected phrases: a match inside a longer one of these is skipped,
+// so "line noise" wins over "noise" and "power line" never shows the hint for "power".
+function shadowRe(lang) {
+  const forms = [...glossary.flatMap((g) => [g.en, g.ar, ...g.variants]), ...PROTECTED]
+    .filter((f) => f.includes(' ') || f.includes('-')).sort((a, b) => b.length - a.length).map(esc);
+  return new RegExp(`(?<!${NOT_LETTER})${lang === 'ar' ? AR_PREFIX : ''}(?:${forms.join('|')})(?!${NOT_LETTER})`, 'giu');
+}
+
 function matchers(lang) {
   return glossary.map((g) => {
     const latin = [g.en, ...(ARABIC.test(g.ar) ? [] : [g.ar]), ...g.variants.filter((v) => !ARABIC.test(v))];
@@ -21,10 +31,10 @@ function matchers(lang) {
     let re = null;
     if (lang === 'ar' && arabic.length) {
       const forms = arabic.sort((a, b) => b.length - a.length).map(esc).join('|');
-      re = new RegExp(`(?<!${NOT_LETTER})${AR_PREFIX}(?:${forms})(?!${NOT_LETTER})`, 'u');
+      re = new RegExp(`(?<!${NOT_LETTER})${AR_PREFIX}(?:${forms})(?!${NOT_LETTER})`, 'gu');
     } else if (lang === 'en') {
       const forms = latin.sort((a, b) => b.length - a.length).map(esc).join('|');
-      re = new RegExp(`(?<!${NOT_LETTER})(?:${forms})(?!${NOT_LETTER})`, 'iu');
+      re = new RegExp(`(?<!${NOT_LETTER})(?:${forms})(?!${NOT_LETTER})`, 'giu');
     }
     // In Arabic lessons an English form counts only as a whole isolated run (an <En> or an auto-isolated span).
     const whole = lang === 'ar' && g.decision !== 'ع' ? new Set(latin.map((x) => x.toLowerCase())) : new Set();
@@ -59,6 +69,7 @@ function card(g, lang) {
 
 export default function rehypeTerms() {
   const byLang = { ar: matchers('ar'), en: matchers('en') };
+  const shadows = { ar: shadowRe('ar'), en: shadowRe('en') };
   return (tree, file) => {
     const path = (file.path ?? file.history?.[0] ?? '').replace(/\\/g, '/');
     const m = path.match(/content\/lessons\/(ar|en)\/[^/]+\.mdx$/);
@@ -71,15 +82,26 @@ export default function rehypeTerms() {
       const k = left.findIndex((x) => x.whole.has(s.trim().toLowerCase()));
       return k < 0 ? null : left.splice(k, 1)[0];
     };
+    // First match of a term that is not part of a longer term or protected phrase in the same text.
+    const firstFree = (re, s, spans) => {
+      re.lastIndex = 0;
+      for (let r; (r = re.exec(s)); ) {
+        const a = r.index, b = a + r[0].length;
+        if (!spans.some(([x, y]) => x <= a && b <= y && y - x > b - a)) return r;
+        if (r[0].length === 0) re.lastIndex++;
+      }
+      return null;
+    };
     // Splits one text node at the earliest remaining match; returns the replacement nodes.
     const splitText = (value) => {
       const out = [];
       let rest = value;
       while (used < MAX_TERMS && rest) {
+        const spans = [...rest.matchAll(shadows[lang])].map((m) => [m.index, m.index + m[0].length]);
         let best = null;
         for (const x of left) {
           if (!x.re) continue;
-          const r = x.re.exec(rest);
+          const r = firstFree(x.re, rest, spans);
           if (r && (!best || r.index < best.r.index || (r.index === best.r.index && r[0].length > best.r[0].length))) best = { x, r };
         }
         if (!best) break;

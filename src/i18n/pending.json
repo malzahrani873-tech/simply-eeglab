@@ -43,7 +43,9 @@
     "daily.share.none": "لم أعرفه اليوم",
     "daily.notThis": "الجواب ليس «{category}». جرّب مرة أخرى.",
     "imageSpec.pending": "الصورة تُضاف قريباً.",
-    "demo.pipelineNote": "هذه محاكاة. إعداد المسار في هذا الدرس {value}"
+    "demo.pipelineNote": "هذه محاكاة. إعداد المسار في هذا الدرس {value}",
+    "game.zoom": "كبّر المكوّن",
+    "card.scriptInLesson": "السكربت طويل، فهو كاملاً في الدرس."
   },
   "en": {
     "imageSpec.label": "Figure in preparation",
@@ -89,6 +91,8 @@
     "daily.share.none": "Didn't get it today",
     "daily.notThis": "It isn’t {category}. Try again.",
     "imageSpec.pending": "Image coming soon.",
-    "demo.pipelineNote": "This is a simulation. The pipeline setting in this lesson is {value}"
+    "demo.pipelineNote": "This is a simulation. The pipeline setting in this lesson is {value}",
+    "game.zoom": "Enlarge the component",
+    "card.scriptInLesson": "The script is long; it is in full in the lesson."
   }
 }

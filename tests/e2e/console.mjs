@@ -4,7 +4,7 @@ import { serve } from '../serve.mjs';
 
 const PAGES = ['/', '/en/', '/lesson/filtering/', '/lesson/rereferencing/', '/lesson/epoch-rejection/', '/lesson/filtering/card/', '/station/03/', '/ica-game/', '/en/ica-game/', '/search/?q=filter', '/en/search/?q=ica', '/progress/', '/about/', '/references/', '/plugins/', '/map/', '/404.html'];
 const { server, url } = await serve();
-const browser = await chromium.launch();
+const browser = await chromium.launch(process.env.CHROMIUM_PATH ? { executablePath: process.env.CHROMIUM_PATH } : {});
 let bad = 0;
 for (const path of PAGES) {
   const page = await browser.newPage();

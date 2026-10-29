@@ -32,7 +32,7 @@ for (const p of ['ica-game/index.html', 'en/ica-game/index.html']) {
 }
 
 const { server, url } = await serve(out);
-const browser = await chromium.launch();
+const browser = await chromium.launch(process.env.CHROMIUM_PATH ? { executablePath: process.env.CHROMIUM_PATH } : {});
 for (const p of ['/ica-game/', '/en/ica-game/']) {
   const page = await browser.newPage();
   const errors = [];
