@@ -1,0 +1,6 @@
+---
+import { nowrap } from '../../lib/bidi';
+const html = await Astro.slots.render('default');
+const plain = html.replace(/<[^>]+>/g, '');
+---
+<span class:list={['en', { nw: nowrap(plain) }]} lang="en" dir="ltr" set:html={html} />

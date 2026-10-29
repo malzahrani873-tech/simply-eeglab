@@ -1,0 +1,126 @@
+{
+  "v": 1,
+  "station": 10,
+  "lang": "en",
+  "passPercent": 80,
+  "questions": [
+    {
+      "id": "s10-q01",
+      "type": "single",
+      "lesson": "mvpa",
+      "objective": 3,
+      "prompt": "Your research question: is the voltage pattern across all channels together enough to tell face pictures from car pictures, and when after the stimulus? Which branch fits?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Decoding (MVPA)"
+        },
+        {
+          "id": "b",
+          "text": "Source analysis with DIPFIT"
+        },
+        {
+          "id": "c",
+          "text": "Connectivity with SIFT"
+        },
+        {
+          "id": "d",
+          "text": "Writing a plugin"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "Decoding trains a classifier on part of the trials and tests it on unseen trials at every time point, giving an accuracy curve over time that you compare with the chance line. You do not need to know in advance which channel carries the difference."
+    },
+    {
+      "id": "s10-q02",
+      "type": "single",
+      "lesson": "dipfit",
+      "objective": 3,
+      "prompt": "Your research question: where in the brain could an ICA component's scalp map come from, and does it look like a single source? Which branch fits?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Decoding (MVPA)"
+        },
+        {
+          "id": "b",
+          "text": "Source analysis with DIPFIT"
+        },
+        {
+          "id": "c",
+          "text": "Connectivity with SIFT"
+        },
+        {
+          "id": "d",
+          "text": "MNE-Python instead of EEGLAB in every case"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "DIPFIT searches for a dipole position whose map is as close as possible to the component's map. The residual variance tells you how much the component looks like one source: the lower, the closer. With a template head model, the position stays an approximate estimate."
+    },
+    {
+      "id": "s10-q03",
+      "type": "single",
+      "lesson": "sift",
+      "objective": 4,
+      "prompt": "Your research question: does one ICA component's activity help predict another component's activity a moment later, and at which frequency? Which branch fits?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Connectivity with SIFT"
+        },
+        {
+          "id": "b",
+          "text": "Source analysis with DIPFIT"
+        },
+        {
+          "id": "c",
+          "text": "Decoding (MVPA)"
+        },
+        {
+          "id": "d",
+          "text": "Writing a plugin"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "SIFT fits a multivariate autoregressive model and computes directed connectivity measures over time and frequency from it. Read an arrow with care: it means the first improves the prediction of the second in the model, not that one region controls the other. First check that your data are enough for the number of parameters."
+    },
+    {
+      "id": "s10-q04",
+      "type": "multiple",
+      "lesson": "mne-fieldtrip",
+      "objective": 4,
+      "prompt": "When is it worth moving from EEGLAB to MNE-Python or FieldTrip? (Select all that apply)",
+      "options": [
+        {
+          "id": "a",
+          "text": "You have MEG data, or an MRI scan for each participant for full source analysis"
+        },
+        {
+          "id": "b",
+          "text": "You want group-level cluster statistics with detailed documentation"
+        },
+        {
+          "id": "c",
+          "text": "You want decoding and machine learning in Python"
+        },
+        {
+          "id": "d",
+          "text": "You want to clean data with ICA and learn through the GUI"
+        }
+      ],
+      "answer": [
+        "a",
+        "b",
+        "c"
+      ],
+      "explanation": "Both tools were built for MEG and individual head models, FieldTrip is known for cluster statistics, and MNE-Python connects to scientific Python libraries. Cleaning data with ICA and learning through the GUI is what EEGLAB does best, so there is no need to move. BIDS moves data between all three tools."
+    }
+  ]
+}

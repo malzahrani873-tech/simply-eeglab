@@ -1,0 +1,213 @@
+---
+import { t } from '../../i18n';
+import { langOf } from '../../lib/lang';
+interface Props { mode?: 'cont' | 'erp'; pipeline?: string }
+const { mode = 'cont', pipeline } = Astro.props;
+const lang = langOf(Astro.url);
+const S = {
+  ar: {
+    title: 'جرّب الفلتر', kind: 'نوع الإشارة', cont: 'إشارة مستمرة', erp: 'تأثيره على ERP', hz: 'هرتز',
+    hpEdge: 'حافة high-pass بالهرتز', lpEdge: 'حافة low-pass بالهرتز', view: 'العرض', time: 'الزمن', spec: 'الطيف',
+    newSig: 'إشارة جديدة', line: 'تردد الكهرباء', line60: '60 هرتز (مثل السعودية وأمريكا)',
+    line50: '50 هرتز (مثل أوروبا وأغلب الدول العربية الأخرى)', before: 'قبل الفلتر', after: 'بعد الفلتر',
+    band: 'النطاق الانتقالي', does: 'ماذا يفعل EEGLAB بهذا الإعداد', none: 'لا يوجد فلتر مفعّل الآن. الإشارة كما سُجّلت.',
+    edge: 'حافة النطاق المسموح (الرقم الذي تكتبه)', width: 'عرض النطاق الانتقالي', cut: 'القطع الفعلي (−6 dB)',
+    order: 'رتبة الفلتر', note: 'فلتر FIR بنافذة Hamming، بلا إزاحة زمنية (zero-phase). كل فلتر في سطر مستقل.',
+    erpLabel: 'موجة ERP مصطنعة. بعد الفلتر صارت قمة P3 {n}% من حجمها الأصلي.',
+    timeLabel: 'عشر ثوانٍ من الإشارة قبل الفلتر وبعده.', specLabel: 'الطيف من 0 إلى 100 هرتز قبل الفلتر وبعده.',
+  },
+  en: {
+    title: 'Try the filter', kind: 'Signal', cont: 'Continuous signal', erp: 'Effect on an ERP', hz: 'Hz',
+    hpEdge: 'High-pass edge in Hz', lpEdge: 'Low-pass edge in Hz', view: 'View', time: 'Time', spec: 'Spectrum',
+    newSig: 'New signal', line: 'Mains frequency', line60: '60 Hz (e.g. Saudi Arabia, the US)',
+    line50: '50 Hz (e.g. Europe, most other Arab countries)', before: 'Before the filter', after: 'After the filter',
+    band: 'Transition band', does: 'What EEGLAB does with this setting', none: 'No filter is on. The signal is as recorded.',
+    edge: 'Passband edge (the number you type)', width: 'Transition bandwidth', cut: 'Actual cutoff (−6 dB)',
+    order: 'Filter order', note: 'Hamming-windowed FIR, zero-phase (no time shift). One filter per line.',
+    erpLabel: 'A simulated ERP. After the filter the P3 peak is {n}% of its original size.',
+    timeLabel: 'Ten seconds of the signal before and after the filter.', specLabel: 'Spectrum from 0 to 100 Hz before and after the filter.',
+  },
+}[lang];
+---
+<filter-demo class="fd" data-err={t(lang, 'interactive.error')} data-mode={mode} data-s={JSON.stringify(S)}>
+  <p class="fd-static">{t(lang, 'interactive.noJs')}</p>
+  {pipeline && <p class="demo-pipe" data-keep>{t(lang, 'demo.pipelineNote', { value: pipeline })}</p>}
+</filter-demo>
+
+<script>
+  import { FS, NS, NF, design, kernelFFT, applyFilters, makeSignal, welch, fmt, fft } from '../../scripts/filter-dsp.js';
+
+  const esc = (s: string) => s.replace(/[&<>]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' })[c]!);
+  let uid = 0;
+
+  class FilterDemoEl extends HTMLElement {
+    s: any; mode = 'cont'; view = 'time'; line = 60; hpOn = true; hp = 1; lpOn = true; lp = 30; u = '';
+    sig: any; Praw: any; y: any; delay = 0; cur: any[] = []; erpBase: any; erpY: any;
+    cv!: HTMLCanvasElement; h = 230; dpr = 0; ready = false;
+
+    connectedCallback() {
+      if (this.ready) return;
+      this.ready = true;
+      try {
+        this.s = JSON.parse(this.dataset.s!);
+        this.mode = this.dataset.mode === 'erp' ? 'erp' : 'cont';
+        this.u = `fd${++uid}`;
+        this.build();
+        this.newSignal();
+      } catch {
+        this.textContent = this.dataset.err!;
+      }
+    }
+
+    build() {
+      const S = this.s, u = this.u;
+      const opts = (g: string, vals: number[], label: string) =>
+        `<div class="opts" data-g="${g}" role="group" aria-label="${label}">${vals.map((v) => `<button type="button" data-v="${v}">${v}</button>`).join('')}</div>`;
+      const keep = this.querySelector('[data-keep]');
+      this.innerHTML = `
+      <div class="fdh"><b>${S.title}</b>
+        <div class="seg" role="group" aria-label="${S.kind}"><button type="button" data-m="cont">${S.cont}</button><button type="button" data-m="erp">${S.erp}</button></div></div>
+      <div class="ctl">
+        <div class="crow"><label class="lab" for="${u}-hp"><span class="sw"><input type="checkbox" role="switch" id="${u}-hp" checked><span></span></span><span lang="en">high-pass</span></label>
+          ${opts('hp', [0.1, 0.5, 1, 2], S.hpEdge)}<span class="muted">${S.hz}</span></div>
+        <div class="crow lpRow"><label class="lab" for="${u}-lp"><span class="sw"><input type="checkbox" role="switch" id="${u}-lp" checked><span></span></span><span lang="en">low-pass</span></label>
+          ${opts('lp', [20, 30, 40], S.lpEdge)}<span class="muted">${S.hz}</span></div>
+        <div class="crow contOnly"><span class="lab">${S.view}</span><div class="seg" role="group" aria-label="${S.view}"><button type="button" data-view="time">${S.time}</button><button type="button" data-view="spec">${S.spec}</button></div>
+          <button type="button" class="btn small sec newSig">${S.newSig}</button></div>
+        <fieldset class="radio contOnly"><legend class="sr">${S.line}</legend>
+          <label><input type="radio" name="${u}-line" value="60" checked>${S.line60}</label>
+          <label><input type="radio" name="${u}-line" value="50">${S.line50}</label>
+        </fieldset>
+      </div>
+      <div class="cv" dir="ltr"><canvas role="img"></canvas></div>
+      <div class="lg"><span><i class="lg-raw"></i>${S.before}</span><span><i class="lg-fil"></i>${S.after}</span><span class="bandL"><i class="lg-band"></i>${S.band}</span></div>
+      <div class="eg"><h4>${S.does}</h4><div class="egb" aria-live="polite"></div></div>`;
+      if (keep) this.append(keep);
+      this.cv = this.querySelector('canvas')!;
+      this.addEventListener('click', (e) => {
+        const b = (e.target as HTMLElement).closest('button');
+        if (!b) return;
+        if (b.dataset.m) { this.mode = b.dataset.m; this.update(); }
+        else if (b.dataset.view) { this.view = b.dataset.view; this.update(); }
+        else if (b.dataset.v) {
+          const g = (b.parentElement as HTMLElement).dataset.g as 'hp' | 'lp';
+          (this as any)[g] = +b.dataset.v; (this as any)[g + 'On'] = true;
+          (this.querySelector(`#${this.u}-${g}`) as HTMLInputElement).checked = true;
+          this.update();
+        } else if (b.classList.contains('newSig')) this.newSignal();
+      });
+      this.addEventListener('change', (e) => {
+        const tg = e.target as HTMLInputElement;
+        if (tg.id === this.u + '-hp') { this.hpOn = tg.checked; this.update(); }
+        else if (tg.id === this.u + '-lp') { this.lpOn = tg.checked; this.update(); }
+        else if (tg.type === 'radio') { this.line = +tg.value; this.newSignal(); }
+      });
+      // Also redraws when a folded section that holds the demo opens.
+      new ResizeObserver(() => this.resize()).observe(this);
+      matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => this.draw());
+      new MutationObserver(() => this.draw()).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+    }
+
+    newSignal() { this.sig = makeSignal(this.line); this.Praw = welch(this.sig.x, 2500, NS - 2500); this.update(); }
+    specs() { const s = []; if (this.hpOn) s.push(design('hp', this.hp)); if (this.lpOn && this.mode === 'cont') s.push(design('lp', this.lp)); return s; }
+
+    update() {
+      const cont = this.mode === 'cont';
+      this.querySelectorAll<HTMLElement>('[data-m]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.m === this.mode)));
+      this.querySelectorAll<HTMLElement>('[data-view]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.view === this.view)));
+      this.querySelectorAll<HTMLElement>('.contOnly,.lpRow').forEach((r) => (r.style.display = cont ? '' : 'none'));
+      this.querySelectorAll<HTMLElement>('[data-g="hp"] button').forEach((b) => b.setAttribute('aria-pressed', String(this.hpOn && +b.dataset.v! === this.hp)));
+      this.querySelectorAll<HTMLElement>('[data-g="lp"] button').forEach((b) => b.setAttribute('aria-pressed', String(this.lpOn && +b.dataset.v! === this.lp)));
+      (this.querySelector('.bandL') as HTMLElement).style.display = cont && this.view === 'spec' ? '' : 'none';
+      const specs = this.specs(); this.cur = specs;
+      if (cont) { const r = applyFilters(this.sig.X, specs); this.y = r.y; this.delay = r.delay; }
+      else this.erpCompute(specs);
+      this.panel(specs); this.draw();
+    }
+
+    erpCompute(specs: any[]) {
+      const n = 300, t0 = -200, off = 20000; const base = new Float64Array(n);
+      for (let i = 0; i < n; i++) { const t = t0 + i * 4; base[i] = 3 * Math.exp(-((t - 100) ** 2) / (2 * 25 * 25)) - 5 * Math.exp(-((t - 170) ** 2) / (2 * 30 * 30)) + 10 * Math.exp(-((t - 350) ** 2) / (2 * 150 * 150)); }
+      const re = new Float64Array(NF), im = new Float64Array(NF); re.set(base, off); fft(re, im, false);
+      const r = applyFilters({ re, im }, specs);
+      this.erpBase = base; this.erpY = Float64Array.from({ length: n }, (_, i) => r.y[off + i + r.delay]);
+    }
+
+    panel(specs: any[]) {
+      const S = this.s, b = this.querySelector('.egb')!;
+      if (!specs.length) { b.innerHTML = `<p class="gt">${S.none}</p>`; return; }
+      const nm: any = { hp: 'high-pass', lp: 'low-pass' }; let h = '';
+      specs.forEach((s) => {
+        h += `<dl><dt><b lang="en">${nm[s.type]}</b></dt><dd></dd><dt>${S.edge}</dt><dd>${fmt(s.e, 2)} Hz</dd>
+          <dt>${S.width}</dt><dd>${fmt(s.df, 2)} Hz</dd><dt>${S.cut}</dt><dd>${fmt(s.cut, 2)} Hz</dd><dt>${S.order}</dt><dd>${s.order}</dd></dl>`;
+      });
+      const code = specs.map((s) => `EEG = pop_eegfiltnew(EEG, '${s.type === 'hp' ? 'locutoff' : 'hicutoff'}', ${s.e});`).join('\n');
+      h += `<pre dir="ltr" tabindex="0">${esc(code)}</pre><p class="gt">${S.note}</p>`;
+      b.innerHTML = h;
+    }
+
+    resize() {
+      const w = this.cv.clientWidth; if (!w) return;
+      this.h = w < 520 ? 190 : 230; this.cv.style.height = this.h + 'px';
+      const dpr = Math.min(2, devicePixelRatio || 1); this.cv.width = w * dpr; this.cv.height = this.h * dpr; this.dpr = dpr; this.draw();
+    }
+
+    draw() {
+      if (!this.dpr || !this.cv.clientWidth) return;
+      const S = this.s, cs = getComputedStyle(this), col = (n: string) => cs.getPropertyValue(n).trim();
+      const C = this.cv.getContext('2d')!, W = this.cv.clientWidth, H = this.h;
+      C.setTransform(this.dpr, 0, 0, this.dpr, 0, 0); C.clearRect(0, 0, W, H);
+      const pad = { l: 40, r: 10, t: 10, b: 26 }, pw = W - pad.l - pad.r, ph = H - pad.t - pad.b;
+      C.font = '12px "JetBrains Mono", monospace'; C.fillStyle = col('--muted'); C.strokeStyle = col('--sep'); C.lineWidth = 1;
+      const axis = (xs: number[], xl: string[], ys: number[], yl: string[], xu: string, yu: string) => {
+        C.beginPath(); xs.forEach((v) => { const X = pad.l + v * pw; C.moveTo(X, pad.t); C.lineTo(X, pad.t + ph); }); ys.forEach((v) => { const Y = pad.t + v * ph; C.moveTo(pad.l, Y); C.lineTo(pad.l + pw, Y); }); C.stroke();
+        C.textAlign = 'center'; C.textBaseline = 'top'; xs.forEach((v, i) => C.fillText(xl[i], pad.l + v * pw, pad.t + ph + 6));
+        C.textAlign = 'right'; C.textBaseline = 'middle'; ys.forEach((v, i) => C.fillText(yl[i], pad.l - 6, pad.t + v * ph));
+        C.textAlign = 'left'; C.textBaseline = 'top'; C.fillText(yu, pad.l + 4, pad.t + 2); C.textAlign = 'right'; C.fillText(xu, pad.l + pw - 2, pad.t + ph - 16);
+      };
+      const line = (arr: ArrayLike<number>, n: number, xf: (i: number) => number, yf: (v: number) => number, c: string, w: number) => {
+        C.strokeStyle = c; C.lineWidth = w; C.beginPath(); for (let i = 0; i < n; i++) { const X = xf(i), Y = yf(arr[i]); i ? C.lineTo(X, Y) : C.moveTo(X, Y); } C.stroke();
+      };
+      let label = '';
+      if (this.mode === 'erp') {
+        const n = 300, b = this.erpBase, y = this.erpY; let lo = -8, hi = 12;
+        for (let i = 0; i < n; i++) { lo = Math.min(lo, y[i] - 1); hi = Math.max(hi, y[i] + 1); }
+        const ys = (v: number) => pad.t + (hi - v) / (hi - lo) * ph, xs = (i: number) => pad.l + i / (n - 1) * pw;
+        const ticks = [-200, 0, 200, 400, 600, 800, 1000]; const yt: number[] = []; for (let v = Math.ceil(lo / 5) * 5; v <= hi; v += 5) yt.push(v);
+        axis(ticks.map((t) => (t + 200) / 1200), ticks.map(String), yt.map((v) => (hi - v) / (hi - lo)), yt.map(String), 'ms', 'µV');
+        C.strokeStyle = col('--bs'); C.lineWidth = 1; C.beginPath(); C.moveTo(pad.l, ys(0)); C.lineTo(pad.l + pw, ys(0)); C.moveTo(xs(50), pad.t); C.lineTo(xs(50), pad.t + ph); C.stroke();
+        C.setLineDash([5, 4]); line(b, n, xs, ys, col('--bs'), 1.6); C.setLineDash([]); line(y, n, xs, ys, col('--primary'), 2.2);
+        const pk = b.indexOf(Math.max(...b.slice(100))), r = y[pk] / b[pk];
+        label = S.erpLabel.replace('{n}', String(Math.round(r * 100)));
+      } else if (this.view === 'time') {
+        const i0 = 13750, n = 2500, x = this.sig.x, y = this.y, d = this.delay;
+        const raw = x.subarray(i0, i0 + n), fil = Float64Array.from({ length: n }, (_, i) => y[i0 + i + d]);
+        let lo = 1e9, hi = -1e9; for (let i = 0; i < n; i++) { lo = Math.min(lo, raw[i], fil[i]); hi = Math.max(hi, raw[i], fil[i]); }
+        const m = (hi - lo) * 0.06; lo -= m; hi += m;
+        const step = hi - lo > 300 ? 100 : hi - lo > 120 ? 50 : 20, yt: number[] = []; for (let v = Math.ceil(lo / step) * step; v <= hi; v += step) yt.push(v);
+        const xt = [0, 2, 4, 6, 8, 10];
+        axis(xt.map((v) => v / 10), xt.map(String), yt.map((v) => (hi - v) / (hi - lo)), yt.map(String), 's', 'µV');
+        const xs = (i: number) => pad.l + i / (n - 1) * pw, ys = (v: number) => pad.t + (hi - v) / (hi - lo) * ph;
+        line(raw, n, xs, ys, col('--bs'), 1); line(fil, n, xs, ys, col('--primary'), 1.4);
+        label = S.timeLabel;
+      } else {
+        const P = this.Praw, NFw = 1024, kmax = Math.round(100 * NFw / FS);
+        const Hm = new Float64Array(kmax + 1).fill(1);
+        for (const s of this.cur) { const K = kernelFFT(s); for (let k = 0; k <= kmax; k++) { const j = Math.round(k * FS / NFw * NF / FS); Hm[k] *= K.re[j] * K.re[j] + K.im[j] * K.im[j]; } }
+        const dbR: number[] = [], dbF: number[] = []; let hi = -1e9;
+        for (let k = 0; k <= kmax; k++) { dbR.push(10 * Math.log10(P[k] + 1e-12)); dbF.push(10 * Math.log10(P[k] * Hm[k] + 1e-12)); hi = Math.max(hi, dbR[k]); }
+        hi = Math.ceil(hi / 10) * 10; const lo = hi - 70;
+        const xs = (k: number) => pad.l + k / kmax * pw, ys = (v: number) => pad.t + (hi - Math.max(lo, Math.min(hi, v))) / (hi - lo) * ph;
+        C.fillStyle = col('--primary'); C.globalAlpha = 0.16;
+        for (const s of this.cur) { const a = s.type === 'hp' ? s.e - s.df : s.e, b2 = s.type === 'hp' ? s.e : s.e + s.df; C.fillRect(xs(a * NFw / FS), pad.t, Math.max(2, (b2 - a) * NFw / FS / kmax * pw), ph); }
+        C.globalAlpha = 1; C.fillStyle = col('--muted');
+        const xt = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100], yt: number[] = []; for (let v = hi; v >= lo; v -= 20) yt.push(v);
+        axis(xt.map((v) => v / 100), xt.map((v, i) => (i % 2 ? '' : String(v))), yt.map((v) => (hi - v) / (hi - lo)), yt.map(String), 'Hz', 'dB');
+        line(dbR, kmax + 1, xs, ys, col('--bs'), 1.2); line(dbF, kmax + 1, xs, ys, col('--primary'), 1.8);
+        label = S.specLabel;
+      }
+      this.cv.setAttribute('aria-label', label);
+    }
+  }
+  customElements.define('filter-demo', FilterDemoEl);
+</script>

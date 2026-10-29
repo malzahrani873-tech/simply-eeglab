@@ -1,0 +1,179 @@
+---
+title: MNE-Python و FieldTrip (بدائل ومقارنة)
+titleEn: MNE-Python & FieldTrip compared
+description: مقارنة بين EEGLAB و MNE-Python و FieldTrip في اللغة ونقاط القوة، وجدول يقابل كل خطوة تعلّمتها هنا بالدالة المقابلة في الأداتين، ومتى تنتقل لأيّهما.
+station: 10
+order: 5
+level: optional
+status: review
+objectives:
+  - يقارن EEGLAB مع MNE-Python و FieldTrip في اللغة وطريقة العمل ونقاط القوة.
+  - يجد لكل خطوة تعلّمها في الموقع الدالة المقابلة في الأداتين.
+  - ينقل داتاست EEGLAB إلى FieldTrip وإلى MNE-Python ويتأكد أنها وصلت كاملة.
+  - يحدد متى يستحق الانتقال، ولأيّ أداة.
+prerequisites: [single-subject-script]
+references:
+  - title: EEGLAB Tutorial
+    url: https://eeglab.org/tutorials/misc/Exporting_Data.html
+    section: "Reference Topics > Exporting Data"
+  - title: MNE-Python documentation
+    url: https://mne.tools/stable/
+    section: "Tutorials > Introductory tutorials; API: mne.io.read_raw_eeglab"
+  - title: FieldTrip documentation
+    url: https://www.fieldtriptoolbox.org/
+    section: "Getting started; Tutorials > Preprocessing"
+datasets: [D1]
+startingPoint:
+  dataset: D1
+  file: eeglab_data.set
+  applied: []
+  script: |
+    [ALLEEG, EEG, CURRENTSET, ALLCOM] = eeglab;
+    eeglabRoot = fileparts(which('eeglab'));
+    EEG = pop_loadset('eeglab_data.set', fullfile(eeglabRoot, 'sample_data'));
+
+    % Show the dataset in the main EEGLAB window
+    [ALLEEG, EEG, CURRENTSET] = pop_newset(ALLEEG, EEG, 0, 'setname', 'D1 raw', 'gui', 'off');
+    eeglab redraw;
+eeglabVersion: "2026.1"
+updated: 2026-10-28
+---
+
+## لماذا هذه الخطوة مهمة؟
+
+EEGLAB ليست الأداة الوحيدة. أداتان مجانيتان أخريان منتشرتان في الأبحاث: **MNE-Python** و **FieldTrip**. ستقرأ أوراقاً تستخدمهما، وقد يعمل زميلك بإحداهما، وقد تحتاج تحليلاً لا تقدّمه EEGLAB بسهولة.
+
+الخبر الجيد: المفاهيم التي تعلّمتها هنا واحدة في الأدوات الثلاث. الفلتر هو الفلتر، و ICA هو ICA، والـ epoch هي الـ epoch. الذي يتغيّر هو اللغة وطريقة كتابة الخطوات. هذا الدرس يعطيك خريطة: كل خطوة تعرفها، وما يقابلها هناك.
+
+| | EEGLAB | MNE-Python | FieldTrip |
+|---|---|---|---|
+| اللغة | MATLAB | Python | MATLAB |
+| واجهة رسومية | نعم، كاملة | لا، سكربتات (مع نوافذ رسم تفاعلية) | لا، سكربتات (مع نوافذ رسم تفاعلية) |
+| طريقة كتابة الخطوة | `EEG = pop_xxx(EEG, ...)` | دوال على كائن: `raw.filter(...)` | `cfg` ثم `data = ft_xxx(cfg, data)` |
+| أقوى ما فيها | ICA و ICLabel، وتعلّم بالواجهة، وكثرة الإضافات | تحليل المصدر الكامل مع MRI، و MEG، والتصنيف، وبيئة Python العلمية | الإحصاء بالتجميع (cluster)، وتحليل المصدر، والتحليل الزمني-الترددي، و MEG |
+| مجانية؟ | نعم (MATLAB مدفوع) | نعم بالكامل | نعم (MATLAB مدفوع) |
+| الإصدار عند كتابة الدرس | 2026.1 | 1.13.2 | FieldTrip بلا أرقام إصدار ثابتة. مع FieldTrip الكامل اكتب `ft_version`. ومع Fieldtrip-lite لا يعرض `ft_version` رقم إصدار، فاقرأه في <MenuPath>File > Manage EEGLAB extensions</MenuPath> |
+
+## قبل وبعد
+
+<Figure src="mne-fieldtrip/mne-fieldtrip-cz.png" alt="متوسط الجهد عند Cz من -1 إلى 2 ثانية: منحنى FieldTrip خط متصل ومنحنى EEGLAB خط متقطع، والمنحنيان فوق بعضهما تماماً." source="D1" />
+
+## الخطوات من الواجهة
+
+لا توجد قوائم للانتقال. الطريق دائماً: احفظ من EEGLAB ملف `.set`، ثم اقرأه في الأداة الأخرى.
+
+**أولاً: جدول المقابلة**
+
+كل صف خطوة تعلّمتها في الموقع. الأسماء من توثيق كل أداة (MNE-Python 1.13.2، وإصدار حديث من FieldTrip؛ والجدول أعلاه يبيّن كيف تعرف إصدارك).
+
+| الخطوة | EEGLAB | MNE-Python | FieldTrip |
+|---|---|---|---|
+| قراءة ملف EEGLAB | `pop_loadset` | `mne.io.read_raw_eeglab` (مستمرة) أو `mne.read_epochs_eeglab` (مقطّعة) | `ft_preprocessing` مع `cfg.dataset = 'file.set'`، أو `eeglab2fieldtrip` من MATLAB |
+| استيراد EDF | `pop_biosig` | `mne.io.read_raw_edf` | `ft_preprocessing` مع `cfg.dataset` |
+| تغيير معدل العيّنات | `pop_resample` | `raw.resample` | `ft_resampledata` |
+| فلتر high-pass و low-pass | `pop_eegfiltnew` | `raw.filter(l_freq, h_freq)` | `cfg.hpfilter` و `cfg.lpfilter` في `ft_preprocessing` |
+| ضوضاء الكهرباء | `pop_eegfiltnew` مع `'revfilt', 1` | `raw.notch_filter(60)` | `cfg.bsfilter = 'yes'` و `cfg.bsfreq = [58 62]` |
+| مواقع الأقطاب | `pop_chanedit` | `raw.set_montage('standard_1005')` | `ft_read_sens` أو ملف `elec` |
+| القنوات السيئة والاستيفاء | `pop_select` ثم `pop_interp` | `raw.info['bads']` ثم `raw.interpolate_bads()` | `ft_channelrepair` مع `ft_prepare_neighbours` |
+| المرجع المتوسط | `pop_reref(EEG, [])` | `raw.set_eeg_reference('average')` | `cfg.reref = 'yes'` و `cfg.refchannel = 'all'` |
+| ICA | `pop_runica` (extended Infomax) | `mne.preprocessing.ICA(method='infomax', fit_params=dict(extended=True))` | `ft_componentanalysis` مع `cfg.method = 'runica'` |
+| تصنيف المكوّنات | `pop_iclabel` | `label_components` من الإضافة mne-icalabel | لا يوجد مقابل مباشر |
+| حذف المكوّنات | `pop_subcomp` | `ica.apply(raw)` | `ft_rejectcomponent` |
+| الأحداث والتقطيع | `pop_epoch` | `mne.events_from_annotations` ثم `mne.Epochs` | `ft_definetrial` ثم `ft_redefinetrial` |
+| الخط القاعدي | `pop_rmbase` | `baseline=(-0.2, 0)` في `mne.Epochs` | `cfg.demean` و `cfg.baselinewindow`، أو `ft_timelockbaseline` |
+| رفض المحاولات بالعتبة | `pop_eegthresh` (القيمة المطلقة) | `reject=dict(eeg=100e-6)` في `mne.Epochs` (**من القمة للقمة**) | `ft_artifact_threshold` ثم `ft_rejectartifact` |
+| المتوسط (ERP) | `mean(EEG.data, 3)` (درس المتوسط) | `epochs.average()` | `ft_timelockanalysis` |
+| الخريطة الطبوغرافية | `pop_topoplot` | `evoked.plot_topomap` | `ft_topoplotER` |
+| الزمني-الترددي | `pop_newtimef` | `epochs.compute_tfr` | `ft_freqanalysis` |
+| الإحصاء بالتجميع | `std_stat` في STUDY، أو LIMO | `mne.stats.permutation_cluster_test` | `ft_timelockstatistics` مع `cfg.method = 'montecarlo'` |
+| ثنائي القطب | DIPFIT (`pop_multifit`) | `mne.fit_dipole` | `ft_dipolefitting` |
+| التصنيف (MVPA) | ERPLAB (`pop_decoding`) | `mne.decoding.SlidingEstimator` مع `cross_val_multiscore` | `ft_timelockstatistics` مع `cfg.method = 'crossvalidate'` |
+| الاتصال الوظيفي | SIFT | الإضافة mne-connectivity | `ft_connectivityanalysis` |
+| سجل الأوامر | `eegh` | لا يوجد: السكربت هو السجل | `data.cfg` يحفظ كل الإعدادات السابقة |
+
+**ثانياً: انقل داتاست إلى MNE-Python**
+
+1. احفظ الداتاست من <MenuPath>File > Save current dataset as</MenuPath>.
+2. في Python (بعد `pip install mne`):
+
+```python
+import mne
+
+# Continuous EEGLAB dataset; use mne.read_epochs_eeglab for epoched files
+raw = mne.io.read_raw_eeglab("eeglab_data.set", preload=True)
+print(raw.info["sfreq"], len(raw.ch_names))   # 128.0 32
+print(raw.annotations)                        # EEGLAB events become annotations
+```
+
+**ثالثاً: انقل داتاست إلى FieldTrip**
+
+3. نزّل FieldTrip من موقعه الرسمي، وأضفه للمسار بـ `addpath` لمجلده الرئيسي فقط، ثم اكتب `ft_defaults`.
+
+<Callout type="warning">
+لا تضع Fieldtrip-lite (إضافة EEGLAB التي يستخدمها DIPFIT) و FieldTrip الكامل على المسار في نفس الوقت. فيهما دوال بنفس الأسماء، و MATLAB يستخدم أيهما جاء أولاً. لتعرف أيهما محمّل، اكتب `which ft_defaults`. إذا كان المسار داخل مجلد `plugins` في EEGLAB (`Fieldtrip-lite...`)، فهي الإضافة. وإذا كان مجلد التنزيل، فهو FieldTrip الكامل. أبقِ واحداً فقط: أزل المجلد الآخر من المسار بـ `rmpath`، أو احذف الإضافة من <MenuPath>File > Manage EEGLAB extensions</MenuPath> إذا كنت تعمل بـ FieldTrip الكامل وحده.
+</Callout>
+
+4. شغّل السكربت في القسم التالي. يحوّل الداتاست من EEGLAB مباشرة، ثم يحسب الـ ERP في FieldTrip.
+
+## السكربت المقابل
+
+```matlab
+% FieldTrip is a separate toolbox: add its main folder only, then ft_defaults
+% addpath('/path/to/fieldtrip'); ft_defaults;
+
+eeglab nogui
+eeglabRoot = fileparts(which('eeglab'));
+EEG = pop_loadset('eeglab_data.set', fullfile(eeglabRoot, 'sample_data'));
+
+% Same epochs as station 5, so both tools see the same trials
+EEG = pop_epoch(EEG, {'square'}, [-1 2], 'epochinfo', 'yes');
+EEG = pop_rmbase(EEG, [-200 0]);
+
+% Convert to a FieldTrip raw data structure (eeglab2fieldtrip ships with DIPFIT)
+data = eeglab2fieldtrip(EEG, 'raw', 'none');
+fprintf('%d trials, %d channels, %g Hz\n', numel(data.trial), numel(data.label), data.fsample);
+
+% Average across trials: the FieldTrip ERP
+cfg = [];
+erp = ft_timelockanalysis(cfg, data);
+
+% Same ERP computed in EEGLAB, for comparison
+erpEeglab = mean(EEG.data, 3);
+fprintf('Max difference EEGLAB vs FieldTrip: %g uV\n', max(abs(erpEeglab(:) - erp.avg(:))));
+
+% Plot channel Cz from FieldTrip, with the EEGLAB curve on top
+cfg = [];
+cfg.channel = 'Cz';
+ft_singleplotER(cfg, erp);
+hold on;
+iCz = find(strcmp({EEG.chanlocs.labels}, 'Cz'));
+plot(EEG.times / 1000, erpEeglab(iCz, :), 'k--');
+legend({'FieldTrip', 'EEGLAB'});
+```
+
+## أي قيمة أختار؟
+
+| إذا كنت تحتاج | انتقل إلى | لماذا |
+|---|---|---|
+| تحليل مصدر كامل بصورة MRI لكل مشارك، أو بيانات MEG | MNE-Python أو FieldTrip | الأداتان بُنيتا أصلاً لـ MEG ولنماذج الرأس الفردية. |
+| إحصاء بالتجميع على مستوى المجموعة مع توثيق مفصّل | FieldTrip | دوال الإحصاء فيها وتعليماتها من أشهر الطرق في الأبحاث. |
+| التصنيف وتعلّم الآلة، أو تريد العمل في Python | MNE-Python | تتصل مباشرة بمكتبات Python العلمية مثل scikit-learn. |
+| تنظيف البيانات بـ ICA والتعلّم بالواجهة | ابقَ في EEGLAB | هذا ما تتقنه EEGLAB، ولا داعي للانتقال. |
+| مشاركة البيانات بين الأدوات | صيغة BIDS | الأدوات الثلاث تقرأ BIDS، فتنقل البيانات بلا تحويل يدوي. |
+
+## أخطاء شائعة
+
+- **نقل الأرقام كما هي بين الأدوات.** عتبة الرفض 100 في EEGLAB قيمة مطلقة بالميكروفولت، وفي MNE-Python `100e-6` بالفولت، ومن القمة للقمة. الرقم نفسه لا يعني نفس الحذف.
+- **افتراض أن الفلتر نفسه.** كل أداة لها تصميم افتراضي مختلف للفلتر. اقرأ ما تطبعه الأداة، واكتبه في Methods.
+- **إضافة FieldTrip بكل مجلداته الفرعية.** `addpath(genpath(...))` يضيف نسخاً متضاربة من الدوال. أضف المجلد الرئيسي فقط واكتب `ft_defaults`.
+- **خلط وحدات الجهد.** EEGLAB تحفظ بالميكروفولت، و MNE-Python تعمل بالفولت. `read_raw_eeglab` يحوّل الوحدة، لكن أي رقم تكتبه بيدك يجب أن يكون بوحدة الأداة.
+- **تبديل الأداة في منتصف المشروع.** إذا بدأت التنظيف في أداة، أكمله فيها، أو أعد المشروع كله في الأداة الجديدة. خلط الخطوات يجعل Methods صعبة الوصف والتكرار.
+
+{/* صندوق "من التجربة": بانتظار قصة من صاحب المشروع. لا يُكتب قبل وصولها. */}
+
+## كيف تتأكد أن الخطوة نجحت؟
+
+- السكربت يطبع `80 trials, 32 channels, 128 Hz`.
+- الفرق الأقصى بين ERP من EEGLAB ومن FieldTrip قريب من الصفر.
+- في Python: `raw.info["sfreq"]` يساوي 128، وعدد القنوات 32، والأحداث ظهرت في `raw.annotations`.
+- منحنى Cz من FieldTrip يشبه منحنى Cz الذي رسمته في درس رسم ERP قناة.

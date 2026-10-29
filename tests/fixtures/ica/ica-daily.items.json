@@ -1,0 +1,1279 @@
+{
+ "v": 1,
+ "source": {
+  "dataset": "ds002680",
+  "license": "CC0",
+  "url": "https://openneuro.org/datasets/ds002680"
+ },
+ "classes": [
+  "brain",
+  "eye",
+  "muscle",
+  "heart",
+  "line",
+  "chan",
+  "other"
+ ],
+ "items": [
+  {
+   "id": "sub-005_IC46",
+   "img": "sub-005_IC46.webp",
+   "w": 720,
+   "h": 280,
+   "level": 1,
+   "answer": "muscle",
+   "iclabel": {
+    "brain": 0.022,
+    "eye": 0.007,
+    "muscle": 0.93,
+    "heart": 0.003,
+    "line": 0.005,
+    "chan": 0.023,
+    "other": 0.011
+   },
+   "line_hz": null
+  },
+  {
+   "id": "sub-004_IC13",
+   "img": "sub-004_IC13.webp",
+   "w": 720,
+   "h": 280,
+   "level": 1,
+   "answer": "brain",
+   "iclabel": {
+    "brain": 0.998,
+    "eye": 0.0,
+    "muscle": 0.0,
+    "heart": 0.0,
+    "line": 0.0,
+    "chan": 0.0,
+    "other": 0.001
+   },
+   "line_hz": 50.0
+  },
+  {
+   "id": "sub-008_IC46",
+   "img": "sub-008_IC46.webp",
+   "w": 720,
+   "h": 280,
+   "level": 1,
+   "answer": "brain",
+   "iclabel": {
+    "brain": 0.959,
+    "eye": 0.002,
+    "muscle": 0.001,
+    "heart": 0.001,
+    "line": 0.016,
+    "chan": 0.001,
+    "other": 0.02
+   },
+   "line_hz": null
+  },
+  {
+   "id": "sub-003_IC29",
+   "img": "sub-003_IC29.webp",
+   "w": 720,
+   "h": 280,
+   "level": 1,
+   "answer": "chan",
+   "iclabel": {
+    "brain": 0.013,
+    "eye": 0.004,
+    "muscle": 0.047,
+    "heart": 0.002,
+    "line": 0.0,
+    "chan": 0.919,
+    "other": 0.015
+   },
+   "line_hz": null
+  },
+  {
+   "id": "sub-002_IC02",
+   "img": "sub-002_IC02.webp",
+   "w": 720,
+   "h": 280,
+   "level": 1,
+   "answer": "eye",
+   "iclabel": {
+    "brain": 0.006,
+    "eye": 0.962,
+    "muscle": 0.006,
+    "heart": 0.004,
+    "line": 0.0,
+    "chan": 0.006,
+    "other": 0.016
+   },
+   "line_hz": null
+  },
+  {
+   "id": "sub-003_IC17",
+   "img": "sub-003_IC17.webp",
+   "w": 720,
+   "h": 280,
+   "level": 1,
+   "answer": "line",
+   "iclabel": {
+    "brain": 0.0,
+    "eye": 0.0,
+    "muscle": 0.0,
+    "heart": 0.0,
+    "line": 0.999,
+    "chan": 0.0,
+    "other": 0.0
+   },
+   "line_hz": 50.0
+  },
+  {
+   "id": "sub-005_IC12",
+   "img": "sub-005_IC12.webp",
+   "w": 720,
+   "h": 280,
+   "level": 1,
+   "answer": "brain",
+   "iclabel": {
+    "brain": 0.995,
+    "eye": 0.0,
+    "muscle": 0.0,
+    "heart": 0.0,
+    "line": 0.004,
+    "chan": 0.0,
+    "other": 0.001
+   },
+   "line_hz": null
+  },
+  {
+   "id": "sub-002_IC05",
+   "img": "sub-002_IC05.webp",
+   "w": 720,
+   "h": 280,
+   "level": 1,
+   "answer": "brain",
+   "iclabel": {
+    "brain": 0.997,
+    "eye": 0.001,
+    "muscle": 0.0,
+    "heart": 0.0,
+    "line": 0.001,
+    "chan": 0.0,
+    "other": 0.001
+   },
+   "line_hz": null
+  },
+  {
+   "id": "sub-003_IC08",
+   "img": "sub-003_IC08.webp",
+   "w": 720,
+   "h": 280,
+   "level": 1,
+   "answer": "brain",
+   "iclabel": {
+    "brain": 0.963,
+    "eye": 0.0,
+    "muscle": 0.0,
+    "heart": 0.0,
+    "line": 0.028,
+    "chan": 0.0,
+    "other": 0.008
+   },
+   "line_hz": 50.0
+  },
+  {
+   "id": "sub-003_IC10",
+   "img": "sub-003_IC10.webp",
+   "w": 720,
+   "h": 280,
+   "level": 1,
+   "answer": "line",
+   "iclabel": {
+    "brain": 0.001,
+    "eye": 0.0,
+    "muscle": 0.0,
+    "heart": 0.0,
+    "line": 0.998,
+    "chan": 0.0,
+    "other": 0.0
+   },
+   "line_hz": 50.0
+  },
+  {
+   "id": "sub-005_IC04",
+   "img": "sub-005_IC04.webp",
+   "w": 720,
+   "h": 280,
+   "level": 1,
+   "answer": "line",
+   "iclabel": {
+    "brain": 0.0,
+    "eye": 0.0,
+    "muscle": 0.0,
+    "heart": 0.0,
+    "line": 1.0,
+    "chan": 0.0,
+    "other": 0.0
+   },
+   "line_hz": 50.0
+  },
+  {
+   "id": "sub-010_IC21",
+   "img": "sub-010_IC21.webp",
+   "w": 720,
+   "h": 280,
+   "level": 1,
+   "answer": "brain",
+   "iclabel": {
+    "brain": 0.997,
+    "eye": 0.0,
+    "muscle": 0.0,
+    "heart": 0.0,
+    "line": 0.002,
+    "chan": 0.0,
+    "other": 0.0
+   },
+   "line_hz": null
+  },
+  {
+   "id": "sub-009_IC29",
+   "img": "sub-009_IC29.webp",
+   "w": 720,
+   "h": 280,
+   "level": 1,
+   "answer": "muscle",
+   "iclabel": {
+    "brain": 0.007,
+    "eye": 0.004,
+    "muscle": 0.964,
+    "heart": 0.0,
+    "line": 0.001,
+    "chan": 0.007,
+    "other": 0.017
+   },
+   "line_hz": null
+  },
+  {
+   "id": "sub-005_IC39",
+   "img": "sub-005_IC39.webp",
+   "w": 720,
+   "h": 280,
+   "level": 1,
+   "answer": "chan",
+   "iclabel": {
+    "brain": 0.009,
+    "eye": 0.005,
+    "muscle": 0.008,
+    "heart": 0.004,
+    "line": 0.005,
+    "chan": 0.937,
+    "other": 0.033
+   },
+   "line_hz": null
+  },
+  {
+   "id": "sub-003_IC03",
+   "img": "sub-003_IC03.webp",
+   "w": 720,
+   "h": 280,
+   "level": 1,
+   "answer": "brain",
+   "iclabel": {
+    "brain": 0.977,
+    "eye": 0.0,
+    "muscle": 0.0,
+    "heart": 0.0,
+    "line": 0.022,
+    "chan": 0.0,
+    "other": 0.0
+   },
+   "line_hz": 50.0
+  },
+  {
+   "id": "sub-008_IC45",
+   "img": "sub-008_IC45.webp",
+   "w": 720,
+   "h": 280,
+   "level": 1,
+   "answer": "muscle",
+   "iclabel": {
+    "brain": 0.002,
+    "eye": 0.003,
+    "muscle": 0.99,
+    "heart": 0.0,
+    "line": 0.0,
+    "chan": 0.0,
+    "other": 0.003
+   },
+   "line_hz": null
+  },
+  {
+   "id": "sub-007_IC07",
+   "img": "sub-007_IC07.webp",
+   "w": 720,
+   "h": 280,
+   "level": 1,
+   "answer": "line",
+   "iclabel": {
+    "brain": 0.0,
+    "eye": 0.0,
+    "muscle": 0.0,
+    "heart": 0.0,
+    "line": 1.0,
+    "chan": 0.0,
+    "other": 0.0
+   },
+   "line_hz": 50.0
+  },
+  {
+   "id": "sub-010_IC05",
+   "img": "sub-010_IC05.webp",
+   "w": 720,
+   "h": 280,
+   "level": 1,
+   "answer": "line",
+   "iclabel": {
+    "brain": 0.0,
+    "eye": 0.0,
+    "muscle": 0.0,
+    "heart": 0.0,
+    "line": 1.0,
+    "chan": 0.0,
+    "other": 0.0
+   },
+   "line_hz": 50.0
+  },
+  {
+   "id": "sub-003_IC09",
+   "img": "sub-003_IC09.webp",
+   "w": 720,
+   "h": 280,
+   "level": 1,
+   "answer": "brain",
+   "iclabel": {
+    "brain": 0.977,
+    "eye": 0.0,
+    "muscle": 0.0,
+    "heart": 0.001,
+    "line": 0.015,
+    "chan": 0.0,
+    "other": 0.006
+   },
+   "line_hz": 50.0
+  },
+  {
+   "id": "sub-011_IC12",
+   "img": "sub-011_IC12.webp",
+   "w": 720,
+   "h": 280,
+   "level": 1,
+   "answer": "line",
+   "iclabel": {
+    "brain": 0.0,
+    "eye": 0.0,
+    "muscle": 0.0,
+    "heart": 0.0,
+    "line": 0.998,
+    "chan": 0.001,
+    "other": 0.0
+   },
+   "line_hz": 50.0
+  },
+  {
+   "id": "sub-002_IC32",
+   "img": "sub-002_IC32.webp",
+   "w": 720,
+   "h": 280,
+   "level": 1,
+   "answer": "muscle",
+   "iclabel": {
+    "brain": 0.003,
+    "eye": 0.003,
+    "muscle": 0.979,
+    "heart": 0.002,
+    "line": 0.003,
+    "chan": 0.0,
+    "other": 0.01
+   },
+   "line_hz": null
+  },
+  {
+   "id": "sub-011_IC66",
+   "img": "sub-011_IC66.webp",
+   "w": 720,
+   "h": 280,
+   "level": 1,
+   "answer": "chan",
+   "iclabel": {
+    "brain": 0.009,
+    "eye": 0.0,
+    "muscle": 0.0,
+    "heart": 0.002,
+    "line": 0.052,
+    "chan": 0.931,
+    "other": 0.006
+   },
+   "line_hz": 50.0
+  },
+  {
+   "id": "sub-011_IC23",
+   "img": "sub-011_IC23.webp",
+   "w": 720,
+   "h": 280,
+   "level": 1,
+   "answer": "muscle",
+   "iclabel": {
+    "brain": 0.003,
+    "eye": 0.0,
+    "muscle": 0.997,
+    "heart": 0.0,
+    "line": 0.0,
+    "chan": 0.0,
+    "other": 0.0
+   },
+   "line_hz": null
+  },
+  {
+   "id": "sub-005_IC28",
+   "img": "sub-005_IC28.webp",
+   "w": 720,
+   "h": 280,
+   "level": 1,
+   "answer": "brain",
+   "iclabel": {
+    "brain": 0.992,
+    "eye": 0.001,
+    "muscle": 0.0,
+    "heart": 0.0,
+    "line": 0.003,
+    "chan": 0.0,
+    "other": 0.005
+   },
+   "line_hz": 50.0
+  },
+  {
+   "id": "sub-002_IC07",
+   "img": "sub-002_IC07.webp",
+   "w": 720,
+   "h": 280,
+   "level": 1,
+   "answer": "line",
+   "iclabel": {
+    "brain": 0.002,
+    "eye": 0.0,
+    "muscle": 0.0,
+    "heart": 0.0,
+    "line": 0.982,
+    "chan": 0.015,
+    "other": 0.001
+   },
+   "line_hz": 50.0
+  },
+  {
+   "id": "sub-006_IC17",
+   "img": "sub-006_IC17.webp",
+   "w": 720,
+   "h": 280,
+   "level": 1,
+   "answer": "brain",
+   "iclabel": {
+    "brain": 0.995,
+    "eye": 0.0,
+    "muscle": 0.0,
+    "heart": 0.0,
+    "line": 0.003,
+    "chan": 0.0,
+    "other": 0.002
+   },
+   "line_hz": 50.0
+  },
+  {
+   "id": "sub-003_IC41",
+   "img": "sub-003_IC41.webp",
+   "w": 720,
+   "h": 280,
+   "level": 1,
+   "answer": "muscle",
+   "iclabel": {
+    "brain": 0.002,
+    "eye": 0.003,
+    "muscle": 0.993,
+    "heart": 0.0,
+    "line": 0.0,
+    "chan": 0.0,
+    "other": 0.001
+   },
+   "line_hz": null
+  },
+  {
+   "id": "sub-011_IC20",
+   "img": "sub-011_IC20.webp",
+   "w": 720,
+   "h": 280,
+   "level": 1,
+   "answer": "brain",
+   "iclabel": {
+    "brain": 0.998,
+    "eye": 0.0,
+    "muscle": 0.0,
+    "heart": 0.0,
+    "line": 0.0,
+    "chan": 0.0,
+    "other": 0.001
+   },
+   "line_hz": null
+  },
+  {
+   "id": "sub-005_IC43",
+   "img": "sub-005_IC43.webp",
+   "w": 720,
+   "h": 280,
+   "level": 1,
+   "answer": "muscle",
+   "iclabel": {
+    "brain": 0.02,
+    "eye": 0.013,
+    "muscle": 0.929,
+    "heart": 0.004,
+    "line": 0.003,
+    "chan": 0.006,
+    "other": 0.025
+   },
+   "line_hz": null
+  },
+  {
+   "id": "sub-003_IC20",
+   "img": "sub-003_IC20.webp",
+   "w": 720,
+   "h": 280,
+   "level": 1,
+   "answer": "muscle",
+   "iclabel": {
+    "brain": 0.002,
+    "eye": 0.0,
+    "muscle": 0.995,
+    "heart": 0.0,
+    "line": 0.0,
+    "chan": 0.0,
+    "other": 0.002
+   },
+   "line_hz": null
+  },
+  {
+   "id": "sub-004_IC18",
+   "img": "sub-004_IC18.webp",
+   "w": 720,
+   "h": 280,
+   "level": 1,
+   "answer": "brain",
+   "iclabel": {
+    "brain": 0.999,
+    "eye": 0.0,
+    "muscle": 0.0,
+    "heart": 0.0,
+    "line": 0.0,
+    "chan": 0.0,
+    "other": 0.001
+   },
+   "line_hz": 50.0
+  },
+  {
+   "id": "sub-007_IC14",
+   "img": "sub-007_IC14.webp",
+   "w": 720,
+   "h": 280,
+   "level": 1,
+   "answer": "muscle",
+   "iclabel": {
+    "brain": 0.001,
+    "eye": 0.0,
+    "muscle": 0.994,
+    "heart": 0.0,
+    "line": 0.0,
+    "chan": 0.0,
+    "other": 0.004
+   },
+   "line_hz": null
+  },
+  {
+   "id": "sub-006_IC13",
+   "img": "sub-006_IC13.webp",
+   "w": 720,
+   "h": 280,
+   "level": 1,
+   "answer": "brain",
+   "iclabel": {
+    "brain": 0.996,
+    "eye": 0.0,
+    "muscle": 0.0,
+    "heart": 0.0,
+    "line": 0.002,
+    "chan": 0.0,
+    "other": 0.002
+   },
+   "line_hz": 50.0
+  },
+  {
+   "id": "sub-009_IC05",
+   "img": "sub-009_IC05.webp",
+   "w": 720,
+   "h": 280,
+   "level": 1,
+   "answer": "eye",
+   "iclabel": {
+    "brain": 0.001,
+    "eye": 0.98,
+    "muscle": 0.003,
+    "heart": 0.001,
+    "line": 0.0,
+    "chan": 0.002,
+    "other": 0.013
+   },
+   "line_hz": null
+  },
+  {
+   "id": "sub-010_IC38",
+   "img": "sub-010_IC38.webp",
+   "w": 720,
+   "h": 280,
+   "level": 1,
+   "answer": "muscle",
+   "iclabel": {
+    "brain": 0.0,
+    "eye": 0.0,
+    "muscle": 0.995,
+    "heart": 0.001,
+    "line": 0.0,
+    "chan": 0.002,
+    "other": 0.002
+   },
+   "line_hz": null
+  },
+  {
+   "id": "sub-006_IC05",
+   "img": "sub-006_IC05.webp",
+   "w": 720,
+   "h": 280,
+   "level": 1,
+   "answer": "line",
+   "iclabel": {
+    "brain": 0.0,
+    "eye": 0.0,
+    "muscle": 0.0,
+    "heart": 0.0,
+    "line": 1.0,
+    "chan": 0.0,
+    "other": 0.0
+   },
+   "line_hz": 50.0
+  },
+  {
+   "id": "sub-008_IC18",
+   "img": "sub-008_IC18.webp",
+   "w": 720,
+   "h": 280,
+   "level": 1,
+   "answer": "muscle",
+   "iclabel": {
+    "brain": 0.001,
+    "eye": 0.0,
+    "muscle": 0.997,
+    "heart": 0.0,
+    "line": 0.0,
+    "chan": 0.0,
+    "other": 0.002
+   },
+   "line_hz": null
+  },
+  {
+   "id": "sub-002_IC25",
+   "img": "sub-002_IC25.webp",
+   "w": 720,
+   "h": 280,
+   "level": 1,
+   "answer": "muscle",
+   "iclabel": {
+    "brain": 0.013,
+    "eye": 0.001,
+    "muscle": 0.983,
+    "heart": 0.0,
+    "line": 0.0,
+    "chan": 0.001,
+    "other": 0.003
+   },
+   "line_hz": null
+  },
+  {
+   "id": "sub-011_IC03",
+   "img": "sub-011_IC03.webp",
+   "w": 720,
+   "h": 280,
+   "level": 1,
+   "answer": "muscle",
+   "iclabel": {
+    "brain": 0.001,
+    "eye": 0.0,
+    "muscle": 0.998,
+    "heart": 0.0,
+    "line": 0.0,
+    "chan": 0.0,
+    "other": 0.0
+   },
+   "line_hz": null
+  },
+  {
+   "id": "sub-003_IC30",
+   "img": "sub-003_IC30.webp",
+   "w": 720,
+   "h": 280,
+   "level": 1,
+   "answer": "muscle",
+   "iclabel": {
+    "brain": 0.0,
+    "eye": 0.0,
+    "muscle": 0.986,
+    "heart": 0.001,
+    "line": 0.0,
+    "chan": 0.005,
+    "other": 0.007
+   },
+   "line_hz": null
+  },
+  {
+   "id": "sub-006_IC23",
+   "img": "sub-006_IC23.webp",
+   "w": 720,
+   "h": 280,
+   "level": 1,
+   "answer": "muscle",
+   "iclabel": {
+    "brain": 0.001,
+    "eye": 0.001,
+    "muscle": 0.997,
+    "heart": 0.0,
+    "line": 0.0,
+    "chan": 0.0,
+    "other": 0.001
+   },
+   "line_hz": null
+  },
+  {
+   "id": "sub-004_IC06",
+   "img": "sub-004_IC06.webp",
+   "w": 720,
+   "h": 280,
+   "level": 1,
+   "answer": "line",
+   "iclabel": {
+    "brain": 0.001,
+    "eye": 0.0,
+    "muscle": 0.0,
+    "heart": 0.0,
+    "line": 0.997,
+    "chan": 0.002,
+    "other": 0.0
+   },
+   "line_hz": 50.0
+  },
+  {
+   "id": "sub-002_IC20",
+   "img": "sub-002_IC20.webp",
+   "w": 720,
+   "h": 280,
+   "level": 1,
+   "answer": "brain",
+   "iclabel": {
+    "brain": 0.989,
+    "eye": 0.0,
+    "muscle": 0.0,
+    "heart": 0.0,
+    "line": 0.001,
+    "chan": 0.0,
+    "other": 0.009
+   },
+   "line_hz": null
+  },
+  {
+   "id": "sub-007_IC55",
+   "img": "sub-007_IC55.webp",
+   "w": 720,
+   "h": 280,
+   "level": 1,
+   "answer": "muscle",
+   "iclabel": {
+    "brain": 0.006,
+    "eye": 0.0,
+    "muscle": 0.961,
+    "heart": 0.001,
+    "line": 0.001,
+    "chan": 0.001,
+    "other": 0.028
+   },
+   "line_hz": null
+  },
+  {
+   "id": "sub-008_IC20",
+   "img": "sub-008_IC20.webp",
+   "w": 720,
+   "h": 280,
+   "level": 1,
+   "answer": "brain",
+   "iclabel": {
+    "brain": 0.983,
+    "eye": 0.0,
+    "muscle": 0.0,
+    "heart": 0.002,
+    "line": 0.003,
+    "chan": 0.001,
+    "other": 0.012
+   },
+   "line_hz": null
+  },
+  {
+   "id": "sub-004_IC23",
+   "img": "sub-004_IC23.webp",
+   "w": 720,
+   "h": 280,
+   "level": 1,
+   "answer": "muscle",
+   "iclabel": {
+    "brain": 0.002,
+    "eye": 0.0,
+    "muscle": 0.987,
+    "heart": 0.001,
+    "line": 0.0,
+    "chan": 0.003,
+    "other": 0.005
+   },
+   "line_hz": null
+  },
+  {
+   "id": "sub-009_IC14",
+   "img": "sub-009_IC14.webp",
+   "w": 720,
+   "h": 280,
+   "level": 1,
+   "answer": "brain",
+   "iclabel": {
+    "brain": 0.997,
+    "eye": 0.0,
+    "muscle": 0.0,
+    "heart": 0.0,
+    "line": 0.001,
+    "chan": 0.0,
+    "other": 0.002
+   },
+   "line_hz": null
+  },
+  {
+   "id": "sub-007_IC21",
+   "img": "sub-007_IC21.webp",
+   "w": 720,
+   "h": 280,
+   "level": 1,
+   "answer": "brain",
+   "iclabel": {
+    "brain": 0.998,
+    "eye": 0.0,
+    "muscle": 0.0,
+    "heart": 0.001,
+    "line": 0.001,
+    "chan": 0.0,
+    "other": 0.0
+   },
+   "line_hz": null
+  },
+  {
+   "id": "sub-008_IC04",
+   "img": "sub-008_IC04.webp",
+   "w": 720,
+   "h": 280,
+   "level": 1,
+   "answer": "line",
+   "iclabel": {
+    "brain": 0.0,
+    "eye": 0.0,
+    "muscle": 0.0,
+    "heart": 0.0,
+    "line": 1.0,
+    "chan": 0.0,
+    "other": 0.0
+   },
+   "line_hz": 50.0
+  },
+  {
+   "id": "sub-002_IC04",
+   "img": "sub-002_IC04.webp",
+   "w": 720,
+   "h": 280,
+   "level": 1,
+   "answer": "brain",
+   "iclabel": {
+    "brain": 0.998,
+    "eye": 0.0,
+    "muscle": 0.0,
+    "heart": 0.0,
+    "line": 0.002,
+    "chan": 0.0,
+    "other": 0.0
+   },
+   "line_hz": 50.0
+  },
+  {
+   "id": "sub-004_IC32",
+   "img": "sub-004_IC32.webp",
+   "w": 720,
+   "h": 280,
+   "level": 1,
+   "answer": "muscle",
+   "iclabel": {
+    "brain": 0.007,
+    "eye": 0.0,
+    "muscle": 0.986,
+    "heart": 0.0,
+    "line": 0.001,
+    "chan": 0.002,
+    "other": 0.004
+   },
+   "line_hz": null
+  },
+  {
+   "id": "sub-008_IC14",
+   "img": "sub-008_IC14.webp",
+   "w": 720,
+   "h": 280,
+   "level": 1,
+   "answer": "line",
+   "iclabel": {
+    "brain": 0.0,
+    "eye": 0.0,
+    "muscle": 0.0,
+    "heart": 0.0,
+    "line": 0.999,
+    "chan": 0.0,
+    "other": 0.0
+   },
+   "line_hz": 50.0
+  },
+  {
+   "id": "sub-006_IC03",
+   "img": "sub-006_IC03.webp",
+   "w": 720,
+   "h": 280,
+   "level": 1,
+   "answer": "line",
+   "iclabel": {
+    "brain": 0.0,
+    "eye": 0.0,
+    "muscle": 0.0,
+    "heart": 0.0,
+    "line": 1.0,
+    "chan": 0.0,
+    "other": 0.0
+   },
+   "line_hz": 50.0
+  },
+  {
+   "id": "sub-011_IC36",
+   "img": "sub-011_IC36.webp",
+   "w": 720,
+   "h": 280,
+   "level": 1,
+   "answer": "brain",
+   "iclabel": {
+    "brain": 0.998,
+    "eye": 0.0,
+    "muscle": 0.0,
+    "heart": 0.0,
+    "line": 0.001,
+    "chan": 0.0,
+    "other": 0.001
+   },
+   "line_hz": 50.0
+  },
+  {
+   "id": "sub-006_IC26",
+   "img": "sub-006_IC26.webp",
+   "w": 720,
+   "h": 280,
+   "level": 1,
+   "answer": "muscle",
+   "iclabel": {
+    "brain": 0.003,
+    "eye": 0.001,
+    "muscle": 0.995,
+    "heart": 0.0,
+    "line": 0.0,
+    "chan": 0.0,
+    "other": 0.001
+   },
+   "line_hz": null
+  },
+  {
+   "id": "sub-006_IC02",
+   "img": "sub-006_IC02.webp",
+   "w": 720,
+   "h": 280,
+   "level": 1,
+   "answer": "eye",
+   "iclabel": {
+    "brain": 0.007,
+    "eye": 0.955,
+    "muscle": 0.007,
+    "heart": 0.002,
+    "line": 0.0,
+    "chan": 0.004,
+    "other": 0.026
+   },
+   "line_hz": null
+  },
+  {
+   "id": "sub-010_IC29",
+   "img": "sub-010_IC29.webp",
+   "w": 720,
+   "h": 280,
+   "level": 1,
+   "answer": "muscle",
+   "iclabel": {
+    "brain": 0.002,
+    "eye": 0.017,
+    "muscle": 0.974,
+    "heart": 0.001,
+    "line": 0.0,
+    "chan": 0.0,
+    "other": 0.006
+   },
+   "line_hz": null
+  },
+  {
+   "id": "sub-002_IC06",
+   "img": "sub-002_IC06.webp",
+   "w": 720,
+   "h": 280,
+   "level": 1,
+   "answer": "line",
+   "iclabel": {
+    "brain": 0.001,
+    "eye": 0.0,
+    "muscle": 0.0,
+    "heart": 0.0,
+    "line": 0.975,
+    "chan": 0.022,
+    "other": 0.002
+   },
+   "line_hz": 50.0
+  },
+  {
+   "id": "sub-005_IC08",
+   "img": "sub-005_IC08.webp",
+   "w": 720,
+   "h": 280,
+   "level": 1,
+   "answer": "chan",
+   "iclabel": {
+    "brain": 0.001,
+    "eye": 0.005,
+    "muscle": 0.028,
+    "heart": 0.001,
+    "line": 0.018,
+    "chan": 0.933,
+    "other": 0.014
+   },
+   "line_hz": 50.0
+  },
+  {
+   "id": "sub-002_IC14",
+   "img": "sub-002_IC14.webp",
+   "w": 720,
+   "h": 280,
+   "level": 1,
+   "answer": "muscle",
+   "iclabel": {
+    "brain": 0.025,
+    "eye": 0.001,
+    "muscle": 0.967,
+    "heart": 0.0,
+    "line": 0.001,
+    "chan": 0.001,
+    "other": 0.006
+   },
+   "line_hz": null
+  },
+  {
+   "id": "sub-004_IC04",
+   "img": "sub-004_IC04.webp",
+   "w": 720,
+   "h": 280,
+   "level": 1,
+   "answer": "line",
+   "iclabel": {
+    "brain": 0.002,
+    "eye": 0.0,
+    "muscle": 0.0,
+    "heart": 0.0,
+    "line": 0.997,
+    "chan": 0.0,
+    "other": 0.001
+   },
+   "line_hz": 50.0
+  },
+  {
+   "id": "sub-005_IC02",
+   "img": "sub-005_IC02.webp",
+   "w": 720,
+   "h": 280,
+   "level": 1,
+   "answer": "line",
+   "iclabel": {
+    "brain": 0.0,
+    "eye": 0.0,
+    "muscle": 0.0,
+    "heart": 0.0,
+    "line": 1.0,
+    "chan": 0.0,
+    "other": 0.0
+   },
+   "line_hz": 50.0
+  },
+  {
+   "id": "sub-009_IC13",
+   "img": "sub-009_IC13.webp",
+   "w": 720,
+   "h": 280,
+   "level": 1,
+   "answer": "brain",
+   "iclabel": {
+    "brain": 0.996,
+    "eye": 0.0,
+    "muscle": 0.0,
+    "heart": 0.0,
+    "line": 0.0,
+    "chan": 0.0,
+    "other": 0.003
+   },
+   "line_hz": null
+  },
+  {
+   "id": "sub-010_IC17",
+   "img": "sub-010_IC17.webp",
+   "w": 720,
+   "h": 280,
+   "level": 1,
+   "answer": "brain",
+   "iclabel": {
+    "brain": 0.992,
+    "eye": 0.0,
+    "muscle": 0.0,
+    "heart": 0.0,
+    "line": 0.003,
+    "chan": 0.0,
+    "other": 0.004
+   },
+   "line_hz": null
+  },
+  {
+   "id": "sub-004_IC09",
+   "img": "sub-004_IC09.webp",
+   "w": 720,
+   "h": 280,
+   "level": 1,
+   "answer": "muscle",
+   "iclabel": {
+    "brain": 0.002,
+    "eye": 0.003,
+    "muscle": 0.986,
+    "heart": 0.001,
+    "line": 0.0,
+    "chan": 0.005,
+    "other": 0.004
+   },
+   "line_hz": null
+  },
+  {
+   "id": "sub-005_IC19",
+   "img": "sub-005_IC19.webp",
+   "w": 720,
+   "h": 280,
+   "level": 1,
+   "answer": "brain",
+   "iclabel": {
+    "brain": 0.992,
+    "eye": 0.0,
+    "muscle": 0.0,
+    "heart": 0.0,
+    "line": 0.002,
+    "chan": 0.0,
+    "other": 0.006
+   },
+   "line_hz": null
+  },
+  {
+   "id": "sub-004_IC24",
+   "img": "sub-004_IC24.webp",
+   "w": 720,
+   "h": 280,
+   "level": 1,
+   "answer": "brain",
+   "iclabel": {
+    "brain": 0.996,
+    "eye": 0.0,
+    "muscle": 0.0,
+    "heart": 0.0,
+    "line": 0.003,
+    "chan": 0.0,
+    "other": 0.001
+   },
+   "line_hz": null
+  },
+  {
+   "id": "sub-007_IC02",
+   "img": "sub-007_IC02.webp",
+   "w": 720,
+   "h": 280,
+   "level": 1,
+   "answer": "line",
+   "iclabel": {
+    "brain": 0.0,
+    "eye": 0.0,
+    "muscle": 0.0,
+    "heart": 0.0,
+    "line": 0.998,
+    "chan": 0.002,
+    "other": 0.0
+   },
+   "line_hz": 50.0
+  },
+  {
+   "id": "sub-009_IC02",
+   "img": "sub-009_IC02.webp",
+   "w": 720,
+   "h": 280,
+   "level": 1,
+   "answer": "line",
+   "iclabel": {
+    "brain": 0.0,
+    "eye": 0.0,
+    "muscle": 0.0,
+    "heart": 0.0,
+    "line": 1.0,
+    "chan": 0.0,
+    "other": 0.0
+   },
+   "line_hz": 50.0
+  },
+  {
+   "id": "sub-007_IC13",
+   "img": "sub-007_IC13.webp",
+   "w": 720,
+   "h": 280,
+   "level": 1,
+   "answer": "brain",
+   "iclabel": {
+    "brain": 0.996,
+    "eye": 0.0,
+    "muscle": 0.0,
+    "heart": 0.0,
+    "line": 0.003,
+    "chan": 0.0,
+    "other": 0.001
+   },
+   "line_hz": 50.0
+  }
+ ]
+}

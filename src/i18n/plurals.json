@@ -1,0 +1,15 @@
+{
+  "ar": {
+    "map.station.lessons.one": "درس واحد",
+    "map.station.lessons.two": "درسان",
+    "map.station.lessons.few": "{n} دروس",
+    "map.station.lessons.many": "{n} درساً",
+    "map.station.lessons": "{n} درس",
+    "station.counts": "{lessons}: {core} أساسي، {rec} مهم، {opt} اختياري"
+  },
+  "en": {
+    "map.station.lessons.one": "1 lesson",
+    "map.station.lessons": "{n} lessons",
+    "station.counts": "{lessons}: {core} core, {rec} recommended, {opt} optional"
+  }
+}

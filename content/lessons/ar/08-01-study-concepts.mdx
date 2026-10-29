@@ -1,0 +1,175 @@
+---
+title: ما هو STUDY ومتى تحتاجه
+titleEn: What a STUDY is and when you need one
+description: ما الفرق بين STUDY و ALLEEG في EEGLAB، ومتى تحتاج STUDY، وما الذي يجب أن يتطابق في ملفات كل المشاركين قبل أن تنشئه.
+station: 8
+order: 1
+level: core
+status: approved
+objectives:
+  - يشرح الفرق بين STUDY و ALLEEG، ومتى يحتاج STUDY بدل داتاست واحدة.
+  - يفحص ملفين من مشاركين مختلفين ويقارن المعدل ونافذة الإيبوك والقنوات وأنواع الأحداث.
+  - يحدد ما يلزم في الملفات إذا أراد تحليل مكوّنات ICA أو تجميعها.
+prerequisites: [erp-average]
+references:
+  - title: EEGLAB Tutorial
+    url: https://eeglab.org/tutorials/10_Group_analysis/multiple_subject_proccessing_overview.html
+    section: "10. Group analysis > a. Multiple subject processing overview"
+  - title: EEGLAB Tutorial
+    url: https://eeglab.org/tutorials/10_Group_analysis/study_creation.html
+    section: "10. Group analysis > b. STUDY creation"
+  - title: "From raw data to group level analysis in EEGLAB"
+    url: https://www.youtube.com/watch?v=-jL3PuHD3aY
+    section: "الفيديو كاملاً"
+    duration: "16:20"
+  - title: Go-nogo categorization and detection task (OpenNeuro ds002680)
+    url: https://openneuro.org/datasets/ds002680
+    section: "README; dataset_description.json"
+datasets: [D6]
+startingPoint:
+  dataset: D6
+  file: animal.study
+  applied: []
+  script: |
+    [ALLEEG, EEG, CURRENTSET, ALLCOM] = eeglab;
+    % Folder for the course data (change it)
+    dataFolder = 'C:\Users\me\Documents\eeg-course';
+
+    % Download the ready Go-nogo STUDY once and unzip it in its own folder
+    zipDir = fullfile(dataFolder, 'animal_study');
+    studyFile = dir(fullfile(zipDir, '**', 'animal.study'));
+    if isempty(studyFile)
+        zipFile = fullfile(dataFolder, 'animal_study.zip');
+        websave(zipFile, 'https://sccn.ucsd.edu/eeglab/download/animal_study.zip');
+        unzip(zipFile, zipDir);
+        studyFile = dir(fullfile(zipDir, '**', 'animal.study'));
+    end
+    studyDir = studyFile(1).folder;
+    fprintf('Go-nogo STUDY folder: %s\n', studyDir);
+    eeglab redraw;
+eeglabVersion: "2026.1"
+updated: 2026-10-28
+---
+
+## لماذا هذه الخطوة مهمة؟
+
+حتى الآن عملت على تسجيل واحد لمشارك واحد. لكن سؤال البحث يكون عادة عن مجموعة: هل يختلف الـ ERP بين صورتين عند أغلب المشاركين، لا عند شخص واحد؟
+
+الـ STUDY في EEGLAB ملف فهرس لهذا السؤال. يحفظ قائمة ملفات المشاركين، ولكل ملف المشارك والشرط والمجموعة والجلسة. ويحفظ التصاميم والمقاييس المحسوبة مسبقاً. لكنه لا يدمج البيانات، ولا يعيد معالجتها.
+
+لذلك يثق الـ STUDY بأن ملفاتك متشابهة في كل ما يهم. إذا اختلف المعدل أو نافذة الإيبوك أو أسماء الأحداث بين مشارك وآخر، تتعطل الدوال أو تخرج نتيجة خاطئة بصمت. هذا الدرس يعلّمك الفحص قبل الإنشاء.
+
+## قبل وبعد
+
+<Figure src="study-concepts/study-concepts-gates.svg" alt="أربعة ملفات .set لأربعة مشاركين تمر على ثلاث بوابات متتالية: نفس المعدل والنافذة، ثم نفس القنوات والأحداث، ثم نفس خطوات المعالجة. ملف المشارك 2 يقف عند البوابة الأولى بعلامة حمراء لأن معدله مختلف، والثلاثة الباقية تمر وتتصل بخطوط بملف واحد اسمه STUDY." caption="رسم توضيحي، بلا بيانات" source="original" />
+
+## الخطوات من الواجهة
+
+**عن البيانات (D6):** تجربة Go-nogo لـ 14 مشاركاً (Delorme وآخرون). تظهر صورة لمدة 20 ms، ويرفع المشارك إصبعه عن زر بأسرع ما يمكن إذا كان فيها حيوان، ويبقيه إذا لم يكن. نسخة EEGLAB الجاهزة كـ STUDY معالجة ومقطّعة مسبقاً، وفيها لكل مشارك ملف لصور الحيوانات (`animal`) وملف للصور الأخرى (`distractor`). الخام في OpenNeuro بصيغة BIDS، ونستخدمه في درس الإنشاء من BIDS.
+
+لماذا لا نكمل على D1؟ لأن D1 تسجيل لمشارك واحد، والـ STUDY تحتاج عدة مشاركين.
+
+**أولاً: نزّل البيانات وافتح المجلد**
+
+1. شغّل سكربت "نقطة البداية". ينزّل `animal_study.zip` من صفحة بيانات EEGLAB ويفك ضغطه مرة واحدة، ويطبع مكان المجلد.
+2. افتح المجلد في مستعرض الملفات. فيه ملف `animal.study` الجاهز، ومجلد لكل مشارك باسم رمزه، من `cba` إلى `wpa`. في كل مجلد داتاستان، مثل `sphanimal.set` و `sphdistractor.set`. بيانات كل داتاست في ملف `.dat` بجانبه (صيغة EEGLAB الأقدم؛ و `cba` وحده بياناته داخل `.set`). وسترى أيضاً ملفات مثل `sphanimal.daterp` و `sphanimal.icaerp`: مقاييس محسوبة مسبقاً بـ EEGLAB 6 سنة 2007. لا نستعملها، ويشرح درس الحساب المسبق السبب.
+3. لا تفتح `animal.study` الآن. نحن نفحص الملفات قبل أي STUDY.
+
+**ثانياً: افحص ملفاً من مشارك**
+
+1. افتح <MenuPath>File > Load existing dataset</MenuPath> واختر `animal_study/cba/cbaanimal.set`، ملف الشرط animal لأول مشارك.
+2. اقرأ النافذة الرئيسية، وسجّل هذه القيم في ورقة: <UiLabel>Channels per frame</UiLabel>، <UiLabel>Frames per epoch</UiLabel>، <UiLabel>Epochs</UiLabel>، <UiLabel>Sampling rate (Hz)</UiLabel>، <UiLabel>Epoch start (sec)</UiLabel>، <UiLabel>Epoch end (sec)</UiLabel>، <UiLabel>Reference</UiLabel>، <UiLabel>Channel locations</UiLabel>، <UiLabel>ICA weights</UiLabel>.
+
+**ثالثاً: افحص ملفاً من مشارك آخر وقارن**
+
+1. افتح `animal_study/wpa/wpaanimal.set`، ملف الشرط animal لآخر مشارك، بنفس الطريقة.
+2. قارن القيم بالورقة. كل القيم يجب أن تتطابق إلا <UiLabel>Epochs</UiLabel>، لأن عدد المحاولات الباقية بعد الرفض يختلف طبيعياً بين الناس. في هذه النسخة ستقرأ 32 قناة، و 750 نقطة في الإيبوك، و 250 Hz، وإيبوكاً من -1 إلى 1.996 ثانية.
+3. السكربت أدناه يقارن نفس الملفين، بنفس القيم مع أسماء القنوات وأنواع الأحداث ونتائج ICLabel وثنائيات القطب، وهي أشياء لا تظهر في النافذة الرئيسية.
+
+**رابعاً: STUDY أم ALLEEG؟**
+
+| | ALLEEG | STUDY |
+|---|---|---|
+| ما هو | قائمة الداتاست المفتوحة في الذاكرة الآن | ملف `.study` يصف مجموعة ملفات وعلاقتها ببعض |
+| يعرف المشارك والشرط | لا، إلا ما كتبته في كل داتاست | نعم، لكل ملف |
+| يحفظ التصاميم والمقاييس المحسوبة | لا | نعم |
+| يبقى بعد إغلاق EEGLAB | لا | نعم، وفتحه يعيد ملء ALLEEG |
+| متى تستخدمه | مقارنة سريعة بين ملفين أو ثلاثة لمشارك واحد | أي تحليل لمجموعة مشاركين |
+
+<Callout type="note" title="الذاكرة مع عشرات المشاركين">
+مع عشرات المشاركين لا تتسع الذاكرة لكل الملفات. فعّل في <MenuPath>File > Preferences</MenuPath> الخيار <UiLabel>If set, keep at most one dataset in memory. This allows processing hundreds of datasets within studies.</UiLabel>، فيقرأ EEGLAB الملفات من القرص عند الحاجة. مع 14 مشاركاً هنا لا يلزم غالباً. عند إنشاء STUDY أو فتحها تظهر نافذة <UiLabel>Study warning</UiLabel> تقترح هذا الخيار، ودرس الإنشاء التالي يشرح ما تضغط.
+</Callout>
+
+## السكربت المقابل
+
+```matlab
+% studyDir comes from the starting point script
+files = dir(fullfile(studyDir, '*', '*.set'));
+fprintf('%d dataset files under %s\n', numel(files), studyDir);
+
+% Header only (no data) of the animal file of the first and the last participant
+animalFiles = files(contains({files.name}, 'animal'));
+A = pop_loadset('filename', animalFiles(1).name,   'filepath', animalFiles(1).folder,   'loadmode', 'info');
+B = pop_loadset('filename', animalFiles(end).name, 'filepath', animalFiles(end).folder, 'loadmode', 'info');
+
+% Side-by-side check of what must match before a STUDY
+show = @(label, a, b) fprintf('%-20s %-14s %-14s\n', label, num2str(a), num2str(b));
+fprintf('%-20s %-14s %-14s\n', 'Property', animalFiles(1).name, animalFiles(end).name);
+show('Sampling rate (Hz)', A.srate,  B.srate);
+show('Channels',           A.nbchan, B.nbchan);
+show('Points per epoch',   A.pnts,   B.pnts);
+show('Epoch start (s)',    A.xmin,   B.xmin);
+show('Epoch end (s)',      A.xmax,   B.xmax);
+show('Epochs',             A.trials, B.trials);
+show('ICA weights',        ~isempty(A.icaweights), ~isempty(B.icaweights));
+show('ICA components',     size(A.icaweights, 1), size(B.icaweights, 1));
+show('ICLabel results',    isfield(A.etc, 'ic_classification'), isfield(B.etc, 'ic_classification'));
+show('Dipoles',            isfield(A.dipfit, 'model'), isfield(B.dipfit, 'model'));
+fprintf('Same channel labels in the same order: %d\n', ...
+    isequal({A.chanlocs.labels}, {B.chanlocs.labels}));
+
+% Event types and their counts in each file
+eeg_eventtypes(A);
+eeg_eventtypes(B);
+```
+
+## أي قيمة أختار؟
+
+هذه قائمة الفحص قبل أي STUDY. "يجب" تعني أن الدوال تتعطل أو تخطئ إذا اختلفت.
+
+| ما تفحصه | القاعدة | لماذا |
+|---|---|---|
+| معدل العيّنات | يجب أن يتطابق | EEGLAB يطبع عند الإنشاء تحذيراً على عدة أسطر يبدأ بـ `IMPORTANT WARNING: SOME DATASETS DO NOT HAVE THE SAME SAMPLING`، ثم تتعطل أغلب دوال STUDY. |
+| نافذة الإيبوك وعدد النقاط | يجب أن تتطابق | الحساب المسبق يقارن نقطة زمنية بنقطة زمنية بين المشاركين. |
+| أسماء القنوات | يجب أن تكون بنفس نظام التسمية | الـ STUDY تطابق القنوات بأسمائها (بلا فرق بين الحروف الكبيرة والصغيرة). `T7` في ملف و `T3` (الاسم القديم لنفس المكان) في آخر قناتان مختلفتان عندها. |
+| القنوات المحذوفة | الأفضل استيفاؤها لكل مشارك قبل STUDY | يوجد خيار استيفاء في الحساب المسبق، لكن الاستيفاء في الملف نفسه أوضح ويُفحص بعينك. |
+| أسماء الأحداث والشروط | يجب أن تُكتب بنفس الطريقة | كل كتابة مختلفة تصير شرطاً جديداً. |
+| خطوات المعالجة (الفلتر، المرجع، الرفض) | يجب أن تكون نفسها | الـ STUDY لا تتحقق منها أبداً. لهذا يأتي سكربت المعالجة الموحّد في المحطة 9. |
+| أوزان ICA ونتائج ICLabel | لازمة إذا أردت حذف مكوّنات معلّمة عند الحساب المسبق | بدونها لا يوجد ما يُحذف. |
+| ثنائيات القطب | لازمة إذا أردت تجميع المكوّنات بمواقعها | هي أساس درس تجميع مكوّنات ICA. |
+| عدد الإيبوكات | يختلف طبيعياً | لكن مشاركاً بقي له عدد قليل جداً يضعف متوسطه. سجّل العدد لكل مشارك. |
+
+## أخطاء شائعة
+
+- **إنشاء STUDY قبل الفحص.** الـ STUDY تُنشأ بلا خطأ حتى لو اختلفت الملفات، والمشكلة تظهر بعد ساعة عند الحساب المسبق.
+- **الاعتماد على الاسم فقط.** ملفان اسمهما `clean` قد يكونان بفلترين مختلفين. افتح `EEG.history` أو سجل الأوامر إذا شككت.
+- **خلط بيانات مرشّحة بغير مرشّحة.** مشارك عولج قبل سنة بإعدادات قديمة يبقى مختلفاً حتى لو تطابق كل ما في النافذة الرئيسية.
+- **نسيان أن ICLabel يعمل لكل ملف.** إذا شغّلته لبعض المشاركين فقط، يحذف الحساب المسبق مكوّنات من بعضهم ويترك الباقي.
+- **بيانات بتردد كهرباء مختلف.** D6 سُجّلت في فرنسا، فالكهرباء هناك 50 Hz. بياناتك في السعودية 60 Hz. هذا لا يهم داخل STUDY واحدة إذا عولجت كل ملفاتها بنفس الخطوات، لكنه يهم إذا دمجت بيانات من مختبرين.
+
+{/* صندوق "من التجربة": بانتظار قصة من صاحب المشروع. لا يُكتب قبل وصولها. */}
+
+## كيف تتأكد أن الخطوة نجحت؟
+
+- **السكربت يطبع عدد الملفات** في المجلد، وهو 28 إذا كان لكل مشارك من الـ 14 ملفان.
+- **كل الأسطر متطابقة بين الملفين** إلا `Epochs` و `ICA components`، وسطر أسماء القنوات يطبع 1. عند `cba` 29 مكوّناً وعند `wpa` 31: عدد المكوّنات قد يختلف بين المشاركين، والتجميع لا يحتاج أن يتطابق.
+- **`eeg_eventtypes`** يطبع نفس أنواع الأحداث في ملفي animal، وهي `Animal` و `rt`، ولو اختلفت أعدادها. ملف distractor فيه `Distractor` فقط، لأن محاولات no-go بلا استجابة.
+- **تعرف الجواب** عن سؤال: هل في الملفات أوزان ICA وثنائيات قطب؟ هنا أوزان ICA وثنائيات القطب من المؤلفين موجودة (`1` في السطرين)، ونتائج ICLabel غير موجودة (`0`). درس التجميع يُبقي ICA وثنائيات القطب، ويشغّل ICLabel.
+
+<Methods>
+Before group analysis, the datasets of all [14] participants were checked for identical sampling rate, epoch limits, channel labels and event types (EEGLAB 2026.1).
+</Methods>
+
+<Callout type="note" title="مصدر البيانات">
+البيانات: نسخة STUDY من SCCN/Delorme. البيانات الأصلية: OpenNeuro ds002680 (CC0).
+</Callout>

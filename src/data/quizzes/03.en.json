@@ -1,0 +1,271 @@
+{
+  "v": 1,
+  "station": 3,
+  "lang": "en",
+  "passPercent": 80,
+  "questions": [
+    {
+      "id": "s03-q01",
+      "type": "order",
+      "lesson": "interpolation",
+      "objective": 2,
+      "prompt": "Put the preprocessing steps in the order they are applied to continuous data on this site's path:",
+      "options": [
+        {
+          "id": "a",
+          "text": "Re-reference to the average reference"
+        },
+        {
+          "id": "b",
+          "text": "High-pass filter at 0.1 Hz"
+        },
+        {
+          "id": "c",
+          "text": "Interpolate the removed channels"
+        },
+        {
+          "id": "d",
+          "text": "Notch filter from 58 to 62 Hz"
+        },
+        {
+          "id": "e",
+          "text": "Remove the bad channels"
+        }
+      ],
+      "answer": [
+        "b",
+        "d",
+        "e",
+        "c",
+        "a"
+      ],
+      "explanation": "Filtering of the continuous data comes first, then bad channels. The average reference comes last, because it needs all channels spread over the head: a bad channel left in spreads its noise into every channel, and a missing one tilts the average toward the other side. So interpolation comes before it."
+    },
+    {
+      "id": "s03-q02",
+      "type": "multiple",
+      "lesson": "filtering",
+      "objective": 2,
+      "prompt": "Which of these choices match the \"Which value should I choose?\" table in the filtering lesson? (Select all that apply)",
+      "options": [
+        {
+          "id": "a",
+          "text": "ERP analysis: high-pass at 0.1 Hz and low-pass at 30 Hz"
+        },
+        {
+          "id": "b",
+          "text": "Computing ICA: high-pass at 1 Hz on a separate copy"
+        },
+        {
+          "id": "c",
+          "text": "Spectral analysis up to 40 Hz: low-pass at 30 Hz"
+        },
+        {
+          "id": "d",
+          "text": "An ERP with a P3: high-pass at 2 Hz to remove all drift"
+        }
+      ],
+      "answer": [
+        "a",
+        "b"
+      ],
+      "explanation": "A 30 Hz low-pass removes everything above it, so it does not suit an analysis up to 40 Hz. A 1 or 2 Hz high-pass shrinks P3 and N400 and creates opposite-polarity deflections around them, so 1 Hz is for the ICA copy only."
+    },
+    {
+      "id": "s03-q03",
+      "type": "image",
+      "lesson": "line-noise",
+      "objective": 2,
+      "prompt": "This is the spectrum of all channels of a dataset recorded in Saudi Arabia, after a high-pass only. What causes the narrow peak, and what is the fix on this site's path?",
+      "image": {
+        "src": "/quiz/03/s03-q03.webp",
+        "w": 720,
+        "h": 480,
+        "status": "pending",
+        "alt": "Spectra of all channels from 1 to 64 Hz, one line per channel, vertical axis in dB. A broad peak near 10 Hz, a gradual fall with frequency, and a sharp narrow peak at 60 Hz rising above the neighboring frequencies.",
+        "spec": "An EEGLAB 2026.1 figure (source: eeglab-ui or script) of Plot > Channel spectra and maps on D1 hp0.1, range 1 64, **with no scalp maps** (empty maps field) so a 60 Hz map does not give the answer away. The \"before\" image of the line-noise lesson can be reused if drawn without maps. One version for both languages."
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": "Line noise at 60 Hz; the fix is a notch filter from 58 to 62 Hz"
+        },
+        {
+          "id": "b",
+          "text": "Line noise at 60 Hz; the fix is a 58 to 62 Hz band-pass without the notch option"
+        },
+        {
+          "id": "c",
+          "text": "Muscle activity; the fix is a 30 Hz low-pass before ICA"
+        },
+        {
+          "id": "d",
+          "text": "An alpha peak, so no filter is needed"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "The narrow peak at 60 Hz comes from the power grid, which runs at 60 Hz in Saudi Arabia. Without `Notch filter the data instead of pass band`, the filter becomes a band-pass that keeps only 58 to 62 Hz and removes all brain activity. A 30 Hz low-pass before ICA removes high frequencies that ICA and ICLabel need."
+    },
+    {
+      "id": "s03-q04",
+      "type": "image",
+      "lesson": "bad-channels",
+      "objective": 1,
+      "prompt": "One channel in these ten seconds is bad. Which one?",
+      "image": {
+        "src": "/quiz/03/s03-q04.webp",
+        "w": 720,
+        "h": 480,
+        "status": "pending",
+        "alt": "A scroll window with channels FPz, EOG1, Fz, Cz, P4 and Oz over ten seconds. FPz and EOG1 show large, spaced peaks at the same moments in both. Channel P4 is a straight line with no variation. The other channels vary with similar amplitude.",
+        "spec": "Script figure on an **exercise copy** of D1 hp0.1 notch60 (source: script): channels FPz, EOG1, Fz, Cz, P4 and Oz over ten seconds that contain two or three blinks, in the style of Plot > Channel data (scroll) with one shared scale. Channel P4 is set to zero in the copy (EEG.data(iP4,:) = 0) to stand for a flat electrode. Under the figure, a small English line: Simulated flat channel for this quiz. Channel names are English, so one version serves both languages."
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": "FPz"
+        },
+        {
+          "id": "b",
+          "text": "EOG1"
+        },
+        {
+          "id": "c",
+          "text": "P4"
+        },
+        {
+          "id": "d",
+          "text": "Cz"
+        }
+      ],
+      "answer": [
+        "c"
+      ],
+      "explanation": "P4 is a flat line that records nothing, the clearest sign of a bad channel. The large peaks in FPz and EOG1 together are eye blinks, a normal artifact that ICA removes later, and a channel is not removed because of them. (The flat channel here is simulated for this question, because D1 has no bad channels.)"
+    },
+    {
+      "id": "s03-q05",
+      "type": "single",
+      "lesson": "interpolation",
+      "objective": 2,
+      "prompt": "Why do you interpolate removed channels before re-referencing to the average?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Because the average reference needs channels spread over the whole head, and a missing channel tilts the average toward the other side"
+        },
+        {
+          "id": "b",
+          "text": "Because interpolation adds new information to the data"
+        },
+        {
+          "id": "c",
+          "text": "Because EEGLAB refuses to re-reference when a channel is missing"
+        },
+        {
+          "id": "d",
+          "text": "Because interpolation raises the data rank"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "An interpolated channel is a mix of its neighbors, so it adds no new information; it lowers the data rank by one. But it completes the spread of channels over the head, so the average is balanced."
+    },
+    {
+      "id": "s03-q06",
+      "type": "multiple",
+      "lesson": "rereferencing",
+      "objective": 3,
+      "prompt": "You re-referenced D1 to the average reference, excluding `EOG1` and `EOG2`. Which statements are true? (Select all that apply)",
+      "options": [
+        {
+          "id": "a",
+          "text": "Every scalp channel changed shape"
+        },
+        {
+          "id": "b",
+          "text": "`EOG1` and `EOG2` stayed as they were"
+        },
+        {
+          "id": "c",
+          "text": "The data rank dropped by one, so ICA on D1 gives thirty-one components"
+        },
+        {
+          "id": "d",
+          "text": "Only the channels near the old reference changed"
+        },
+        {
+          "id": "e",
+          "text": "You can change the reference after ICA with no effect on the weights"
+        }
+      ],
+      "answer": [
+        "a",
+        "b",
+        "c"
+      ],
+      "explanation": "Every channel is the difference between its electrode and the reference, so changing the reference changes all channels together. Excluded channels are not part of the computation, so they stay the same. After an average reference the scalp channels sum to zero, so the rank drops by one. ICA weights are tied to the reference they were computed on, so do not change it afterward."
+    },
+    {
+      "id": "s03-q07",
+      "type": "single",
+      "lesson": "resampling",
+      "objective": 2,
+      "prompt": "Your data were recorded at 1000 Hz, and the highest frequency you care about is 40 Hz. Which new rate is the safe choice?",
+      "options": [
+        {
+          "id": "a",
+          "text": "50 Hz"
+        },
+        {
+          "id": "b",
+          "text": "64 Hz"
+        },
+        {
+          "id": "c",
+          "text": "80 Hz"
+        },
+        {
+          "id": "d",
+          "text": "250 Hz"
+        }
+      ],
+      "answer": [
+        "d"
+      ],
+      "explanation": "The rule: the new rate should be at least 2.5 times the highest frequency of interest, 100 Hz here. 80 Hz is only twice, with no margin, because the EEGLAB anti-aliasing filter fully keeps frequencies only up to 80% of the new Nyquist. 250 Hz is the common choice for ERP data."
+    },
+    {
+      "id": "s03-q08",
+      "type": "single",
+      "lesson": "line-noise",
+      "objective": 1,
+      "prompt": "Your analysis is ERP only, and you will apply a 30 Hz low-pass at the end. Do you usually need a notch filter for line noise?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Yes, always, whatever the analysis"
+        },
+        {
+          "id": "b",
+          "text": "Usually not, because a 30 Hz low-pass removes the 60 Hz peak; but you need it if you keep high frequencies, as in ICA or spectral analysis"
+        },
+        {
+          "id": "c",
+          "text": "No, because line noise does not appear in ERP data"
+        },
+        {
+          "id": "d",
+          "text": "Yes, but with a wide filter from 45 to 75 Hz"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "The decision follows the frequencies you keep. On this site's path we remove line noise even though the analysis is ERP, because we keep high frequencies until after ICA and postpone the low-pass until after cleaning. A wide filter takes real brain and muscle activity with it, so stay within ± 2 Hz."
+    }
+  ]
+}

@@ -1,0 +1,25 @@
+---
+import { t, type Lang } from '../i18n';
+interface Props { lang: Lang; followSystem?: boolean; noReset?: boolean }
+// Reset lives at the bottom of /progress/ only; the about page uses this for the theme button.
+const { lang, followSystem, noReset } = Astro.props;
+---
+<div class="reset-box" data-reset data-l-body={t(lang, 'progress.reset.body', { n: '{n}' })}
+  data-l-done={t(lang, 'progress.reset.done')} data-l-none={t(lang, 'progress.reset.none')}>
+  <div class="acts">
+    {!noReset && <button type="button" class="btn sec danger-text" data-reset-open hidden>{t(lang, 'progress.reset')}</button>}
+    {followSystem && <button type="button" class="btn sec" data-follow-system hidden>{t(lang, 'theme.followSystem')}</button>}
+  </div>
+  <p class="muted" role="status" aria-live="polite" data-reset-status></p>
+  {!noReset && <dialog data-reset-dialog aria-labelledby="reset-t">
+    <h2 id="reset-t">{t(lang, 'progress.reset.title')}</h2>
+    <p data-reset-body></p>
+    <div class="acts">
+      <button type="button" class="btn sec" value="cancel" data-reset-cancel>{t(lang, 'common.cancel')}</button>
+      <button type="button" class="btn danger" data-reset-confirm>{t(lang, 'progress.reset.confirm')}</button>
+    </div>
+  </dialog>}
+</div>
+<script>
+  import '../scripts/reset.ts';
+</script>

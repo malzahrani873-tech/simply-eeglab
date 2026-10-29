@@ -1,0 +1,173 @@
+---
+title: ERP والمتوسطات
+titleEn: ERPs & averaging
+description: كيف تحسب متوسط الـ epochs لتحصل على ERP في EEGLAB، ولماذا يكشف المتوسط موجة لا تراها في المحاولة الواحدة.
+station: 6
+order: 1
+level: core
+status: approved
+objectives:
+  - يحسب متوسط ERP لشرط واحد من السكربت ويعرضه من الواجهة.
+  - يحدد على الموجة أول مكوّن ERP سالب وأول مكوّن موجب كبير بكمونهما التقريبي.
+  - يشرح لماذا يقلّل المتوسط الضوضاء، وكيف يتغيّر ذلك مع عدد المحاولات.
+prerequisites: [epoch-rejection]
+references:
+  - title: EEGLAB Tutorial
+    url: https://eeglab.org/tutorials/08_Plot_data/Data_Averaging.html
+    section: "8. Plot data > a. ERPs: Plotting ERPs in a Topographic Map"
+  - title: Applied Event-Related Potential Data Analysis (Luck)
+    url: https://socialsci.libretexts.org/Bookshelves/Psychology/Biological_Psychology/Applied_Event-Related_Potential_Data_Analysis_(Luck)
+    section: "Chapter 6: Assigning Events to Bins, Averaging, Baseline Correction, and Assessing Data Quality"
+datasets: [D1]
+startingPoint:
+  dataset: D1
+  file: eeglab_data.set
+  applied: [filtering, line-noise, bad-channels, interpolation, rereferencing, run-ica, ica-1hz-copy-weights, iclabel, extract-epochs, baseline-correction, epoch-rejection]
+  script: |
+    % Shortcut: if you saved D1_epochs_clean.set in the epoch rejection lesson,
+    % keep the first line and the last three lines, and replace every line between them with:
+    % EEG = pop_loadset('D1_epochs_clean.set', pwd);
+    [ALLEEG, EEG, CURRENTSET, ALLCOM] = eeglab;
+    eeglabRoot = fileparts(which('eeglab'));
+    EEG = pop_loadset('eeglab_data.set', fullfile(eeglabRoot, 'sample_data'));
+    fullLocs = EEG.chanlocs;
+
+    % Main dataset: high-pass at 0.1 Hz, then 60 Hz line-noise removal
+    EEG = pop_eegfiltnew(EEG, 'locutoff', 0.1);
+    EEG = pop_eegfiltnew(EEG, 'locutoff', 58, 'hicutoff', 62, 'revfilt', 1);
+
+    % Bad channels you removed earlier, e.g. {'T7'}; leave empty if none
+    badChans = {};
+    if ~isempty(badChans)
+        EEG = pop_select(EEG, 'rmchannel', badChans);
+        EEG = pop_interp(EEG, fullLocs, 'spherical');
+    end
+
+    % Average reference, EOG channels excluded
+    eogIdx = find(ismember({EEG.chanlocs.labels}, {'EOG1', 'EOG2'}));
+    EEG = pop_reref(EEG, [], 'exclude', eogIdx);
+
+    % ICA on a 1-Hz copy, then copy the weights back
+    EEG_ica = pop_eegfiltnew(EEG, 'locutoff', 1);
+    EEG_ica = pop_runica(EEG_ica, 'icatype', 'runica', 'extended', 1);
+    EEG.icaweights  = EEG_ica.icaweights;
+    EEG.icasphere   = EEG_ica.icasphere;
+    EEG.icachansind = EEG_ica.icachansind;
+    EEG.icawinv     = [];
+    EEG.icaact      = [];
+    EEG = eeg_checkset(EEG);
+
+    % Remove components ICLabel rates above 90% Eye or Muscle
+    EEG = pop_iclabel(EEG, 'default');
+    EEG = pop_icflag(EEG, [NaN NaN; 0.9 1; 0.9 1; NaN NaN; NaN NaN; NaN NaN; NaN NaN]);
+    artifactComps = find(EEG.reject.gcompreject);
+    if ~isempty(artifactComps)
+        EEG = pop_subcomp(EEG, artifactComps, 0);
+    end
+
+    % Low-pass at 30 Hz
+    EEG = pop_eegfiltnew(EEG, 'hicutoff', 30);
+    EEG.setname = 'D1 main clean lp30';
+
+    % Epochs around 'square', baseline -200 to 0 ms
+    EEG = pop_epoch(EEG, {'square'}, [-1 2], 'newname', 'D1 epochs', 'epochinfo', 'yes');
+    EEG = pop_rmbase(EEG, [-200 0]);
+
+    % Reject epochs beyond +/-100 uV
+    EEG = pop_eegthresh(EEG, 1, 1:EEG.nbchan, -100, 100, EEG.xmin, EEG.xmax, 0, 0);
+    if any(EEG.reject.rejthresh)
+        EEG = pop_rejepoch(EEG, EEG.reject.rejthresh, 0);
+    end
+    EEG.setname = 'D1 epochs clean';
+    EEG = eeg_checkset(EEG);
+    EEG.filename = ''; EEG.filepath = ''; EEG.datfile = ''; EEG.saved = 'no';
+    [ALLEEG, EEG, CURRENTSET] = pop_newset(ALLEEG, EEG, 0, 'setname', 'D1 epochs clean', 'gui', 'off');
+    eeglab redraw;
+eeglabVersion: "2026.1"
+updated: 2026-10-28
+---
+
+## لماذا هذه الخطوة مهمة؟
+
+في كل epoch، استجابة الدماغ للمربع صغيرة، بضعة ميكروفولت، وفوقها نشاط آخر أكبر منها لا علاقة له بالمثير. لذلك لا تكاد ترى الاستجابة في المحاولة الواحدة.
+
+الفكرة: الاستجابة للمثير تتكرر بنفس الشكل وفي نفس التوقيت في كل محاولة، أما النشاط الآخر فيختلف عشوائياً. إذا حسبت متوسط كل الـ epochs نقطة بنقطة، تبقى الاستجابة، ويلغي النشاط العشوائي بعضه بعضاً.
+
+الموجة الناتجة هي الجهد المرتبط بحدث (<En>ERP</En>). وهي أساس كل ما بعدها: القياس، والمقارنة بين الشروط، والإحصاء.
+
+## قبل وبعد
+
+<Figure src="erp-average/erp-average-1-10-all.png" alt="ثلاث لوحات للقناة Pz بنفس المحاور: حقبة واحدة، ثم متوسط 10 حقب، ثم متوسط كل الحقب (77). الحقبة الواحدة ضوضاء، والمتوسط الكامل موجة أنعم فيها قمة موجبة بعد 400 ملي ثانية." caption="n = 1 و n = 10 و n = 77" source="D1" />
+
+## الخطوات من الواجهة
+
+ابدأ والداتاست `D1 epochs clean` مفتوحة، كما في "نقطة البداية".
+
+EEGLAB لا يحتوي قائمة منفصلة اسمها "احسب المتوسط". المتوسط يُحسب داخل قوائم رسم الـ ERP، أو بسطر واحد في السكربت. هنا نعرضه مرة واحدة للنظرة الأولى، وخيارات الرسم بالتفصيل في المحطة 7.
+
+1. افتح <MenuPath>Plot > Channel ERPs > In scalp/rect. array</MenuPath>.
+2. تظهر نافذة <UiLabel>Topographic ERP plot - pop_plottopo()</UiLabel>. اترك <UiLabel>Channels to plot</UiLabel> على `1:32`، واترك <UiLabel>Plot single trials</UiLabel> و<UiLabel>Plot in rect. array</UiLabel> غير مفعّلين، واضغط <UiLabel>Ok</UiLabel>.
+3. يظهر متوسط كل قناة في مكانها على الرأس. اضغط على موجة <En>Pz</En> لتكبيرها في نافذة مستقلة.
+4. ابحث في الموجة المكبّرة عن شيئين، بعد الخط العمودي عند الصفر:
+   - موجة سالبة صغيرة حوالي 200 ميلي ثانية، أوضح في القنوات الخلفية مثل <En>POz</En> و<En>Oz</En>.
+   - موجة موجبة كبيرة قمتها حوالي 400 ميلي ثانية، أكبر ما تكون في القنوات الوسطى والجدارية مثل <En>Cz</En> و<En>Pz</En>.
+
+<Callout type="note" title="اتجاه المحور">
+في هذه النافذة، الموجب لأعلى (الخيار `'ydir', 1` في آخر خانة). بعض الكتب والبرامج ترسم السالب لأعلى، فانظر دائماً لعلامات المحور قبل أن تقول "قمة موجبة".
+</Callout>
+
+## السكربت المقابل
+
+```matlab
+% The ERP is the mean over epochs: channels x time points
+% (the same line pop_plottopo computes in the GUI step)
+erp = mean(EEG.data, 3);
+fprintf('Averaged %d epochs\n', EEG.trials);
+
+% Plot the ERP at Pz, positive up
+pz = find(strcmp({EEG.chanlocs.labels}, 'Pz'));
+figure;
+plot(EEG.times, erp(pz, :), 'k', 'LineWidth', 1.5);
+xlim([-200 800]); grid on;
+xline(0, '--'); yline(0);
+xlabel('Time (ms)'); ylabel('Amplitude (\muV)');
+title(sprintf('ERP at Pz, %d epochs', EEG.trials));
+
+% Approximate latency of the largest positive peak between 250 and 600 ms
+win = EEG.times >= 250 & EEG.times <= 600;
+winTimes = EEG.times(win);
+[peakAmp, iPeak] = max(erp(pz, win));
+fprintf('Positive peak at Pz: %.1f uV at %.0f ms\n', peakAmp, winTimes(iPeak));
+
+% Quick look at all channels, same as the GUI step
+figure; pop_plottopo(EEG, 1:EEG.nbchan, EEG.setname, 0, 'ydir', 1);
+```
+
+## أي قيمة أختار؟
+
+| الإعداد | القيمة | لماذا |
+|---|---|---|
+| ما يدخل المتوسط | الـ epochs النظيفة من شرط واحد فقط | المتوسط يخلط كل ما تعطيه. إذا كان عندك شرطان، احسب متوسطاً لكل شرط وحده. |
+| عدد المحاولات | أكثر ما تستطيع بعد الرفض، ونفس العدد تقريباً لكل شرط | الضوضاء في المتوسط تقلّ بنسبة الجذر التربيعي لعدد المحاولات: 4 أضعاف المحاولات تعني نصف الضوضاء. |
+| نافذة البحث عن القمة | تُحدَّد قبل رؤية البيانات، من الأدبيات | النافذة 250 إلى 600 ميلي ثانية هنا لمثال واحد فقط. القياس الدقيق للسعة والكمون في درس ERPLAB. |
+
+## أخطاء شائعة
+
+- **خلط الشروط في متوسط واحد.** في D1 ظهر المربع في موقعين (حقل `position`). متوسط الموقعين معاً صحيح كمثال هنا، لكن مقارنة الموقعين تحتاج متوسطاً لكل واحد. مقارنة الشروط في درس رسم ERP للقنوات في المحطة 7.
+- **قراءة القمة الأعلى كأنها "المكوّن".** قمة الموجة في قناة واحدة قد تأتي من أكثر من مكوّن ERP متداخل. الكمون التقريبي هنا للتعرّف على الموجة، لا لاستنتاج علمي.
+- **الخلط بين اتجاه المحور.** موجة موجبة مرسومة لأسفل تُقرأ خطأ كسالبة. انظر للمحور.
+- **المتوسط قبل الرفض.** epoch واحد فيه آرتفاكت كبير يكفي ليغيّر المتوسط. ارفض أولاً، كما في الدرس السابق.
+- **أعداد مختلفة جداً بين الشروط.** شرط بـ 20 محاولة وآخر بـ 80 يختلفان في الضوضاء، فتظهر القمم مختلفة حتى لو كانت الاستجابة نفسها.
+
+{/* صندوق "من التجربة": بانتظار قصة من صاحب المشروع. لا يُكتب قبل وصولها. */}
+
+## كيف تتأكد أن الخطوة نجحت؟
+
+- `size(erp)` يعطي `32 384`: قناة × نقطة زمنية، بلا بُعد الـ epochs.
+- عند Pz قمة موجبة بين 300 و 500 ميلي ثانية تقريباً، وسعتها حوالي 10 ميكروفولت. التوتوريال الرسمي يذكر أن أكبر تباين في ERP هذه البيانات عند حوالي 430 ميلي ثانية.
+- الموجة قبل الصفر (فترة baseline) قريبة من الصفر ومسطّحة نسبياً.
+- لو رسمت متوسط 10 epochs فقط، ستكون الموجة أكثر خشونة من متوسط الكل.
+
+<Methods>
+ERPs were computed by averaging the [N] artifact-free epochs time-locked to the square stimulus (EEGLAB 2026.1).
+</Methods>

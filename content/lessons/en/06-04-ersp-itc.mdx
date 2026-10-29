@@ -1,0 +1,180 @@
+---
+title: "Time-frequency: ERSP & ITC"
+titleEn: "Time-frequency: ERSP & ITC"
+description: How to compute ERSP and ITC for one channel in EEGLAB with Channel time-frequency, read the colors of the map, and tell a change in power from consistent phase.
+station: 6
+order: 4
+level: recommended
+status: approved
+objectives:
+  - Compute ERSP and ITC for one channel, from the GUI and from a script.
+  - Interpret the colors of an ERSP map as an increase or decrease in power relative to the baseline, in dB.
+  - Explain the difference between ERSP (change in power) and ITC (phase consistency across trials), and how ITC relates to the ERP.
+prerequisites: [erp-average, power-spectrum]
+references:
+  - title: EEGLAB Tutorial
+    url: https://eeglab.org/tutorials/08_Plot_data/Time-Frequency_decomposition.html
+    section: "8. Plot data > d. Time-Frequency"
+  - title: EEGLAB Tutorial
+    url: https://eeglab.org/tutorials/ConceptsGuide/Time_frequency_tutorial.html
+    section: "Concepts guide: time-frequency"
+  - title: "Time-Frequency Analysis of EEG Time Series Part 5: Practicum in EEGLAB"
+    url: https://www.youtube.com/watch?v=b0430f_W0mo
+    section: "Full video"
+    duration: "8:55"
+datasets: [D1]
+startingPoint:
+  dataset: D1
+  file: eeglab_data.set
+  applied: [filtering, line-noise, bad-channels, interpolation, rereferencing, run-ica, ica-1hz-copy-weights, iclabel, extract-epochs, baseline-correction, epoch-rejection]
+  script: |
+    % Shortcut: if you saved D1_epochs_clean.set in the epoch rejection lesson,
+    % keep the first line and the last three lines, and replace every line between them with:
+    % EEG = pop_loadset('D1_epochs_clean.set', pwd);
+    [ALLEEG, EEG, CURRENTSET, ALLCOM] = eeglab;
+    eeglabRoot = fileparts(which('eeglab'));
+    EEG = pop_loadset('eeglab_data.set', fullfile(eeglabRoot, 'sample_data'));
+    fullLocs = EEG.chanlocs;
+
+    % Main dataset: high-pass at 0.1 Hz, then 60 Hz line-noise removal
+    EEG = pop_eegfiltnew(EEG, 'locutoff', 0.1);
+    EEG = pop_eegfiltnew(EEG, 'locutoff', 58, 'hicutoff', 62, 'revfilt', 1);
+
+    % Bad channels you removed earlier, e.g. {'T7'}; leave empty if none
+    badChans = {};
+    if ~isempty(badChans)
+        EEG = pop_select(EEG, 'rmchannel', badChans);
+        EEG = pop_interp(EEG, fullLocs, 'spherical');
+    end
+
+    % Average reference, EOG channels excluded
+    eogIdx = find(ismember({EEG.chanlocs.labels}, {'EOG1', 'EOG2'}));
+    EEG = pop_reref(EEG, [], 'exclude', eogIdx);
+
+    % ICA on a 1-Hz copy, then copy the weights back
+    EEG_ica = pop_eegfiltnew(EEG, 'locutoff', 1);
+    EEG_ica = pop_runica(EEG_ica, 'icatype', 'runica', 'extended', 1);
+    EEG.icaweights  = EEG_ica.icaweights;
+    EEG.icasphere   = EEG_ica.icasphere;
+    EEG.icachansind = EEG_ica.icachansind;
+    EEG.icawinv     = [];
+    EEG.icaact      = [];
+    EEG = eeg_checkset(EEG);
+
+    % Remove components ICLabel rates above 90% Eye or Muscle
+    EEG = pop_iclabel(EEG, 'default');
+    EEG = pop_icflag(EEG, [NaN NaN; 0.9 1; 0.9 1; NaN NaN; NaN NaN; NaN NaN; NaN NaN]);
+    artifactComps = find(EEG.reject.gcompreject);
+    if ~isempty(artifactComps)
+        EEG = pop_subcomp(EEG, artifactComps, 0);
+    end
+
+    % Low-pass at 30 Hz
+    EEG = pop_eegfiltnew(EEG, 'hicutoff', 30);
+    EEG.setname = 'D1 main clean lp30';
+
+    % Epochs around 'square', baseline -200 to 0 ms
+    EEG = pop_epoch(EEG, {'square'}, [-1 2], 'newname', 'D1 epochs', 'epochinfo', 'yes');
+    EEG = pop_rmbase(EEG, [-200 0]);
+
+    % Reject epochs beyond +/-100 uV
+    EEG = pop_eegthresh(EEG, 1, 1:EEG.nbchan, -100, 100, EEG.xmin, EEG.xmax, 0, 0);
+    if any(EEG.reject.rejthresh)
+        EEG = pop_rejepoch(EEG, EEG.reject.rejthresh, 0);
+    end
+    EEG.setname = 'D1 epochs clean';
+    EEG = eeg_checkset(EEG);
+    EEG.filename = ''; EEG.filepath = ''; EEG.datfile = ''; EEG.saved = 'no';
+    [ALLEEG, EEG, CURRENTSET] = pop_newset(ALLEEG, EEG, 0, 'setname', 'D1 epochs clean', 'gui', 'off');
+    eeglab redraw;
+eeglabVersion: "2026.1"
+updated: 2026-10-28
+---
+
+## Why this step matters
+
+The ERP collects what repeats with the same shape and timing in every trial. But some brain activity after the stimulus changes in strength without being in the same phase every time, such as a drop in alpha. That activity cancels out in the average, so you do not see it in the ERP.
+
+Time-frequency analysis computes two things for each frequency, each moment, and each trial: the power and the phase. Then it gives you two maps:
+
+- **<En>ERSP</En>:** the change in power at each time and frequency relative to baseline, in dB. It sees activity whether or not it is in the same phase.
+- **<En>ITC</En>:** how consistent the phase is across trials at each time and frequency, from 0 (random phase) to 1 (the same phase in every trial). High ITC is a condition for activity to appear in the ERP: activity with random phase cancels out in the average.
+
+## Before and after
+
+<Figure src="ersp-itc/ersp-itc-cz.png" alt="Channel time-frequency for Cz, 3 to 30 Hz: ERSP map in dB on top, ITC map below with the ERP under it. A red area in both maps at low frequencies after the stimulus." source="D1" />
+
+## Steps in the GUI
+
+Start with the dataset `D1 epochs clean` open, as in "Starting point".
+
+1. Open the menu. Where it is depends on your settings:
+   - If you turned on the legacy menus in the epoch rejection lesson: <MenuPath>Plot > Time-frequency transforms > Channel time-frequency</MenuPath>.
+   - If you did not: <MenuPath>Plot > Channel time-frequency</MenuPath>.
+2. The <UiLabel>Plot channel time frequency -- pop_newtimef()</UiLabel> window opens. In <UiLabel>Channel number</UiLabel>, type `14`, that is, channel <En>Cz</En>, or pick it with the <UiLabel>...</UiLabel> button.
+3. Keep <UiLabel>Sub epoch time limits [min max] (msec)</UiLabel> at its value, that is, the whole epoch.
+4. In <UiLabel>Frequency limits [min max] (Hz) or sequence</UiLabel>, type `3 30`. The data have a 30 Hz low-pass, so there is nothing meaningful above it.
+5. Keep <UiLabel>Baseline limits [min max] (msec) (0->pre-stim.)</UiLabel> at `0`, that is, the whole period before the stimulus.
+6. Keep <UiLabel>Wavelet cycles [min max/fact] or sequence</UiLabel> at `3 0.8`.
+7. In <UiLabel>Optional newtimef() arguments (see Help)</UiLabel>, type `'winsize', 128`, a window 1 second long, so the analysis starts at 3 Hz.
+8. Keep <UiLabel>Plot Event Related Spectral Power</UiLabel> and <UiLabel>Plot Inter Trial Coherence</UiLabel> checked, and press <UiLabel>Ok</UiLabel>. The computation takes a few seconds.
+9. Read the figure:
+   - **Top (ERSP):** red is an increase in power over baseline, blue a decrease, green no change. On the left is the spectrum of the baseline period.
+   - **Bottom (ITC):** red is consistent phase across trials. Below the map is the ERP of the same channel.
+   - Compare the two maps: the red area at low frequencies around 200 to 400 ms appears in both. This is the ERP itself, in the language of frequencies.
+
+<Callout type="note" title="The map edges">
+The map does not start at -1000 ms or end at 1992 ms. Each point needs a 1-second window around it, so half a second is lost at each edge. That is why we cut long epochs in the epoching lesson.
+</Callout>
+
+## The equivalent script
+
+```matlab
+% ERSP and ITC at Cz, 3 to 30 Hz, wavelets from 3 cycles
+cz = find(strcmp({EEG.chanlocs.labels}, 'Cz'));
+figure;
+[ersp, itc, powbase, times, freqs] = pop_newtimef(EEG, 1, cz, ...
+    [EEG.xmin EEG.xmax]*1000, [3 0.8], 'freqs', [3 30], 'winsize', 128, ...
+    'baseline', 0, 'padratio', 1, 'plotphase', 'off');
+
+% ersp: frequencies x times in dB; itc: complex, its magnitude is 0 to 1
+itcMag = abs(itc);
+fprintf('Frequencies %.1f to %.1f Hz, times %.0f to %.0f ms\n', ...
+    freqs(1), freqs(end), times(1), times(end));
+
+% Where is the phase locking strongest?
+[maxItc, idx] = max(itcMag(:));
+[fi, ti] = ind2sub(size(itcMag), idx);
+fprintf('Max ITC %.2f at %.1f Hz, %.0f ms\n', maxItc, freqs(fi), times(ti));
+```
+
+## Which value should I choose?
+
+| Setting | Value | Why |
+|---|---|---|
+| Number of cycles | `3 0.8` (the default) | 3 cycles at the lowest frequency, growing slowly with frequency. Fewer cycles give better time resolution and worse frequency resolution, and the other way around. |
+| Window length | `'winsize', 128` (1 second at 128 Hz) | Lowest frequency = number of cycles ÷ window length in seconds, so 3 Hz here. A shorter window raises the lowest frequency. |
+| Frequency range | 3 to 30 Hz | The window does not allow below 3 Hz, and the low-pass removed everything above 30 Hz. |
+| Baseline | `0` (everything before the stimulus) | ERSP is relative to this period. Make sure it contains no response. |
+| Channel | Cz here | The ERP in D1 is large at central and parietal channels. For a question about alpha, try posterior channels such as POz. |
+
+## Common mistakes
+
+- **Short epochs.** A 1-second window eats half a second at each edge. An epoch from -200 to 800 ms leaves almost nothing. Cut longer epochs for time-frequency analysis.
+- **Always reading red as "more activity".** Red is an increase **relative to baseline**. If the baseline period itself is unusual, the whole map changes.
+- **Mixing up ERSP and ITC.** An ERSP increase without ITC means stronger activity with a different phase each time, so it will not show in the ERP. High ITC means the phase is consistent, which, together with enough amplitude, is what lets activity appear in the ERP.
+- **Analyzing frequencies above the low-pass.** Above 30 Hz there is no signal in our data, and the ratios there are noise.
+- **Judging without statistics.** A map without a test shows every change, even random ones. The <UiLabel>Bootstrap significance level (Ex: 0.01 -> 1%)</UiLabel> box hides what is not significant, and full statistics come in station 8.
+
+{/* "From experience" box: waiting for the project owner's story. Do not write it before it arrives. */}
+
+## How to check it worked
+
+- `freqs(1)` is about 3 and `freqs(end)` about 30, and `times` runs from about -500 to 1500 ms.
+- `size(ersp)` and `size(itc)` are equal: number of frequencies × 200 time points.
+- The highest ITC is at a low frequency (about 3 to 7 Hz) at roughly 200 to 400 ms, with a value of roughly 0.5 to 0.8.
+- In the ERSP, the same area is red: an increase of a few dB over baseline.
+
+<Methods>
+Event-related spectral perturbation and inter-trial coherence were computed at Cz with newtimef using Morlet wavelets whose number of cycles increased linearly from 3 at 3 Hz to 6 at 30 Hz, relative to a −500 to 0 ms prestimulus baseline (EEGLAB 2026.1).
+</Methods>

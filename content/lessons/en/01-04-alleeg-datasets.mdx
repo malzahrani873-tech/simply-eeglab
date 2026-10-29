@@ -1,0 +1,137 @@
+---
+title: ALLEEG & dataset management
+titleEn: ALLEEG & dataset management
+description: How EEGLAB keeps several versions of a dataset in memory, how to store a new version after a step, and how to move between versions without mixing them up.
+station: 1
+order: 4
+level: recommended
+status: approved
+objectives:
+  - Store the result of a step as a new dataset instead of overwriting the original.
+  - Move between the datasets in memory from the Datasets menu and know which one is current.
+  - Delete a dataset from memory, and know that this does not delete its file.
+prerequisites: [eeg-struct]
+references:
+  - title: EEGLAB Tutorial
+    url: https://eeglab.org/tutorials/03_Dataset_management/datasets.html
+    section: "3. Dataset management"
+datasets: [D1]
+startingPoint:
+  dataset: D1
+  file: eeglab_data.set
+  applied: []
+  script: |
+    [ALLEEG, EEG, CURRENTSET, ALLCOM] = eeglab;
+    sampleFolder = fullfile(fileparts(which('eeglab')), 'sample_data');
+    EEG = pop_loadset('filename', 'eeglab_data.set', 'filepath', sampleFolder);
+    [ALLEEG, EEG, CURRENTSET] = pop_newset(ALLEEG, EEG, 0, 'setname', 'Continuous EEG Data', 'gui', 'off');
+    eeglab redraw;
+eeglabVersion: "2026.1"
+updated: 2026-10-28
+---
+
+## Why this step matters
+
+Every processing step creates a new version of your data. EEGLAB can keep several versions in memory at the same time, so you can compare before and after, or go back one step without loading the file again.
+
+EEGLAB uses three variables for this:
+
+- `ALLEEG`: the shelf that holds every dataset in memory.
+- `EEG`: the dataset you are working on now.
+- `CURRENTSET`: the number of that dataset on the shelf.
+
+If you do not know which dataset is current, you may filter the wrong version or save over the original. This lesson shows you how to always know where you are.
+
+## Before and after
+
+<Figure src="alleeg-datasets/alleeg-shelf.svg" alt="A shelf named ALLEEG holding two boxes: 1 is Continuous EEG Data with 32 channels, 2 is D1 no EOG with 30 channels. An arrow CURRENTSET = 2 points at box 2, and a copy of it in front of the shelf is named EEG." source="original" />
+
+## Steps in the GUI
+
+### 1. Make a change and store it as a new dataset
+
+To have something to store, we make one simple change: remove the two eye channels `EOG1` and `EOG2`. This is only an example for this lesson.
+
+1. With `eeglab_data.set` open, open <MenuPath>Edit > Select data</MenuPath>.
+2. In the <UiLabel>Channel(s)</UiLabel> row, type `EOG1 EOG2`.
+3. Tick the box in the same row, under <UiLabel>on->remove these</UiLabel>. Without this tick, EEGLAB would keep these two channels and remove all the others.
+4. Click <UiLabel>OK</UiLabel>.
+5. A window opens asking <UiLabel>What do you want to do with the new dataset?</UiLabel>. In <UiLabel>Name it:</UiLabel>, replace `Continuous EEG Data` with `D1 no EOG`.
+6. Leave <UiLabel>Save it as file:</UiLabel> unticked. The new dataset stays in memory only.
+7. Leave <UiLabel>Overwrite it in memory (set=yes; unset=create a new dataset)</UiLabel> unticked, so the original stays as dataset 1.
+8. Click <UiLabel>OK</UiLabel>.
+
+The main window now starts with `#2: D1 no EOG`, and <UiLabel>Channels per frame</UiLabel> shows 30.
+
+### 2. Move between datasets
+
+1. Open the <UiLabel>Datasets</UiLabel> menu. It lists `Dataset 1:Continuous EEG Data` and `Dataset 2:D1 no EOG`. The current one has a check mark.
+2. Choose `Dataset 1:Continuous EEG Data`. The main window shows `#1` and 32 channels again.
+3. Any menu you use now works on dataset 1. Before each step, look at the first line of the main window to know which dataset is current.
+
+### 3. Delete a dataset from memory
+
+1. Open <MenuPath>Edit > Delete dataset(s) from memory</MenuPath>.
+2. In <UiLabel>Dataset(s) to delete:</UiLabel>, type `2`.
+3. Click <UiLabel>OK</UiLabel>. The <UiLabel>Datasets</UiLabel> menu now lists dataset 1 only.
+
+Deleting from memory does not touch any file on disk. A dataset that was never saved is lost when you delete it.
+
+## The equivalent script
+
+```matlab
+% Start EEGLAB and load the sample dataset as dataset 1
+[ALLEEG, EEG, CURRENTSET, ALLCOM] = eeglab;
+sampleFolder = fullfile(fileparts(which('eeglab')), 'sample_data');
+EEG = pop_loadset('filename', 'eeglab_data.set', 'filepath', sampleFolder);
+[ALLEEG, EEG, CURRENTSET] = eeg_store(ALLEEG, EEG, 0);
+
+% Remove the two eye channels and store the result as a new dataset
+EEG = pop_select(EEG, 'rmchannel', {'EOG1', 'EOG2'});
+[ALLEEG, EEG, CURRENTSET] = pop_newset(ALLEEG, EEG, CURRENTSET, ...
+    'setname', 'D1 no EOG', 'gui', 'off');
+
+CURRENTSET                            % 2
+[ALLEEG(1).nbchan ALLEEG(2).nbchan]   % 32 30
+
+% Go back to dataset 1
+[ALLEEG, EEG, CURRENTSET] = pop_newset(ALLEEG, EEG, CURRENTSET, 'retrieve', 1);
+EEG.nbchan                            % 32
+
+% Delete dataset 2 from memory (its file, if any, is not touched)
+ALLEEG = pop_delset(ALLEEG, 2);
+eeglab redraw;
+```
+
+- `pop_newset` with `CURRENTSET` stores the changed `EEG` as a new dataset after the current one. With `'gui', 'off'` it does not open the naming window.
+- `'retrieve', 1` makes dataset 1 the current dataset again, as choosing it from the <UiLabel>Datasets</UiLabel> menu does.
+
+## Which value should I choose?
+
+The choice is in the window that opens after each step:
+
+| Option | When to use it |
+|---|---|
+| Create a new dataset (the default) | You want to compare with the previous version, or you are not sure about the step yet. |
+| <UiLabel>Overwrite it in memory</UiLabel> | Memory is limited, or you no longer need the previous version in this session. |
+| <UiLabel>Save it as file:</UiLabel> | You want to keep this version after closing MATLAB. Give it a new name so you do not overwrite the original file. |
+
+**A good habit:** give each version a name that says what was done, such as `D1 no EOG` or `D1 filtered 1Hz`. A dataset list full of `Continuous EEG Data` is easy to mix up.
+
+## Common mistakes
+
+- **Working on the wrong dataset.** After you switch from the <UiLabel>Datasets</UiLabel> menu, every step applies to the dataset you chose. Check the `#` number in the first line of the main window before each step.
+- **Thinking that storing in memory saves the file.** A new dataset lives in memory until you save it. It is lost when you close MATLAB.
+- **Forgetting the tick under <UiLabel>on->remove these</UiLabel>.** Without it, <MenuPath>Edit > Select data</MenuPath> keeps only `EOG1` and `EOG2`, and the new dataset has 2 channels instead of 30.
+- **Changing `EEG` in a script and forgetting `eeg_store` or `pop_newset`.** The change is in the `EEG` variable only, and the <UiLabel>Datasets</UiLabel> menu does not know about it.
+
+{/* "From experience" box: waiting for a story from the project owner. Do not write it before it arrives. */}
+
+## How to check it worked
+
+1. After step 1, the first line of the main window is `#2: D1 no EOG`, with 30 channels.
+2. The <UiLabel>Datasets</UiLabel> menu lists two datasets, with a check mark on the current one.
+3. After switching to dataset 1, the main window shows `#1` and 32 channels.
+4. After deleting, the <UiLabel>Datasets</UiLabel> menu lists dataset 1 only.
+
+Nothing in this lesson is saved to disk, and the sample file stays as it was.

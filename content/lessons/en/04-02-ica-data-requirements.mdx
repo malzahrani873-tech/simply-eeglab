@@ -1,0 +1,141 @@
+---
+title: How much data ICA needs
+titleEn: How much data ICA needs
+description: How to check whether your recording is long enough for ICA from the number of channels and data points, and when to lower the number of components.
+station: 4
+order: 2
+level: recommended
+status: approved
+objectives:
+  - Compute the number of data points per weight for a dataset, from the GUI numbers or from a script.
+  - Estimate the shortest recording ICA needs for a given number of channels and sampling rate.
+  - Decide when to lower the number of components with the pca option, and when not to.
+prerequisites: [ica-concept]
+references:
+  - title: EEGLAB Concepts guide
+    url: https://eeglab.org/tutorials/ConceptsGuide/ICA_background.html
+    section: "How many data points do I need to run an ICA?"
+  - title: EEGLAB Tutorial
+    url: https://eeglab.org/tutorials/06_RejectArtifacts/RunICA.html
+    section: "Issues with data rank deficiencies"
+  - title: Makoto's preprocessing pipeline
+    url: https://eeglab.ucsd.edu/wiki/Makoto%27s_preprocessing_pipeline
+    section: "§13.1 What is the minimum length of data to perform ICA?; §12 Adjust data rank for ICA"
+datasets: [D1]
+startingPoint:
+  dataset: D1
+  file: eeglab_data.set
+  applied: [filtering, line-noise, bad-channels, interpolation, rereferencing]
+  script: |
+    [ALLEEG, EEG, CURRENTSET, ALLCOM] = eeglab;
+    eeglabRoot = fileparts(which('eeglab'));
+    EEG = pop_loadset('eeglab_data.set', fullfile(eeglabRoot, 'sample_data'));
+    fullLocs = EEG.chanlocs;
+
+    % Main dataset: high-pass at 0.1 Hz, then 60 Hz line-noise removal
+    EEG = pop_eegfiltnew(EEG, 'locutoff', 0.1);
+    EEG = pop_eegfiltnew(EEG, 'locutoff', 58, 'hicutoff', 62, 'revfilt', 1);
+
+    % Bad channels you removed earlier, e.g. {'T7'}; leave empty if none
+    badChans = {};
+    if ~isempty(badChans)
+        EEG = pop_select(EEG, 'rmchannel', badChans);
+        EEG = pop_interp(EEG, fullLocs, 'spherical');
+    end
+
+    % Average reference, EOG channels excluded
+    eogIdx = find(ismember({EEG.chanlocs.labels}, {'EOG1', 'EOG2'}));
+    EEG = pop_reref(EEG, [], 'exclude', eogIdx);
+    EEG.filename = ''; EEG.filepath = ''; EEG.datfile = ''; EEG.saved = 'no';
+    [ALLEEG, EEG, CURRENTSET] = pop_newset(ALLEEG, EEG, 0, 'setname', 'D1 main', 'gui', 'off');
+    eeglab redraw;
+interactive: []
+eeglabVersion: "2026.1"
+updated: 2026-10-28
+---
+
+## Why this step matters
+
+ICA learns an unmixing matrix: one weight for every pair of channel and component. With 32 channels that is 32 × 32 = 1024 weights. Each weight has to be learned from the data, so ICA needs enough data points to learn them all.
+
+The official EEGLAB guide gives this rule: to find N stable components, you typically need *more than* k × N² data points per channel. N² is the number of weights, and k is a multiplier: how many data points each weight gets.
+
+Two things matter most:
+
+- **The number of components grows as a square.** Doubling the channels from 32 to 64 needs four times the data, not twice.
+- **k is not fixed.** The official guide says k increases as the number of channels increases. Its example uses 32 channels and about 30 points per weight, and it says that even 30 points per weight does not appear to be enough for 256 components.
+
+## Before and after
+
+<Figure src="ica-data-requirements/ica-minutes-curve.svg" alt="Curve of the shortest recording ICA needs against the number of components, at k = 30 and 250 Hz. Horizontal axis: 32, 64, 128 and 256 components; vertical axis: minutes of recording. Points: 32 components 2.0 min, 64 components 8.2 min, 128 components 32.8 min, 256 components 131.1 min. At 256 a dashed note: k = 30 may not be enough here (official guide)." source="original" />
+
+## Steps in the GUI
+
+There is no menu for this check. You read three numbers from the main EEGLAB window and do the arithmetic yourself. Start with the main dataset `D1 main` loaded, as in the Starting point.
+
+1. Read <UiLabel>Channels per frame</UiLabel>: 32 in D1.
+2. Read <UiLabel>Frames per epoch</UiLabel>: 30504 in D1. For continuous data this is the number of data points per channel. For epoched data, multiply it by <UiLabel>Epochs</UiLabel>.
+3. Read <UiLabel>Sampling rate (Hz)</UiLabel>: 128 in D1.
+4. Work out the number of components: the data rank, as in the Running ICA lesson. In D1 it is 32 − 0 interpolated − 1 for the average reference = 31.
+5. Divide: 30504 / 31² = 30504 / 961 ≈ 31.7 points per weight. This is close to the official example, which uses almost the same tutorial dataset (30800 points, 32 channels), so D1 has enough data for 31 components.
+
+## The equivalent script
+
+```matlab
+% How much data ICA has in the current dataset
+nComp   = EEG.nbchan - numel(badChans) - 1;   % expected rank after average reference
+nPoints = EEG.pnts * EEG.trials;
+fprintf('Data points per channel: %d\n', nPoints);
+fprintf('Recording length: %.2f min\n', nPoints / EEG.srate / 60);
+fprintf('Points per weight, %d channels: %.1f\n', EEG.nbchan, nPoints / EEG.nbchan^2);
+fprintf('Points per weight, %d components: %.1f\n', nComp, nPoints / nComp^2);
+
+% Shortest recording that gives k = 30 points per weight at this sampling rate
+k = 30;
+for N = [32 64 128 256]
+    fprintf('%3d components: at least %.1f min\n', N, k * N^2 / EEG.srate / 60);
+end
+```
+
+In D1 the script prints 30504 points, 3.97 minutes, 29.8 points per weight for 32 channels, and 31.7 for 31 components. Then the shortest lengths at 128 Hz: 4.0, 16.0, 64.0, and 256.0 minutes.
+
+Notice that D1 is just under 4 minutes, right at the limit for k = 30 with 32 channels. The average reference lowers the components to 31, which brings it back above the limit.
+
+## Which value should I choose?
+
+The table gives the shortest recording for k = 30. Treat it as a minimum, because k should grow with the number of channels.
+
+| Components | Weights (N²) | Data points (k = 30) | Minutes at 250 Hz | Minutes at 128 Hz |
+|---|---|---|---|---|
+| 32 | 1024 | 30720 | 2.0 | 4.0 |
+| 64 | 4096 | 122880 | 8.2 | 16.0 |
+| 128 | 16384 | 491520 | 32.8 | 64.0 |
+| 256 | 65536 | 1966080 | 131.1 | 256.0 |
+
+**When to reduce the rank with `'pca'`:**
+
+| Case | What to do | Why |
+|---|---|---|
+| Average reference or interpolated channels | Components = channels − interpolated − 1 | The data rank is lower, as in the Running ICA lesson. |
+| The recording is too short for all components | Reduce the number with `'pca'`, for example `'pca', 20` | Fewer components need fewer data points. |
+| Enough data and full rank | Do not reduce | Official tutorial: PCA slightly corrupts the data, so the full-rank data are better whenever possible. |
+
+## Common mistakes
+
+- **Counting minutes and forgetting the sampling rate.** The rule counts data points. The same 4 minutes give 30720 points at 128 Hz and 60000 points at 250 Hz.
+- **Doubling the data for double the channels.** The need grows with N², so 64 channels need four times the data of 32.
+- **Running ICA on each epoch or short block separately.** Independence must be fully expressed in the data, which needs many data points, as the official FAQ explains. Decompose all the data together.
+- **Mixing sessions from different days.** The official guide advises running ICA separately on sessions recorded on different days, because the electrode positions differ slightly.
+- **Reducing with `'pca'` only to save time.** PCA slightly corrupts the data. Use it for a reason: a lower rank, or too little data.
+
+{/* "From experience" box: waiting for the project owner's story. Do not write it before it arrives. */}
+
+## How to check it worked
+
+1. **You know your numbers:** channels, data points per channel, sampling rate, and the expected number of components.
+2. **Points per weight:** in D1 it is about 31.7 for 31 components.
+3. **The decision is written down:** enough data, or a lower number of components with `'pca'` and its reason.
+
+<Methods>
+The ICA training data comprised [30504] samples per channel ([3.97] min at 128 Hz), giving [31.7] data points per unmixing weight for [31] components.
+</Methods>

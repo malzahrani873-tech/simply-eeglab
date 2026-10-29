@@ -1,0 +1,172 @@
+{
+  "v": 1,
+  "station": 9,
+  "lang": "en",
+  "passPercent": 80,
+  "questions": [
+    {
+      "id": "s09-q01",
+      "type": "single",
+      "lesson": "eegh-history",
+      "objective": 1,
+      "prompt": "You applied a filter from the GUI and want its exact matching line of code. What is the quickest way?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Type `eegh` in the command window"
+        },
+        {
+          "id": "b",
+          "text": "Type `help pop_eegfiltnew` and guess the values"
+        },
+        {
+          "id": "c",
+          "text": "Open `Edit > Dataset info`"
+        },
+        {
+          "id": "d",
+          "text": "Run `eeglab` again, then type `eegh`"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "`eegh` prints every command of the session in order, including the filter line with its values, such as `'revfilt',1` for the notch box. Running `eeglab` again starts an empty history, so you lose the session history if you did not save it."
+    },
+    {
+      "id": "s09-q02",
+      "type": "single",
+      "lesson": "eegh-history",
+      "objective": 2,
+      "prompt": "A colleague sent you a `.set` file and you want to know how it was made. Where do you look?",
+      "options": [
+        {
+          "id": "a",
+          "text": "In `EEG.history`, because it is saved inside the file itself"
+        },
+        {
+          "id": "b",
+          "text": "In `eegh` on your computer"
+        },
+        {
+          "id": "c",
+          "text": "In the file name"
+        },
+        {
+          "id": "d",
+          "text": "In `EEG.event`"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "The dataset history (`EEG.history`) keeps the commands that changed this dataset, and it travels with it inside the `.set` file. `eegh` is your own session history. A file name is not enough: two files called `clean` may have gone through different filters."
+    },
+    {
+      "id": "s09-q03",
+      "type": "order",
+      "lesson": "single-subject-script",
+      "objective": 1,
+      "prompt": "Put these lines in the order they come in the single-subject script:",
+      "options": [
+        {
+          "id": "a",
+          "text": "`EEG = pop_reref(EEG, [], 'exclude', eogIdx);`"
+        },
+        {
+          "id": "b",
+          "text": "`EEG = pop_epoch(EEG, {'square'}, [-1 2], 'newname', 'D1 epochs', 'epochinfo', 'yes');`"
+        },
+        {
+          "id": "c",
+          "text": "`EEG = pop_loadset('filename', 'eeglab_data.set', 'filepath', dataDir);`"
+        },
+        {
+          "id": "d",
+          "text": "`EEG = pop_interp(EEG, fullLocs, 'spherical');`"
+        },
+        {
+          "id": "e",
+          "text": "`EEG_ica = pop_runica(EEG_ica, 'icatype', 'runica', 'extended', 1);`"
+        },
+        {
+          "id": "f",
+          "text": "`EEG = pop_eegfiltnew(EEG, 'locutoff', 0.1);`"
+        }
+      ],
+      "answer": [
+        "c",
+        "f",
+        "d",
+        "a",
+        "e",
+        "b"
+      ],
+      "explanation": "The same order as the stations: load, then filter, then interpolate before the reference, then the average reference before ICA, then ICA on a 1 Hz copy, and epoching last. Do not move a step without a reason; each part of this order is explained in its lesson."
+    },
+    {
+      "id": "s09-q04",
+      "type": "single",
+      "lesson": "single-subject-script",
+      "objective": 3,
+      "prompt": "Your script works today, and you suspect it relies on a variable such as `badChans` left over from an earlier session. How do you check?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Run it a second time in the same session"
+        },
+        {
+          "id": "b",
+          "text": "Run it after `clear` in a fresh MATLAB, without clicking anything in the GUI while it runs"
+        },
+        {
+          "id": "c",
+          "text": "Delete its comments"
+        },
+        {
+          "id": "d",
+          "text": "Open `eegh` and look at the last line"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "A script that works only because `EEG` or `badChans` already exists will fail tomorrow. Always run it after `clear`. If a window opens and waits for you, a line is missing arguments: fix it."
+    },
+    {
+      "id": "s09-q05",
+      "type": "multiple",
+      "lesson": "single-subject-script",
+      "objective": 2,
+      "prompt": "Which changes make the script run on another computer and without your input? (Select all that apply)",
+      "options": [
+        {
+          "id": "a",
+          "text": "Replace the fixed path with `fullfile(eeglabRoot, 'sample_data')`"
+        },
+        {
+          "id": "b",
+          "text": "Put the settings that change between projects in a `Settings` section at the top"
+        },
+        {
+          "id": "c",
+          "text": "Remove plotting lines such as `figure` and `pop_viewprops` from the processing script"
+        },
+        {
+          "id": "d",
+          "text": "Write a path such as `C:\\Users\\me\\...` so it is clear"
+        },
+        {
+          "id": "e",
+          "text": "Improve the values while copying lines from the lessons"
+        }
+      ],
+      "answer": [
+        "a",
+        "b",
+        "c"
+      ],
+      "explanation": "A fixed path works on your computer only. Settings at the top mean you change one number instead of searching the code. Plotting lines open windows, slow the run, and stop it on a computing cluster. Every line is copied from its lesson unchanged, so the result matches what the lesson explained."
+    }
+  ]
+}

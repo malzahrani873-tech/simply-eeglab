@@ -1,0 +1,8 @@
+---
+import StationPage from '../../components/StationPage.astro';
+import { roadmap, pad } from '../../lib/site-data';
+export function getStaticPaths() {
+  return roadmap.stations.map((s: any) => ({ params: { nn: pad(s.station) }, props: { station: s.station } }));
+}
+---
+<StationPage lang="ar" station={Astro.props.station} />

@@ -1,0 +1,203 @@
+---
+title: MVPA
+titleEn: Decoding (MVPA)
+description: كيف تدرّب مصنّفاً يميّز الوجوه من السيارات من نمط القنوات كلها عبر الزمن بإضافة ERPLAB، وتقرأ منحنى الدقة مقابل خط الصدفة.
+station: 10
+order: 3
+level: optional
+status: review
+objectives:
+  - "يجهّز البيانات للتصنيف في ERPLAB: قائمة الأحداث، ثم الـ bins، ثم epochs حسب الـ bin."
+  - يستخرج ملف BEST ويشغّل التصنيف بـ SVM مع التحقق المتقاطع.
+  - يقرأ منحنى دقة التصنيف عبر الزمن ويقارنه بخط الصدفة.
+  - "يعرف أهم مصادر الدقة الزائفة: اختلاف عدد المحاولات بين الشرطين."
+prerequisites: [erp-average]
+references:
+  - title: ERPLAB Decoding Tutorial
+    url: https://github.com/ucdavis/erplab/wiki/Decoding-Tutorial
+    section: "Part 1 Example of ERP Decoding; Part 2 Interpretation; Part 5 Decoding with ERPLAB Classic"
+  - title: ERP CORE analysis scripts (N170)
+    url: https://github.com/lucklab/ERP_CORE
+    section: "N170/EEG_ERP_Processing: BDF_N170.txt and 5_Elist_Bin_Epoch.m"
+  - title: Luck, Applied Event-Related Potential Data Analysis (2nd ed.)
+    url: https://socialsci.libretexts.org/Bookshelves/Psychology/Book%3A_Applied_Event-Related_Potential_Data_Analysis_(Luck)
+    section: "Chapter 12: Multivariate Pattern Classification (Decoding)"
+datasets: [D3]
+startingPoint:
+  dataset: D3
+  file: 2_N170_shifted_ds_reref_ucbip_hpfilt_ica_corr_cbip.set
+  applied: []
+  script: |
+    [ALLEEG, EEG, CURRENTSET, ALLCOM] = eeglab;
+
+    % ERP CORE N170, participant 2, from the "intermediate-stage processed
+    % files" download. ERP CORE already applied: event shift of 26 ms,
+    % resampling to 256 Hz, average reference, 0.1 Hz high-pass and ICA
+    % correction of blinks and eye movements. Continuous, not epoched.
+    dataDir = fullfile(pwd, 'N170', '2');
+    EEG = pop_loadset('filename', '2_N170_shifted_ds_reref_ucbip_hpfilt_ica_corr_cbip.set', ...
+        'filepath', dataDir);
+
+    % Show the dataset in the main EEGLAB window
+    [ALLEEG, EEG, CURRENTSET] = pop_newset(ALLEEG, EEG, 0, 'setname', 'N170 sub2 ica corr', 'gui', 'off');
+    eeglab redraw;
+eeglabVersion: "2026.1"
+updated: 2026-10-28
+---
+
+## لماذا هذه الخطوة مهمة؟
+
+تحليل الـ ERP التقليدي يختار قناة أو قناتين ويقارن متوسط الشرطين فيها. التصنيف (<En>decoding</En>، ويسمّى أيضاً <En>MVPA</En>) يسأل سؤالاً مختلفاً: هل نمط الجهد على **كل القنوات معاً** يكفي لنعرف أي شرط كان على الشاشة؟
+
+الفكرة بسيطة. نأخذ جزءاً من المحاولات ونعلّم منه مصنّفاً (<En>SVM</En>)، ثم نختبره على محاولات لم يرها. نكرّر ذلك عند كل نقطة زمنية، فنحصل على منحنى: نسبة الإجابات الصحيحة عبر الزمن. إذا ارتفع المنحنى فوق خط الصدفة بعد ظهور المثير، فالدماغ يحمل معلومة تميّز الشرطين في تلك اللحظة.
+
+قوة هذه الطريقة أنها لا تحتاج أن تعرف مسبقاً أي قناة تحمل الفرق، وتلتقط فروقاً موزّعة لا تظهر في قناة واحدة.
+
+في هذا الدرس نصنّف الوجوه مقابل السيارات لمشارك واحد من تجربة N170 في ERP CORE (D3). في كل محاولة رأى المشارك وجهاً أو سيارة أو وجهاً مبعثراً أو سيارة مبعثرة، وضغط زراً ليقول هل الصورة شيء أم نسيج. الوجوه والسيارات تختلف بوضوح حول 170 ملي ثانية بعد الصورة، فيجب أن يرتفع المنحنى فوق الصدفة بوضوح.
+
+<Callout type="warning">
+هذا مثال لمشارك واحد. الدراسة الحقيقية تحتاج إحصاءً على مستوى المجموعة عبر المشاركين (Luck، الطبعة الثانية، الفصل 12).
+</Callout>
+
+<Callout type="note" title="كيف يصنّف ERPLAB">
+التصنيف في ERPLAB لا يصنّف المحاولات المفردة مباشرة. يقسم محاولات كل شرط إلى مجموعات، ويأخذ متوسط كل مجموعة (ERP صغير)، ثم يصنّف هذه المتوسطات. هذا يقلّل الضوضاء كثيراً، وهو أسلوب كتاب Luck ودرس ERPLAB الرسمي.
+</Callout>
+
+بيانات هذا الدرس من ERP CORE لـ Emily S. Kappenman و Steven J. Luck، برخصة CC BY-SA 4.0.
+
+## قبل وبعد
+
+<ImageSpec>
+منحنى دقة التصنيف من نافذة ERPLAB > Multivariate Pattern Classification (MVPC) Tools > Plot MVPC Results للمشارك 2 من تجربة N170 في ERP CORE (وجوه مقابل سيارات): المحور الأفقي الزمن من -200 إلى 800 ملي ثانية، والعمودي نسبة الإجابات الصحيحة من 0 إلى 1، وخط أفقي متقطّع عند 0.5 (الصدفة)، وخط عمودي عند الصفر. المنحنى يبقى قرب 0.5 قبل الصفر، ويرتفع إلى قمته بين 130 و250 ملي ثانية تقريباً. المصدر: لقطة من EEGLAB 2026.1 مع ERPLAB 13.10 على جهاز صاحب المشروع. نسبة التعليق: ERP CORE (Kappenman و Luck)، CC BY-SA 4.0.
+</ImageSpec>
+
+## الخطوات من الواجهة
+
+**أولاً: ثبّت ERPLAB وتأكد من المتطلبات**
+
+1. ERPLAB إضافة غير مرفقة مع EEGLAB. افتح <MenuPath>File > Manage EEGLAB extensions</MenuPath>، وابحث عن ERPLAB، وثبّته (آخر إصدار عند كتابة الدرس 13.10). أعد تشغيل `eeglab`، فتظهر قائمة <MenuPath>ERPLAB</MenuPath> في شريط القوائم.
+2. أدوات التصنيف تحتاج صندوق MATLAB الإضافي <En>Statistics and Machine Learning Toolbox</En>، وتحتاج MATLAB 2020b أو أحدث. اكتب `ver` في نافذة الأوامر وتأكد أنه موجود.
+
+**ثانياً: قائمة الأحداث، ثم الـ bins، ثم التقطيع**
+
+3. ابدأ من `N170 sub2 ica corr` كما في "نقطة البداية". هذه بيانات مستمرة، لم تُقطَّع بعد. رموز الأحداث من 1 إلى 40 وجوه، ومن 41 إلى 80 سيارات، ومن 101 إلى 180 صور مبعثرة، و 201 إجابة صحيحة.
+4. افتح <MenuPath>ERPLAB > EventList > Create EEG EVENTLIST</MenuPath>. فعّل خيار تنظيف الرموز من الحروف (<En>alphanumeric cleaning</En>) كما تفعل سكربتات ERP CORE. اضغط زر التنفيذ.
+5. اكتب ملف وصف الـ bins (<En>BDF</En>) باسم `n170_faces_cars_bins.txt`. هو ملف نصي بهذا المحتوى، منسوخ من أول bin اثنين في ملف `BDF_N170.txt` من ERP CORE. كل bin يأخذ الصورة فقط إذا تبعتها إجابة صحيحة (201) خلال 200 إلى 1000 ملي ثانية:
+
+```text
+bin 1
+Faces, Correct
+.{1-40}{t<200-1000>201}
+
+bin 2
+Cars, Correct
+.{41-80}{t<200-1000>201}
+```
+
+6. افتح <MenuPath>ERPLAB > Assign bins (BINLISTER)</MenuPath>، واختر الملف `n170_faces_cars_bins.txt`، واضغط <UiLabel>RUN</UiLabel>.
+7. افتح <MenuPath>ERPLAB > Extract bin-based epochs</MenuPath>. اكتب النطاق `-200 800`، واختر تصحيح الخط القاعدي من الفترة قبل المثير (<UiLabel>Pre</UiLabel>)، واضغط <UiLabel>RUN</UiLabel>. سمِّ الداتاست `N170 sub2 faces cars`.
+
+**ثالثاً: ملف BEST، ثم التصنيف**
+
+8. افتح <MenuPath>ERPLAB > Bin-Epoched Single Trial (BEST) Tools > Extract Bin-Epoched Single Trial (BEST) Data</MenuPath>، واترك الـ bins الاثنين، واضغط <UiLabel>RUN</UiLabel>. الـ BEST ملف يجمع محاولات كل bin جاهزة للتصنيف.
+9. افتح <MenuPath>ERPLAB > Multivariate Pattern Classification (MVPC) Tools > ERP Decoding</MenuPath>. اضبط:
+    - <UiLabel>Iterations</UiLabel>: `100`.
+    - <UiLabel>Cross-Validation Blocks</UiLabel>: `3`.
+    - <UiLabel>Channels</UiLabel>: القنوات من 1 إلى 28 (قنوات الرأس، من FP1 إلى O2). اترك القنوات من 29 إلى 35، فهي قنوات العين وقنوات EOG ثنائية القطب.
+    - معادلة المحاولات: <UiLabel>Equal Trials, Equal AVGs</UiLabel> مع <UiLabel>Across Classes</UiLabel>.
+    - المقياس: <UiLabel>ACC</UiLabel> (نسبة الإجابات الصحيحة).
+
+    تأكد أن خانة <UiLabel>Chance</UiLabel> تعرض 0.5، ثم شغّل. يستغرق الحساب بضع دقائق.
+10. افتح <MenuPath>ERPLAB > Multivariate Pattern Classification (MVPC) Tools > Plot MVPC Results</MenuPath>. يظهر منحنى الدقة عبر الزمن.
+11. احفظ النتيجة من <MenuPath>ERPLAB > Multivariate Pattern Classification (MVPC) Tools > Save current MVPCset as</MenuPath> باسم `N170_sub2_faces_cars.mvpc`.
+
+## السكربت المقابل
+
+يكمل من "نقطة البداية". ERPLAB يطبع كل خطوة في `eegh`، فتستطيع أيضاً حفظ سكربتك من الواجهة كما تعلّمت في درس سجل الأوامر.
+
+```matlab
+% ERPLAB is not bundled with EEGLAB: install it from the extension manager
+plugin_askinstall('ERPLAB', 'pop_decoding', true);
+
+% EventList, with the same options as the ERP CORE scripts
+EEG = pop_creabasiceventlist(EEG, 'AlphanumericCleaning', 'on', ...
+    'BoundaryNumeric', {-99}, 'BoundaryString', {'boundary'});
+
+% Bin descriptor file: bins 1 and 2 of BDF_N170.txt (correct trials only)
+bdfFile = fullfile(pwd, 'n170_faces_cars_bins.txt');
+fid = fopen(bdfFile, 'w');
+fprintf(fid, 'bin 1\nFaces, Correct\n.{1-40}{t<200-1000>201}\n\n');
+fprintf(fid, 'bin 2\nCars, Correct\n.{41-80}{t<200-1000>201}\n');
+fclose(fid);
+
+% Assign bins, then cut bin-based epochs with a pre-stimulus baseline
+EEG = pop_binlister(EEG, 'BDF', bdfFile, 'IndexEL', 1, ...
+    'SendEL2', 'EEG', 'Voutput', 'EEG');
+EEG = pop_epochbin(EEG, [-200 800], 'pre');
+EEG.setname = 'N170 sub2 faces cars';
+fprintf('Trials per bin: %s\n', num2str(EEG.EVENTLIST.trialsperbin));
+
+% BEST: single trials per bin, ready for decoding
+BEST = pop_extractbest(EEG, 'Bins', [1 2], 'Criterion', 'good', ...
+    'ExcludeBoundary', 'on');
+
+% SVM decoding: 3 cross-validation blocks, 100 iterations
+% Channels 1-28 are the scalp channels; 29-35 are eye and bipolar EOG
+chans = 1:28;
+MVPC = pop_decoding(BEST, 'Classes', [1 2], 'Channels', chans, ...
+    'nIter', 100, 'nCrossblocks', 3, 'Method', 'SVM', ...
+    'classcoding', 'OneVsAll', 'TrialsAVGs', 'EqtrlEqagclasses', ...
+    'OutcomeMetric', 'ACC');
+
+% Plot decoding accuracy over time against chance
+figure;
+plot(MVPC.times, MVPC.average_score, 'LineWidth', 1.5); hold on;
+yline(MVPC.chance, '--');
+xline(0, ':');
+xlabel('Time (ms)'); ylabel('Proportion correct');
+title('ERP CORE N170, participant 2: faces vs cars');
+
+% Peak accuracy after stimulus onset
+post = MVPC.times > 0;
+[peakAcc, iPeak] = max(MVPC.average_score(post));
+postTimes = MVPC.times(post);
+fprintf('Peak accuracy %.2f at %d ms (chance %.2f)\n', ...
+    peakAcc, round(postTimes(iPeak)), MVPC.chance);
+
+% Save the results
+MVPC = pop_savemymvpc(MVPC, 'mvpcname', 'N170_sub2_faces_cars', ...
+    'filename', 'N170_sub2_faces_cars.mvpc', 'filepath', pwd, 'Warning', 'off');
+```
+
+## أي قيمة أختار؟
+
+| الإعداد | القيمة في الدرس | لماذا |
+|---|---|---|
+| كتل التحقق المتقاطع | 3 | محاولات كل شرط تُقسم إلى 3 مجموعات، ويُختبر المصنّف كل مرة على مجموعة لم يتدرّب عليها. مع حوالي 80 محاولة لكل شرط، كل متوسط فيه حوالي ثلثها. القيمة الافتراضية في `pop_decoding`. |
+| التكرارات | 100 | كل تكرار يوزّع المحاولات على المجموعات توزيعاً عشوائياً جديداً، ثم يُحسب المتوسط. القيمة الافتراضية. درس ERPLAB الرسمي يستخدم 10 لتوفير الوقت فقط. |
+| معادلة المحاولات | Equal Trials, Equal AVGs | نفس عدد المحاولات لكل شرط. بدونها يطبع ERPLAB تحذيراً صريحاً: الدقة ترتفع ارتفاعاً زائفاً. القيمة الافتراضية للسكربت ليست هذه، فاكتبها دائماً. |
+| المقياس | ACC (نسبة الإجابات الصحيحة) | أسهل في القراءة: الصدفة مع شرطين 0.5، ومع أربعة شروط 0.25. القيمة الافتراضية للسكربت في هذا الإصدار AUC، وخط الصدفة فيها أيضاً 0.5. |
+| القنوات | قنوات الرأس الـ 28، بدون EOG | قنوات العين قد تصنّف من حركة العين لا من نشاط الدماغ. |
+| رفض المحاولات | لا شيء | `'Criterion', 'good'` يأخذ كل المحاولات، لأن الدرس لا يشغّل خطوة رفض التشويش في ERP CORE (السكربت 6). لهذا قد يختلف عدد محاولاتك عن أرقام ERP CORE المنشورة. |
+| النطاق الزمني | -200 إلى 800 ملي ثانية | يشمل فترة قبل المثير. الدقة قبل الصفر يجب أن تبقى قرب الصدفة، وهي فحصك الأول. |
+
+## أخطاء شائعة
+
+- **نسيان معادلة عدد المحاولات.** إذا كان عند شرط محاولات أكثر، فمتوسطاته أقل ضوضاء، فيتعلّم المصنّف الفرق في الضوضاء لا في الدماغ. استخدم دائماً <UiLabel>Equal Trials, Equal AVGs</UiLabel>.
+- **إدخال قنوات EOG.** إذا اختلفت حركة العين بين الشرطين، فالمصنّف يقرأ العين. أخرج قنوات EOG، وتذكّر أن المكوّنات المتبقية قد تحمل أثراً منها.
+- **التصنيف على بيانات غير مقطّعة حسب الـ bins.** `pop_extractbest` يحتاج epochs من <MenuPath>ERPLAB > Extract bin-based epochs</MenuPath>، لا من أمر التقطيع العادي في EEGLAB.
+- **قراءة دقة واحدة فوق 0.5 كنتيجة.** منحنى مشارك واحد مليء بالتذبذب. النتيجة العلمية تحتاج عدة مشاركين واختباراً إحصائياً، وهذا خارج الدرس.
+- **تفسير الدقة العالية كاختلاف أكبر في الـ ERP.** الدقة تقول إن المعلومة موجودة في النمط، ولا تقول أي قناة أو أي اتجاه. للتفسير ارجع لمنحنيات الـ ERP.
+
+{/* صندوق "من التجربة": بانتظار قصة من صاحب المشروع. لا يُكتب قبل وصولها. */}
+
+## كيف تتأكد أن الخطوة نجحت؟
+
+- نافذة الأوامر تطبع عدد المحاولات لكل bin: رقمان متقاربان، كل منهما 80 أو أقل (تدخل المحاولات الصحيحة فقط).
+- `MVPC.chance` يساوي 0.5، و `MVPC.DecodingUnit` يساوي `proportion correct`.
+- الدقة قبل الصفر تتذبذب حول 0.5، ثم ترتفع فوقها بوضوح بعد الصورة، وقمتها بين 130 و250 ملي ثانية تقريباً.
+- المنحنى يظهر في نافذة <UiLabel>Plot MVPC Results</UiLabel>، والملف `N170_sub2_faces_cars.mvpc` محفوظ في مجلد العمل.
+
+<Methods>
+Faces and cars (correct trials only) were decoded at each time point from the 28 scalp channels with a support vector machine in ERPLAB [version] (EEGLAB 2026.1; Lopez-Calderon & Luck, 2014), using 3-fold cross-validation on averages of equal numbers of trials per class, repeated over 100 iterations; chance was 0.5. Data were from the ERP CORE N170 paradigm (participant 2).
+</Methods>

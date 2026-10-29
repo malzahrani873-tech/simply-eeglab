@@ -1,0 +1,220 @@
+---
+title: Plotting channel ERPs
+titleEn: Plotting channel ERPs
+description: How to plot ERPs for all channels and for one channel in EEGLAB, and compare two conditions on one axis with clear polarity and labeled axes.
+station: 7
+order: 2
+level: core
+status: review
+objectives:
+  - Plot the ERPs of all channels at their scalp positions and open one channel by clicking it.
+  - Split epochs into two conditions using an event field and plot both conditions on one axis.
+  - Set the polarity, label both axes with units, and report the number of trials per condition.
+prerequisites: [erp-average]
+references:
+  - title: EEGLAB Tutorial
+    url: https://eeglab.org/tutorials/08_Plot_data/Data_Averaging.html
+    section: "8. Plot data > a. ERPs: Plotting ERPs in a Topographic Map; Plotting ERPs in a Column Array"
+  - title: EEGLAB Tutorial
+    url: https://eeglab.org/tutorials/08_Plot_data/Data_Averaging.html
+    section: "Comparing different conditions and performing statistics"
+  - title: Applied Event-Related Potential Data Analysis (Luck)
+    url: https://socialsci.libretexts.org/Bookshelves/Psychology/Biological_Psychology/Applied_Event-Related_Potential_Data_Analysis_(Luck)
+    section: "Chapter 2: Processing the Data from One Participant in the ERP CORE N400 Experiment"
+datasets: [D1]
+startingPoint:
+  dataset: D1
+  file: eeglab_data.set
+  applied: [filtering, line-noise, bad-channels, interpolation, rereferencing, run-ica, ica-1hz-copy-weights, iclabel, extract-epochs, baseline-correction, epoch-rejection]
+  script: |
+    % Shortcut: if you saved D1_epochs_clean.set in the epoch rejection lesson, keep
+    % the first line and the last two lines (pop_newset, eeglab redraw), and replace
+    % every line between them with:
+    % EEG = pop_loadset('D1_epochs_clean.set', pwd);
+    [ALLEEG, EEG, CURRENTSET, ALLCOM] = eeglab;
+    eeglabRoot = fileparts(which('eeglab'));
+    EEG = pop_loadset('eeglab_data.set', fullfile(eeglabRoot, 'sample_data'));
+    fullLocs = EEG.chanlocs;
+
+    % Main dataset: high-pass at 0.1 Hz, then 60 Hz line-noise removal
+    EEG = pop_eegfiltnew(EEG, 'locutoff', 0.1);
+    EEG = pop_eegfiltnew(EEG, 'locutoff', 58, 'hicutoff', 62, 'revfilt', 1);
+
+    % Bad channels you removed earlier, e.g. {'T7'}; leave empty if none
+    badChans = {};
+    if ~isempty(badChans)
+        EEG = pop_select(EEG, 'rmchannel', badChans);
+        EEG = pop_interp(EEG, fullLocs, 'spherical');
+    end
+
+    % Average reference, EOG channels excluded
+    eogIdx = find(ismember({EEG.chanlocs.labels}, {'EOG1', 'EOG2'}));
+    EEG = pop_reref(EEG, [], 'exclude', eogIdx);
+
+    % ICA on a 1-Hz copy, then copy the weights back
+    EEG_ica = pop_eegfiltnew(EEG, 'locutoff', 1);
+    EEG_ica = pop_runica(EEG_ica, 'icatype', 'runica', 'extended', 1);
+    EEG.icaweights  = EEG_ica.icaweights;
+    EEG.icasphere   = EEG_ica.icasphere;
+    EEG.icachansind = EEG_ica.icachansind;
+    EEG.icawinv     = [];
+    EEG.icaact      = [];
+    EEG = eeg_checkset(EEG);
+
+    % Remove eye and muscle components, then low-pass at 30 Hz
+    EEG = pop_iclabel(EEG, 'default');
+    EEG = pop_icflag(EEG, [NaN NaN; 0.9 1; 0.9 1; NaN NaN; NaN NaN; NaN NaN; NaN NaN]);
+    artifactComps = find(EEG.reject.gcompreject);
+    if ~isempty(artifactComps)
+        EEG = pop_subcomp(EEG, artifactComps, 0);
+    end
+    EEG = pop_eegfiltnew(EEG, 'hicutoff', 30);
+
+    % Epochs around 'square', baseline, and +/-100 uV rejection
+    EEG = pop_epoch(EEG, {'square'}, [-1 2], 'newname', 'D1 epochs', 'epochinfo', 'yes');
+    EEG = pop_rmbase(EEG, [-200 0]);
+    EEG = pop_eegthresh(EEG, 1, 1:EEG.nbchan, -100, 100, EEG.xmin, EEG.xmax, 0, 0);
+    badEpochs = find(EEG.reject.rejthresh);
+    if ~isempty(badEpochs)
+        EEG = pop_rejepoch(EEG, EEG.reject.rejthresh, 0);
+    end
+    EEG.setname = 'D1 epochs clean';
+    EEG = eeg_checkset(EEG);
+    EEG = pop_saveset(EEG, 'filename', 'D1_epochs_clean.set', 'filepath', pwd);
+    EEG.filename = ''; EEG.filepath = ''; EEG.datfile = ''; EEG.saved = 'no';
+    [ALLEEG, EEG, CURRENTSET] = pop_newset(ALLEEG, EEG, 0, 'setname', 'D1 epochs clean', 'gui', 'off');
+    eeglab redraw;
+eeglabVersion: "2026.1"
+updated: 2026-10-28
+---
+
+## Why this step matters
+
+An ERP waveform on screen looks simple. But a reader needs three things to understand it: which direction is positive, what unit each axis has, and how many trials went into the average.
+
+A figure without these three is easy to misread. A peak "going up" may be negative in a flipped plot, and a difference between two conditions may come from different trial counts rather than from the brain.
+
+In this lesson you plot the ERPs of all channels, then compare two conditions at one channel with a complete figure.
+
+## Before and after
+
+<BeforeAfter>
+<Figure src="channel-erp-plot/channel-erp-before.png" alt="Pz ERP for two conditions with no axis labels, no zero lines, no legend, and the vertical axis flipped without any sign of it." caption="Before" source="D1" />
+<Figure src="channel-erp-plot/channel-erp-after.png" alt="The same plot, positive up, with Time (ms) and Potential (µV) on the axes, lines at 0 ms and 0 µV, a legend with Position 1 (n = 38) and Position 2 (n = 39), and Pz as the title." caption="After" source="D1" />
+</BeforeAfter>
+
+## Steps in the GUI
+
+Start with the dataset `D1 epochs clean` open, as in "Starting point".
+
+**1. All channel ERPs at their scalp positions**
+
+1. Open <MenuPath>Plot > Channel ERPs > In scalp/rect. array</MenuPath>. The window <UiLabel>Topographic ERP plot - pop_plottopo()</UiLabel> appears.
+2. Leave <UiLabel>Channels to plot</UiLabel> at `1:32`.
+3. Leave <UiLabel>Plot single trials</UiLabel> and <UiLabel>Plot in rect. array</UiLabel> unchecked.
+4. Note that <UiLabel>Other plot options (see help)</UiLabel> contains `'ydir', 1`. This means positive up. Leave it and press <UiLabel>Ok</UiLabel>.
+5. One waveform appears for each channel at its approximate position on the head, nose up.
+6. Click the `Pz` waveform. It opens in its own window with full axes. This is where you read amplitude and latency.
+
+**2. The same plot in columns**
+
+Open the same window again and check <UiLabel>Plot in rect. array</UiLabel>. The channels appear in an ordered grid. This is clearer for reading numbers; the scalp layout is clearer for seeing the distribution.
+
+**3. Two conditions on one axis**
+
+In D1 each `square` event has a `position` field with value 1 or 2: where the square appeared on the screen. These are our two conditions. Both positions are in the left visual field, at about 5.5 and 2.7 degrees from the center, so expect a small difference between them and no difference between the two halves of the head.
+
+EEGLAB menus compare conditions through a STUDY, even with a single participant. The official tutorial says so, and it is the topic of station 8. Here we compare with a short script, because it shows what happens inside any comparison plot: split the trials, average each part, and plot both on one axis.
+
+Copy the full script block below into the command window.
+
+<Callout type="warning">
+Do not use <MenuPath>Edit > Select epochs or events</MenuPath> to split D1 in EEGLAB 2026.1. In this release the tool stops on epoched data with "All epochs have been removed, empty dataset", even when many epochs remain. The script below splits by epoch indices directly and avoids the problem.
+</Callout>
+
+**4. The difference wave**
+
+The difference wave is one condition minus the other, at every time point. It shows when and where the two conditions differ, in one curve instead of two.
+
+1. The last part of the script below stores the two conditions as datasets in EEGLAB, prints their numbers (for example `Datasets for Sum/Compare ERPs: 2 (position 1) and 3 (position 2)`), and calls `pop_comperp` once.
+2. A plot appears with three curves at each channel: position 1, position 2 and their difference (position 1 minus position 2), positive up because of `'tplotopt', {'ydir', 1}`. Click `Pz` to open it on its own.
+
+Optional: the same plot has a menu, <MenuPath>Plot > Sum/Compare ERPs</MenuPath>, but it is hidden by default in EEGLAB 2026.1. It appears only after you check <UiLabel>If set, show all menu items from previous EEGLAB versions. You must restart EEGLAB for this to take effect.</UiLabel> in <MenuPath>File > Preferences</MenuPath> and restart EEGLAB. This option changes how every menu looks compared with the images in these lessons, so turn it off again afterwards.
+
+## The equivalent script
+
+```matlab
+EEG = pop_loadset('D1_epochs_clean.set', pwd);
+
+% All channels at their scalp positions, positive up
+figure; pop_plottopo(EEG, 1:EEG.nbchan, 'D1 epochs clean', 0, 'ydir', 1);
+
+% Stimulus position of the time-locking 'square' event in each epoch
+pos = eeg_getepochevent(EEG, 'type', {'square'}, 'timewin', [-5 5], 'fieldname', 'position');
+fprintf('Position 1: %d epochs, position 2: %d epochs\n', sum(pos == 1), sum(pos == 2));
+
+% One dataset per condition, for later use
+EEG_pos1 = pop_select(EEG, 'trial', find(pos == 1));
+EEG_pos2 = pop_select(EEG, 'trial', find(pos == 2));
+EEG_pos1.setname = 'D1 epochs clean pos1';
+EEG_pos2.setname = 'D1 epochs clean pos2';
+
+% Both conditions on one axis at Pz
+chan = find(strcmp({EEG.chanlocs.labels}, 'Pz'));
+erp1 = mean(EEG_pos1.data(chan, :, :), 3);
+erp2 = mean(EEG_pos2.data(chan, :, :), 3);
+
+figure; hold on;
+plot(EEG.times, erp1, 'LineWidth', 1.5);
+plot(EEG.times, erp2, 'LineWidth', 1.5);
+xline(0, 'k:');
+yline(0, 'k-');
+xlim([-200 800]);
+set(gca, 'YDir', 'normal');   % positive up
+xlabel('Time (ms)');
+ylabel('Potential (\muV)');
+legend({sprintf('Position 1 (n = %d)', EEG_pos1.trials), ...
+        sprintf('Position 2 (n = %d)', EEG_pos2.trials)}, 'Location', 'best');
+title('Pz');
+
+% Both conditions as datasets in EEGLAB, for Plot > Sum/Compare ERPs
+[ALLEEG, ~, idx1] = eeg_store(ALLEEG, EEG_pos1);
+[ALLEEG, ~, idx2] = eeg_store(ALLEEG, EEG_pos2);
+eeglab redraw;
+fprintf('Datasets for Sum/Compare ERPs: %d (position 1) and %d (position 2)\n', idx1, idx2);
+
+% Difference wave at every channel: position 1, position 2, and position 1 minus position 2
+pop_comperp(ALLEEG, 1, idx1, idx2, 'addavg', 'on', 'subavg', 'on', 'diffavg', 'on', 'diffstd', 'off', 'tplotopt', {'ydir', 1});
+```
+
+## Which value should I choose?
+
+| Setting | Value | Why |
+|---|---|---|
+| Polarity | Positive up (`'ydir', 1`) | The default in EEGLAB 2026.1 menus (`icadefs.m`: `YDIR = 1`). Some fields have traditionally plotted negative up. Whatever you choose, state it on the axis or in the caption. |
+| Plot range | `-200 800` ms | Shows the whole baseline and the post-stimulus period until the response ends. The epoch is longer (-1 to 2 s), but the ends add nothing to this figure. |
+| Channel | `Pz` in this example | A midline posterior channel where the response to this visual task is clear. In your research, choose the channel from previous studies before you see your result. |
+| Vertical limits | The same limits for every plot you compare | Different automatic limits make a small difference look large. Use `ylim` with the same values. |
+| Trial count | Always in the legend or caption | An average of 20 trials is noisier than an average of 40. Readers need the number to judge. |
+
+## Common mistakes
+
+- **A flipped script without knowing it.** Called without `'ydir'`, `plottopo` plots negative up, while the menu plots positive up. Write `'ydir', 1` explicitly in every script.
+- **Axes without units.** "Time (ms)" and "Potential (µV)" are not decoration. Without them the reader cannot tell whether the axis is in seconds or samples.
+- **Comparing conditions with very different trial counts.** Noise in an average falls as trials increase, so a peak in the condition with fewer trials may look larger by chance. Report the counts, and be careful when they differ a lot.
+- **Concluding a difference from one participant.** The difference between position 1 and 2 here describes this recording only. A conclusion needs a group of participants and statistics (station 8).
+- **Plotting an ERP from continuous data.** Plotting needs epochs. If the <MenuPath>Plot > Channel ERPs</MenuPath> menu is grayed out, the open dataset is not epoched.
+
+{/* Experience box: waiting for a story from the project owner. Do not write it before it arrives. */}
+
+## How to check it worked
+
+- **The counts add up:** the trial counts of the two conditions sum to `EEG.trials`, and each is close to 40 (40 and 40 before rejection).
+- **The polarity is right:** the positive peak in the Pz plot points up, as in the menu window after clicking Pz.
+- **The two plots agree:** the overall average at Pz in `pop_plottopo` lies between the two condition curves of the script plot.
+- **The figure is complete:** both axis labels with units, the time-zero line, and a legend with trial counts.
+- **The difference wave** at Pz averages 0 µV from -200 to 0 ms, because baseline correction set that mean to zero in both conditions. Single points still swing above and below zero: over the whole epoch these swings are about as large as the difference after 0 ms. With about 38 trials per condition in one recording, noise alone makes differences this size, which is why a conclusion needs a group of participants (station 8).
+
+<Methods>
+ERPs were averaged separately for each stimulus position and plotted at Pz from -200 to 800 ms with positive voltage up (pop_plottopo, EEGLAB 2026.1).
+</Methods>

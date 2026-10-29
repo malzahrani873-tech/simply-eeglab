@@ -1,0 +1,290 @@
+{
+  "v": 1,
+  "station": 4,
+  "lang": "en",
+  "passPercent": 80,
+  "questions": [
+    {
+      "id": "s04-q01",
+      "type": "single",
+      "lesson": "ica-concept",
+      "objective": 2,
+      "prompt": "You ran ICA on your data and have not removed any component yet. What changed in the data?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Nothing: ICA gives you another way to see the same data as independent sources, and removal is a separate decision"
+        },
+        {
+          "id": "b",
+          "text": "The channels with blinks were removed"
+        },
+        {
+          "id": "c",
+          "text": "The artifact segments were cut from the recording"
+        },
+        {
+          "id": "d",
+          "text": "The number of channels now equals the number of components"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "ICA computes weights that unmix the channels into components, each with a scalp map and a time course, and removes no channel and no part of the recording. Removing a component is a decision you make after review, in the ICLabel lesson."
+    },
+    {
+      "id": "s04-q02",
+      "type": "order",
+      "lesson": "run-ica",
+      "objective": 1,
+      "prompt": "Put the ICA cleaning steps in the order of this site's path:",
+      "options": [
+        {
+          "id": "a",
+          "text": "Copy the weights to the main dataset (0.1 Hz)"
+        },
+        {
+          "id": "b",
+          "text": "Remove the artifact components from the main dataset"
+        },
+        {
+          "id": "c",
+          "text": "Create a copy with a 1 Hz high-pass filter"
+        },
+        {
+          "id": "d",
+          "text": "Classify the components with ICLabel and review them by eye"
+        },
+        {
+          "id": "e",
+          "text": "Run `runica` on the 1 Hz copy"
+        }
+      ],
+      "answer": [
+        "c",
+        "e",
+        "a",
+        "d",
+        "b"
+      ],
+      "explanation": "ICA is computed on a 1 Hz copy because slow drift confuses it. Then the weights move to the main dataset that goes on to the ERP. Classification and review come next, and removal is always from the main dataset, not from the 1 Hz copy."
+    },
+    {
+      "id": "s04-q03",
+      "type": "single",
+      "lesson": "ica-1hz-copy-weights",
+      "objective": 2,
+      "prompt": "Why is it valid to copy ICA weights from the 1 Hz copy to the main dataset filtered at 0.1 Hz?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Because the weights are a fixed way to combine channels (a spatial filter), and both copies have the same channels and the same mixing in the head; only their frequencies differ"
+        },
+        {
+          "id": "b",
+          "text": "Because a 1 Hz filter does not change the data at all"
+        },
+        {
+          "id": "c",
+          "text": "Because EEGLAB recomputes ICA automatically on the main dataset"
+        },
+        {
+          "id": "d",
+          "text": "Because P3 is not affected by a 1 Hz filter"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "ICA does not learn a signal; it learns how to combine the channels. That is why the weights move between two copies with the same channels in the same order. A 1 Hz filter does shrink P3, which is why the analysis continues on the main dataset, not on the ICA copy."
+    },
+    {
+      "id": "s04-q04",
+      "type": "multiple",
+      "lesson": "iclabel",
+      "objective": 2,
+      "prompt": "Which statements about ICLabel's decisions are true? (Select all that apply)",
+      "options": [
+        {
+          "id": "a",
+          "text": "ICLabel's probabilities are an estimate from a trained classifier and can be wrong, so you review every component before removing it"
+        },
+        {
+          "id": "b",
+          "text": "A component whose top class is Other is not removed unless you are sure it is an artifact"
+        },
+        {
+          "id": "c",
+          "text": "A component at 55% Eye and 40% Brain needs your review before any decision"
+        },
+        {
+          "id": "d",
+          "text": "You remove components from the 1 Hz copy, because ICA was computed on it"
+        },
+        {
+          "id": "e",
+          "text": "Component numbers are fixed, so you can copy them from the lesson's picture"
+        }
+      ],
+      "answer": [
+        "a",
+        "b",
+        "c"
+      ],
+      "explanation": "ICLabel is an assistant, not a judge. Removal is from the main dataset at 0.1 Hz, because the 1 Hz copy is only for computing the weights. Component order changes between runs, so find a component by its shape, not its number."
+    },
+    {
+      "id": "s04-q05",
+      "type": "image",
+      "lesson": "ic-artifacts",
+      "objective": 1,
+      "prompt": "These are the scalp map, spectrum and time course of an ICA component. Which class does it belong to?",
+      "image": {
+        "src": "/quiz/04/s04-q05.webp",
+        "w": 720,
+        "h": 280,
+        "status": "draft",
+        "fromIcaGame": "sub-003_IC01",
+        "alt": "A scalp map with a strong color at the front of the head, symmetric between left and right. The spectrum is highest at the lowest frequencies, then falls smoothly. The time course has two or three large, separate peaks in five seconds.",
+        "spec": "An ICA game image (level 1), draft file assets/ica-game/draft/img/sub-003_IC01.webp: scalp map, spectrum and time course of a component from OpenNeuro ds002718 (CC0), with no text that reveals the class. The final image is copied after expert approval (expert_agrees), and the question takes its final game id. One version for both languages."
+      },
+      "options": [
+        {
+          "id": "brain",
+          "text": "Brain"
+        },
+        {
+          "id": "eye",
+          "text": "Eye"
+        },
+        {
+          "id": "muscle",
+          "text": "Muscle"
+        },
+        {
+          "id": "heart",
+          "text": "Heart"
+        }
+      ],
+      "answer": [
+        "eye"
+      ],
+      "explanation": "The three signs agree: a symmetric frontal map, a spectrum highest at low frequencies that then falls smoothly, and large separate peaks, one per blink. This is an eye component, a blink. Frontal brain components exist too, but their spectrum has a peak and their time course is an ongoing oscillation."
+    },
+    {
+      "id": "s04-q06",
+      "type": "image",
+      "lesson": "ic-artifacts",
+      "objective": 1,
+      "prompt": "These are the scalp map, spectrum and time course of an ICA component. Which class does it belong to?",
+      "image": {
+        "src": "/quiz/04/s04-q06.webp",
+        "w": 720,
+        "h": 280,
+        "status": "draft",
+        "fromIcaGame": "sub-006_IC15",
+        "alt": "A scalp map with a small, focal spot at the edge of the head near the front left temple. The spectrum rises above 20 Hz and stays high up to 80. The time course is fast, rough activity.",
+        "spec": "An ICA game image (level 1), draft file assets/ica-game/draft/img/sub-006_IC15.webp: scalp map, spectrum and time course of a component from OpenNeuro ds002718 (CC0), with no text that reveals the class. The final image is copied after expert approval (expert_agrees), and the question takes its final game id. One version for both languages."
+      },
+      "options": [
+        {
+          "id": "muscle",
+          "text": "Muscle"
+        },
+        {
+          "id": "line",
+          "text": "Line Noise"
+        },
+        {
+          "id": "brain",
+          "text": "Brain"
+        },
+        {
+          "id": "chan",
+          "text": "Channel Noise"
+        }
+      ],
+      "answer": [
+        "muscle"
+      ],
+      "explanation": "A small spot at the edge near the temple, a spectrum that rises or stays high from about 20 Hz upward, and fast rough activity: these are the signs of muscle. Line noise is a narrow peak at one frequency, not a broad rise."
+    },
+    {
+      "id": "s04-q07",
+      "type": "image",
+      "lesson": "ic-artifacts",
+      "objective": 1,
+      "prompt": "These are the scalp map, spectrum and time course of an ICA component. Which class does it belong to?",
+      "image": {
+        "src": "/quiz/04/s04-q07.webp",
+        "w": 720,
+        "h": 280,
+        "status": "draft",
+        "fromIcaGame": "sub-011_IC11",
+        "alt": "A smooth, broad scalp map over the back of the head. The spectrum falls as frequency rises, with a clear peak near 10 Hz. The time course is an ongoing oscillation without large separate peaks.",
+        "spec": "An ICA game image (level 1), draft file assets/ica-game/draft/img/sub-011_IC11.webp: scalp map, spectrum and time course of a component from OpenNeuro ds002718 (CC0), with no text that reveals the class. The final image is copied after expert approval (expert_agrees), and the question takes its final game id. One version for both languages."
+      },
+      "options": [
+        {
+          "id": "brain",
+          "text": "Brain"
+        },
+        {
+          "id": "eye",
+          "text": "Eye"
+        },
+        {
+          "id": "muscle",
+          "text": "Muscle"
+        },
+        {
+          "id": "other",
+          "text": "Other"
+        }
+      ],
+      "answer": [
+        "brain"
+      ],
+      "explanation": "A smooth, broad map like a single source, a spectrum that falls with frequency with a peak near 10 Hz, and an ongoing oscillation: this is a brain component, and its 10 Hz peak looks like posterior alpha. Do not remove brain components."
+    },
+    {
+      "id": "s04-q08",
+      "type": "image",
+      "lesson": "ic-artifacts",
+      "objective": 1,
+      "prompt": "These are the scalp map, spectrum and time course of an ICA component. Which class does it belong to?",
+      "image": {
+        "src": "/quiz/04/s04-q08.webp",
+        "w": 720,
+        "h": 280,
+        "status": "draft",
+        "fromIcaGame": "sub-009_IC22",
+        "alt": "A scalp map that is mostly neutral, with a very small spot around one electrode at the back of the midline. The spectrum falls with frequency and has a narrow peak at 50 Hz. The time course shows irregular jumps.",
+        "spec": "An ICA game image (level 1), draft file assets/ica-game/draft/img/sub-009_IC22.webp: scalp map, spectrum and time course of a component from OpenNeuro ds002718 (CC0), with no text that reveals the class. The final image is copied after expert approval (expert_agrees), and the question takes its final game id. One version for both languages."
+      },
+      "options": [
+        {
+          "id": "chan",
+          "text": "Channel Noise"
+        },
+        {
+          "id": "muscle",
+          "text": "Muscle"
+        },
+        {
+          "id": "line",
+          "text": "Line Noise"
+        },
+        {
+          "id": "brain",
+          "text": "Brain"
+        }
+      ],
+      "answer": [
+        "chan"
+      ],
+      "explanation": "The telling sign here is the map: all the activity is concentrated on one electrode, and the time course jumps like a single bad channel. This is channel noise. The narrow 50 Hz peak shows up in many components of this dataset, recorded in a country with 50 Hz mains, and is not enough on its own for the Line Noise class."
+    }
+  ]
+}

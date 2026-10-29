@@ -1,0 +1,1306 @@
+[
+  {
+    "id": "eeg",
+    "en": "EEG",
+    "ar": "EEG",
+    "variants": [
+      "تخطيط كهربية الدماغ"
+    ],
+    "decision": "إ",
+    "def": {
+      "ar": "تسجيل النشاط الكهربائي للدماغ من أقطاب على فروة الرأس.",
+      "en": "A recording of the brain's electrical activity from electrodes on the scalp."
+    }
+  },
+  {
+    "id": "electrode",
+    "en": "electrode",
+    "ar": "قطب",
+    "variants": [
+      "أقطاب"
+    ],
+    "decision": "ع+إ",
+    "def": {
+      "ar": "القطعة المعدنية التي توضع على الرأس لالتقاط الإشارة.",
+      "en": "The physical sensor placed on the scalp to pick up the signal."
+    }
+  },
+  {
+    "id": "channel",
+    "en": "channel",
+    "ar": "قناة",
+    "variants": [
+      "قنوات"
+    ],
+    "decision": "ع+إ",
+    "def": {
+      "ar": "الإشارة المسجّلة من قطب واحد، وهي ما يعرضه EEGLAB.",
+      "en": "The signal recorded from one electrode, as shown in EEGLAB."
+    }
+  },
+  {
+    "id": "system-10-20",
+    "en": "10-20 system",
+    "ar": "نظام 10-20",
+    "variants": [],
+    "decision": "ع",
+    "def": {
+      "ar": "طريقة قياسية لتوزيع الأقطاب على الرأس بمسافات نسبتها 10% و20%.",
+      "en": "A standard scheme for placing electrodes at 10% and 20% distances over the head."
+    }
+  },
+  {
+    "id": "system-10-10",
+    "en": "10-10 system",
+    "ar": "نظام 10-10",
+    "variants": [],
+    "decision": "ع",
+    "def": {
+      "ar": "امتداد لنظام 10-20 بأقطاب أكثر ومسافات 10%.",
+      "en": "An extension of the 10-20 system with more electrodes at 10% spacing."
+    }
+  },
+  {
+    "id": "postsynaptic-potential",
+    "en": "postsynaptic potential",
+    "ar": "الجهد بعد المشبكي",
+    "variants": [
+      "الجهود بعد المشبكية"
+    ],
+    "decision": "ع+إ",
+    "def": {
+      "ar": "تغيّر في جهد الخلية العصبية بعد استقبال إشارة، وهو مصدر معظم إشارة EEG.",
+      "en": "A voltage change in a neuron after it receives input; the main source of the EEG."
+    }
+  },
+  {
+    "id": "action-potential",
+    "en": "action potential",
+    "ar": "جهد الفعل",
+    "variants": [],
+    "decision": "ع+إ",
+    "def": {
+      "ar": "نبضة كهربائية قصيرة تنتقل على محور الخلية العصبية.",
+      "en": "A brief electrical impulse that travels along a neuron's axon."
+    }
+  },
+  {
+    "id": "signal",
+    "en": "signal",
+    "ar": "إشارة",
+    "variants": [],
+    "decision": "ع",
+    "def": {
+      "ar": "قيم تتغيّر مع الزمن، مثل الجهد المسجّل في قناة.",
+      "en": "Values that change over time, such as the voltage recorded on a channel."
+    }
+  },
+  {
+    "id": "amplitude",
+    "en": "amplitude",
+    "ar": "سعة",
+    "variants": [],
+    "decision": "ع+إ",
+    "def": {
+      "ar": "حجم الإشارة، ويُقاس في EEG بالميكروفولت (µV).",
+      "en": "The size of a signal, measured in microvolts (µV) in EEG."
+    }
+  },
+  {
+    "id": "frequency",
+    "en": "frequency",
+    "ar": "تردد",
+    "variants": [],
+    "decision": "ع",
+    "def": {
+      "ar": "عدد الدورات في الثانية، ويُقاس بالهرتز.",
+      "en": "The number of cycles per second, measured in hertz (Hz)."
+    }
+  },
+  {
+    "id": "sampling-rate",
+    "en": "sampling rate",
+    "ar": "معدل العيّنات",
+    "variants": [],
+    "decision": "ع+إ",
+    "def": {
+      "ar": "عدد العيّنات المسجّلة في الثانية لكل قناة.",
+      "en": "The number of samples recorded per second on each channel."
+    }
+  },
+  {
+    "id": "sample",
+    "en": "sample",
+    "ar": "عيّنة",
+    "variants": [
+      "عيّنات"
+    ],
+    "decision": "ع",
+    "def": {
+      "ar": "قيمة واحدة للإشارة في لحظة زمنية واحدة.",
+      "en": "A single value of the signal at one point in time."
+    }
+  },
+  {
+    "id": "nyquist",
+    "en": "Nyquist frequency",
+    "ar": "تردد Nyquist",
+    "variants": [],
+    "decision": "ع+إ",
+    "def": {
+      "ar": "نصف معدل العيّنات، وهو أعلى تردد يمكن تمثيله بلا تشويه.",
+      "en": "Half the sampling rate; the highest frequency that can be represented without distortion."
+    }
+  },
+  {
+    "id": "aliasing",
+    "en": "aliasing",
+    "ar": "التداخل الطيفي",
+    "variants": [],
+    "decision": "ع+إ",
+    "def": {
+      "ar": "ظهور تردد عالٍ كأنه تردد منخفض لأن معدل العيّنات أقل من اللازم.",
+      "en": "A high frequency appearing as a lower one because the sampling rate is too low."
+    }
+  },
+  {
+    "id": "spectrum",
+    "en": "spectrum",
+    "ar": "الطيف",
+    "variants": [],
+    "decision": "ع",
+    "def": {
+      "ar": "توزيع قوة الإشارة على الترددات.",
+      "en": "How a signal's strength is distributed across frequencies."
+    }
+  },
+  {
+    "id": "psd",
+    "en": "power spectral density (PSD)",
+    "ar": "الطيف الترددي (PSD)",
+    "variants": [
+      "PSD"
+    ],
+    "decision": "ع+إ",
+    "def": {
+      "ar": "مقدار القدرة عند كل تردد في الإشارة.",
+      "en": "The amount of power at each frequency in a signal."
+    }
+  },
+  {
+    "id": "power",
+    "en": "power",
+    "ar": "القدرة",
+    "variants": [],
+    "decision": "ع+إ",
+    "def": {
+      "ar": "مربع السعة، ويقيس قوة الإشارة عند تردد معيّن.",
+      "en": "The squared amplitude; how strong a signal is at a given frequency."
+    }
+  },
+  {
+    "id": "phase",
+    "en": "phase",
+    "ar": "الطور",
+    "variants": [],
+    "decision": "ع+إ",
+    "def": {
+      "ar": "موضع الموجة في دورتها عند لحظة معيّنة.",
+      "en": "Where a wave is in its cycle at a given moment."
+    }
+  },
+  {
+    "id": "decibel",
+    "en": "dB (decibel)",
+    "ar": "ديسيبل (dB)",
+    "variants": [
+      "ديسيبل",
+      "dB"
+    ],
+    "decision": "ع+إ",
+    "def": {
+      "ar": "مقياس لوغاريتمي للقدرة يسهّل مقارنة القيم الكبيرة والصغيرة.",
+      "en": "A logarithmic scale for power that makes large and small values easy to compare."
+    }
+  },
+  {
+    "id": "line-noise",
+    "en": "line noise",
+    "ar": "ضوضاء الكهرباء",
+    "variants": [],
+    "decision": "ع+إ",
+    "def": {
+      "ar": "تداخل من شبكة الكهرباء عند 60 هرتز في السعودية أو 50 هرتز في بلدان أخرى.",
+      "en": "Interference from the mains supply at 60 Hz in Saudi Arabia or 50 Hz elsewhere."
+    }
+  },
+  {
+    "id": "noise",
+    "en": "noise",
+    "ar": "ضوضاء",
+    "variants": [],
+    "decision": "ع",
+    "def": {
+      "ar": "أي جزء من التسجيل لا يحمل المعلومة التي نقيسها.",
+      "en": "Any part of the recording that does not carry the information we want."
+    }
+  },
+  {
+    "id": "artifact",
+    "en": "artifact",
+    "ar": "آرتفاكت",
+    "variants": [
+      "آرتفاكتس"
+    ],
+    "decision": "ع+إ",
+    "def": {
+      "ar": "إشارة غير دماغية تختلط بالتسجيل، مثل الرمش أو نشاط العضلات.",
+      "en": "A non-brain signal mixed into the recording, such as blinks or muscle activity."
+    }
+  },
+  {
+    "id": "dataset",
+    "en": "dataset",
+    "ar": "داتاست",
+    "variants": [
+      "داتاستان",
+      "داتاستين"
+    ],
+    "decision": "ع+إ",
+    "def": {
+      "ar": "ملف بيانات EEG واحد محمّل في EEGLAB مع معلوماته.",
+      "en": "One EEG data file loaded in EEGLAB together with its information."
+    }
+  },
+  {
+    "id": "gui",
+    "en": "GUI",
+    "ar": "الواجهة",
+    "variants": [],
+    "decision": "ع+إ",
+    "def": {
+      "ar": "النوافذ والقوائم التي نستخدمها بالفأرة بدل كتابة الأوامر.",
+      "en": "The windows and menus used with the mouse instead of typed commands."
+    }
+  },
+  {
+    "id": "menu",
+    "en": "menu",
+    "ar": "قائمة",
+    "variants": [
+      "قوائم"
+    ],
+    "decision": "ع",
+    "def": {
+      "ar": "مجموعة أوامر تظهر عند الضغط على اسمها في أعلى النافذة.",
+      "en": "A list of commands that opens from its name at the top of the window."
+    }
+  },
+  {
+    "id": "dialog-field",
+    "en": "field (in a dialog)",
+    "ar": "خانة",
+    "variants": [
+      "خانات"
+    ],
+    "decision": "ع",
+    "def": {
+      "ar": "مكان في نافذة نكتب فيه قيمة أو نختارها.",
+      "en": "A box in a dialog window where you type or choose a value."
+    }
+  },
+  {
+    "id": "struct-field",
+    "en": "field (in a struct)",
+    "ar": "حقل",
+    "variants": [
+      "حقول"
+    ],
+    "decision": "ع",
+    "def": {
+      "ar": "جزء مسمّى داخل struct يحمل قيمة، مثل EEG.srate.",
+      "en": "A named part of a struct that holds a value, such as EEG.srate."
+    }
+  },
+  {
+    "id": "struct",
+    "en": "struct",
+    "ar": "struct",
+    "variants": [],
+    "decision": "إ",
+    "def": {
+      "ar": "متغيّر في MATLAB يجمع عدة حقول مسمّاة في مكان واحد.",
+      "en": "A MATLAB variable that groups several named fields together."
+    }
+  },
+  {
+    "id": "plugin",
+    "en": "plugin",
+    "ar": "plugin",
+    "variants": [
+      "إضافة",
+      "extension"
+    ],
+    "decision": "ع+إ",
+    "def": {
+      "ar": "حزمة تضيف وظائف أو قوائم جديدة إلى EEGLAB.",
+      "en": "A package that adds new functions or menus to EEGLAB."
+    }
+  },
+  {
+    "id": "script",
+    "en": "script",
+    "ar": "سكربت",
+    "variants": [
+      "سكربتات"
+    ],
+    "decision": "ع",
+    "def": {
+      "ar": "ملف أوامر MATLAB ينفّذ خطوات المعالجة بالترتيب.",
+      "en": "A MATLAB file of commands that runs processing steps in order."
+    }
+  },
+  {
+    "id": "command-history",
+    "en": "command history",
+    "ar": "سجل الأوامر",
+    "variants": [],
+    "decision": "ع+إ",
+    "def": {
+      "ar": "قائمة الأوامر التي نفّذتها الواجهة، ويعرضها الأمر eegh.",
+      "en": "The list of commands the GUI has run, shown by the eegh command."
+    }
+  },
+  {
+    "id": "pipeline",
+    "en": "pipeline",
+    "ar": "بايبلاين",
+    "variants": [
+      "سلسلة خطوات المعالجة"
+    ],
+    "decision": "ع+إ",
+    "def": {
+      "ar": "سلسلة خطوات المعالجة بترتيب ثابت من البيانات الخام إلى النتيجة.",
+      "en": "The fixed sequence of processing steps from raw data to results."
+    }
+  },
+  {
+    "id": "batch-processing",
+    "en": "batch processing",
+    "ar": "معالجة دفعات",
+    "variants": [],
+    "decision": "ع+إ",
+    "def": {
+      "ar": "تطبيق نفس السكربت على ملفات عدة مشاركين تلقائياً.",
+      "en": "Running the same script automatically on many participants' files."
+    }
+  },
+  {
+    "id": "event",
+    "en": "event",
+    "ar": "حدث",
+    "variants": [
+      "أحداث"
+    ],
+    "decision": "ع+إ",
+    "def": {
+      "ar": "علامة في التسجيل تحدد لحظة شيء مهم، مثل ظهور مثير.",
+      "en": "A marker in the recording that flags a moment of interest, such as a stimulus."
+    }
+  },
+  {
+    "id": "event-type",
+    "en": "event type",
+    "ar": "نوع الحدث",
+    "variants": [],
+    "decision": "ع",
+    "def": {
+      "ar": "اسم أو رقم يميّز نوع الحدث، مثل \"square\".",
+      "en": "The name or code that identifies what kind of event it is."
+    }
+  },
+  {
+    "id": "event-latency",
+    "en": "latency (event)",
+    "ar": "التوقيت",
+    "variants": [
+      "توقيت الحدث"
+    ],
+    "decision": "ع+إ",
+    "def": {
+      "ar": "موضع الحدث في التسجيل، ويُخزَّن في EEGLAB بالعيّنات.",
+      "en": "The position of an event in the recording, stored in samples in EEGLAB."
+    }
+  },
+  {
+    "id": "boundary-event",
+    "en": "boundary event",
+    "ar": "حدث boundary",
+    "variants": [],
+    "decision": "إ",
+    "def": {
+      "ar": "حدث يضعه EEGLAB حيث قُطع جزء من البيانات أو وُصلت ملفات.",
+      "en": "An event EEGLAB inserts where data were cut or files were joined."
+    }
+  },
+  {
+    "id": "bids",
+    "en": "BIDS",
+    "ar": "BIDS",
+    "variants": [],
+    "decision": "إ",
+    "def": {
+      "ar": "معيار موحّد لتسمية ملفات البيانات العصبية وتنظيمها في مجلدات.",
+      "en": "A standard for naming and organizing neuroimaging data files."
+    }
+  },
+  {
+    "id": "participant",
+    "en": "participant",
+    "ar": "مشارك",
+    "variants": [
+      "مشاركون",
+      "مشاركين",
+      "subject"
+    ],
+    "decision": "ع",
+    "def": {
+      "ar": "الشخص الذي سُجّلت بياناته في التجربة.",
+      "en": "The person whose data were recorded in the study."
+    }
+  },
+  {
+    "id": "trial",
+    "en": "trial",
+    "ar": "محاولة",
+    "variants": [
+      "محاولات"
+    ],
+    "decision": "ع+إ",
+    "def": {
+      "ar": "تكرار واحد للمهمة في التجربة، غالباً حول مثير واحد.",
+      "en": "One repetition of the task, usually around a single stimulus."
+    }
+  },
+  {
+    "id": "condition",
+    "en": "condition",
+    "ar": "شرط",
+    "variants": [
+      "شروط"
+    ],
+    "decision": "ع+إ",
+    "def": {
+      "ar": "حالة تجريبية نقارن بينها وبين غيرها، مثل \"مألوف\" و\"غير مألوف\".",
+      "en": "An experimental situation compared with others, such as familiar vs unfamiliar."
+    }
+  },
+  {
+    "id": "preprocessing",
+    "en": "preprocessing",
+    "ar": "المعالجة المسبقة",
+    "variants": [],
+    "decision": "ع",
+    "def": {
+      "ar": "تنظيف البيانات وتجهيزها قبل التحليل.",
+      "en": "Cleaning and preparing the data before analysis."
+    }
+  },
+  {
+    "id": "resampling",
+    "en": "resampling",
+    "ar": "إعادة أخذ العيّنات",
+    "variants": [],
+    "decision": "ع+إ",
+    "def": {
+      "ar": "تغيير معدل العيّنات للبيانات.",
+      "en": "Changing the sampling rate of the data."
+    }
+  },
+  {
+    "id": "downsampling",
+    "en": "downsampling",
+    "ar": "تخفيض معدل العيّنات",
+    "variants": [],
+    "decision": "ع+إ",
+    "def": {
+      "ar": "تقليل معدل العيّنات لتصغير البيانات وتسريع المعالجة.",
+      "en": "Lowering the sampling rate to shrink the data and speed up processing."
+    }
+  },
+  {
+    "id": "filter",
+    "en": "filter",
+    "ar": "فلتر",
+    "variants": [
+      "فلاتر"
+    ],
+    "decision": "ع",
+    "def": {
+      "ar": "أداة تُضعف ترددات معيّنة في الإشارة وتُبقي غيرها.",
+      "en": "A tool that weakens some frequencies in a signal and keeps others."
+    }
+  },
+  {
+    "id": "filtering",
+    "en": "filtering",
+    "ar": "فلترة",
+    "variants": [],
+    "decision": "ع",
+    "def": {
+      "ar": "تطبيق فلتر على البيانات.",
+      "en": "Applying a filter to the data."
+    }
+  },
+  {
+    "id": "high-pass",
+    "en": "high-pass",
+    "ar": "high-pass",
+    "variants": [],
+    "decision": "إ",
+    "def": {
+      "ar": "فلتر يمرّر الترددات العالية ويُضعف البطيئة مثل الانجراف.",
+      "en": "A filter that passes high frequencies and weakens slow drifts."
+    }
+  },
+  {
+    "id": "low-pass",
+    "en": "low-pass",
+    "ar": "low-pass",
+    "variants": [],
+    "decision": "إ",
+    "def": {
+      "ar": "فلتر يمرّر الترددات المنخفضة ويُضعف العالية مثل نشاط العضلات.",
+      "en": "A filter that passes low frequencies and weakens fast ones such as muscle activity."
+    }
+  },
+  {
+    "id": "band-pass",
+    "en": "band-pass",
+    "ar": "band-pass",
+    "variants": [],
+    "decision": "إ",
+    "def": {
+      "ar": "فلتر يمرّر نطاقاً من الترددات بين حدّين.",
+      "en": "A filter that passes only a range of frequencies between two edges."
+    }
+  },
+  {
+    "id": "notch-filter",
+    "en": "notch filter",
+    "ar": "فلتر notch",
+    "variants": [],
+    "decision": "إ",
+    "def": {
+      "ar": "فلتر يُضعف نطاقاً ضيقاً حول تردد واحد مثل 60 هرتز.",
+      "en": "A filter that weakens a narrow band around one frequency, such as 60 Hz."
+    }
+  },
+  {
+    "id": "cutoff-frequency",
+    "en": "cutoff frequency",
+    "ar": "تردد القطع",
+    "variants": [],
+    "decision": "ع+إ",
+    "def": {
+      "ar": "التردد الذي تنخفض عنده سعة الإشارة إلى النصف (−6 dB) في فلاتر FIR.",
+      "en": "The frequency where the filter halves the amplitude (−6 dB) for FIR filters."
+    }
+  },
+  {
+    "id": "passband-edge",
+    "en": "passband edge",
+    "ar": "حافة النطاق المسموح",
+    "variants": [],
+    "decision": "ع+إ",
+    "def": {
+      "ar": "آخر تردد يمرّ بلا إضعاف تقريباً، وهو الرقم الذي نكتبه في pop_eegfiltnew.",
+      "en": "The last frequency passed almost unchanged; the number you enter in pop_eegfiltnew."
+    }
+  },
+  {
+    "id": "transition-band",
+    "en": "transition band",
+    "ar": "النطاق الانتقالي",
+    "variants": [],
+    "decision": "ع+إ",
+    "def": {
+      "ar": "المسافة بين الترددات المسموحة والمحجوبة حيث يتدرّج الإضعاف.",
+      "en": "The range between passed and blocked frequencies where attenuation ramps up."
+    }
+  },
+  {
+    "id": "filter-order",
+    "en": "filter order",
+    "ar": "رتبة الفلتر",
+    "variants": [],
+    "decision": "ع+إ",
+    "def": {
+      "ar": "طول الفلتر بالعيّنات، وكلما زاد ضاق النطاق الانتقالي.",
+      "en": "The length of the filter in samples; higher order means a narrower transition band."
+    }
+  },
+  {
+    "id": "bad-channel",
+    "en": "bad channel",
+    "ar": "قناة سيئة",
+    "variants": [
+      "قنوات سيئة"
+    ],
+    "decision": "ع",
+    "def": {
+      "ar": "قناة إشارتها مسطّحة أو مليئة بالضوضاء طوال التسجيل تقريباً.",
+      "en": "A channel that is flat or noisy for most of the recording."
+    }
+  },
+  {
+    "id": "interpolation",
+    "en": "interpolation",
+    "ar": "الاستيفاء",
+    "variants": [],
+    "decision": "ع+إ",
+    "def": {
+      "ar": "تقدير إشارة قناة محذوفة من القنوات المحيطة بها.",
+      "en": "Estimating a removed channel's signal from the channels around it."
+    }
+  },
+  {
+    "id": "reference",
+    "en": "reference",
+    "ar": "المرجع",
+    "variants": [],
+    "decision": "ع+إ",
+    "def": {
+      "ar": "النقطة التي يُقاس جهد كل قناة بالنسبة لها.",
+      "en": "The point against which each channel's voltage is measured."
+    }
+  },
+  {
+    "id": "re-referencing",
+    "en": "re-referencing",
+    "ar": "إعادة المرجع",
+    "variants": [],
+    "decision": "ع+إ",
+    "def": {
+      "ar": "تغيير المرجع بعد التسجيل بحساب الجهد بالنسبة لمرجع جديد.",
+      "en": "Changing the reference after recording by expressing voltages relative to a new one."
+    }
+  },
+  {
+    "id": "average-reference",
+    "en": "average reference",
+    "ar": "المرجع المتوسط",
+    "variants": [],
+    "decision": "ع+إ",
+    "def": {
+      "ar": "مرجع يساوي متوسط كل قنوات الرأس.",
+      "en": "A reference equal to the mean of all scalp channels."
+    }
+  },
+  {
+    "id": "linked-mastoids",
+    "en": "linked mastoids",
+    "ar": "متوسط الماستويد",
+    "variants": [],
+    "decision": "ع+إ",
+    "def": {
+      "ar": "مرجع يساوي متوسط قطبي العظمتين خلف الأذنين.",
+      "en": "A reference equal to the mean of the two electrodes behind the ears."
+    }
+  },
+  {
+    "id": "asr",
+    "en": "ASR",
+    "ar": "ASR",
+    "variants": [
+      "Artifact Subspace Reconstruction"
+    ],
+    "decision": "إ",
+    "def": {
+      "ar": "طريقة تكتشف المقاطع شديدة الضوضاء وتعيد بناءها من بيانات نظيفة.",
+      "en": "A method that detects high-noise bursts and reconstructs them from clean data."
+    }
+  },
+  {
+    "id": "ica",
+    "en": "ICA",
+    "ar": "ICA",
+    "variants": [
+      "تحليل المكوّنات المستقلة"
+    ],
+    "decision": "إ",
+    "def": {
+      "ar": "طريقة تفصل الإشارة المسجّلة إلى مصادر مستقلة، بعضها دماغي وبعضها آرتفاكت.",
+      "en": "A method that separates the recording into independent sources, some brain and some artifact."
+    }
+  },
+  {
+    "id": "independent-component",
+    "en": "independent component",
+    "ar": "مكوّن ICA",
+    "variants": [
+      "مكوّنات ICA"
+    ],
+    "decision": "ع+إ",
+    "def": {
+      "ar": "مصدر واحد مستقل ناتج عن ICA، له خريطة رأس وسلسلة زمنية.",
+      "en": "One independent source from ICA, with its own scalp map and time series."
+    }
+  },
+  {
+    "id": "decomposition",
+    "en": "decomposition",
+    "ar": "تفكيك",
+    "variants": [],
+    "decision": "ع",
+    "def": {
+      "ar": "تحويل البيانات إلى مجموعة مكوّنات ICA.",
+      "en": "Breaking the data down into a set of ICA components."
+    }
+  },
+  {
+    "id": "ica-weights",
+    "en": "weights (ICA)",
+    "ar": "الأوزان",
+    "variants": [],
+    "decision": "ع+إ",
+    "def": {
+      "ar": "المصفوفة التي تحوّل القنوات إلى مكوّنات ICA.",
+      "en": "The matrix that turns channels into ICA components."
+    }
+  },
+  {
+    "id": "rank",
+    "en": "rank",
+    "ar": "رتبة البيانات",
+    "variants": [],
+    "decision": "ع+إ",
+    "def": {
+      "ar": "عدد القنوات المستقلة فعلاً في البيانات، ويقل بعد الاستيفاء أو المرجع المتوسط.",
+      "en": "The number of truly independent channels; it drops after interpolation or average reference."
+    }
+  },
+  {
+    "id": "pca",
+    "en": "PCA",
+    "ar": "PCA",
+    "variants": [],
+    "decision": "إ",
+    "def": {
+      "ar": "طريقة تختصر البيانات إلى عدد أقل من الأبعاد.",
+      "en": "A method that reduces data to fewer dimensions."
+    }
+  },
+  {
+    "id": "iclabel",
+    "en": "ICLabel",
+    "ar": "ICLabel",
+    "variants": [],
+    "decision": "إ",
+    "def": {
+      "ar": "أداة تصنّف كل مكوّن ICA إلى سبع فئات مع احتمال لكل فئة.",
+      "en": "A tool that classifies each ICA component into seven classes with a probability for each."
+    }
+  },
+  {
+    "id": "scalp-map",
+    "en": "scalp map",
+    "ar": "خريطة الرأس",
+    "variants": [
+      "topography"
+    ],
+    "decision": "ع+إ",
+    "def": {
+      "ar": "رسم يبيّن توزيع قيمة على الرأس من الأعلى.",
+      "en": "A top-down picture showing how a value is spread over the head."
+    }
+  },
+  {
+    "id": "time-series",
+    "en": "time series",
+    "ar": "السلسلة الزمنية",
+    "variants": [],
+    "decision": "ع",
+    "def": {
+      "ar": "قيم الإشارة مرتّبة بحسب الزمن.",
+      "en": "The values of a signal in time order."
+    }
+  },
+  {
+    "id": "blink",
+    "en": "blink",
+    "ar": "رمش العين",
+    "variants": [],
+    "decision": "ع",
+    "def": {
+      "ar": "إغلاق العين وفتحها، ويظهر كقمم كبيرة في القنوات الأمامية.",
+      "en": "Closing and opening the eye; seen as large peaks on frontal channels."
+    }
+  },
+  {
+    "id": "eye-movement",
+    "en": "eye movement",
+    "ar": "حركة العين",
+    "variants": [],
+    "decision": "ع",
+    "def": {
+      "ar": "تحرّك العين يميناً أو يساراً، ويظهر كتغيّر في القنوات الأمامية الجانبية.",
+      "en": "Moving the eyes sideways; seen as steps on the side frontal channels."
+    }
+  },
+  {
+    "id": "muscle",
+    "en": "muscle",
+    "ar": "عضلة",
+    "variants": [
+      "نشاط عضلي"
+    ],
+    "decision": "ع",
+    "def": {
+      "ar": "نشاط كهربائي من العضلات بترددات عالية، غالباً من الفك والرقبة.",
+      "en": "High-frequency electrical activity from muscles, often jaw and neck."
+    }
+  },
+  {
+    "id": "heart",
+    "en": "heart (ECG)",
+    "ar": "القلب",
+    "variants": [
+      "ECG"
+    ],
+    "decision": "ع",
+    "def": {
+      "ar": "نبض القلب الكهربائي الذي قد يظهر في EEG كقمم منتظمة.",
+      "en": "The heart's electrical beat that can appear in EEG as regular spikes."
+    }
+  },
+  {
+    "id": "channel-noise",
+    "en": "channel noise",
+    "ar": "ضوضاء قناة",
+    "variants": [],
+    "decision": "ع",
+    "def": {
+      "ar": "ضوضاء في قناة واحدة، غالباً من قطب ضعيف الاتصال.",
+      "en": "Noise on a single channel, usually from a poorly connected electrode."
+    }
+  },
+  {
+    "id": "iclabel-classes",
+    "en": "Brain / Eye / Muscle / Heart / Line Noise / Channel Noise / Other",
+    "ar": "دماغ / العين / عضلة / قلب / ضوضاء الكهرباء / ضوضاء قناة / أخرى",
+    "variants": [],
+    "decision": "ع+إ",
+    "def": {
+      "ar": "فئات ICLabel السبع التي يُصنَّف إليها كل مكوّن ICA.",
+      "en": "The seven ICLabel classes each ICA component is assigned to."
+    }
+  },
+  {
+    "id": "dipole",
+    "en": "dipole",
+    "ar": "ثنائي القطب",
+    "variants": [],
+    "decision": "ع+إ",
+    "def": {
+      "ar": "نموذج لمصدر كهربائي صغير داخل الدماغ له موضع واتجاه.",
+      "en": "A model of a small electrical source in the brain with a position and direction."
+    }
+  },
+  {
+    "id": "residual-variance",
+    "en": "residual variance",
+    "ar": "التباين المتبقّي",
+    "variants": [],
+    "decision": "ع+إ",
+    "def": {
+      "ar": "نسبة خريطة الرأس التي لا يفسّرها نموذج ثنائي القطب.",
+      "en": "The share of a scalp map that the dipole model fails to explain."
+    }
+  },
+  {
+    "id": "epoch",
+    "en": "epoch",
+    "ar": "epoch",
+    "variants": [
+      "epochs",
+      "مقطع زمني حول حدث"
+    ],
+    "decision": "إ",
+    "def": {
+      "ar": "مقطع زمني قصير مقتطع حول حدث.",
+      "en": "A short time segment cut out around an event."
+    }
+  },
+  {
+    "id": "baseline",
+    "en": "baseline",
+    "ar": "baseline",
+    "variants": [
+      "فترة ما قبل المثير"
+    ],
+    "decision": "إ",
+    "def": {
+      "ar": "الفترة قبل المثير التي تُستخدم كمستوى صفر للمقارنة.",
+      "en": "The pre-stimulus period used as the zero level for comparison."
+    }
+  },
+  {
+    "id": "baseline-correction",
+    "en": "baseline correction",
+    "ar": "تصحيح baseline",
+    "variants": [],
+    "decision": "ع+إ",
+    "def": {
+      "ar": "طرح متوسط فترة baseline من كل epoch.",
+      "en": "Subtracting the mean of the baseline period from each epoch."
+    }
+  },
+  {
+    "id": "rejection",
+    "en": "rejection",
+    "ar": "رفض",
+    "variants": [],
+    "decision": "ع",
+    "def": {
+      "ar": "استبعاد epochs أو بيانات لا تصلح للتحليل.",
+      "en": "Excluding epochs or data that are unfit for analysis."
+    }
+  },
+  {
+    "id": "threshold",
+    "en": "threshold",
+    "ar": "حد",
+    "variants": [],
+    "decision": "ع+إ",
+    "def": {
+      "ar": "قيمة إذا تجاوزتها الإشارة اعتُبرت مشكلة.",
+      "en": "A value beyond which the signal is treated as a problem."
+    }
+  },
+  {
+    "id": "erp",
+    "en": "ERP",
+    "ar": "ERP",
+    "variants": [
+      "الجهد المرتبط بحدث"
+    ],
+    "decision": "إ",
+    "def": {
+      "ar": "متوسط استجابة الدماغ لحدث معيّن عبر محاولات كثيرة.",
+      "en": "The brain's average response to a given event across many trials."
+    }
+  },
+  {
+    "id": "erp-component",
+    "en": "ERP component",
+    "ar": "مكوّن ERP",
+    "variants": [
+      "مكوّنات ERP"
+    ],
+    "decision": "ع",
+    "def": {
+      "ar": "موجة محددة في الـ ERP لها توقيت ومعنى، مثل P3 وN400.",
+      "en": "A specific wave in the ERP with a typical timing and meaning, such as P3 or N400."
+    }
+  },
+  {
+    "id": "averaging",
+    "en": "averaging",
+    "ar": "حساب المتوسط",
+    "variants": [],
+    "decision": "ع",
+    "def": {
+      "ar": "جمع epochs الشرط الواحد وقسمتها على عددها.",
+      "en": "Adding a condition's epochs together and dividing by their number."
+    }
+  },
+  {
+    "id": "grand-average",
+    "en": "grand average",
+    "ar": "المتوسط العام",
+    "variants": [],
+    "decision": "ع+إ",
+    "def": {
+      "ar": "متوسط الـ ERP عبر كل المشاركين.",
+      "en": "The ERP averaged across all participants."
+    }
+  },
+  {
+    "id": "erp-latency",
+    "en": "latency (ERP)",
+    "ar": "الكمون",
+    "variants": [],
+    "decision": "ع+إ",
+    "def": {
+      "ar": "زمن ظهور قمة أو مكوّن ERP بعد المثير.",
+      "en": "The time after the stimulus at which an ERP peak or component occurs."
+    }
+  },
+  {
+    "id": "mean-amplitude",
+    "en": "mean amplitude",
+    "ar": "متوسط السعة",
+    "variants": [],
+    "decision": "ع+إ",
+    "def": {
+      "ar": "متوسط قيمة الإشارة داخل نافذة زمنية محددة.",
+      "en": "The average signal value within a set time window."
+    }
+  },
+  {
+    "id": "peak-amplitude",
+    "en": "peak amplitude",
+    "ar": "قمة السعة",
+    "variants": [],
+    "decision": "ع+إ",
+    "def": {
+      "ar": "أعلى قيمة (أو أدنى قيمة) للإشارة داخل نافذة زمنية.",
+      "en": "The highest (or lowest) signal value within a time window."
+    }
+  },
+  {
+    "id": "bin",
+    "en": "bin (ERPLAB)",
+    "ar": "bin",
+    "variants": [
+      "bins"
+    ],
+    "decision": "إ",
+    "def": {
+      "ar": "مجموعة أحداث في ERPLAB تُحسب لها موجة متوسطة واحدة.",
+      "en": "A set of events in ERPLAB that gets one averaged waveform."
+    }
+  },
+  {
+    "id": "erpset",
+    "en": "ERPset",
+    "ar": "ERPset",
+    "variants": [
+      "ERPsets"
+    ],
+    "decision": "إ",
+    "def": {
+      "ar": "ملف ERPLAB يحمل الموجات المتوسطة لمشارك واحد.",
+      "en": "An ERPLAB file holding one participant's averaged waveforms."
+    }
+  },
+  {
+    "id": "sme",
+    "en": "SME",
+    "ar": "SME",
+    "variants": [
+      "standardized measurement error"
+    ],
+    "decision": "إ",
+    "def": {
+      "ar": "مقياس لدقة قياس الـ ERP عند مشارك واحد؛ كلما صغر كانت البيانات أفضل.",
+      "en": "A measure of how precisely a participant's ERP is measured; smaller is better."
+    }
+  },
+  {
+    "id": "time-frequency",
+    "en": "time-frequency",
+    "ar": "زمني-ترددي",
+    "variants": [],
+    "decision": "ع",
+    "def": {
+      "ar": "تحليل يبيّن كيف تتغيّر قدرة كل تردد مع الزمن.",
+      "en": "Analysis showing how power at each frequency changes over time."
+    }
+  },
+  {
+    "id": "ersp",
+    "en": "ERSP",
+    "ar": "ERSP",
+    "variants": [],
+    "decision": "إ",
+    "def": {
+      "ar": "تغيّر القدرة عند كل تردد وزمن مقارنة بفترة baseline.",
+      "en": "The change in power at each time and frequency relative to baseline."
+    }
+  },
+  {
+    "id": "itc",
+    "en": "ITC",
+    "ar": "ITC",
+    "variants": [],
+    "decision": "إ",
+    "def": {
+      "ar": "مقياس لثبات الطور عبر المحاولات عند كل تردد وزمن.",
+      "en": "How consistent the phase is across trials at each time and frequency."
+    }
+  },
+  {
+    "id": "wavelet",
+    "en": "wavelet",
+    "ar": "wavelet",
+    "variants": [],
+    "decision": "إ",
+    "def": {
+      "ar": "موجة قصيرة تُستخدم لقياس قدرة الترددات عبر الزمن.",
+      "en": "A short wave used to measure frequency power over time."
+    }
+  },
+  {
+    "id": "erp-image",
+    "en": "ERP image",
+    "ar": "ERP image",
+    "variants": [],
+    "decision": "إ",
+    "def": {
+      "ar": "رسم يعرض كل المحاولات كخطوط ملوّنة مرتّبة فوق بعضها.",
+      "en": "A plot showing every trial as a colored row, stacked in order."
+    }
+  },
+  {
+    "id": "study",
+    "en": "STUDY",
+    "ar": "STUDY",
+    "variants": [],
+    "decision": "إ",
+    "def": {
+      "ar": "بنية في EEGLAB تجمع داتاست عدة مشاركين لتحليلها معاً.",
+      "en": "An EEGLAB structure that groups many participants' datasets for joint analysis."
+    }
+  },
+  {
+    "id": "design",
+    "en": "design",
+    "ar": "تصميم",
+    "variants": [],
+    "decision": "ع+إ",
+    "def": {
+      "ar": "تحديد الشروط والمجموعات التي يقارن بينها STUDY.",
+      "en": "The definition of which conditions and groups a STUDY compares."
+    }
+  },
+  {
+    "id": "within-subject",
+    "en": "within-subject",
+    "ar": "داخل المشارك",
+    "variants": [],
+    "decision": "ع+إ",
+    "def": {
+      "ar": "مقارنة شروط سجّلها نفس المشارك.",
+      "en": "A comparison between conditions recorded from the same participant."
+    }
+  },
+  {
+    "id": "between-subject",
+    "en": "between-subject",
+    "ar": "بين المجموعات",
+    "variants": [],
+    "decision": "ع+إ",
+    "def": {
+      "ar": "مقارنة مجموعات مختلفة من المشاركين.",
+      "en": "A comparison between different groups of participants."
+    }
+  },
+  {
+    "id": "multiple-comparisons",
+    "en": "multiple comparisons",
+    "ar": "المقارنات المتعددة",
+    "variants": [],
+    "decision": "ع+إ",
+    "def": {
+      "ar": "مشكلة إجراء اختبارات كثيرة معاً، مما يرفع احتمال نتيجة زائفة.",
+      "en": "The problem that running many tests at once raises the chance of a false positive."
+    }
+  },
+  {
+    "id": "permutation-test",
+    "en": "permutation test",
+    "ar": "اختبار التبديل",
+    "variants": [],
+    "decision": "ع+إ",
+    "def": {
+      "ar": "اختبار إحصائي يخلط تسميات الشروط عشوائياً ليبني توزيع الصدفة.",
+      "en": "A test that randomly shuffles condition labels to build the chance distribution."
+    }
+  },
+  {
+    "id": "clustering",
+    "en": "clustering",
+    "ar": "تجميع",
+    "variants": [],
+    "decision": "ع+إ",
+    "def": {
+      "ar": "تجميع مكوّنات ICA المتشابهة من عدة مشاركين في مجموعات.",
+      "en": "Grouping similar ICA components from many participants together."
+    }
+  },
+  {
+    "id": "source-localization",
+    "en": "source localization",
+    "ar": "تحديد موقع المصدر",
+    "variants": [],
+    "decision": "ع+إ",
+    "def": {
+      "ar": "تقدير مكان المصدر داخل الدماغ من خريطة الرأس.",
+      "en": "Estimating where in the brain a signal comes from, using its scalp map."
+    }
+  },
+  {
+    "id": "head-model",
+    "en": "head model",
+    "ar": "نموذج الرأس",
+    "variants": [],
+    "decision": "ع+إ",
+    "def": {
+      "ar": "نموذج رياضي لطبقات الرأس يُستخدم لتحديد موقع المصدر.",
+      "en": "A mathematical model of the head's layers used for source localization."
+    }
+  },
+  {
+    "id": "connectivity",
+    "en": "connectivity",
+    "ar": "الاتصال الوظيفي",
+    "variants": [],
+    "decision": "ع+إ",
+    "def": {
+      "ar": "قياس كيف تتفاعل إشارات مناطق الدماغ مع بعضها.",
+      "en": "Measuring how signals from brain regions interact with each other."
+    }
+  },
+  {
+    "id": "decoding",
+    "en": "decoding / MVPA",
+    "ar": "التصنيف (decoding) / MVPA",
+    "variants": [
+      "decoding",
+      "MVPA"
+    ],
+    "decision": "ع+إ",
+    "def": {
+      "ar": "استخدام نمط الإشارة في عدة قنوات لتوقّع الشرط التجريبي.",
+      "en": "Using the pattern across channels to predict the experimental condition."
+    }
+  },
+  {
+    "id": "hpc",
+    "en": "HPC",
+    "ar": "الحوسبة عالية الأداء (HPC)",
+    "variants": [
+      "HPC"
+    ],
+    "decision": "ع+إ",
+    "def": {
+      "ar": "تشغيل التحليل على حواسيب قوية مشتركة بدل جهازك.",
+      "en": "Running analysis on shared high-powered computers instead of your own machine."
+    }
+  },
+  {
+    "id": "precompute",
+    "en": "precompute",
+    "ar": "الحساب المسبق",
+    "variants": [
+      "حساب المقاييس مسبقاً"
+    ],
+    "decision": "ع+إ",
+    "def": {
+      "ar": "حساب ERP أو الطيف لكل مشارك وشرط وحفظه قبل الرسم والإحصاء في STUDY.",
+      "en": "Computing and saving ERPs or spectra for each participant and condition before STUDY plotting and statistics."
+    }
+  }
+]

@@ -1,0 +1,35 @@
+% Copied from lessons/en/04-04-ica-1hz-copy-weights.md. The lesson is the reference.
+% Starting point
+[ALLEEG, EEG, CURRENTSET, ALLCOM] = eeglab;
+eeglabRoot = fileparts(which('eeglab'));
+EEG = pop_loadset('eeglab_data.set', fullfile(eeglabRoot, 'sample_data'));
+fullLocs = EEG.chanlocs;
+
+% Main dataset: high-pass at 0.1 Hz, then 60 Hz line-noise removal
+EEG = pop_eegfiltnew(EEG, 'locutoff', 0.1);
+EEG = pop_eegfiltnew(EEG, 'locutoff', 58, 'hicutoff', 62, 'revfilt', 1);
+
+% Bad channels you removed earlier, e.g. {'T7'}; leave empty if none
+badChans = {};
+if ~isempty(badChans)
+    EEG = pop_select(EEG, 'rmchannel', badChans);
+    EEG = pop_interp(EEG, fullLocs, 'spherical');
+end
+
+% Average reference, EOG channels excluded
+eogIdx = find(ismember({EEG.chanlocs.labels}, {'EOG1', 'EOG2'}));
+EEG = pop_reref(EEG, [], 'exclude', eogIdx);
+EEG.setname = 'D1 main';
+EEG_main = EEG;
+
+% ICA copy: same data, high-pass at 1 Hz, with ICA weights
+EEG_ica = pop_eegfiltnew(EEG_main, 'locutoff', 1);
+EEG_ica.setname = 'D1 ica1hz';
+EEG_ica = pop_runica(EEG_ica, 'icatype', 'runica', 'extended', 1);
+
+% Dataset 1: main dataset; dataset 2: ICA copy
+EEG_main.filename = ''; EEG_main.filepath = ''; EEG_main.datfile = ''; EEG_main.saved = 'no';
+[ALLEEG, EEG, CURRENTSET] = pop_newset(ALLEEG, EEG_main, 0, 'setname', 'D1 main', 'gui', 'off');
+EEG_ica.filename = ''; EEG_ica.filepath = ''; EEG_ica.datfile = ''; EEG_ica.saved = 'no';
+[ALLEEG, EEG, CURRENTSET] = pop_newset(ALLEEG, EEG_ica, CURRENTSET, 'setname', 'D1 ica1hz', 'gui', 'off');
+eeglab redraw;

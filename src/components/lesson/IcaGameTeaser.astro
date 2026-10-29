@@ -1,0 +1,20 @@
+---
+import { t } from '../../i18n';
+import { langOf } from '../../lib/lang';
+import { url } from '../../lib/url';
+import { teaserItem } from '../../lib/ica-data';
+import Icon from '../Icon.astro';
+const lang = langOf(Astro.url);
+const item = teaserItem();
+---
+<aside class="game" aria-labelledby="ica-teaser-t">
+  <h3 id="ica-teaser-t">{t(lang, 'about.game.title')}</h3>
+  {item && (
+    <figure class="fig bare">
+      <div class="game-img"><img src={item.src} alt={item.alt[lang]} width={item.w} height={item.h} loading="lazy" /></div>
+      <figcaption><span>{t(lang, 'game.choose')} <b>{t(lang, `game.cat.${item.catKey}`)}</b></span></figcaption>
+    </figure>
+  )}
+  <p>{t(lang, 'about.game.body')}</p>
+  <div><a class="btn pri small" href={url('ica-game/', lang)}><Icon name="game" class="ico s20" />{t(lang, 'about.game.cta')}</a></div>
+</aside>

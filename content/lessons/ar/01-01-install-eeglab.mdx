@@ -1,0 +1,163 @@
+---
+title: التثبيت والإضافات
+titleEn: Installing EEGLAB & plugins
+description: كيف تحصل على MATLAB، وتثبّت EEGLAB 2026.1 وتشغّله، وتضيف إليه plugin جديداً من مدير الإضافات.
+station: 1
+order: 1
+level: core
+status: approved
+objectives:
+  - تختار طريقة للحصول على MATLAB تناسب وضعك (رخصة الجامعة، أو MATLAB Online المجاني، أو EEGLAB المجمّع).
+  - تثبّت EEGLAB 2026.1 وتشغّله وتتأكد من ظهور نافذته الرئيسية.
+  - تثبّت plugin من مدير الإضافات في قائمة File.
+prerequisites: [matlab-basics]
+references:
+  - title: EEGLAB Tutorial
+    url: https://eeglab.org/tutorials/01_Install/Install.html
+    section: "1. Installing EEGLAB"
+  - title: EEGLAB Extensions
+    url: https://eeglab.org/others/EEGLAB_Extensions.html
+    section: "To install or update a plugin"
+  - title: Download EEGLAB
+    url: https://eeglab.org/others/How_to_download_EEGLAB.html
+    section: "Download the EEGLAB ZIP file archive"
+  - title: The compiled version of EEGLAB
+    url: https://eeglab.org/others/Compiled_EEGLAB.html
+    section: "Installation"
+  - title: Running EEGLAB on Octave
+    url: https://eeglab.org/others/Running_EEGLAB_on_Octave.html
+    section: "Running EEGLAB on Octave"
+  - title: MATLAB Online Versions (MathWorks)
+    url: https://www.mathworks.com/products/matlab-online/matlab-online-versions.html
+    section: "MATLAB Online (basic)"
+eeglabVersion: "2026.1"
+updated: 2026-10-28
+---
+
+## لماذا هذه الخطوة مهمة؟
+
+<En>EEGLAB</En> مجموعة دوال مكتوبة بلغة <En>MATLAB</En>. لذلك تحتاج MATLAB أولاً، ثم مجلد EEGLAB نفسه.
+
+بعد التثبيت ستضيف قدرات جديدة لـ EEGLAB بالإضافات (<En>plugins</En>). الإضافة حزمة صغيرة تضيف قوائم ودوال، مثل قراءة صيغة ملف لا يقرؤها EEGLAB وحده.
+
+كل الدروس التالية تفترض أن EEGLAB يعمل عندك، وأن إضافة Biosig مثبّتة لاستيراد ملفات EDF في درس الاستيراد.
+
+## قبل وبعد
+
+<ImageSpec>
+لقطتان متجاورتان. اليسرى: نافذة MATLAB وفي الـ Command Window الأمر eeglab مكتوباً قبل الضغط على Enter، والـ Current Folder يعرض مجلد EEGLAB بعد فكّه (يظهر فيه eeglab.m ومجلدات functions و plugins و sample_data). اليمنى: نافذة EEGLAB الرئيسية بعد التشغيل، فارغة من البيانات، وفي شريطها القوائم السبع بالترتيب: File و Edit و Tools و Plot و Study و Datasets و Help. لقطة واجهة حقيقية من EEGLAB 2026.1 (source: eeglab-ui).
+</ImageSpec>
+
+## الخطوات من الواجهة
+
+<Callout type="note" title="لا يوجد عندك MATLAB؟">
+إذا لم يكن عندك MATLAB بعد، اقرأ جدول «أي قيمة أختار؟» في الأسفل أولاً، ثم ارجع هنا.
+</Callout>
+
+### 1. نزّل EEGLAB
+
+1. افتح صفحة التنزيل الرسمية: [Download EEGLAB](https://eeglab.org/others/How_to_download_EEGLAB.html).
+2. املأ النموذج: الاسم والبريد، وفعّل خانة قبول رخصة BSD، ثم اضغط <UiLabel>Submit</UiLabel>.
+3. ستحصل على ملف ZIP لآخر إصدار مستقر.
+
+<Callout type="warning">
+لا تنزّل ملف ZIP من صفحة EEGLAB على GitHub. هذا الملف ينقصه إضافات أساسية، كما ينبّه التوثيق الرسمي.
+</Callout>
+
+### 2. فُكّ الملف في مكان ثابت
+
+فُكّ الملف في مجلد لن تنقله لاحقاً، مثل مجلد `Documents/MATLAB`. ستحصل على مجلد اسمه يبدأ بـ `eeglab` ثم رقم الإصدار.
+
+### 3. احفظ المسار قبل أول تشغيل
+
+احفظ المسار **قبل** أن تكتب `eeglab`. السبب: عند التشغيل يضيف EEGLAB مجلداته الفرعية إلى المسار، وزر الحفظ يحفظ المسار كله كما هو في تلك اللحظة.
+
+1. افتح MATLAB، ولا تشغّل EEGLAB بعد. إذا كنت شغّلته في هذه الجلسة، أغلق MATLAB وافتحه من جديد.
+2. اكتب `pathtool` في الـ Command Window (أو افتح <UiLabel>Set Path</UiLabel> من واجهة MATLAB).
+3. اضغط <UiLabel>Add Folder</UiLabel> واختر مجلد EEGLAB الرئيسي فقط.
+4. اضغط <UiLabel>Save</UiLabel> ثم <UiLabel>Close</UiLabel>.
+
+### 4. شغّل EEGLAB
+
+اكتب `eeglab` في الـ Command Window واضغط <kbd>Enter</kbd>.
+
+تظهر النافذة الرئيسية لـ EEGLAB بسبع قوائم: <UiLabel>File</UiLabel> و <UiLabel>Edit</UiLabel> و <UiLabel>Tools</UiLabel> و <UiLabel>Plot</UiLabel> و <UiLabel>Study</UiLabel> و <UiLabel>Datasets</UiLabel> و <UiLabel>Help</UiLabel>. عند التشغيل يضيف EEGLAB مجلداته الفرعية إلى مسار الجلسة الحالية بنفسه، ولا يحفظها.
+
+من الآن يكفي أن تكتب `eeglab` في أي جلسة MATLAB جديدة.
+
+### 5. ثبّت إضافة Biosig
+
+1. من نافذة EEGLAB افتح <MenuPath>File > Manage EEGLAB extensions</MenuPath>. يحتاج هذا اتصالاً بالإنترنت.
+2. تظهر قائمة الإضافات. الإضافات المكتوبة بخط عريض مثبّتة عندك، والحمراء تحتاج تحديثاً.
+3. اضغط زر البحث في أعلى النافذة واكتب `Biosig`.
+4. اختر Biosig من القائمة، ثم اضغط <UiLabel>Install/Update</UiLabel>.
+5. ينزّل EEGLAB الإضافة ويعيد بناء نافذته. Biosig تقرأ ملفات EDF و BDF وصيغاً أخرى كثيرة.
+
+يعرض مدير الإضافات لكل إضافة تقييمها بالنجوم وعدد مرات تنزيلها، ويرتّب القائمة حسب التنزيلات. إذا وجدت إضافتين لنفس العمل، فهذان الرقمان دليل أوّلي سريع. ولتعرف ماذا تفعل كل إضافة شائعة ومتى تحتاجها، افتح [دليل الإضافات](/plugins/).
+
+<ImageSpec optional>
+نافذة مدير الإضافات (Manage EEGLAB extensions) وفيها Biosig محدّدة في القائمة، وزر Install/Update في الأسفل. لقطة واجهة من EEGLAB 2026.1 (source: eeglab-ui).
+</ImageSpec>
+
+## السكربت المقابل
+
+نفس الخطوات من السطر. شغّله مرة واحدة بعد فكّ EEGLAB، في جلسة MATLAB جديدة لم تشغّل فيها EEGLAB بعد.
+
+```matlab
+% Go to the EEGLAB folder (change the path to yours)
+cd('C:\Users\me\Documents\MATLAB\eeglab2026.1');
+
+% Save the root EEGLAB folder in the path BEFORE starting EEGLAB,
+% so its subfolders are not saved too
+addpath(pwd);
+savepath;
+
+% Start EEGLAB; it adds its own subfolders for this session only
+eeglab;
+
+% Install Biosig only if it is not installed yet (needs internet)
+if ~exist('sopen', 'file')
+    plugin_askinstall('Biosig', 'sopen', true);
+end
+```
+
+- `addpath(pwd)` ثم `savepath` يحفظان المجلد الرئيسي فقط، لأنهما قبل `eeglab`. لو جاءا بعده، لحفظ `savepath` كل المجلدات الفرعية التي أضافها EEGLAB، وهذا ما يحذّر منه التوثيق.
+- `sopen` دالة من Biosig. إذا وُجدت، فالإضافة مثبّتة ولا داعي لإعادة تثبيتها.
+- الوسيط الثالث `true` يثبّت الإضافة بدون نافذة سؤال، فيصلح داخل السكربت.
+
+## أي قيمة أختار؟
+
+القرار الوحيد هنا: من أين تحصل على MATLAB؟ الخيارات مرتّبة من الأفضل للدروس إلى الأضعف.
+
+| الخيار | التكلفة | يكفي لهذه الدروس؟ | لماذا |
+|---|---|---|---|
+| **رخصة الجامعة** | مجانية للطالب غالباً | نعم، كاملة | أغلب الجامعات توفّر رخصة MATLAB لطلابها. اسأل قسم تقنية المعلومات في جامعتك. التوثيق الرسمي يوصي بنسخة MATLAB أولاً. |
+| **MATLAB Online (basic)** | مجاني بحساب MathWorks | للتجربة فقط، مع قيود | 20 ساعة في الشهر، و 5 جيجابايت تخزين في MATLAB Drive، وحد 15 دقيقة للحساب المتواصل (صفحة MathWorks). يمكن نظرياً رفع مجلد EEGLAB إلى MATLAB Drive ثم كتابة `eeglab`، لكننا لم نجرّب ذلك بعد على 2026.1. |
+| **EEGLAB المجمّع (compiled)** | مجاني، بدون MATLAB | أغلبها، بلا إضافات جديدة | نسخة جاهزة لـ Windows و macOS لا تحتاج MATLAB. تأتي ومعها إضافات كثيرة، وتشغّل سكربتات بسيطة. لكن ليس فيها قائمة <UiLabel>Manage EEGLAB extensions</UiLabel>، فلا تستطيع أن تضيف لها plugin جديداً. التوثيق يضعها ثانياً بعد MATLAB. |
+| **GNU Octave** | مجاني ومفتوح المصدر | جزئياً | بديل مفتوح لـ MATLAB. التوثيق الرسمي يقول إنه أقل استقراراً من MATLAB، ويضعه الخيار الثالث والأخير. لا نعد بأن كل الدروس تعمل عليه. |
+
+**نسخة MATLAB:** يوصي فريق EEGLAB بإصدار حديث من MATLAB، وليس بالضرورة الأحدث. إذا كان عندك MATLAB 2016a أو أقدم، فصفحة التنزيل توجّهك إلى EEGLAB 2020.0، وهذا الموقع لا يغطّي ذلك الإصدار.
+
+**التحديث:** في نسخة MATLAB تجد <MenuPath>Help > Check for EEGLAB update</MenuPath>، ويطبع EEGLAB عند التشغيل إن كان عندك آخر إصدار. لكن هذه الدروس مكتوبة على EEGLAB 2026.1، فلا تحدّث في منتصف المسار. أسماء القوائم والأرقام قد تتغيّر في إصدار أحدث.
+
+<Callout type="warning">
+MATLAB Online يوقف أي عملية حساب متواصلة بعد 15 دقيقة. تفكيك ICA على بيانات كبيرة قد يتجاوز هذا الحد.
+</Callout>
+
+## أخطاء شائعة
+
+- **تنزيل ZIP من GitHub بدل صفحة التنزيل.** تنقصك إضافات أساسية مثل ICLabel و clean_rawdata و firfilt. تظهر رسائل تحذير حمراء عند التشغيل للأولين، ويطلب EEGLAB تنزيل firfilt عند أول فلترة.
+- **حفظ المجلد مع كل مجلداته الفرعية.** يحدث هذا بزر <UiLabel>Add with Subfolders</UiLabel>، أو بحفظ المسار بعد تشغيل `eeglab` في نفس الجلسة. التوثيق ينصح بحفظ المجلد الرئيسي فقط، و EEGLAB يطبع تحذيراً أحمر عند التشغيل إذا وجد مجلداته الفرعية محفوظة.
+- **إبقاء إصدار قديم من EEGLAB في المسار.** إذا ثبّتّ إصداراً جديداً، احذف القديم من <UiLabel>Set Path</UiLabel> بزر <UiLabel>Remove</UiLabel>. وإلا قد يستدعي MATLAB دوال قديمة.
+- **البحث عن مدير الإضافات في النسخة المجمّعة.** القائمة غير موجودة فيها أصلاً. إذا احتجت plugin غير موجود فيها، فأنت تحتاج نسخة MATLAB.
+- **فشل `savepath` أو زر <UiLabel>Save</UiLabel>.** يحدث هذا غالباً عندما لا يملك حسابك صلاحية الكتابة في مجلد MATLAB. شغّل MATLAB بصلاحية المسؤول مرة واحدة. أو أنشئ ملفاً اسمه `startup.m` في المجلد الذي يطبعه الأمر `userpath`، واكتب فيه سطراً واحداً: `addpath` ثم مسار مجلد EEGLAB بين قوسين. يشغّل MATLAB هذا الملف تلقائياً في بداية كل جلسة، ولا يحتاج صلاحيات.
+
+{/* صندوق "من التجربة": بانتظار قصة من صاحب المشروع. لا يُكتب قبل وصولها. */}
+
+## كيف تتأكد أن الخطوة نجحت؟
+
+1. **النافذة:** نافذة EEGLAB الرئيسية ظهرت بالقوائم السبع.
+2. **المسار:** أغلق MATLAB وافتحه من جديد، ثم اكتب `which eeglab`. يجب أن يظهر مسار الملف `eeglab.m` داخل مجلدك. وعند تشغيل `eeglab` يجب ألا يظهر تحذير أحمر عن المجلدات الفرعية (subfolders).
+3. **الإصدار:** اكتب `eeg_getversion`. يجب أن يظهر رقم إصدار يبدأ بـ `2026.1`.
+4. **الإضافة:** اكتب `exist('sopen', 'file')`. الناتج `2` يعني أن Biosig مثبّتة. وفي مدير الإضافات يظهر اسمها بخط عريض.
+5. **سطور الإقلاع:** عند كل تشغيل يطبع EEGLAB في الـ Command Window سطراً لكل إضافة يحمّلها، يبدأ بـ `EEGLAB: adding` ثم اسم الإضافة ورقم نسختها. ابحث فيها عن Biosig.

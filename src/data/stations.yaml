@@ -1,0 +1,132 @@
+# Station page text: description and outcomes.
+# Source: curriculum.md §3.1 (ar) and §3.2 (en), copied as written.
+
+- station: 0
+  description: "الأساس اللي يخلّي باقي المسار مفهوماً: من وين تجي إشارة EEG، وين تنحط الأقطاب، وكيف تقرأ سطر MATLAB."
+  descriptionEn: "The groundwork that makes the rest of the path make sense: where the EEG signal comes from, where electrodes go, how to read a line of MATLAB, and what a spectrum shows."
+  outcomes:
+    - "تشرح ليش EEG يقيس نشاط مجموعات كبيرة من الخلايا لا خلية وحدة"
+    - "تحدد موقع أي قطب من اسمه في نظام 10-20"
+    - "تشغّل سطر MATLAB وتقرأ متغيّراً من الـ Workspace"
+    - "تقرأ رسمة طيف بسيطة"
+  outcomesEn:
+    - "Explain why EEG reflects large synchronized populations, not single cells"
+    - "Locate any electrode from its 10-20 name"
+    - "Run a MATLAB line and read a variable"
+    - "Read a simple spectrum"
+- station: 1
+  description: "تثبّت EEGLAB وتفتح أول داتاست، وتتعرّف على المكان اللي تعيش فيه بياناتك: الـ `EEG` struct."
+  descriptionEn: "Install EEGLAB, open your first dataset, and meet the place your data lives: the `EEG` structure."
+  outcomes:
+    - "تثبّت EEGLAB وتضيف plugin"
+    - "تفتح `eeglab_data.set` وتستعرضها"
+    - "تقرأ عدد القنوات ومعدل العيّنات والأحداث من `EEG`"
+  outcomesEn:
+    - "Install EEGLAB and add a plugin"
+    - "Open and browse `eeglab_data.set`"
+    - "Read channel count, sampling rate and events from `EEG`"
+- station: 2
+  description: "تحوّل ملف تسجيل حقيقي من جهاز EEG إلى داتاست جاهزة: الإشارة، ومواقع الأقطاب، والأحداث."
+  descriptionEn: "Turn a real recording file into a ready dataset: signal, electrode locations and events."
+  outcomes:
+    - "تستورد ملف EDF أو BDF أو BrainVision"
+    - "تربط القنوات بمواقعها وتتحقق منها برسمة رأس"
+    - "تتأكد إن الأحداث وصلت بأنواعها وتوقيتها الصحيح"
+  outcomesEn:
+    - "Import an EDF, BDF or BrainVision file"
+    - "Attach channel locations and check them on a head plot"
+    - "Confirm events arrived with the right types and timing"
+- station: 3
+  description: "تنظيف الإشارة الخام خطوة خطوة قبل أي تحليل: المعدل، الفلترة، الكهرباء، القنوات السيئة، والمرجع."
+  descriptionEn: "Clean the raw signal step by step before any analysis: sampling rate, filtering, line noise, bad channels, interpolation and reference."
+  outcomes:
+    - "تطبّق بايبلاين معالجة مسبقة كامل على مشارك واحد"
+    - "تختار قيم الفلترة حسب نوع التحليل"
+    - "تحذف القنوات السيئة وتستوفيها ثم تعيد المرجع للمتوسط بالترتيب الصحيح"
+  outcomesEn:
+    - "Run a full preprocessing pipeline on one participant"
+    - "Choose filter settings for your analysis"
+    - "Remove and interpolate bad channels, then re-reference to the average, in the right order"
+- station: 4
+  description: "أقوى أداة في EEGLAB لتنظيف الرمش والعضلات والقلب بدون ما ترمي بيانات. وأصعب مهارة على المبتدئين: قراءة المكوّنات."
+  descriptionEn: "EEGLAB's strongest tool for removing blinks, muscle and heart artifacts without discarding data, and the hardest beginner skill: reading components."
+  outcomes:
+    - "تشغّل ICA على نسخة مفلترة عند 1 هرتز وتنسخ الأوزان لبياناتك الأصلية"
+    - "تصنّف المكوّنات بـ ICLabel وتراجع قراره بعينك"
+    - "تحذف مكوّنات الآرتفاكت وتتحقق إن الإشارة تحسّنت"
+  outcomesEn:
+    - "Run ICA on a 1-Hz-filtered copy and copy the weights to your data"
+    - "Classify components with ICLabel and check its decision yourself"
+    - "Remove artifact components and verify the signal improved"
+- station: 5
+  description: "تقصّ الإشارة المستمرة إلى مقاطع حول كل حدث، وتجهّزها للمتوسطات."
+  descriptionEn: "Cut the continuous signal into segments around each event and prepare them for averaging."
+  outcomes:
+    - "تستخرج epochs حول نوع حدث محدد بنافذة مناسبة"
+    - "تطبّق تصحيح baseline"
+    - "تحدد epochs السيئة وترفضها بحد مناسب"
+  outcomesEn:
+    - "Extract epochs around an event type with a suitable window"
+    - "Apply baseline correction"
+    - "Find and reject bad epochs with a suitable threshold"
+- station: 6
+  description: "من epochs نظيفة إلى نتائج: موجات ERP، والطيف الترددي، والتحليل الزمني-الترددي."
+  descriptionEn: "From clean epochs to results: ERP waveforms, the power spectrum and time-frequency analysis."
+  outcomes:
+    - "تحسب ERP لشرط وتقرأ مكوّناته"
+    - "تحسب الطيف PSD وتفسّر قمة ألفا"
+    - "تقيس سعة وكمون مكوّن ERP بطريقة قابلة للتكرار"
+  outcomesEn:
+    - "Compute an ERP for a condition and read its components"
+    - "Compute a PSD and interpret the alpha peak"
+    - "Measure ERP amplitude and latency reproducibly"
+- station: 7
+  description: "تحويل النتائج إلى رسومات واضحة وصادقة: خرائط الرأس، وموجات ERP، و ERP image."
+  descriptionEn: "Turn results into clear and honest figures: scalp maps, ERP waveforms and ERP images."
+  outcomes:
+    - "ترسم خريطة رأس عند زمن محدد"
+    - "ترسم ERP لقنوات مختارة بمحاور صحيحة"
+    - "تجهّز رسمة تصلح للنشر"
+  outcomesEn:
+    - "Plot a scalp map at a chosen latency"
+    - "Plot channel ERPs with correct axes"
+    - "Prepare a publication-ready figure"
+- station: 8
+  description: "من مشارك واحد إلى مجموعة: تجهيز الملفات، وإنشاء STUDY من الملفات أو من BIDS، وتصميم الشروط، وحساب المقاييس ورسمها، والإحصاء، وإخراج النتائج للورقة."
+  descriptionEn: "From one participant to a group: preparing files, creating a STUDY from files or BIDS, designing conditions, precomputing and plotting measures, statistics, and exporting results."
+  outcomes:
+    - "تتحقق أن ملفات المشاركين جاهزة لـ STUDY"
+    - "تنشئ STUDY وتعرّف تصميماً داخل المشارك وبين المجموعات"
+    - "تحسب ERP والطيف للمجموعة وترسمها"
+    - "تختبر الفروق مع تصحيح المقارنات المتعددة"
+    - "تخرج الأرقام إلى جدول لبرنامج الإحصاء"
+  outcomesEn:
+    - "Check that participant files are ready for a STUDY"
+    - "Create a STUDY and define within- and between-subject designs"
+    - "Compute and plot group ERPs and spectra"
+    - "Test differences with multiple-comparison correction"
+    - "Export values to a table for your stats software"
+- station: 9
+  description: "تحويل كل ضغطة في الواجهة إلى سطر كود، ثم تشغيل البايبلاين على كل المشاركين بدون تدخّل."
+  descriptionEn: "Turn every GUI click into a line of code, then run the pipeline on all participants unattended."
+  outcomes:
+    - "تستخرج الكود من `eegh` لأي خطوة سويتها"
+    - "تكتب سكربتاً لمشارك واحد من الاستيراد للحفظ"
+    - "تشغّله على كل المشاركين وتنظّم ملفاتك بدون ما تنفجر مساحة التخزين"
+    - "تعرف متى يصلح بايبلاين جاهز وماذا تتحقق منه قبل أن تثق بنتيجته"
+  outcomesEn:
+    - "Get the code for any step from `eegh`"
+    - "Write a single-subject script from import to saving"
+    - "Run it on all participants and organize files without exhausting your storage"
+    - "Know when a ready-made pipeline fits and what to check before trusting it"
+- station: 10
+  description: "فروع متخصّصة لمن يحتاجها: مصادر الإشارة، الاتصال الوظيفي، التصنيف الآلي، وكتابة plugin، ومقارنة بالأدوات البديلة."
+  descriptionEn: "Specialized branches for those who need them: source localization, connectivity, decoding, writing plugins, and other tools."
+  outcomes:
+    - "تحدد أي فرع متقدّم يخدم سؤالك البحثي"
+    - "تشغّل أول تجربة فيه على داتاست مفتوحة"
+    - "تعرف متى تنتقل لأداة غير EEGLAB"
+  outcomesEn:
+    - "Pick the advanced branch that serves your research question"
+    - "Run a first example on open data"
+    - "Know when to move to a tool other than EEGLAB"

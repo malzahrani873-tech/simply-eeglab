@@ -1,0 +1,137 @@
+---
+title: Data quality (SME)
+titleEn: Data quality (SME)
+description: How to read the SME values ERPLAB computes during averaging, and compare them across participants to decide whether a participant's data are usable.
+station: 6
+order: 5
+level: optional
+status: review
+objectives:
+  - Show the aSME values of an ERPset in the ERPLAB table, and read them for each channel and time window.
+  - Collect the SME for one channel and window across all participants in a script, and identify the outlier participant.
+  - Explain why SME describes a participant's data quality better than the number of trials alone.
+prerequisites: [erplab-amplitude-latency]
+references:
+  - title: ERPLAB Toolbox wiki
+    url: https://github.com/ucdavis/erplab/wiki/ERPLAB-Data-Quality-Metrics
+    section: "ERPLAB Data Quality Metrics"
+  - title: Applied Event-Related Potential Data Analysis (Luck)
+    url: https://socialsci.libretexts.org/Bookshelves/Psychology/Biological_Psychology/Applied_Event-Related_Potential_Data_Analysis_(Luck)/06:_Assigning_Events_to_Bins_Averaging_Baseline_Correction_and_Assessing_Data_Quality
+    section: "Chapter 6: Assessing Data Quality (6.7 The Signal-to-Noise Ratio)"
+  - title: Applied ERP Data Analysis, data master folder
+    url: https://doi.org/10.18115/D50056
+    section: "Chapter_10 folder"
+datasets: [D3]
+startingPoint:
+  dataset: D3
+  file: Chapter_10/Data/ERPsets
+  applied: []
+  script: |
+    [ALLEEG, EEG, CURRENTSET, ALLCOM] = eeglab;
+
+    % The 40 single-participant ERPsets from chapter 10 of Luck's book
+    dataDir = fullfile(pwd, 'Chapter_10', 'Data', 'ERPsets');
+    files = dir(fullfile(dataDir, '*.erp'));
+    ALLERP = [];   % start from an empty ERPset list
+    [ERP, ALLERP] = pop_loaderp('filename', {files.name}, 'filepath', dataDir, ...
+        'UpdateMainGui', 'on');
+    fprintf('Loaded %d ERPsets\n', numel(ALLERP));
+    eeglab redraw
+eeglabVersion: "2026.1"
+updated: 2026-10-28
+---
+
+## Why this step matters
+
+We start this lesson from ready-made ERPsets from Luck's book (chapter 10). Building an ERPset from your own data is explained in chapters 2 and 6 of the book.
+
+The number of trials is not enough to describe a participant's data quality. A participant with 100 noisy trials is worse than one with 60 clean trials. What you need is a number that says: how much could my score change if I repeated the experiment with the same participant?
+
+That number is the <En>SME</En>: a measure of how precisely a participant's ERP is measured; smaller is better. Its unit is microvolts, like the score itself. ERPLAB computes its analytic version (<En>aSME</En>) automatically during averaging, for mean amplitude in 100-ms windows around zero (such as 0 to 100 and 100 to 200 ms). Peak amplitude and latency need another version based on bootstrapping, which Luck explains in chapter 10.
+
+<Callout type="note" title="Why C3 at 200 to 300 ms?">
+The ready-made windows in these files are 100 ms wide and computed for each channel, not for the difference wave. So here we use C3 in the 200 to 300 ms window, inside the LRP window, as a general indicator of a participant's data quality. It is not the precision of the score you learned in the previous lesson (150 to 400 ms on the difference wave); that needs bSME, and its script `LRP_bSME.m` comes with the chapter 10 files.
+</Callout>
+
+The practical idea: compare SME across participants. A participant whose SME is much larger than the others adds noise to the whole analysis, and deserves a look before entering the statistics.
+
+## Before and after
+
+<ImageSpec>
+Dot plot: participants 1 to 40 on the horizontal axis, aSME in µV at C3 in the 200 to 300 ms window, bin 1, on the vertical axis. A horizontal line at the median, and a dashed line at twice the median. Most dots sit near the median, and dots above the dashed line are in a different color with the participant number. Source: script on the chapter 10 data from Luck's book. Data: ERP CORE, image licence CC BY-SA 4.0.
+</ImageSpec>
+
+## Steps in the GUI
+
+Start with the forty ERPsets from `Chapter_10/Data/ERPsets` loaded, as in "Starting point". ERPLAB is installed from the previous lesson.
+
+1. From the <MenuPath>ERPsets</MenuPath> menu, choose the first ERPset.
+2. Open <MenuPath>ERPLAB > Data Quality viewing (ERPs only) > Summarize Data Quality (min, median, max)</MenuPath>. The command window prints the smallest, median, and largest aSME values, and where each one is (channel, window, and bin).
+3. Open <MenuPath>ERPLAB > Data Quality viewing (ERPs only) > Show Data Quality measures in table</MenuPath>.
+4. In <UiLabel>Selected DQ Measure:</UiLabel>, choose `aSME`, and in <UiLabel>Selected BIN:</UiLabel>, choose bin 1.
+5. The table has one row per channel and one column per time window in <UiLabel>Time-windows</UiLabel>. Check <UiLabel>Color heatmap</UiLabel> to color the large values.
+6. Check <UiLabel>Outliers</UiLabel>, and keep <UiLabel>Std from mean</UiLabel> at its value. Channels whose SME is far from the channel mean are marked, often a bad channel for this participant.
+7. To compare participants, press <UiLabel>Select ERPset</UiLabel> and choose another participant. To compare all forty at once, use the script.
+
+<Callout type="note" title="Do the files hold quality values?">
+To find out whether the files contain quality values, open <MenuPath>ERPLAB > Data Quality viewing (ERPs only) > Show which Data Quality measures are in each loaded ERPSET</MenuPath>. If `aSME` does not appear, the file was built without computing quality. The fix is to redo the averaging with <MenuPath>ERPLAB > Compute averaged ERPs</MenuPath> with data quality turned on, as in chapter 6 of Luck's book.
+</Callout>
+
+## The equivalent script
+
+```matlab
+% aSME at C3, 200-300 ms window, bin 1, for every participant
+c3 = find(strcmp({ALLERP(1).chanlocs.labels}, 'C3'));
+nSets = numel(ALLERP);
+sme = nan(nSets, 1);
+for k = 1:nSets
+    dq = ALLERP(k).dataquality;
+    iA = find(strcmpi({dq.type}, 'aSME'));
+    if isempty(iA)
+        error('ERPset %d has no aSME values', k);
+    end
+    tw = dq(iA).times;   % one row per time window, in ms
+    iW = find(tw(:, 1) == 200 & tw(:, 2) == 300);
+    sme(k) = dq(iA).data(c3, iW, 1);   % channels x windows x bins
+end
+
+% Summary across participants
+fprintf('aSME at C3, 200-300 ms: median %.2f uV, RMS %.2f uV\n', ...
+    median(sme), sqrt(mean(sme.^2)));
+
+% Participants with aSME more than twice the median
+outliers = find(sme > 2 * median(sme));
+fprintf('Participants to inspect: %s\n', mat2str(outliers'));
+
+% Same summary as the GUI, for one ERPset
+dq_summary(ALLERP(1));
+```
+
+## Which value should I choose?
+
+| Setting | Value | Why |
+|---|---|---|
+| Time window | The window you will actually score | SME describes the precision of a specific score. The SME for 200 to 300 ms does not describe the precision of a 150 to 400 ms score. You can set custom windows when averaging. |
+| Channel | The channel you score | C3 here, because the LRP is measured at C3 and C4. |
+| "Outlier participant" threshold | No general number. Twice the median here is only an example for inspection, not a published criterion | Decide before you see the results, and report it in your paper. An outlier is inspected first, not removed automatically. |
+| Combining participants | RMS instead of the mean | The ERPLAB wiki recommends RMS because it relates more closely to how noise affects statistical power. |
+
+## Common mistakes
+
+- **Judging by the number of trials only.** The number of trials is part of SME, but the noise in each trial is another part. Look at SME.
+- **Using aSME for peak amplitude.** aSME describes mean amplitude only. For peaks and latencies you need bootstrapping (bSME), and its script comes with the chapter 10 files of Luck's book.
+- **Comparing SME from different windows or channels.** Values naturally differ between channels and windows. Compare the same channel and the same window across participants.
+- **Removing a participant after seeing that they "spoil" the result.** The exclusion rule is set before the analysis. Otherwise it becomes choosing the result you want.
+
+{/* "From experience" box: waiting for the project owner's story. Do not write it before it arrives. */}
+
+## How to check it worked
+
+- `numel(ALLERP)` is 40, and the `has no aSME values` message does not appear.
+- `sme` holds 40 positive values, all in µV, most of them close to the median.
+- The command window prints the list of participants to inspect, which may be empty.
+- The GUI table for the first ERPset gives, at C3 and the 200 to 300 ms window, the same value as `sme(1)`.
+
+<Methods>
+Data quality was quantified for each participant with the analytic standardized measurement error (aSME) of mean amplitude from 200 to 300 ms at C3 (ERPLAB 13.10; Luck et al., 2021).
+</Methods>

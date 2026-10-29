@@ -1,0 +1,173 @@
+---
+title: ERPs & averaging
+titleEn: ERPs & averaging
+description: How to average epochs into an ERP in EEGLAB, and why the average reveals a waveform you cannot see in a single trial.
+station: 6
+order: 1
+level: core
+status: approved
+objectives:
+  - Compute the ERP average for one condition in a script and display it from the GUI.
+  - Identify on the waveform the first negative and the first large positive ERP component, with their approximate latencies.
+  - Explain why averaging reduces noise, and how this changes with the number of trials.
+prerequisites: [epoch-rejection]
+references:
+  - title: EEGLAB Tutorial
+    url: https://eeglab.org/tutorials/08_Plot_data/Data_Averaging.html
+    section: "8. Plot data > a. ERPs: Plotting ERPs in a Topographic Map"
+  - title: Applied Event-Related Potential Data Analysis (Luck)
+    url: https://socialsci.libretexts.org/Bookshelves/Psychology/Biological_Psychology/Applied_Event-Related_Potential_Data_Analysis_(Luck)
+    section: "Chapter 6: Assigning Events to Bins, Averaging, Baseline Correction, and Assessing Data Quality"
+datasets: [D1]
+startingPoint:
+  dataset: D1
+  file: eeglab_data.set
+  applied: [filtering, line-noise, bad-channels, interpolation, rereferencing, run-ica, ica-1hz-copy-weights, iclabel, extract-epochs, baseline-correction, epoch-rejection]
+  script: |
+    % Shortcut: if you saved D1_epochs_clean.set in the epoch rejection lesson,
+    % keep the first line and the last three lines, and replace every line between them with:
+    % EEG = pop_loadset('D1_epochs_clean.set', pwd);
+    [ALLEEG, EEG, CURRENTSET, ALLCOM] = eeglab;
+    eeglabRoot = fileparts(which('eeglab'));
+    EEG = pop_loadset('eeglab_data.set', fullfile(eeglabRoot, 'sample_data'));
+    fullLocs = EEG.chanlocs;
+
+    % Main dataset: high-pass at 0.1 Hz, then 60 Hz line-noise removal
+    EEG = pop_eegfiltnew(EEG, 'locutoff', 0.1);
+    EEG = pop_eegfiltnew(EEG, 'locutoff', 58, 'hicutoff', 62, 'revfilt', 1);
+
+    % Bad channels you removed earlier, e.g. {'T7'}; leave empty if none
+    badChans = {};
+    if ~isempty(badChans)
+        EEG = pop_select(EEG, 'rmchannel', badChans);
+        EEG = pop_interp(EEG, fullLocs, 'spherical');
+    end
+
+    % Average reference, EOG channels excluded
+    eogIdx = find(ismember({EEG.chanlocs.labels}, {'EOG1', 'EOG2'}));
+    EEG = pop_reref(EEG, [], 'exclude', eogIdx);
+
+    % ICA on a 1-Hz copy, then copy the weights back
+    EEG_ica = pop_eegfiltnew(EEG, 'locutoff', 1);
+    EEG_ica = pop_runica(EEG_ica, 'icatype', 'runica', 'extended', 1);
+    EEG.icaweights  = EEG_ica.icaweights;
+    EEG.icasphere   = EEG_ica.icasphere;
+    EEG.icachansind = EEG_ica.icachansind;
+    EEG.icawinv     = [];
+    EEG.icaact      = [];
+    EEG = eeg_checkset(EEG);
+
+    % Remove components ICLabel rates above 90% Eye or Muscle
+    EEG = pop_iclabel(EEG, 'default');
+    EEG = pop_icflag(EEG, [NaN NaN; 0.9 1; 0.9 1; NaN NaN; NaN NaN; NaN NaN; NaN NaN]);
+    artifactComps = find(EEG.reject.gcompreject);
+    if ~isempty(artifactComps)
+        EEG = pop_subcomp(EEG, artifactComps, 0);
+    end
+
+    % Low-pass at 30 Hz
+    EEG = pop_eegfiltnew(EEG, 'hicutoff', 30);
+    EEG.setname = 'D1 main clean lp30';
+
+    % Epochs around 'square', baseline -200 to 0 ms
+    EEG = pop_epoch(EEG, {'square'}, [-1 2], 'newname', 'D1 epochs', 'epochinfo', 'yes');
+    EEG = pop_rmbase(EEG, [-200 0]);
+
+    % Reject epochs beyond +/-100 uV
+    EEG = pop_eegthresh(EEG, 1, 1:EEG.nbchan, -100, 100, EEG.xmin, EEG.xmax, 0, 0);
+    if any(EEG.reject.rejthresh)
+        EEG = pop_rejepoch(EEG, EEG.reject.rejthresh, 0);
+    end
+    EEG.setname = 'D1 epochs clean';
+    EEG = eeg_checkset(EEG);
+    EEG.filename = ''; EEG.filepath = ''; EEG.datfile = ''; EEG.saved = 'no';
+    [ALLEEG, EEG, CURRENTSET] = pop_newset(ALLEEG, EEG, 0, 'setname', 'D1 epochs clean', 'gui', 'off');
+    eeglab redraw;
+eeglabVersion: "2026.1"
+updated: 2026-10-28
+---
+
+## Why this step matters
+
+In each epoch, the brain's response to the square is small, a few microvolts, with other, larger activity on top of it that has nothing to do with the stimulus. So you can hardly see the response in a single trial.
+
+The idea: the response to the stimulus repeats with the same shape and timing in every trial, while the other activity varies at random. If you average all epochs point by point, the response stays and the random activity cancels out.
+
+The resulting waveform is the event-related potential (<En>ERP</En>). Everything after it builds on it: measurement, comparing conditions, and statistics.
+
+## Before and after
+
+<Figure src="erp-average/erp-average-1-10-all.png" alt="Three panels for Pz with the same axes: one epoch, the average of 10, and the average of all 77. The single epoch is noise; the full average is smoother, with a positive peak after 400 ms." caption="n = 1, n = 10 and n = 77" source="D1" />
+
+## Steps in the GUI
+
+Start with the dataset `D1 epochs clean` open, as in "Starting point".
+
+EEGLAB has no separate "compute average" menu. The average is computed inside the ERP plotting menus, or with one line in a script. Here we display it once for a first look; the plotting options in detail come in station 7.
+
+1. Open <MenuPath>Plot > Channel ERPs > In scalp/rect. array</MenuPath>.
+2. The <UiLabel>Topographic ERP plot - pop_plottopo()</UiLabel> window opens. Keep <UiLabel>Channels to plot</UiLabel> at `1:32`, leave <UiLabel>Plot single trials</UiLabel> and <UiLabel>Plot in rect. array</UiLabel> unchecked, and press <UiLabel>Ok</UiLabel>.
+3. The average of each channel appears at its place on the head. Click the <En>Pz</En> trace to enlarge it in its own window.
+4. In the enlarged trace, look for two things after the vertical line at zero:
+   - A small negative wave around 200 ms, clearest at posterior channels such as <En>POz</En> and <En>Oz</En>.
+   - A large positive wave peaking around 400 ms, largest at central and parietal channels such as <En>Cz</En> and <En>Pz</En>.
+
+<Callout type="note" title="Axis direction">
+In this window, positive is up (the `'ydir', 1` option in the last box). Some books and programs plot negative up, so always check the axis labels before you say "positive peak".
+</Callout>
+
+## The equivalent script
+
+```matlab
+% The ERP is the mean over epochs: channels x time points
+% (the same line pop_plottopo computes in the GUI step)
+erp = mean(EEG.data, 3);
+fprintf('Averaged %d epochs\n', EEG.trials);
+
+% Plot the ERP at Pz, positive up
+pz = find(strcmp({EEG.chanlocs.labels}, 'Pz'));
+figure;
+plot(EEG.times, erp(pz, :), 'k', 'LineWidth', 1.5);
+xlim([-200 800]); grid on;
+xline(0, '--'); yline(0);
+xlabel('Time (ms)'); ylabel('Amplitude (\muV)');
+title(sprintf('ERP at Pz, %d epochs', EEG.trials));
+
+% Approximate latency of the largest positive peak between 250 and 600 ms
+win = EEG.times >= 250 & EEG.times <= 600;
+winTimes = EEG.times(win);
+[peakAmp, iPeak] = max(erp(pz, win));
+fprintf('Positive peak at Pz: %.1f uV at %.0f ms\n', peakAmp, winTimes(iPeak));
+
+% Quick look at all channels, same as the GUI step
+figure; pop_plottopo(EEG, 1:EEG.nbchan, EEG.setname, 0, 'ydir', 1);
+```
+
+## Which value should I choose?
+
+| Setting | Value | Why |
+|---|---|---|
+| What goes into the average | Clean epochs from one condition only | The average mixes whatever you give it. With two conditions, compute one average per condition. |
+| Number of trials | As many as you can keep after rejection, and about the same number per condition | Noise in the average falls with the square root of the number of trials: 4 times the trials means half the noise. |
+| Peak search window | Set before you look at the data, from the literature | The 250 to 600 ms window here is for one example only. Precise amplitude and latency measurement comes in the ERPLAB lesson. |
+
+## Common mistakes
+
+- **Mixing conditions in one average.** In D1 the square appeared at two positions (the `position` field). Averaging both positions together is fine as an example here, but comparing positions needs one average each. Comparing conditions is covered in the channel ERP plotting lesson in station 7.
+- **Reading the highest peak as "the component".** A peak at one channel can come from more than one overlapping ERP component. The approximate latency here is for recognizing the waveform, not for a scientific conclusion.
+- **Confusing the axis direction.** A positive wave plotted downward is misread as negative. Check the axis.
+- **Averaging before rejection.** One epoch with a large artifact is enough to change the average. Reject first, as in the previous lesson.
+- **Very different trial counts between conditions.** A condition with 20 trials and another with 80 differ in noise, so their peaks look different even when the response is the same.
+
+{/* "From experience" box: waiting for the project owner's story. Do not write it before it arrives. */}
+
+## How to check it worked
+
+- `size(erp)` returns `32 384`: channels × time points, with no epoch dimension.
+- At Pz there is a positive peak between roughly 300 and 500 ms, of about 10 µV. The official tutorial notes that the largest ERP variance in these data is at about 430 ms.
+- The waveform before zero (the baseline period) is close to zero and fairly flat.
+- If you plot the average of only 10 epochs, the waveform is rougher than the average of all epochs.
+
+<Methods>
+ERPs were computed by averaging the [N] artifact-free epochs time-locked to the square stimulus (EEGLAB 2026.1).
+</Methods>

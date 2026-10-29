@@ -1,0 +1,81 @@
+---
+import { existsSync } from 'node:fs';
+import Icon from '../Icon.astro';
+import { t, tn, type Lang } from '../../i18n';
+import { url, asset } from '../../lib/url';
+import { quizFor, qtext } from '../../lib/quiz';
+import { nodeTitle } from '../../lib/site-data';
+import { iso } from '../../lib/bidi';
+
+interface Props { lang: Lang; station: number; published: (slug: string) => boolean }
+const { lang, station, published } = Astro.props;
+const quiz = quizFor(station, lang)!;
+const sep = lang === 'ar' ? '، ' : ', ';
+const answerText = (q: any) => {
+  const text = (id: string) => q.options.find((o: any) => o.id === id).text;
+  return q.type === 'order'
+    ? q.answer.map((id: string, i: number) => `${i + 1}. ${text(id)}`).join(sep)
+    : q.answer.map(text).join(sep);
+};
+const lessonHref = (slug: string) => (published(slug) ? url(`lesson/${slug}/`, lang) : '');
+const imgReady = (q: any) => q.image?.status === 'ready' && existsSync(`public${q.image.src}`);
+---
+<section class="quiz" id="quiz" aria-labelledby="quiz-t" data-station={station} data-pass={quiz.passPercent}
+  data-l-correct={t(lang, 'quiz.correct')}
+  data-l-result={t(lang, 'quiz.result', { n: '{n}', total: '{total}' })} data-l-review={t(lang, 'quiz.review')}
+  data-l-passed={t(lang, 'quiz.passed')} data-l-pick={t(lang, 'quiz.pick')} data-l-pos={t(lang, 'quiz.position', { n: '{n}' })}>
+  <h2 id="quiz-t">{t(lang, 'station.quiz.title')}</h2>
+  <p class="muted">{t(lang, 'quiz.lead', { n: quiz.questions.length })}</p>
+  {quiz.questions.map((q, i) => (
+    <fieldset class="qz" id={q.id} data-type={q.type} data-answer={JSON.stringify(q.answer)} data-lesson={q.lesson}
+      data-lesson-title={nodeTitle(lang, q.lesson)} data-lesson-href={lessonHref(q.lesson)}>
+      <legend><span class="qn">{i + 1}.</span> <Fragment set:html={qtext(q.prompt, lang)} /></legend>
+      {q.image && (imgReady(q)
+        ? <img class="qimg" src={asset(q.image.src.slice(1))} width={q.image.w} height={q.image.h} alt={q.image.alt} loading="lazy" decoding="async" />
+        : <div class="ph" role="note"><p class="pt"><Icon name="img" class="ico s20" />{t(lang, 'imageSpec.label')}</p><p set:html={iso(q.image.alt, lang)} /></div>)}
+      {q.type === 'order' ? (
+        <>
+          <p class="qhint js-only" hidden>{t(lang, 'quiz.orderHint')}</p>
+          <ol class="ord">
+            {q.options.map((o) => (
+              <li data-id={o.id}><span class="ot" set:html={qtext(o.text, lang)} />
+                <span class="mv" hidden>
+                  <button type="button" class="ib" data-mv="-1" aria-label={`${t(lang, 'quiz.moveUp')}: ${o.text}`}><Icon name="up" class="ico s20" /></button>
+                  <button type="button" class="ib" data-mv="1" aria-label={`${t(lang, 'quiz.moveDown')}: ${o.text}`}><Icon name="dn" class="ico s20" /></button>
+                </span></li>
+            ))}
+          </ol>
+        </>
+      ) : (
+        <div class="opts2">
+          {q.options.map((o) => (
+            <label class="opt"><input type={q.type === 'multiple' ? 'checkbox' : 'radio'} name={q.id} value={o.id} /><span set:html={qtext(o.text, lang)} /></label>
+          ))}
+        </div>
+      )}
+      <button type="button" class="btn qz-check" hidden>{t(lang, 'quiz.check')}</button>
+      <div class="qz-fb" role="status" aria-live="polite"></div>
+      <details class="qz-ans">
+        <summary>{t(lang, 'quiz.showAnswer')}</summary>
+        <div class="qz-exp">
+          <p><b set:html={qtext(t(lang, 'quiz.wrong', { answer: answerText(q) }), lang)} /></p>
+          <p set:html={qtext(q.explanation, lang)} />
+          <p>{lessonHref(q.lesson)
+            ? <a href={lessonHref(q.lesson)}><Fragment set:html={iso(t(lang, 'quiz.reviewLesson', { title: nodeTitle(lang, q.lesson) }), lang)} /></a>
+            : <span set:html={iso(t(lang, 'quiz.reviewLesson', { title: nodeTitle(lang, q.lesson) }), lang)} />}</p>
+        </div>
+      </details>
+    </fieldset>
+  ))}
+  <template id="qz-ic-ok"><Icon name="ok" class="ico s20" /></template>
+  <template id="qz-ic-bad"><Icon name="bad" class="ico s20" /></template>
+  <div class="qz-sum" hidden tabindex="-1">
+    <p class="qz-score"></p>
+    <p class="qz-pass" hidden><Icon name="ok" class="ico s20" /> <span></span></p>
+    <div class="qz-rev"></div>
+    <button type="button" class="btn sec qz-retry">{t(lang, 'quiz.retry')}</button>
+  </div>
+</section>
+<script>
+  import '../../scripts/quiz.ts';
+</script>

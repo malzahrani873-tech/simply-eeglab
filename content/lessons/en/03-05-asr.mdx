@@ -1,0 +1,158 @@
+---
+title: clean_rawdata & ASR
+titleEn: clean_rawdata & ASR
+description: How to find and remove short, large artifact bursts in EEGLAB with ASR from the clean_rawdata plugin, and what the boundary events it leaves do to your epochs.
+station: 3
+order: 5
+level: recommended
+status: approved
+objectives:
+  - Run ASR from clean_rawdata with conservative settings on a copy of the data, from the GUI and from a script.
+  - Compare the data before and after ASR, and count the boundary events and the epochs lost.
+  - Decide when to use ASR and when to avoid it.
+prerequisites: [bad-channels]
+references:
+  - title: EEGLAB Tutorial
+    url: https://eeglab.org/tutorials/06_RejectArtifacts/cleanrawdata.html
+    section: "6. Reject artifacts > c. Automated rejection"
+  - title: EEGLAB plugin
+    url: https://eeglab.org/plugins/clean_rawdata/
+    section: "clean_rawdata"
+  - title: EEGLAB Tutorial
+    url: https://eeglab.org/tutorials/06_RejectArtifacts/RunICA.html
+    section: "Issues associated with aggressive automated artifact removal before ICA"
+  - title: "EEGLAB preprocessing #7: Removing bad data segments"
+    url: https://www.youtube.com/watch?v=ZvbRiX84mgc
+    section: "Full video"
+    duration: "11:06"
+datasets: [D1, D3]
+startingPoint:
+  dataset: D1
+  file: eeglab_data.set
+  applied: [filtering, line-noise]
+  script: |
+    [ALLEEG, EEG, CURRENTSET, ALLCOM] = eeglab;
+    eeglabRoot = fileparts(which('eeglab'));
+    EEG = pop_loadset('eeglab_data.set', fullfile(eeglabRoot, 'sample_data'));
+
+    % Main dataset: high-pass at 0.1 Hz, then 60 Hz line-noise removal
+    EEG = pop_eegfiltnew(EEG, 'locutoff', 0.1);
+    EEG = pop_eegfiltnew(EEG, 'locutoff', 58, 'hicutoff', 62, 'revfilt', 1);
+    EEG.filename = ''; EEG.filepath = ''; EEG.datfile = ''; EEG.saved = 'no';
+    [ALLEEG, EEG, CURRENTSET] = pop_newset(ALLEEG, EEG, 0, 'setname', 'D1 hp0.1 notch60', 'gui', 'off');
+    eeglab redraw;
+interactive: []
+eeglabVersion: "2026.1"
+updated: 2026-10-29
+---
+
+## Why this step matters
+
+Some artifacts are short and huge: a cable pulled, the participant moved, a sudden jump in all channels. They are not like blinks, which repeat with the same shape and which ICA isolates well. A one-of-a-kind burst confuses ICA instead. On our path you try ASR on D1 only for comparison, and do not save the result.
+
+Artifact Subspace Reconstruction (ASR) finds these bursts automatically. It is part of the clean_rawdata plugin, which ships with EEGLAB. As the official tutorial explains, it works in two stages:
+
+1. It finds clean portions of the recording, the calibration data, and learns how large normal activity is.
+2. It marks every short window whose activity is many times larger than the calibration data. The default is 20 standard deviations.
+
+For recorded data the official tutorial advises removing the marked portions rather than correcting them. Correction was designed for real-time use, and its effect on offline analysis is not clearly understood.
+
+<Callout type="warning">
+**Removal has a price: boundary events.** Every removed portion leaves a boundary event at the cut. Later, when you extract epochs, EEGLAB drops every epoch that contains a boundary event. So ASR can cost you epochs, and you should count them.
+</Callout>
+
+<Callout type="warning">
+**This lesson is off the main path.** You try ASR on a copy of D1 and measure what it removes, without saving the result. The path continues from `D1 hp0.1 notch60`.
+</Callout>
+
+## Before and after
+
+<ImageSpec>
+The window that opens after clean_rawdata, from vis_artifacts, on D1: the original data and the cleaned data overlaid in two colours, with the removed portions marked. Choose a segment that contains a removed portion. If D1 has no clear removed portion with these settings, use one participant from D3, high-pass filtered at 0.1 Hz, with the same settings except the ignored channels: type the eye channel names from that file's channel list instead of `EOG1 EOG2`. Say so under the image. Source: an EEGLAB screenshot.
+</ImageSpec>
+
+## Steps in the GUI
+
+Start with `D1 hp0.1 notch60` loaded, as in the Starting point. It is already high-pass filtered.
+
+1. Open <MenuPath>Tools > Reject data using Clean Rawdata and ASR</MenuPath>.
+2. Leave <UiLabel>Remove channel drift (data not already high-pass filtered)</UiLabel> unchecked, because the data are already filtered at 0.1 Hz.
+3. Keep <UiLabel>Process/remove channels</UiLabel> checked, check <UiLabel>Ignore these channels (ECG, EMG, ...)</UiLabel>, and type `EOG1 EOG2` next to it.
+4. Uncheck the three channel criteria: <UiLabel>Remove channel if it is flat for more than (seconds)</UiLabel>, <UiLabel>Max acceptable high-frequency noise std dev</UiLabel>, and <UiLabel>Min acceptable correlation with nearby chans [0-1]</UiLabel>. Bad channels belong to their own lesson.
+5. Keep <UiLabel>Perform Artifact Subspace Reconstruction bad burst correction/rejection</UiLabel> checked, with `20` in <UiLabel>Max acceptable 0.5 second window std dev</UiLabel>.
+6. Keep <UiLabel>Remove bad data periods (when uncheck, correct using ASR)</UiLabel> checked, and leave <UiLabel>Use Riemanian distance metric (not Euclidean) - beta</UiLabel> unchecked.
+7. Keep <UiLabel>Additional removal of bad data periods</UiLabel> checked, with `-Inf 7` in <UiLabel>Acceptable [min max] channel RMS range (+/- std dev)</UiLabel> and `25` in <UiLabel>Maximum out-of-bound channels (%)</UiLabel>.
+8. Keep <UiLabel>Pop up scrolling data window with rejected data highlighted</UiLabel> checked and press <UiLabel>OK</UiLabel>.
+9. A scrolling window shows the original and cleaned data together. Scroll through it and look at what was removed.
+10. Name the new dataset `D1 asr`. In the main window, compare <UiLabel>Frames per epoch</UiLabel> and <UiLabel>Events</UiLabel> with `D1 hp0.1 notch60`. The extra events are the boundary events.
+11. Do not save `D1 asr`. The main path continues from `D1 hp0.1 notch60`.
+
+## The equivalent script
+
+```matlab
+% ASR on a copy: no channel criteria (bad channels lesson), EOG channels ignored
+EEG_asr = pop_clean_rawdata(EEG, 'FlatlineCriterion', 'off', 'ChannelCriterion', 'off', ...
+    'LineNoiseCriterion', 'off', 'Highpass', 'off', 'BurstCriterion', 20, ...
+    'WindowCriterion', 0.25, 'BurstRejection', 'on', 'Distance', 'Euclidian', ...
+    'WindowCriterionTolerances', [-Inf 7], 'channels_ignore', {'EOG1', 'EOG2'});
+EEG_asr.setname = 'D1 asr';
+
+% How much data was kept, and how many boundary events were added
+fprintf('Data kept: %.1f of %.1f s (%.1f%%)\n', EEG_asr.pnts / EEG_asr.srate, ...
+    EEG.pnts / EEG.srate, 100 * EEG_asr.pnts / EEG.pnts);
+fprintf('Boundary events: %d\n', sum(strcmp({EEG_asr.event.type}, 'boundary')));
+
+% Effect on epochs: pop_epoch drops every epoch that contains a boundary event
+epBefore = pop_epoch(EEG, {'square'}, [-0.2 0.8]);
+epAfter  = pop_epoch(EEG_asr, {'square'}, [-0.2 0.8]);
+fprintf('Epochs around square: %d before ASR, %d after\n', epBefore.trials, epAfter.trials);
+
+% Original and cleaned data in one scrolling window
+vis_artifacts(EEG_asr, EEG);
+```
+
+The script prints how many seconds were kept, how many boundary events were added, and how many epochs around `square` survive. `pop_epoch` is from station 5; here it only counts the epochs lost.
+
+## Which value should I choose?
+
+| Setting | Value | Why |
+|---|---|---|
+| ASR threshold (<UiLabel>Max acceptable 0.5 second window std dev</UiLabel>) | 20 | The default, and quite conservative according to the plugin page. |
+| A stricter threshold | 5 | The plugin calls 5 reasonably conservative, but notes that some extreme EEG bursts, such as sleep spindles, can cross even 5. |
+| The most aggressive value | 3 | The plugin says it is the most aggressive value that can be used without losing much EEG. |
+| Remove or correct | Remove | Official tutorial: correction was designed for real-time use. |
+| <UiLabel>Remove channel drift (data not already high-pass filtered)</UiLabel> | Unchecked if you already filtered | Otherwise the data are filtered twice. |
+| Non-brain channels (EOG, ECG) | Ignored | Their large signal is not a fault, and the bad channels lesson ignores them for the same reason. |
+
+**When to use ASR, and when to avoid it:**
+
+| Use it | Avoid it |
+|---|---|
+| Data with rare, huge bursts, such as movement or cable artifacts | Data that are already clean, such as D1 |
+| Before ICA, to give ICA cleaner training data | When every epoch matters and the bursts are few: remove them by eye instead |
+| With a conservative threshold such as 20 | With a low threshold that removes blinks, which ICA can correct |
+
+<Callout type="expert">
+**A two-copy approach:** the official tutorial notes that aggressive cleaning before ICA can remove data that ICA could have corrected, such as blinks. One option, as in the 1-Hz filtering lesson, is to run ASR only on the ICA copy, compute ICA, and copy the weights back to the main dataset, which keeps all its data.
+</Callout>
+
+## Common mistakes
+
+- **Using correction instead of removal on recorded data.** Keep <UiLabel>Remove bad data periods (when uncheck, correct using ASR)</UiLabel> checked.
+- **A threshold that is too low.** At 3 or 5, ASR may remove blinks and large but normal brain activity. Start at 20, look at what was removed, then decide.
+- **Forgetting the boundary events.** Each removed portion becomes a boundary event, and every epoch that contains one is dropped. Count the epochs before and after.
+- **Running ASR on data with a slow drift.** ASR needs high-pass filtered data, as the plugin page notes. Filter first, or check <UiLabel>Remove channel drift (data not already high-pass filtered)</UiLabel>.
+- **Not looking at the result.** The official plugin page recommends that new users compare the original and cleaned data by eye. The scrolling window is there for that.
+
+{/* "From experience" box: waiting for the project owner's story. Do not write it before it arrives. */}
+
+## How to check it worked
+
+1. **The scrolling window** showed the original and cleaned data, and you saw what was removed.
+2. **The script check:** it prints the seconds kept, the number of boundary events, and the epochs before and after.
+3. **The events increased** in the main window by the number of boundary events.
+4. **The path is unchanged:** `D1 asr` is not saved, and the next lesson starts from `D1 hp0.1 notch60`.
+
+<Methods>
+High-amplitude bursts were identified with Artifact Subspace Reconstruction (burst criterion 20 SD; clean_rawdata plugin 2.11, EEGLAB 2026.1), and the affected periods were removed together with windows in which more than 25% of channels exceeded 7 SD ([N] s, [P]% of the data); EOG channels were excluded.
+</Methods>

@@ -1,0 +1,60 @@
+---
+// Preview-only page: every lesson component in each of its states, for visual review in both
+// languages and themes. Never built in production.
+import Base from '../layouts/Base.astro';
+import { type Lang } from '../i18n';
+import { components as C } from './lesson/index';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const ar = lang === 'ar';
+const { MenuPath, UiLabel, En, Callout, Figure, ImageSpec, Methods, BeforeAfter, YouTube, LessonComplete, IcaGameTeaser, FilterDemo, RerefDemo, EpochRejectDemo } = C;
+const code = "EEG = pop_eegfiltnew(EEG, 'locutoff', 0.1);\nEEG = pop_eegfiltnew(EEG, 'hicutoff', 40);\n[ALLEEG, EEG] = eeg_store(ALLEEG, EEG);";
+---
+<Base lang={lang} title="Components" description="Component gallery" path="dev/components/" noindex>
+  <div class="wrap" style="max-width:42rem;padding-block:24px 64px">
+    <h1>Components</h1>
+
+    <h2>MenuPath · UiLabel · En</h2>
+    <p>{ar ? 'افتح ' : 'Open '}<MenuPath>Tools &gt; Filter the data &gt; Basic FIR filter (new, default)</MenuPath>{ar ? ' واكتب ' : ' and type '}<code>0.1</code>{ar ? ' في ' : ' in '}<UiLabel>Lower edge of the frequency pass band (Hz)</UiLabel>.</p>
+    <p>{ar ? 'فلتر ' : 'A '}<En>high-pass</En>{ar ? ' يمرّر الترددات العالية.' : ' filter passes high frequencies.'}</p>
+
+    <h2>Callout</h2>
+    <Callout type="note" title={ar ? 'ملاحظة' : 'Note'}><p>{ar ? 'نص ملاحظة قصيرة.' : 'A short note.'}</p></Callout>
+    <Callout type="warning" title={ar ? 'انتبه' : 'Careful'}><p>{ar ? 'نص تحذير.' : 'A warning.'}</p></Callout>
+    <Callout type="expert" title={ar ? 'للمتقدّم' : 'For experts'}><p>{ar ? 'تفصيل للمتقدّمين.' : 'A detail for experts.'}</p></Callout>
+    <Callout type="experience"><p><strong>{ar ? 'من التجربة:' : 'From experience:'}</strong> {ar ? 'قصة قصيرة.' : 'A short story.'}</p></Callout>
+
+    <h2>Code</h2>
+    <div class="code"><pre dir="ltr" tabindex="0"><code>{code}</code></pre></div>
+
+    <h2>Figure</h2>
+    <Figure src="electrode-10-20/electrode-10-20.svg" alt="10-20" caption={ar ? 'نظام 10-20.' : 'The 10-20 system.'} source="original" />
+    <Figure src="electrode-10-20/electrode-10-20.svg" alt="10-20" caption={ar ? 'صورة من بيانات ERP CORE.' : 'A figure made from ERP CORE data.'} source="D3" />
+
+    <h2>ImageSpec</h2>
+    <ImageSpec>{ar ? 'صورة مطلوبة: الإشارة قبل الفلتر وبعده.' : 'Figure needed: the signal before and after filtering.'}</ImageSpec>
+    <ImageSpec optional>{ar ? 'صورة اختيارية.' : 'Optional figure.'}</ImageSpec>
+
+    <h2>BeforeAfter</h2>
+    <BeforeAfter><ImageSpec>{ar ? 'قبل' : 'Before'}</ImageSpec><ImageSpec>{ar ? 'بعد' : 'After'}</ImageSpec></BeforeAfter>
+
+    <h2>YouTube</h2>
+    <YouTube id="d3haHpOPCc8" title="EEGLAB" duration="12:00" />
+
+    <h2>Methods</h2>
+    <Methods>Data were high-pass filtered at 0.1 Hz and low-pass filtered at 40 Hz (FIR, pop_eegfiltnew, EEGLAB 2026.1).</Methods>
+
+    <h2>FilterDemo</h2>
+    <FilterDemo />
+    <FilterDemo mode="erp" />
+    <h2>RerefDemo</h2>
+    <RerefDemo />
+    <h2>EpochRejectDemo</h2>
+    <EpochRejectDemo />
+    <h2>IcaGameTeaser</h2>
+    <IcaGameTeaser />
+    <h2>LessonComplete</h2>
+    <LessonComplete slug="filtering" />
+  </div>
+</Base>

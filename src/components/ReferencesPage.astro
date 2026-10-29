@@ -1,0 +1,63 @@
+---
+import { readFileSync } from 'node:fs';
+import { load as loadYaml } from 'js-yaml';
+import Base from '../layouts/Base.astro';
+import Icon from './Icon.astro';
+import { t, type Lang } from '../i18n';
+import { url } from '../lib/url';
+import { datasets } from '../lib/site-data';
+import { iso } from '../lib/bidi';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const sources = loadYaml(readFileSync('src/data/sources.yaml', 'utf8')) as any[];
+const sep = lang === 'ar' ? '، ' : ', ';
+const dl = (d: any) => (d.dataUrl && d.dataUrl !== 'TBD' ? d.dataUrl : d.url);
+const nt = t(lang, 'a11y.newTab');
+---
+<Base lang={lang} title={t(lang, 'refs.title')} path="references/" current="references">
+  <div class="wrap narrow simple refs-page">
+    <h1>{t(lang, 'refs.title')}</h1>
+    <p class="lead">{t(lang, 'refs.lead')}</p>
+    <a class="card-row link-row" href={url('plugins/', lang)}>
+      <Icon name="plug" class="ico s32" />
+      <span><b>{t(lang, 'refs.plugins')}</b><br /><span class="muted">{t(lang, 'refs.plugins.sub')}</span></span>
+      <Icon name={lang === 'ar' ? 'chevStart' : 'chevEnd'} class="ico s20 end" />
+    </a>
+
+    <h2 id="sources">{t(lang, 'refs.sources')}</h2>
+    <div class="tcards" role="table" aria-label={t(lang, 'refs.sources')}>
+      <div class="tr th" role="row">
+        {['source', 'type', 'lang', 'stations', 'license'].map((c) => <span role="columnheader">{t(lang, `refs.col.${c}`)}</span>)}
+      </div>
+      {sources.map((s) => (
+        <div class="tr" role="row">
+          <span role="cell" class="c-src"><a href={s.url} rel="noopener" target="_blank" lang="en">{s.title}<span class="sr"> {nt}</span></a></span>
+          <span role="cell"><span class="lbl">{t(lang, 'refs.col.type')}: </span>{t(lang, s.free ? 'refs.free' : 'refs.paid')}</span>
+          <span role="cell"><span class="lbl">{t(lang, 'refs.col.lang')}: </span>{s.lang === 'en' ? 'English' : 'العربية'}</span>
+          <span role="cell"><span class="lbl">{t(lang, 'refs.col.stations')}: </span>{s.stations.join(sep)}</span>
+          <span role="cell"><span class="lbl">{t(lang, 'refs.col.license')}: </span><Fragment set:html={iso(s.license[lang], lang)} /></span>
+        </div>
+      ))}
+    </div>
+
+    <h2 id="data">{t(lang, 'refs.data')}</h2>
+    <p>{t(lang, 'refs.data.lead')}</p>
+    <ul class="dlist">
+      {datasets.map((d) => (
+        <li id={`data-${d.code}`}>
+          <p class="dn"><span class="code-tag">{d.code}</span> <span lang="en">{d.name}</span></p>
+          <p class="muted"><span class="lbl">{t(lang, 'refs.col.license')}: </span>{d.licenseUrl ? <a href={d.licenseUrl} rel="license noopener" target="_blank" lang="en">{d.license}</a> : <span lang="en">{d.license}</span>}</p>
+          {d.cite && <p class="cite" lang="en" dir="ltr">{d.cite}</p>}
+          <a class="btn sec" href={dl(d)} rel="noopener" target="_blank"><Icon name="download" class="ico s20" />{t(lang, 'refs.data.download')}<span class="sr"> {nt}</span></a>
+        </li>
+      ))}
+    </ul>
+
+    <h2 id="credits">{t(lang, 'refs.credits')}</h2>
+    <ul>
+      <li set:html={iso(t(lang, 'refs.credits.fonts'), lang)} />
+      <li set:html={iso(t(lang, 'refs.credits.icons'), lang)} />
+    </ul>
+  </div>
+</Base>

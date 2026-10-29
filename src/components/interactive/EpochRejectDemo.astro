@@ -1,0 +1,113 @@
+---
+import { t } from '../../i18n';
+import { langOf } from '../../lib/lang';
+const lang = langOf(Astro.url);
+const S = {
+  ar: {
+    title: 'جرّب حد الرفض', thr: 'حد السعة (±µV)', none: 'بدون رفض', newSig: 'epochs جديدة',
+    count: 'رُفض {n} من {total} ({p}%)', before: 'المتوسط قبل الرفض', after: 'المتوسط بعد الرفض',
+    imgLabel: 'صورة 60 epoch، كل صف epoch، والمرفوضة مشطوبة.', erpLabel: 'متوسط ERP قبل الرفض وبعده.',
+    note: 'تبسيط: قناة واحدة، وآرتفاكتس مصطنعة بأشكال مثالية، والرفض بالسعة فقط. في التحليل الحقيقي يُفضَّل غالباً إزالة الرمش بـ ICA قبل الرفض.',
+  },
+  en: {
+    title: 'Try the rejection threshold', thr: 'Amplitude threshold (±µV)', none: 'No rejection', newSig: 'New epochs',
+    count: 'Rejected {n} of {total} ({p}%)', before: 'Average before rejection', after: 'Average after rejection',
+    imgLabel: 'Image of 60 epochs, one row each; rejected ones are struck through.', erpLabel: 'ERP average before and after rejection.',
+    note: 'Simplified: one channel, idealised artifacts, amplitude rejection only. In real analyses blinks are usually removed with ICA before rejection.',
+  },
+}[lang];
+---
+<epoch-reject-demo class="fd" data-s={JSON.stringify(S)}>
+  <p class="fd-static">{t(lang, 'interactive.noJs')}</p>
+</epoch-reject-demo>
+
+<script>
+  // Each epoch = fixed ERP + background noise; 15% get a blink or a muscle burst.
+  // An epoch is rejected when any sample exceeds +/- threshold (the pop_eegthresh logic).
+  const NE = 60, NT = 250, T0 = -200, DT = 4;
+  const erp = (t: number) => 3 * Math.exp(-((t - 100) ** 2) / 1250) - 5 * Math.exp(-((t - 170) ** 2) / 1800) + 10 * Math.exp(-((t - 350) ** 2) / 45000);
+  const gauss = () => { let u = 0, v = 0; while (!u) u = Math.random(); while (!v) v = Math.random(); return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v); };
+  class EpochRejectEl extends HTMLElement {
+    s: any; thr = 100; ep: Float64Array[] = []; cv!: HTMLCanvasElement; cv2!: HTMLCanvasElement; dpr = 0; done = false;
+    connectedCallback() {
+      if (this.done) return; this.done = true;
+      const S = (this.s = JSON.parse(this.dataset.s!));
+      this.innerHTML = `<div class="fdh"><b>${S.title}</b></div>
+        <div class="ctl"><div class="crow"><span class="lab">${S.thr}</span><div class="opts" role="group" aria-label="${S.thr}">
+          ${[50, 75, 100, 150, 0].map((v) => `<button type="button" data-v="${v}">${v || S.none}</button>`).join('')}</div>
+          <button type="button" class="btn small sec newSig">${S.newSig}</button></div>
+          <p class="count" role="status" aria-live="polite"></p></div>
+        <div class="cv" dir="ltr"><canvas class="c1" role="img" aria-label="${S.imgLabel}"></canvas><canvas class="c2" role="img" aria-label="${S.erpLabel}"></canvas></div>
+        <div class="lg"><span><i class="lg-raw dash"></i>${S.before}</span><span><i class="lg-fil"></i>${S.after}</span></div><p class="gt fd-note">${S.note}</p>`;
+      this.cv = this.querySelector('.c1')!; this.cv2 = this.querySelector('.c2')!;
+      this.addEventListener('click', (e) => {
+        const b = (e.target as HTMLElement).closest('button'); if (!b) return;
+        if (b.dataset.v !== undefined) this.thr = +b.dataset.v; else { this.gen(); }
+        this.draw();
+      });
+      new ResizeObserver(() => this.resize()).observe(this);
+      new MutationObserver(() => this.draw()).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+      this.gen();
+    }
+    gen() {
+      this.ep = Array.from({ length: NE }, () => {
+        const x = Float64Array.from({ length: NT }, (_, i) => erp(T0 + i * DT) + gauss() * 10);
+        let s = 0; for (let i = 1; i < NT; i++) { s = 0.85 * s + gauss() * 4; x[i] += s; }
+        if (Math.random() < 0.15) {
+          const c = Math.random() * NT, blink = Math.random() < 0.6, a = blink ? 100 + Math.random() * 100 : 0;
+          for (let i = 0; i < NT; i++) x[i] += blink ? a * Math.exp(-(((i - c) / 18) ** 2)) : Math.exp(-(((i - c) / 12) ** 2)) * 70 * Math.sin(i * 2.1);
+        }
+        return x;
+      });
+    }
+    resize() {
+      const w = this.cv.clientWidth; if (!w) return;
+      const dpr = Math.min(2, devicePixelRatio || 1);
+      for (const [c, h] of [[this.cv, 180], [this.cv2, 170]] as const) { c.style.height = h + 'px'; c.width = w * dpr; c.height = h * dpr; }
+      this.dpr = dpr; this.draw();
+    }
+    draw() {
+      if (!this.ep.length) return;
+      const S = this.s;
+      const rej = this.ep.map((x) => this.thr > 0 && x.some((v) => Math.abs(v) > this.thr));
+      const n = rej.filter(Boolean).length;
+      this.querySelectorAll<HTMLElement>('[data-v]').forEach((b) => b.setAttribute('aria-pressed', String(+b.dataset.v! === this.thr)));
+      this.querySelector('.count')!.textContent = S.count.replace('{n}', n).replace('{total}', NE).replace('{p}', Math.round((n / NE) * 100));
+      if (!this.dpr) return;
+      const cs = getComputedStyle(this), col = (k: string) => cs.getPropertyValue(k).trim();
+      // ERP image: rows coloured by amplitude, red positive, blue negative.
+      const C = this.cv.getContext('2d')!, Wd = this.cv.clientWidth, H = 180, rh = H / NE;
+      C.setTransform(this.dpr, 0, 0, this.dpr, 0, 0); C.clearRect(0, 0, Wd, H);
+      const cw = Wd / NT;
+      this.ep.forEach((x, r) => {
+        for (let i = 0; i < NT; i++) {
+          const v = Math.max(-1, Math.min(1, x[i] / 60));
+          const a = Math.abs(v), red = v > 0;
+          C.fillStyle = `rgb(${red ? 255 : Math.round(255 * (1 - a))},${Math.round(255 * (1 - a * 0.85))},${red ? Math.round(255 * (1 - a)) : 255})`;
+          C.fillRect(i * cw, r * rh, cw + 0.5, rh + 0.5);
+        }
+        if (rej[r]) {
+          C.fillStyle = 'rgba(0,0,0,.45)'; C.fillRect(0, r * rh, Wd, rh);
+          C.strokeStyle = '#fff'; C.lineWidth = 1; C.beginPath(); C.moveTo(0, r * rh + rh / 2); C.lineTo(Wd, r * rh + rh / 2); C.stroke();
+        }
+      });
+      // Averages
+      const D = this.cv2.getContext('2d')!, H2 = 170, pad = 30;
+      D.setTransform(this.dpr, 0, 0, this.dpr, 0, 0); D.clearRect(0, 0, Wd, H2);
+      const avg = (keep: (r: number) => boolean) => {
+        const out = new Float64Array(NT); let k = 0;
+        this.ep.forEach((x, r) => { if (!keep(r)) return; k++; for (let i = 0; i < NT; i++) out[i] += x[i]; });
+        return out.map((v) => v / Math.max(k, 1));
+      };
+      const all = avg(() => true), kept = avg((r) => !rej[r]);
+      let lo = -10, hi = 15; for (const a of [all, kept]) for (const v of a) { lo = Math.min(lo, v); hi = Math.max(hi, v); }
+      const ys = (v: number) => 8 + ((hi - v) / (hi - lo)) * (H2 - 8 - pad), xs = (i: number) => (i / (NT - 1)) * Wd;
+      D.strokeStyle = col('--sep'); D.beginPath(); D.moveTo(0, ys(0)); D.lineTo(Wd, ys(0)); D.moveTo(xs(50), 8); D.lineTo(xs(50), H2 - pad); D.stroke();
+      D.fillStyle = col('--muted'); D.font = '12px "JetBrains Mono", monospace'; D.textAlign = 'center';
+      for (const t of [0, 200, 400, 600, 800]) D.fillText(String(t), xs((t - T0) / DT), H2 - 10);
+      const line = (a: Float64Array, c: string, w: number, dash: number[]) => { D.setLineDash(dash); D.strokeStyle = c; D.lineWidth = w; D.beginPath(); a.forEach((v, i) => (i ? D.lineTo(xs(i), ys(v)) : D.moveTo(xs(i), ys(v)))); D.stroke(); D.setLineDash([]); };
+      line(all, col('--bs'), 1.6, [5, 4]); line(kept, col('--primary'), 2.2, []);
+    }
+  }
+  customElements.define('epoch-reject-demo', EpochRejectEl);
+</script>

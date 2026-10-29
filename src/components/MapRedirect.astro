@@ -1,0 +1,21 @@
+---
+// Fallback for hosts without _redirects: /map/ moved to the home page.
+import { t, dir, type Lang } from '../i18n';
+import { url, asset } from '../lib/url';
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const to = url('', lang);
+---
+<!doctype html>
+<html lang={lang} dir={dir(lang)}>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex" />
+  <link rel="canonical" href={new URL(to, Astro.site).href} />
+  <meta http-equiv="refresh" content={`0; url=${to}`} />
+  <title>{t(lang, 'map.title')}</title>
+  <script is:inline src={asset('scripts/redirect.js')} data-to={to}></script>
+</head>
+<body><p><a href={to}>{t(lang, 'map.title')}</a></p></body>
+</html>

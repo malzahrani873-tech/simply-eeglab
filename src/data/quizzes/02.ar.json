@@ -1,0 +1,208 @@
+{
+  "v": 1,
+  "station": 2,
+  "lang": "ar",
+  "passPercent": 80,
+  "questions": [
+    {
+      "id": "s02-q01",
+      "type": "single",
+      "lesson": "import-raw",
+      "objective": 1,
+      "prompt": "معك ملف `S001R03.edf` من PhysioNet. أي قائمة تستورده بها؟",
+      "options": [
+        {
+          "id": "a",
+          "text": "`File > Load existing dataset`"
+        },
+        {
+          "id": "b",
+          "text": "`File > Import data > Using EEGLAB functions and plugins > From EDF/EDF+/GDF files (BIOSIG toolbox)`"
+        },
+        {
+          "id": "c",
+          "text": "`File > Import data > Using EEGLAB functions and plugins > From Brain Vis. Rec. .vhdr file`"
+        },
+        {
+          "id": "d",
+          "text": "`File > Import data > Using EEGLAB functions and plugins > From Neuroscan .CNT file`"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "ملفات EDF و EDF+ و GDF تُقرأ بإضافة Biosig، والدالة المقابلة `pop_biosig`. أما `Load existing dataset` فيفتح ملفات `.set` فقط، والقائمتان الأخريان لصيغتي BrainVision و Neuroscan."
+    },
+    {
+      "id": "s02-q02",
+      "type": "multiple",
+      "lesson": "import-raw",
+      "objective": 2,
+      "prompt": "أي العبارات صحيحة عن استيراد الصيغ المختلفة؟ (اختر كل ما ينطبق)",
+      "options": [
+        {
+          "id": "a",
+          "text": "ملف BDF من BioSemi يُقرأ بـ Biosig، ويُستحسن اختيار قناة مرجع مؤقتة عند الاستيراد"
+        },
+        {
+          "id": "b",
+          "text": "في تسجيل BrainVision تختار ملف `.vhdr`، لا `.eeg` ولا `.vmrk`"
+        },
+        {
+          "id": "c",
+          "text": "كل ملف `.cnt` يُقرأ بنفس الإضافة لأن الامتداد واحد"
+        },
+        {
+          "id": "d",
+          "text": "إذا ألغيت `Import EDF+ annotations` قد يصير عدد الأحداث صفراً"
+        }
+      ],
+      "answer": [
+        "a",
+        "b",
+        "d"
+      ],
+      "explanation": "ملف `.cnt` من Neuroscan وملف `.cnt` من ANT صيغتان مختلفتان بنفس الامتداد، فاختر الإضافة حسب الجهاز لا الامتداد. وبيانات BioSemi مسجّلة بلا مرجع، فتخسر جزءاً كبيراً من جودة الإشارة إذا بقيت بلا مرجع."
+    },
+    {
+      "id": "s02-q03",
+      "type": "image",
+      "lesson": "import-raw",
+      "objective": 3,
+      "prompt": "استوردت `S001R03.edf` فظهرت النافذة الرئيسية هكذا. ماذا يعني سطر `Channel locations`؟",
+      "image": {
+        "src": "/quiz/02/s02-q03.webp",
+        "w": 720,
+        "h": 480,
+        "status": "pending",
+        "alt": "نافذة EEGLAB الرئيسية للداتاست S001R03: سطر Channels per frame قيمته 64، و Sampling rate (Hz) قيمته 160، و Events فيه رقم أكبر من صفر، و Channel locations قيمته No (labels only).",
+        "spec": "لقطة حقيقية من EEGLAB 2026.1 (المصدر: eeglab-ui) للنافذة الرئيسية بعد استيراد S001R03.edf، مثل صورة \"بعد\" في درس import-raw لكن **بلا أسهم**. نسخة واحدة للغتين."
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": "الاستيراد فشل، فأعد الاستيراد بإضافة أخرى"
+        },
+        {
+          "id": "b",
+          "text": "أسماء القنوات موجودة بلا مواقع على الرأس، وهذا متوقع بعد الاستيراد"
+        },
+        {
+          "id": "c",
+          "text": "القنوات كلها سيئة"
+        },
+        {
+          "id": "d",
+          "text": "الملف بلا أسماء قنوات"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "`No (labels only)` تعني أن كل قناة لها اسم بلا إحداثيات. هذا ليس خطأ في الاستيراد: تضيف المواقع في درس مواقع الأقطاب، بعد إزالة النقاط من الأسماء. وبقية الأسطر (64 قناة و 160 هرتز وأحداث أكثر من صفر) تقول إن الاستيراد نجح."
+    },
+    {
+      "id": "s02-q04",
+      "type": "image",
+      "lesson": "channel-locations",
+      "objective": 3,
+      "prompt": "بعد البحث عن المواقع رسمت `Plot > Channel locations > By name`. بعض الأقطاب مثل T9 و T10 و Iz على حافة الدائرة أو خارجها. ماذا تستنتج؟",
+      "image": {
+        "src": "/quiz/02/s02-q04.webp",
+        "w": 640,
+        "h": 640,
+        "status": "pending",
+        "alt": "رأس من الأعلى والأنف للأعلى، وعليه 64 قطباً بأسمائها. Cz في المركز، و Fpz في الأمام، و Oz في الخلف، وأقطاب الحافة السفلى للقبعة مثل T9 و T10 و Iz على الدائرة أو خارجها قليلاً.",
+        "spec": "لقطة حقيقية من EEGLAB 2026.1 (المصدر: eeglab-ui) لنافذة Plot > Channel locations > By name على S001R03 بعد البحث في standard_1005.elc، مثل صورة درس channel-locations لكن **بلا أسهم ولا ملاحظة**. نسخة واحدة للغتين."
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": "المواقع صحيحة: هذه أقطاب تحت المستوى الأفقي لمنتصف الرأس، فتُرسم على الدائرة أو خارجها"
+        },
+        {
+          "id": "b",
+          "text": "البحث فشل، فأعد إزالة النقاط من الأسماء"
+        },
+        {
+          "id": "c",
+          "text": "اختر `Import file instead and erase all channels` وأعد البحث"
+        },
+        {
+          "id": "d",
+          "text": "هذه قنوات سيئة يجب حذفها"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "الدائرة تمثّل المستوى الأفقي المار بمنتصف الرأس، والأقطاب حول الحافة السفلى للقبعة تحته، فتُرسم على الدائرة أو خارجها. ووجود Cz في المركز و Fpz في الأمام و Oz في الخلف علامة أن البحث نجح. أما خيار `Import file instead and erase all channels` فيستبدل قنواتك بكل قنوات القالب."
+    },
+    {
+      "id": "s02-q05",
+      "type": "single",
+      "lesson": "events",
+      "objective": 3,
+      "prompt": "توقيت حدث في `EEG.event` هو 673، ومعدل العيّنات 160 هرتز. بعد كم ثانية من بداية التسجيل وقع؟",
+      "options": [
+        {
+          "id": "a",
+          "text": "673 ثانية"
+        },
+        {
+          "id": "b",
+          "text": "4.2 ثانية"
+        },
+        {
+          "id": "c",
+          "text": "0.24 ثانية"
+        },
+        {
+          "id": "d",
+          "text": "107680 ثانية"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "التوقيت في `EEG.event` بالعيّنات. الزمن بالثواني = (رقم العيّنة − 1) ÷ معدل العيّنات = (673 − 1) ÷ 160 = 4.2 ثانية. نطرح 1 لأن أول عيّنة رقمها 1 وتقع عند الزمن صفر."
+    },
+    {
+      "id": "s02-q06",
+      "type": "order",
+      "lesson": "events",
+      "objective": 2,
+      "prompt": "رتّب خطوات العمل على `S001R03.edf` كما في المحطة 2:",
+      "options": [
+        {
+          "id": "a",
+          "text": "البحث عن مواقع القنوات في القالب القياسي"
+        },
+        {
+          "id": "b",
+          "text": "التحقق من أنواع الأحداث وعددها بـ `eeg_eventtypes`"
+        },
+        {
+          "id": "c",
+          "text": "استيراد الملف بإضافة Biosig"
+        },
+        {
+          "id": "d",
+          "text": "إزالة النقاط من أسماء القنوات"
+        },
+        {
+          "id": "e",
+          "text": "حفظ نسخة `.set` بعد الاستيراد"
+        }
+      ],
+      "answer": [
+        "c",
+        "e",
+        "d",
+        "a",
+        "b"
+      ],
+      "explanation": "تستورد أولاً، ثم تحفظ `.set` حتى لا تكرّر الاستيراد. بعدها تصلح الأسماء، لأن البحث عن المواقع يطابق الأسماء مع القالب، و `Cz..` لا يطابق `Cz`. ثم تتحقق من الأحداث قبل أي تقطيع لاحق."
+    }
+  ]
+}

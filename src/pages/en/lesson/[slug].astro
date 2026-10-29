@@ -1,0 +1,9 @@
+---
+import LessonPage from '../../../components/LessonPage.astro';
+import { lessons, slugOf } from '../../../lib/site-data';
+export async function getStaticPaths() {
+  return [...(await lessons()).values()].filter((l) => l.id.startsWith('en/')).map((entry) => ({ params: { slug: slugOf(entry) }, props: { entry } }));
+}
+const { entry } = Astro.props;
+---
+<LessonPage lang="en" entry={entry} slug={Astro.params.slug} />

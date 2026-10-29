@@ -1,0 +1,556 @@
+{
+  "v": 1,
+  "source": {
+    "dataset": "ds002718",
+    "subjects": [
+      "sub-002",
+      "sub-003",
+      "sub-004",
+      "sub-005",
+      "sub-006",
+      "sub-007",
+      "sub-008",
+      "sub-009",
+      "sub-010",
+      "sub-011"
+    ],
+    "license": "CC0",
+    "url": "https://openneuro.org/datasets/ds002718",
+    "eeglab": "2026.1",
+    "iclabel": "1.7",
+    "matlab": "",
+    "colormap": "turbo",
+    "generated": "2026-10-29"
+  },
+  "classes": [
+    "brain",
+    "eye",
+    "muscle",
+    "heart",
+    "line",
+    "chan",
+    "other"
+  ],
+  "items": [
+    {
+      "id": "c002",
+      "img": "/ica-game/c002.webp",
+      "w": 720,
+      "h": 280,
+      "level": 1,
+      "answer": "brain",
+      "eye_subtype": null,
+      "iclabel": {
+        "brain": 0.999,
+        "muscle": 0.0,
+        "eye": 0.0,
+        "heart": 0.0,
+        "line": 0.001,
+        "chan": 0.0,
+        "other": 0.0
+      },
+      "validation": {
+        "expert_agrees": true,
+        "eog_corr": 0.07,
+        "ecg_corr": 0.04
+      },
+      "line_hz": null,
+      "hint_panel": "topo",
+      "origin": "sub-002/IC03"
+    },
+    {
+      "id": "c004",
+      "img": "/ica-game/c004.webp",
+      "w": 720,
+      "h": 280,
+      "level": 1,
+      "answer": "heart",
+      "eye_subtype": null,
+      "iclabel": {
+        "brain": 0.351,
+        "muscle": 0.0,
+        "eye": 0.001,
+        "heart": 0.617,
+        "line": 0.004,
+        "chan": 0.001,
+        "other": 0.027
+      },
+      "validation": {
+        "expert_agrees": true,
+        "eog_corr": 0.03,
+        "ecg_corr": 0.61
+      },
+      "line_hz": null,
+      "hint_panel": "topo",
+      "origin": "sub-002/IC12"
+    },
+    {
+      "id": "c005",
+      "img": "/ica-game/c005.webp",
+      "w": 720,
+      "h": 280,
+      "level": 1,
+      "answer": "eye",
+      "eye_subtype": "blink",
+      "iclabel": {
+        "brain": 0.0,
+        "muscle": 0.0,
+        "eye": 0.999,
+        "heart": 0.0,
+        "line": 0.0,
+        "chan": 0.0,
+        "other": 0.001
+      },
+      "validation": {
+        "expert_agrees": true,
+        "eog_corr": 0.74,
+        "ecg_corr": 0.04
+      },
+      "line_hz": null,
+      "hint_panel": "topo",
+      "origin": "sub-003/IC01"
+    },
+    {
+      "id": "c007",
+      "img": "/ica-game/c007.webp",
+      "w": 720,
+      "h": 280,
+      "level": 1,
+      "answer": "line",
+      "eye_subtype": null,
+      "iclabel": {
+        "brain": 0.0,
+        "muscle": 0.0,
+        "eye": 0.0,
+        "heart": 0.0,
+        "line": 1.0,
+        "chan": 0.0,
+        "other": 0.0
+      },
+      "validation": {
+        "expert_agrees": true,
+        "eog_corr": 0.02,
+        "ecg_corr": 0.09
+      },
+      "line_hz": 50,
+      "hint_panel": "topo",
+      "origin": "sub-003/IC13"
+    },
+    {
+      "id": "c010",
+      "img": "/ica-game/c010.webp",
+      "w": 720,
+      "h": 280,
+      "level": 1,
+      "answer": "line",
+      "eye_subtype": null,
+      "iclabel": {
+        "brain": 0.0,
+        "muscle": 0.0,
+        "eye": 0.0,
+        "heart": 0.0,
+        "line": 1.0,
+        "chan": 0.0,
+        "other": 0.0
+      },
+      "validation": {
+        "expert_agrees": true,
+        "eog_corr": 0.0,
+        "ecg_corr": 0.22
+      },
+      "line_hz": 50,
+      "hint_panel": "topo",
+      "origin": "sub-004/IC02"
+    },
+    {
+      "id": "c012",
+      "img": "/ica-game/c012.webp",
+      "w": 720,
+      "h": 280,
+      "level": 1,
+      "answer": "brain",
+      "eye_subtype": null,
+      "iclabel": {
+        "brain": 1.0,
+        "muscle": 0.0,
+        "eye": 0.0,
+        "heart": 0.0,
+        "line": 0.0,
+        "chan": 0.0,
+        "other": 0.0
+      },
+      "validation": {
+        "expert_agrees": true,
+        "eog_corr": 0.24,
+        "ecg_corr": 0.01
+      },
+      "line_hz": null,
+      "hint_panel": "topo",
+      "origin": "sub-004/IC08"
+    },
+    {
+      "id": "c015",
+      "img": "/ica-game/c015.webp",
+      "w": 720,
+      "h": 280,
+      "level": 1,
+      "answer": "eye",
+      "eye_subtype": "blink",
+      "iclabel": {
+        "brain": 0.0,
+        "muscle": 0.0,
+        "eye": 0.998,
+        "heart": 0.0,
+        "line": 0.0,
+        "chan": 0.0,
+        "other": 0.001
+      },
+      "validation": {
+        "expert_agrees": true,
+        "eog_corr": 0.83,
+        "ecg_corr": 0.06
+      },
+      "line_hz": null,
+      "hint_panel": "topo",
+      "origin": "sub-005/IC01"
+    },
+    {
+      "id": "c016",
+      "img": "/ica-game/c016.webp",
+      "w": 720,
+      "h": 280,
+      "level": 1,
+      "answer": "brain",
+      "eye_subtype": null,
+      "iclabel": {
+        "brain": 0.999,
+        "muscle": 0.0,
+        "eye": 0.0,
+        "heart": 0.0,
+        "line": 0.001,
+        "chan": 0.0,
+        "other": 0.0
+      },
+      "validation": {
+        "expert_agrees": true,
+        "eog_corr": 0.08,
+        "ecg_corr": 0.02
+      },
+      "line_hz": null,
+      "hint_panel": "topo",
+      "origin": "sub-005/IC07"
+    },
+    {
+      "id": "c018",
+      "img": "/ica-game/c018.webp",
+      "w": 720,
+      "h": 280,
+      "level": 1,
+      "answer": "muscle",
+      "eye_subtype": null,
+      "iclabel": {
+        "brain": 0.0,
+        "muscle": 0.999,
+        "eye": 0.001,
+        "heart": 0.0,
+        "line": 0.0,
+        "chan": 0.0,
+        "other": 0.0
+      },
+      "validation": {
+        "expert_agrees": true,
+        "eog_corr": 0.04,
+        "ecg_corr": 0.01
+      },
+      "line_hz": null,
+      "hint_panel": "topo",
+      "origin": "sub-006/IC15"
+    },
+    {
+      "id": "c019",
+      "img": "/ica-game/c019.webp",
+      "w": 720,
+      "h": 280,
+      "level": 1,
+      "answer": "brain",
+      "eye_subtype": null,
+      "iclabel": {
+        "brain": 0.999,
+        "muscle": 0.0,
+        "eye": 0.0,
+        "heart": 0.0,
+        "line": 0.001,
+        "chan": 0.0,
+        "other": 0.0
+      },
+      "validation": {
+        "expert_agrees": true,
+        "eog_corr": 0.02,
+        "ecg_corr": 0.02
+      },
+      "line_hz": null,
+      "hint_panel": "topo",
+      "origin": "sub-006/IC18"
+    },
+    {
+      "id": "c020",
+      "img": "/ica-game/c020.webp",
+      "w": 720,
+      "h": 280,
+      "level": 1,
+      "answer": "eye",
+      "eye_subtype": "blink",
+      "iclabel": {
+        "brain": 0.0,
+        "muscle": 0.0,
+        "eye": 0.999,
+        "heart": 0.0,
+        "line": 0.0,
+        "chan": 0.0,
+        "other": 0.0
+      },
+      "validation": {
+        "expert_agrees": true,
+        "eog_corr": 0.6,
+        "ecg_corr": 0.01
+      },
+      "line_hz": null,
+      "hint_panel": "topo",
+      "origin": "sub-007/IC10"
+    },
+    {
+      "id": "c024",
+      "img": "/ica-game/c024.webp",
+      "w": 720,
+      "h": 280,
+      "level": 1,
+      "answer": "muscle",
+      "eye_subtype": null,
+      "iclabel": {
+        "brain": 0.0,
+        "muscle": 1.0,
+        "eye": 0.0,
+        "heart": 0.0,
+        "line": 0.0,
+        "chan": 0.0,
+        "other": 0.0
+      },
+      "validation": {
+        "expert_agrees": true,
+        "eog_corr": 0.06,
+        "ecg_corr": 0.0
+      },
+      "line_hz": null,
+      "hint_panel": "topo",
+      "origin": "sub-008/IC35"
+    },
+    {
+      "id": "c026",
+      "img": "/ica-game/c026.webp",
+      "w": 720,
+      "h": 280,
+      "level": 1,
+      "answer": "eye",
+      "eye_subtype": "saccade",
+      "iclabel": {
+        "brain": 0.0,
+        "muscle": 0.0,
+        "eye": 1.0,
+        "heart": 0.0,
+        "line": 0.0,
+        "chan": 0.0,
+        "other": 0.0
+      },
+      "validation": {
+        "expert_agrees": true,
+        "eog_corr": 0.67,
+        "ecg_corr": 0.01
+      },
+      "line_hz": null,
+      "hint_panel": "topo",
+      "origin": "sub-009/IC12"
+    },
+    {
+      "id": "c029",
+      "img": "/ica-game/c029.webp",
+      "w": 720,
+      "h": 280,
+      "level": 1,
+      "answer": "chan",
+      "eye_subtype": null,
+      "iclabel": {
+        "brain": 0.003,
+        "muscle": 0.0,
+        "eye": 0.002,
+        "heart": 0.0,
+        "line": 0.002,
+        "chan": 0.984,
+        "other": 0.01
+      },
+      "validation": {
+        "expert_agrees": true,
+        "eog_corr": 0.0,
+        "ecg_corr": 0.01
+      },
+      "line_hz": null,
+      "hint_panel": "topo",
+      "origin": "sub-009/IC22"
+    },
+    {
+      "id": "c030",
+      "img": "/ica-game/c030.webp",
+      "w": 720,
+      "h": 280,
+      "level": 1,
+      "answer": "brain",
+      "eye_subtype": null,
+      "iclabel": {
+        "brain": 1.0,
+        "muscle": 0.0,
+        "eye": 0.0,
+        "heart": 0.0,
+        "line": 0.0,
+        "chan": 0.0,
+        "other": 0.0
+      },
+      "validation": {
+        "expert_agrees": true,
+        "eog_corr": 0.07,
+        "ecg_corr": 0.03
+      },
+      "line_hz": null,
+      "hint_panel": "topo",
+      "origin": "sub-010/IC16"
+    },
+    {
+      "id": "c032",
+      "img": "/ica-game/c032.webp",
+      "w": 720,
+      "h": 280,
+      "level": 1,
+      "answer": "chan",
+      "eye_subtype": null,
+      "iclabel": {
+        "brain": 0.002,
+        "muscle": 0.003,
+        "eye": 0.004,
+        "heart": 0.005,
+        "line": 0.011,
+        "chan": 0.971,
+        "other": 0.004
+      },
+      "validation": {
+        "expert_agrees": true,
+        "eog_corr": 0.11,
+        "ecg_corr": 0.02
+      },
+      "line_hz": null,
+      "hint_panel": "topo",
+      "origin": "sub-010/IC24"
+    },
+    {
+      "id": "c033",
+      "img": "/ica-game/c033.webp",
+      "w": 720,
+      "h": 280,
+      "level": 1,
+      "answer": "muscle",
+      "eye_subtype": null,
+      "iclabel": {
+        "brain": 0.0,
+        "muscle": 0.999,
+        "eye": 0.0,
+        "heart": 0.0,
+        "line": 0.0,
+        "chan": 0.0,
+        "other": 0.0
+      },
+      "validation": {
+        "expert_agrees": true,
+        "eog_corr": 0.02,
+        "ecg_corr": 0.01
+      },
+      "line_hz": null,
+      "hint_panel": "topo",
+      "origin": "sub-010/IC30"
+    },
+    {
+      "id": "c035",
+      "img": "/ica-game/c035.webp",
+      "w": 720,
+      "h": 280,
+      "level": 1,
+      "answer": "eye",
+      "eye_subtype": "blink",
+      "iclabel": {
+        "brain": 0.0,
+        "muscle": 0.0,
+        "eye": 0.999,
+        "heart": 0.0,
+        "line": 0.0,
+        "chan": 0.0,
+        "other": 0.001
+      },
+      "validation": {
+        "expert_agrees": true,
+        "eog_corr": 0.65,
+        "ecg_corr": 0.01
+      },
+      "line_hz": null,
+      "hint_panel": "topo",
+      "origin": "sub-011/IC02"
+    },
+    {
+      "id": "c036",
+      "img": "/ica-game/c036.webp",
+      "w": 720,
+      "h": 280,
+      "level": 1,
+      "answer": "brain",
+      "eye_subtype": null,
+      "iclabel": {
+        "brain": 1.0,
+        "muscle": 0.0,
+        "eye": 0.0,
+        "heart": 0.0,
+        "line": 0.0,
+        "chan": 0.0,
+        "other": 0.0
+      },
+      "validation": {
+        "expert_agrees": true,
+        "eog_corr": 0.01,
+        "ecg_corr": 0.01
+      },
+      "line_hz": null,
+      "hint_panel": "topo",
+      "origin": "sub-011/IC11"
+    },
+    {
+      "id": "c037",
+      "img": "/ica-game/c037.webp",
+      "w": 720,
+      "h": 280,
+      "level": 1,
+      "answer": "muscle",
+      "eye_subtype": null,
+      "iclabel": {
+        "brain": 0.001,
+        "muscle": 0.999,
+        "eye": 0.0,
+        "heart": 0.0,
+        "line": 0.0,
+        "chan": 0.0,
+        "other": 0.0
+      },
+      "validation": {
+        "expert_agrees": true,
+        "eog_corr": 0.02,
+        "ecg_corr": 0.0
+      },
+      "line_hz": null,
+      "hint_panel": "topo",
+      "origin": "sub-011/IC26"
+    }
+  ]
+}

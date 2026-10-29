@@ -1,0 +1,32 @@
+# Figures still to come at the first release (decision ق-36): these lessons may go live with the listed
+# number of required <ImageSpec>, shown as "image coming soon". Counts may only go down; remove a line when its figures land.
+content/lessons/ar/01-01-install-eeglab.mdx 1
+content/lessons/ar/01-02-eeglab-gui.mdx 2
+content/lessons/ar/02-02-channel-locations.mdx 2
+content/lessons/ar/02-03-events.mdx 1
+content/lessons/ar/03-05-asr.mdx 1
+content/lessons/ar/04-07-amica-picard.mdx 1
+content/lessons/ar/06-03-erplab-amplitude-latency.mdx 1
+content/lessons/ar/06-05-data-quality-sme.mdx 1
+content/lessons/ar/07-03-erp-image.mdx 2
+content/lessons/ar/08-06-study-plot-channels.mdx 1
+content/lessons/ar/08-07-study-statistics.mdx 1
+content/lessons/ar/08-09-ic-clustering.mdx 1
+content/lessons/ar/10-02-sift.mdx 1
+content/lessons/ar/10-03-mvpa.mdx 1
+content/lessons/ar/10-04-write-plugin.mdx 1
+content/lessons/en/01-01-install-eeglab.mdx 1
+content/lessons/en/01-02-eeglab-gui.mdx 2
+content/lessons/en/02-02-channel-locations.mdx 2
+content/lessons/en/02-03-events.mdx 1
+content/lessons/en/03-05-asr.mdx 1
+content/lessons/en/04-07-amica-picard.mdx 1
+content/lessons/en/06-03-erplab-amplitude-latency.mdx 1
+content/lessons/en/06-05-data-quality-sme.mdx 1
+content/lessons/en/07-03-erp-image.mdx 2
+content/lessons/en/08-06-study-plot-channels.mdx 1
+content/lessons/en/08-07-study-statistics.mdx 1
+content/lessons/en/08-09-ic-clustering.mdx 1
+content/lessons/en/10-02-sift.mdx 1
+content/lessons/en/10-03-mvpa.mdx 1
+content/lessons/en/10-04-write-plugin.mdx 1

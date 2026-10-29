@@ -1,0 +1,11 @@
+---
+import { t } from '../../i18n';
+import { langOf } from '../../lib/lang';
+import Icon from '../Icon.astro';
+const lang = langOf(Astro.url);
+// [value] slots are for the reader to fill in; they are marked so they stand out.
+const text = (await Astro.slots.render('default')).replace(/<\/?p>/g, '').trim().replace(/\[([^\]<]+)\]/g, '<mark class="slot">[$1]</mark>');
+---
+<p class="mn2">{t(lang, 'methods.note')}</p>
+<blockquote class="mq" lang="en" dir="ltr" set:html={text} />
+<div class="mt"><button type="button" class="btn small sec copy-btn" data-copy-prev hidden><Icon name="copy" class="ico s20" /><span>{t(lang, 'methods.copy')}</span><span class="sr">{t(lang, 'methods.copy.sr')}</span></button></div>

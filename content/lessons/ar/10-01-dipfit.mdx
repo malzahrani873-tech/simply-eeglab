@@ -1,0 +1,202 @@
+---
+title: تحليل المصدر DIPFIT
+titleEn: Source localization with DIPFIT
+description: كيف تضبط نموذج الرأس في DIPFIT، وتطابق مواقع الأقطاب معه، وتقدّر ثنائي قطب لكل مكوّن ICA وتقرأ التباين المتبقّي.
+station: 10
+order: 1
+level: optional
+status: approved
+objectives:
+  - يضبط نموذج الرأس في DIPFIT ويطابق مواقع الأقطاب معه.
+  - يقدّر ثنائي قطب لكل مكوّن ICA بالملاءمة الآلية.
+  - يفسّر التباين المتبقّي لكل مكوّن ويميّز المكوّن ثنائي القطب من غيره.
+prerequisites: [run-ica, channel-locations]
+references:
+  - title: EEGLAB Tutorial
+    url: https://eeglab.org/tutorials/09_source/Model_Settings.html
+    section: "9. Source analysis > a. Head model"
+  - title: EEGLAB Tutorial
+    url: https://eeglab.org/tutorials/09_source/DIPFIT.html
+    section: "9. Source analysis > b. Indep. Comp. sources"
+  - title: EEGLAB Tutorial
+    url: https://eeglab.org/tutorials/10_Group_analysis/component_clustering_tools.html
+    section: "10. Group analysis > STUDY ICA clusters (residual variance threshold)"
+  - title: "ICA applied to EEG part 5: Source localization of ICA components"
+    url: https://www.youtube.com/watch?v=kQI3Yzv1wqs
+    section: "الفيديو كاملاً"
+    duration: "14:05"
+datasets: [D1]
+startingPoint:
+  dataset: D1
+  file: eeglab_data.set
+  applied: [filtering, line-noise, bad-channels, interpolation, rereferencing, run-ica, ica-1hz-copy-weights]
+  script: |
+    [ALLEEG, EEG, CURRENTSET, ALLCOM] = eeglab;
+    eeglabRoot = fileparts(which('eeglab'));
+    EEG = pop_loadset('eeglab_data.set', fullfile(eeglabRoot, 'sample_data'));
+    fullLocs = EEG.chanlocs;
+
+    % Main dataset: high-pass at 0.1 Hz, then 60 Hz line-noise removal
+    EEG = pop_eegfiltnew(EEG, 'locutoff', 0.1);
+    EEG = pop_eegfiltnew(EEG, 'locutoff', 58, 'hicutoff', 62, 'revfilt', 1);
+
+    % Bad channels you removed earlier, e.g. {'T7'}; leave empty if none
+    badChans = {};
+    if ~isempty(badChans)
+        EEG = pop_select(EEG, 'rmchannel', badChans);
+        EEG = pop_interp(EEG, fullLocs, 'spherical');
+    end
+
+    % Average reference, EOG channels excluded
+    eogIdx = find(ismember({EEG.chanlocs.labels}, {'EOG1', 'EOG2'}));
+    EEG = pop_reref(EEG, [], 'exclude', eogIdx);
+    EEG.setname = 'D1 main';
+
+    % ICA on a 1-Hz copy, then copy the weights back
+    EEG_ica = pop_eegfiltnew(EEG, 'locutoff', 1);
+    EEG_ica = pop_runica(EEG_ica, 'icatype', 'runica', 'extended', 1);
+    EEG.icaweights  = EEG_ica.icaweights;
+    EEG.icasphere   = EEG_ica.icasphere;
+    EEG.icachansind = EEG_ica.icachansind;
+    EEG.icawinv     = [];
+    EEG.icaact      = [];
+    EEG = eeg_checkset(EEG);
+
+    % Show the dataset in the main EEGLAB window
+    EEG.filename = ''; EEG.filepath = ''; EEG.datfile = ''; EEG.saved = 'no';
+    [ALLEEG, EEG, CURRENTSET] = pop_newset(ALLEEG, EEG, 0, 'setname', 'D1 main', 'gui', 'off');
+    eeglab redraw;
+eeglabVersion: "2026.1"
+updated: 2026-10-28
+---
+
+## لماذا هذه الخطوة مهمة؟
+
+كل مكوّن ICA له خريطة رأس ثابتة. السؤال الطبيعي بعدها: من أين في الدماغ يمكن أن تأتي هذه الخريطة؟
+
+إضافة DIPFIT تجيب بنموذج بسيط: مصدر واحد صغير داخل الرأس، اسمه ثنائي القطب (<En>dipole</En>)، يشبه بطارية صغيرة لها موضع واتجاه. تبحث DIPFIT عن الموضع الذي ينتج خريطة أقرب ما يمكن لخريطة المكوّن.
+
+ما لم تفسّره الملاءمة اسمه التباين المتبقّي (<En>residual variance</En>). كلما قلّ، كان المكوّن أقرب لمصدر واحد في الدماغ. هذا يساعدك على تمييز المكوّنات الدماغية، ويلزمك لاحقاً في تجميع مكوّنات ICA بين المشاركين.
+
+<Callout type="warning">
+هذا الدرس يستخدم نموذج رأس قياسياً ومواقع أقطاب قياسية، لا رأس المشارك الحقيقي. الموضع الناتج تقدير تقريبي، لا عنوان تشريحي دقيق.
+</Callout>
+
+إذا كانت عندك صورة MRI لكل مشارك، فإضافة NFT تبني نموذج رأس خاصاً به بدل النموذج القياسي، وتجدها في مدير الإضافات.
+
+## قبل وبعد
+
+<Figure src="dipfit/dipfit-maps-12.png" alt="خرائط أول 12 مكوناً من ICA بعد توفيق الثنائيات، فوق كل خريطة رقم المكوّن ونسبة التباين المتبقي، وعلى كل خريطة إسقاط ثنائيه." source="D1" />
+
+<Figure src="dipfit/dipfit-dipplot.png" alt="نافذة dipplot: صورة رنين مغناطيسي قياسية للرأس بثلاثة مناظر (من فوق، ومن الخلف، ومن الجانب) وعليها ثنائيات المكوّنات المرقمة." source="D1" />
+
+## الخطوات من الواجهة
+
+ابدأ من النسخة الرئيسية وفيها أوزان ICA، كما في "نقطة البداية". الخطوة 4 تغيّر مواقع الأقطاب في الداتاست المفتوحة، فاحفظ النتيجة في آخر الدرس في ملف جديد، ولا تحفظها فوق النسخة الرئيسية.
+
+**أولاً: تأكد أن Fieldtrip-lite مثبّت**
+
+1. يحسب DIPFIT الملاءمة بدوال من FieldTrip. هذه الدوال ليست داخل EEGLAB نفسه، بل تأتي في إضافة منفصلة اسمها Fieldtrip-lite. للتأكد، اكتب في نافذة الأوامر:
+
+```matlab
+exist('ft_dipolefitting', 'file')
+```
+
+   إذا طبع `2` فالإضافة مثبّتة، فانتقل إلى الخطوة 3. وإذا طبع `0` فهي غير مثبّتة.
+2. لتثبيتها، افتح <MenuPath>File > Manage EEGLAB extensions</MenuPath>، وابحث عن Fieldtrip-lite، وثبّتها، ثم أعد تشغيل `eeglab`. إذا تجاوزت هذه الخطوة، يسألك EEGLAB عند فتح إعدادات DIPFIT في الخطوة 6: `Fieldtrip-lite extension is not installed. Do you want to download it now?`. اضغط <UiLabel>Yes</UiLabel>. درس تجميع مكوّنات ICA في المحطة 8 يحتاج هذه الإضافة أيضاً.
+
+**ثانياً: طابق أسماء الأقطاب مع ملف نموذج الرأس**
+
+3. افتح <MenuPath>Edit > Channel locations</MenuPath>.
+4. اضغط <UiLabel>Look up locs</UiLabel>، واختر من القائمة البند الذي وصفه <UiLabel>use MNI coordinate file for BEM dipfit model</UiLabel>. اضغط <UiLabel>Ok</UiLabel>.
+5. اضغط <UiLabel>Ok</UiLabel> في نافذة مواقع الأقطاب. تطبع نافذة الأوامر السطر `Channel lookup: no location for EOG1,EOG2`، لأن القناتين ليستا في ملف القوالب. هذا مقصود: قنوات العين لا تدخل في الملاءمة.
+
+**ثالثاً: اختر نموذج الرأس**
+
+6. افتح <MenuPath>Tools > Source localization using DIPFIT > Head model and settings</MenuPath>.
+7. في <UiLabel>Select a head model</UiLabel> اترك الاختيار الافتراضي <UiLabel>Template Boundary Element Model (MNI)</UiLabel>.
+8. انظر خانة <UiLabel>Matrix to align chan. locs. with head model</UiLabel>. يجب أن تكون ممتلئة، وأغلبها أصفار وآحاد مع الرقم `-1.5708`، أي دوران 90 درجة بين اتجاه الأنف في EEGLAB وفي النموذج. إذا كانت فارغة، ارجع للخطوة 4.
+9. اضغط <UiLabel>Ok</UiLabel>. تطبع نافذة الأوامر `Warning: 2 channels without coordinates removed from dipole fitting`، وهما قناتا العين نفسهما.
+
+**رابعاً: ملاءمة آلية لكل المكوّنات**
+
+10. افتح <MenuPath>Tools > Source localization using DIPFIT > Component dipole autofit</MenuPath>.
+11. اترك <UiLabel>Component indices (default:all)</UiLabel> فارغة، فتُلاءَم كل المكوّنات.
+12. اترك <UiLabel>Rejection threshold RV (%)</UiLabel> على `100`، حتى يبقى لكل مكوّن ثنائي قطب وتقرأ تباينه المتبقّي بنفسك.
+13. فعّل <UiLabel>Plot resulting dipoles using dipplot (check)</UiLabel>، واضغط <UiLabel>Ok</UiLabel>. الملاءمة تأخذ دقائق، وتطبع نافذة الأوامر تقدّمها.
+
+**خامساً: اقرأ النتيجة**
+
+14. افتح <MenuPath>Plot > Component maps > In 2-D</MenuPath>، واكتب `1:12` في رقم المكوّنات، وفعّل <UiLabel>Plot associated dipole(s) (if present)</UiLabel>.
+15. افتح <MenuPath>Tools > Source localization using DIPFIT > Component dipole plot</MenuPath>، وفعّل <UiLabel>Plot summary mode</UiLabel>، واضغط <UiLabel>Ok</UiLabel>. تعرض نافذة واحدة كل ثنائيات الأقطاب من ثلاثة مناظر (من الأعلى ومن الخلف ومن الجانب)، مع قائمة المكوّنات وتباينها المتبقّي.
+16. لكل مكوّن: هل ثنائي القطب داخل الدماغ؟ وما تباينه المتبقّي؟ قارن مكوّن الرمش الذي عرفته في درس ICLabel بمكوّن دماغي مثل ألفا في الخلف.
+17. احفظ من <MenuPath>File > Save current dataset as</MenuPath> باسم `D1_dipfit.set`.
+
+## السكربت المقابل
+
+```matlab
+% DIPFIT needs the Fieldtrip-lite plugin: install it once if missing
+if ~exist('ft_dipolefitting', 'file')
+    plugin_askinstall('Fieldtrip-lite', 'ft_dipolefitting', true);
+end
+
+% Work on a copy: the lookup below changes channel coordinates
+EEG.setname = 'D1 dipfit';
+
+% Template electrode positions that match the BEM head model.
+% Channels missing from the template (EOG1, EOG2) lose their
+% coordinates and are left out of the fit.
+EEG = pop_chanedit(EEG, 'lookup', 'standard_1005.elc');
+
+% Template BEM head model (MNI); the alignment matrix is set
+% automatically from the template file name
+EEG = pop_dipfit_settings(EEG, 'model', 'standardBEM');
+disp(EEG.dipfit.coord_transform);   % expect 0 0 0 0 0 -1.5708 1 1 1
+
+% Coarse grid scan + fine fit for all components, keep every dipole
+EEG = pop_multifit(EEG, [], 'threshold', 100);
+
+% Residual variance per component, in percent
+rv = 100 * [EEG.dipfit.model.rv];
+fprintf('IC %2d: RV = %5.1f%%\n', [1:numel(rv); rv]);
+fprintf('%d of %d components below 15%% RV\n', sum(rv < 15), numel(rv));
+
+% Scalp maps of the first 12 components with their dipoles
+pop_topoplot(EEG, 0, 1:12, 'D1 dipfit', 0, 1);
+
+% Summary view of all dipoles: top, back and side, with component numbers
+pop_dipplot(EEG, 1:numel(EEG.dipfit.model), 'normlen', 'on', 'summary', 'on', 'num', 'on');
+
+EEG = pop_saveset(EEG, 'filename', 'D1_dipfit.set', 'filepath', pwd);
+```
+
+## أي قيمة أختار؟
+
+| الإعداد | القيمة | لماذا |
+|---|---|---|
+| نموذج الرأس | <UiLabel>Template Boundary Element Model (MNI)</UiLabel> | التوثيق الرسمي: النموذج الكروي (BESA) باقٍ للتوافق مع القديم ولا يُستخدم للنشر، ونموذج BEM أقرب لشكل الرأس الحقيقي (صفحة Head model). |
+| حد قبول ثنائي القطب | التباين المتبقّي أقل من 15% | الحد الافتراضي في EEGLAB لاختيار المكوّنات قبل التجميع، مع ورقة تبرّره في نفس الصفحة (STUDY ICA clusters). قاعدة بداية لا قانون. |
+| حد الرفض في الملاءمة | 100% أثناء التعلّم | تحتفظ بكل ثنائيات القطب وتقرأها. في سكربت المشروع يمكن وضعه 15 فيُعلَّم الباقي تلقائياً. |
+| عدد ثنائيات القطب | واحد، واثنان متماثلان فقط إذا كانت الخريطة متماثلة بين النصفين | الخيار <UiLabel>Fit bilateral dipoles (check)</UiLabel> مخصّص لهذه الحالة (صفحة DIPFIT، Fitting symmetrical dipoles). |
+
+## أخطاء شائعة
+
+- **ترك مصفوفة المطابقة فارغة.** بدون مطابقة بين مواقع الأقطاب ونموذج الرأس، تخرج المواضع في أماكن خاطئة. تأكد أنها ممتلئة قبل الملاءمة.
+- **تغيير مواقع الأقطاب بعد ضبط النموذج.** إذا عدّلت المواقع، افتح <UiLabel>Head model and settings</UiLabel> من جديد حتى تُحسب المطابقة مرة ثانية.
+- **قراءة الموضع كعنوان تشريحي دقيق.** النموذج والأقطاب قياسيان، فالخطأ قد يبلغ سنتيمترات. اكتب "قرب" المنطقة، لا "في" تلفيف بعينه.
+- **اعتبار التباين المنخفض دليلاً على مصدر دماغي.** مكوّن الرمش قد يُلاءَم جيداً بتباين منخفض، لكن موضعه في مقدمة الرأس قرب العينين. اقرأ الموضع والخريطة والطيف معاً، كما في درس ICLabel.
+- **إدخال قنوات العين في الملاءمة.** نموذج الرأس ضعيف عند العينين، والتوثيق الرسمي ينصح باستبعادها. في هذا الدرس استُبعدت تلقائياً لأنها بلا موقع بعد الخطوة 2.
+
+{/* صندوق "من التجربة": بانتظار قصة من صاحب المشروع. لا يُكتب قبل وصولها. */}
+
+## كيف تتأكد أن الخطوة نجحت؟
+
+- `exist('ft_dipolefitting', 'file')` يطبع `2`.
+- `EEG.dipfit.coord_transform` ليس فارغاً، وفيه `-1.5708`.
+- `numel(EEG.dipfit.model)` يساوي عدد مكوّنات ICA عندك.
+- مكوّن الرمش موضعه في مقدمة الرأس، ومكوّن ألفا الخلفي موضعه في الجزء الخلفي من الدماغ.
+- عدد المكوّنات تحت 15% يطبعه السكربت. سجّله، فستحتاجه في تجميع مكوّنات ICA.
+
+<Methods>
+Equivalent current dipoles were fitted to each independent component (pop_multifit, dipfit plugin 5.6, EEGLAB 2026.1) using the template boundary element head model (MNI) and template electrode positions (standard_1005); components with residual variance above 15% were considered non-dipolar.
+</Methods>

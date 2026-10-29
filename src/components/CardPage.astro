@@ -1,0 +1,66 @@
+---
+import Base from '../layouts/Base.astro';
+import Icon from './Icon.astro';
+import Logo from './Logo.astro';
+import { t, type Lang } from '../i18n';
+import { url, asset } from '../lib/url';
+import { roadmap, type Lesson } from '../lib/site-data';
+import { cardFrom, cardTooLong } from '../lib/card';
+import { mdInline } from '../lib/mini-md';
+import { iso } from '../lib/bidi';
+
+interface Props { lang: Lang; entry: Lesson; slug: string }
+const { lang, entry, slug } = Astro.props;
+const d = entry.data;
+const node = roadmap.byId.get(slug)!;
+const c = cardFrom(entry.body ?? '');
+if (cardTooLong(c)) console.log(`card on 2 pages: ${slug} (${lang})`);
+const lessonUrl = new URL(url(`lesson/${slug}/`, lang), Astro.site).href;
+const x = (s: string) => mdInline(s, lang);
+---
+<Base lang={lang} title={t(lang, 'card.pageTitle', { title: d.title })} path={`lesson/${slug}/card/`} noindex bodyClass="card-page">
+  <div class="wrap card-wrap">
+    <div class="card-bar">
+      <a href={url(`lesson/${slug}/`, lang)}>{t(lang, 'card.back')}</a>
+      <button type="button" class="btn pri" data-print hidden><Icon name="print" class="ico s20" />{t(lang, 'card.print')}</button>
+    </div>
+    <noscript><p class="muted">{t(lang, 'card.noJs')}</p></noscript>
+    <article class="a4">
+      <header>
+        <p class="wm"><Logo />{lang === 'ar' ? <span><span lang="en">EEGLAB</span> ببساطة</span> : <span>Simply EEGLAB</span>}</p>
+        <h1 set:html={iso(d.title, lang)} />
+        <p class="cm">{t(lang, 'card.meta', { station: d.station, n: node.order, version: d.eeglabVersion })}</p>
+      </header>
+      {c.steps.length > 0 && (
+        <section><h2>{t(lang, 'card.gui')}</h2>
+          <ol class="csteps">{c.steps.map((s) => (
+            <li>
+              {s.path.map((p) => <span class="mp" dir="ltr" lang="en">{p.map((it, i) => <>{i > 0 && <span class="cr" aria-hidden="true"> › </span>}<span class="it">{it}</span></>)}</span>)}
+              {s.labels.map((l) => <span class="ui" lang="en" dir="ltr">{l}</span>)}
+              {s.values.length > 0 && <> <span aria-hidden="true">←</span> {s.values.map((v) => <code dir="ltr">{v}</code>)}</>}
+            </li>
+          ))}</ol>
+        </section>
+      )}
+      {c.script && <section><h2>{t(lang, 'card.script')}</h2><pre dir="ltr"><code>{c.script}</code></pre></section>}
+      {c.table && (
+        <section><h2>{t(lang, 'card.values')}</h2>
+          <table><thead><tr>{c.table[0].map((h) => <th set:html={x(h)} />)}</tr></thead>
+            <tbody>{c.table.slice(1).map((r) => <tr>{r.map((cell) => <td set:html={x(cell)} />)}</tr>)}</tbody></table>
+        </section>
+      )}
+      {c.checks.length > 0 && (
+        <section><h2>{t(lang, 'card.check')}</h2>
+          <ul class="checks">{c.checks.map((k) => <li><span class="box" aria-hidden="true"></span><span set:html={x(k)} /></li>)}</ul>
+        </section>
+      )}
+      {c.methods && <section><h2>{t(lang, 'card.methods')}</h2><p class="mq" lang="en" dir="ltr">{c.methods}</p></section>}
+      <footer>
+        <p>{t(lang, 'card.footer', { url: '{url}' }).split('{url}').map((part, i) => <>{i > 0 && <span dir="ltr">{lessonUrl}</span>}{part}</>)}</p>
+        <p>{t(lang, 'footer.license')}: <span dir="ltr">CC BY-NC-SA 4.0 · MIT (code)</span></p>
+        <p>{t(lang, 'footer.disclaimer')}</p>
+      </footer>
+    </article>
+  </div>
+  <script is:inline src={asset('scripts/card-print.js')} defer></script>
+</Base>

@@ -1,0 +1,26 @@
+name: Report a mistake / بلّغ عن خطأ
+description: A scientific or technical mistake in a lesson.
+labels: [content]
+body:
+  - type: input
+    id: lesson
+    attributes:
+      label: Lesson link / رابط الدرس
+    validations:
+      required: true
+  - type: textarea
+    id: what
+    attributes:
+      label: What is wrong / ما الخطأ
+      description: Quote the sentence or step. / انسخ الجملة أو الخطوة.
+    validations:
+      required: true
+  - type: textarea
+    id: source
+    attributes:
+      label: Source / المصدر
+      description: A link to the documentation or paper that shows the correct version. / رابط التوثيق أو البحث.
+  - type: input
+    id: version
+    attributes:
+      label: EEGLAB version / إصدار EEGLAB

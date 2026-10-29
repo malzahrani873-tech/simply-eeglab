@@ -1,0 +1,200 @@
+{
+  "v": 1,
+  "station": 0,
+  "lang": "en",
+  "passPercent": 80,
+  "questions": [
+    {
+      "id": "s00-q01",
+      "type": "single",
+      "lesson": "eeg-origin",
+      "objective": 1,
+      "prompt": "What mainly reaches a scalp electrode from brain activity?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Action potentials from a few neurons"
+        },
+        {
+          "id": "b",
+          "text": "Postsynaptic potentials from millions of parallel pyramidal cells active at the same time"
+        },
+        {
+          "id": "c",
+          "text": "The activity of one cell right under the electrode"
+        },
+        {
+          "id": "d",
+          "text": "Activity from deep brain structures more than from the cortex"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "Postsynaptic potentials last tens of milliseconds, so they overlap across many cells. Pyramidal cells are parallel and point toward the surface, so their currents add up instead of canceling. Action potentials are very short, about 1 ms, so they rarely line up across many cells."
+    },
+    {
+      "id": "s00-q02",
+      "type": "multiple",
+      "lesson": "eeg-origin",
+      "objective": 2,
+      "prompt": "Which of these are non-brain sources that can appear in an EEG recording? (Select all that apply)",
+      "options": [
+        {
+          "id": "a",
+          "text": "Eye blinks and eye movements"
+        },
+        {
+          "id": "b",
+          "text": "Jaw, neck and forehead muscles"
+        },
+        {
+          "id": "c",
+          "text": "The power line in the building"
+        },
+        {
+          "id": "d",
+          "text": "Postsynaptic potentials in the cortex"
+        }
+      ],
+      "answer": [
+        "a",
+        "b",
+        "c"
+      ],
+      "explanation": "Blinks, muscles and the power line are all artifacts: non-brain signals mixed into the recording, sometimes larger than the brain signal itself. Postsynaptic potentials in the cortex are the main brain signal. You learn to remove artifacts in stations 3 and 4."
+    },
+    {
+      "id": "s00-q03",
+      "type": "image",
+      "lesson": "electrode-10-20",
+      "objective": 1,
+      "prompt": "The head in the drawing is seen from above, nose up, as in EEGLAB plots. What is the name of the highlighted electrode?",
+      "image": {
+        "src": "/quiz/00/s00-q03.webp",
+        "w": 600,
+        "h": 600,
+        "status": "ready",
+        "alt": "A head seen from above with the nose at the top and ears at the sides, with 21 dots for the 10-20 electrodes and no names. One dot is filled in a different color in the middle row from front to back, in the right half of the drawing, between the midline and the ear.",
+        "spec": "Original drawing (source: original), with no text at all. A head from above, nose at the top and ears at the sides, with the 21 electrodes of the 10-20 system at their standard positions (as in the electrode-10-20 lesson drawing) as grey dots without names. Only the C4 dot is filled with the highlight color. The left of the drawing is the participant's left, and the drawing is not mirrored in the Arabic version. One version for both languages."
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": "C3"
+        },
+        {
+          "id": "b",
+          "text": "C4"
+        },
+        {
+          "id": "c",
+          "text": "Cz"
+        },
+        {
+          "id": "d",
+          "text": "T8"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "The electrode is in the central C row, in the right half, and an even number means right, so it is C4. C3 is its mirror on the left, Cz is exactly on the midline, and T8 is farther out at the edge near the ear. The left of an EEGLAB plot is the participant's left, because the head is drawn from above."
+    },
+    {
+      "id": "s00-q04",
+      "type": "single",
+      "lesson": "matlab-basics",
+      "objective": 2,
+      "prompt": "The matrix `demo.data` has 3 rows and 1280 columns: channels in rows, samples in columns. Which command gives you samples 1 to 5 of the second channel?",
+      "options": [
+        {
+          "id": "a",
+          "text": "`demo.data(2, 1:5)`"
+        },
+        {
+          "id": "b",
+          "text": "`demo.data(1:5, 2)`"
+        },
+        {
+          "id": "c",
+          "text": "`demo.data(2, 0:4)`"
+        },
+        {
+          "id": "d",
+          "text": "`demo.data{2}(1:5)`"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "The first number selects the row (channel) and the second the columns (samples). MATLAB counts from 1, not 0, so `0:4` gives an error. Curly braces are for cell arrays, not matrices. `EEG.data` in EEGLAB uses the same order: channels first, then samples."
+    },
+    {
+      "id": "s00-q05",
+      "type": "single",
+      "lesson": "signal-basics",
+      "objective": 2,
+      "prompt": "A dataset was recorded at a sampling rate of 128 Hz. What is the highest frequency it can represent?",
+      "options": [
+        {
+          "id": "a",
+          "text": "32 Hz"
+        },
+        {
+          "id": "b",
+          "text": "64 Hz"
+        },
+        {
+          "id": "c",
+          "text": "128 Hz"
+        },
+        {
+          "id": "d",
+          "text": "256 Hz"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "The highest frequency that can be represented is the Nyquist frequency, half the sampling rate: 128 ÷ 2 = 64 Hz. A faster frequency does not disappear; it shows up disguised as a lower one (aliasing)."
+    },
+    {
+      "id": "s00-q06",
+      "type": "image",
+      "lesson": "signal-basics",
+      "objective": 1,
+      "prompt": "This is the spectrum of a simulated EEG signal. At which frequency is the alpha peak?",
+      "image": {
+        "src": "/quiz/00/s00-q06.webp",
+        "w": 720,
+        "h": 360,
+        "status": "pending",
+        "alt": "A spectrum plot, frequency in Hz from 0 to 70 on the horizontal axis, amplitude in microvolts on the vertical axis. It has three peaks: a small one near 6, a higher one near 10, and a very narrow one at 60.",
+        "spec": "Script figure (source: script, a copy of the signal-basics lesson script). A 10-second simulated signal at 250 Hz: 10 Hz alpha at 20 µV, 6 Hz theta at 8, a 60 Hz wave at 10, broadband noise at 5, and rng(0). Amplitude spectrum with fft from 0 to 70 Hz, one black line. Axis labels in English, Frequency (Hz) and Amplitude (µV), so one version serves both languages. No labels on the peaks."
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": "About 6 Hz"
+        },
+        {
+          "id": "b",
+          "text": "About 10 Hz"
+        },
+        {
+          "id": "c",
+          "text": "60 Hz"
+        },
+        {
+          "id": "d",
+          "text": "There is no alpha peak"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "Alpha is roughly 8 to 12 Hz, and the highest peak in that range is near 10 Hz. The peak near 6 Hz is theta. The very narrow peak at 60 Hz is power-line noise, not brain activity."
+    }
+  ]
+}

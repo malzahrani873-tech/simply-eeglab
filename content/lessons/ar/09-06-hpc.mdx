@@ -1,0 +1,210 @@
+---
+title: الحوسبة على HPC
+titleEn: Running on HPC
+description: متى يستحق نقل المعالجة إلى عنقود حوسبة (HPC)، وكيف تجهّز سكربت دفعات يعمل بلا واجهة، وكيف ترسله لعنقود جامعتك أو لبوابة NSG المجانية.
+station: 9
+order: 6
+level: optional
+status: approved
+objectives:
+  - يحسب وقت المعالجة المتوقع ويقرر هل يحتاج HPC.
+  - يكتب سكربتاً يعمل بلا واجهة ولا رسوم، بمسارات نسبية، ومشارك واحد لكل مهمة.
+  - يشغّل السكربت من سطر الأوامر بـ matlab -batch، ويرسله لعنقود بنظام مهام.
+  - يعرف بوابة NSG وإضافتها nsgportal كبديل مجاني للباحثين.
+prerequisites: [batch-processing]
+references:
+  - title: EEGLAB and HPC
+    url: https://eeglab.org/others/EEGLAB_and_high_performance_computing.html
+    section: "EEGLAB and the Neuroscience Gateway"
+  - title: nsgportal (GitHub wiki)
+    url: https://github.com/sccn/nsgportal/wiki
+    section: "Setting up the plug-in; Creating and managing an NSG job using pop_nsg from the command line"
+  - title: EEGLAB Tutorial
+    url: https://eeglab.org/tutorials/11_Scripting/
+    section: "11. Scripting"
+  - title: "EEGLAB on high performance computing ressources"
+    url: https://www.youtube.com/watch?v=1_h8NFS_ipI
+    section: "الفيديو كاملاً"
+    duration: "8:32"
+datasets: [D4]
+startingPoint:
+  dataset: D4
+  file: sub-002_task-FaceRecognition_eeg.set
+  applied: []
+  script: |
+    [ALLEEG, EEG, CURRENTSET, ALLCOM] = eeglab;
+
+    % Run from inside faces_project, where ds002718 sits in rawdata
+    bidsRoot = fullfile(pwd, 'rawdata');
+    EEG = pop_loadset('sub-002_task-FaceRecognition_eeg.set', fullfile(bidsRoot, 'sub-002', 'eeg'));
+
+    % Show the dataset in the main EEGLAB window
+    [ALLEEG, EEG, CURRENTSET] = pop_newset(ALLEEG, EEG, 0, 'setname', 'sub-002 raw', 'gui', 'off');
+    eeglab redraw;
+eeglabVersion: "2026.1"
+updated: 2026-10-28
+---
+
+## لماذا هذه الخطوة مهمة؟
+
+سكربت الدفعات من الدرس السابق يعمل على جهازك مشاركاً بعد مشارك. هذا يكفي لأغلب المشاريع. لكن بعض الخطوات بطيئة: ICA على 72 قناة وخمسين دقيقة من التسجيل قد تأخذ وقتاً طويلاً لكل مشارك، و AMICA و DIPFIT أبطأ. ضربها في 18 مشاركاً، أو في 100، فيصبح جهازك مشغولاً أياماً.
+
+عنقود الحوسبة (<En>HPC</En>، الحوسبة عالية الأداء) مجموعة أجهزة كثيرة تشغّل مهامك في نفس الوقت. عشرون مشاركاً يصبحون عشرين مهمة متوازية، فتنتهي في وقت مشارك واحد تقريباً.
+
+لكن العنقود لا يعرض نوافذ، ولا تستطيع أن تضغط فيه شيئاً. السكربت يجب أن يعمل من البداية للنهاية وحده. هذا الدرس يجهّز سكربتك لذلك.
+
+**متى يستحق الانتقال؟** احسب: وقت مشارك واحد × عدد المشاركين. إذا كان الناتج ساعات قليلة، شغّله على جهازك ليلاً. إذا كان أياماً، أو تكرّر التشغيل كثيراً، فالعنقود يستحق.
+
+## قبل وبعد
+
+<Figure src="hpc/hpc-flow.svg" alt="أربعة صناديق متتالية: جهازك فيه مجلد المشروع والسكربت، ثم السكربت run_ica_d4.m يعمل بلا واجهة، ثم العنقود بثلاث مهام متوازية sub-002 و sub-003 و sub-004 في جامعتك أو NSG، ثم النتائج: ملف أوزان ICA لكل مشارك ومجلد السجلات logs." source="original" />
+
+## الخطوات من الواجهة
+
+العنقود يعمل بلا واجهة، فالخطوات هنا تجهيز وإرسال.
+
+**أولاً: جهّز السكربت**
+
+1. ابدأ من سكربت الدفعات، وتأكد من أربعة شروط:
+   - يبدأ بـ `eeglab nogui`، فلا تُفتح أي نافذة.
+   - لا يرسم، أو يحفظ الرسم في ملف بـ `print` ثم يغلقه.
+   - كل المسارات مبنية من مجلد المشروع بـ `fullfile`، لا مسارات من جهازك مثل `C:\Users\...`.
+   - يعالج **مشاركاً واحداً** يختاره من رقم يعطيه له العنقود. هكذا يرسل العنقود نفس السكربت عشرين مرة بأرقام مختلفة.
+2. جرّبه على جهازك من سطر أوامر النظام (لا من MATLAB):
+
+```text
+matlab -batch "run_ica_d4"
+```
+
+`-batch` يشغّل السكربت بلا واجهة، ثم يغلق MATLAB. إذا حدث خطأ، يخرج برمز خطأ يراه العنقود.
+
+**ثانياً: عنقود جامعتك**
+
+3. اسأل قسم الحوسبة في جامعتك: هل MATLAB مثبّت؟ أي نظام مهام يستخدمون (SLURM هو الأشهر)؟ وأين تضع EEGLAB؟
+4. انسخ مجلد المشروع والسكربت و EEGLAB إلى حسابك على العنقود.
+5. اكتب ملف المهمة. هذا مثال بنظام SLURM لثلاث مهام، واحدة لكل مشارك. الأسماء والقيم تختلف بين الجامعات، فعدّلها حسب تعليماتهم:
+
+```text
+#!/bin/bash
+#SBATCH --job-name=d4-ica
+#SBATCH --array=1-3
+#SBATCH --cpus-per-task=4
+#SBATCH --mem=16G
+#SBATCH --time=04:00:00
+#SBATCH --output=logs/ica_%a.out
+
+module load matlab
+matlab -batch "run_ica_d4"
+```
+
+6. أرسله بـ `sbatch job_ica.sh`، وتابعه بـ `squeue -u` مع اسم مستخدمك.
+
+**ثالثاً: بوابة NSG (بديل مجاني)**
+
+7. إذا لم يكن عند جامعتك عنقود، فبوابة <En>Neuroscience Gateway</En> (NSG) مجانية للباحثين الأكاديميين، وفيها MATLAB و EEGLAB جاهزان. سجّل حساباً في موقعها.
+8. ثبّت إضافة nsgportal من <MenuPath>File > Manage EEGLAB extensions</MenuPath> (آخر إصدار عند كتابة الدرس 2.1.1).
+9. افتح <MenuPath>Tools > NSG Tools > NSG account info</MenuPath>، واكتب اسم المستخدم وكلمة المرور.
+10. ضع السكربت والبيانات التي يحتاجها في مجلد واحد، ثم افتح <MenuPath>Tools > NSG Tools > Manage NSG jobs</MenuPath>، واختر المجلد، واكتب اسم السكربت، وأرسل المهمة. من نفس النافذة تتابع حالتها وتنزّل النتائج.
+
+## السكربت المقابل
+
+يقرأ السكربت الملفات التي كتبها `pop_importbids` في `derivatives/eeglab` في درس الدفعات، فشغّل ذلك الاستيراد مرة واحدة أولاً. شغّله من داخل `faces_project`.
+
+```matlab
+% run_ica_d4.m - one subject per job, no display
+% Local test:  matlab -batch "run_ica_d4"
+% On SLURM:    the array index selects the subject
+eeglab nogui
+
+projectRoot = pwd;
+outRoot     = fullfile(projectRoot, 'derivatives', 'eeglab');
+logRoot     = fullfile(projectRoot, 'logs');
+subjects    = {'sub-002', 'sub-003', 'sub-004'};
+
+% Subject index from the cluster, or 1 when run locally
+taskId = str2double(getenv('SLURM_ARRAY_TASK_ID'));
+if isnan(taskId), taskId = 1; end
+subj = subjects{taskId};
+fprintf('Job %d: %s\n', taskId, subj);
+
+cfg.lineFreq  = 50;                     % same settings as the batch lesson
+cfg.eogLabels = {'EEG061', 'EEG062'};
+cfg.dropLabels = {'EEG063', 'EEG064'};
+
+try
+    % File written by pop_importbids in the batch processing lesson
+    outDir = fullfile(outRoot, subj, 'eeg');
+    EEG = pop_loadset('filename', sprintf('%s_task-FaceRecognition_eeg.set', subj), ...
+        'filepath', outDir);
+
+    % Same steps as process_subject up to ICA, so the weights fit its main dataset
+    EEG = pop_select(EEG, 'rmchannel', cfg.dropLabels);
+    fullLocs = EEG.chanlocs;
+    EEG = pop_eegfiltnew(EEG, 'locutoff', 0.1);
+    EEG = pop_eegfiltnew(EEG, 'locutoff', cfg.lineFreq - 2, 'hicutoff', cfg.lineFreq + 2, 'revfilt', 1);
+    EEG_test = pop_clean_rawdata(EEG, 'FlatlineCriterion', 5, 'ChannelCriterion', 0.8, ...
+        'LineNoiseCriterion', 4, 'Highpass', 'off', 'BurstCriterion', 'off', ...
+        'WindowCriterion', 'off', 'BurstRejection', 'off', 'Distance', 'Euclidian', ...
+        'channels_ignore', cfg.eogLabels);
+    badChans = setdiff({EEG.chanlocs.labels}, {EEG_test.chanlocs.labels}, 'stable');
+    if ~isempty(badChans)
+        EEG = pop_select(EEG, 'rmchannel', badChans);
+    end
+    if ~isempty(badChans)
+        EEG = pop_interp(EEG, fullLocs, 'spherical');
+    end
+    clear EEG_test
+    eogIdx = find(ismember({EEG.chanlocs.labels}, cfg.eogLabels));
+    EEG = pop_reref(EEG, [], 'exclude', eogIdx);
+
+    % ICA on a 1-Hz high-passed copy (the slow step worth a cluster)
+    EEG_ica = pop_eegfiltnew(EEG, 'locutoff', 1);
+    tic;
+    EEG_ica = pop_runica(EEG_ica, 'icatype', 'runica', 'extended', 1);
+    fprintf('ICA finished in %.1f min\n', toc / 60);
+
+    % Save only the small result: the ICA weights and the bad channel list
+    icaInfo = struct('icaweights', EEG_ica.icaweights, 'icasphere', EEG_ica.icasphere, ...
+                     'icachansind', EEG_ica.icachansind, 'badChans', {badChans});
+    save(fullfile(outDir, sprintf('%s_task-FaceRecognition_desc-ica.mat', subj)), ...
+         '-struct', 'icaInfo');
+catch err
+    % Write the error to a log file, then exit with an error code
+    if ~exist(logRoot, 'dir'), mkdir(logRoot); end
+    fid = fopen(fullfile(logRoot, sprintf('%s_error.txt', subj)), 'w');
+    fprintf(fid, '%s\n', getReport(err, 'extended', 'hyperlinks', 'off'));
+    fclose(fid);
+    rethrow(err);
+end
+```
+
+## أي قيمة أختار؟
+
+| الإعداد | القيمة في الدرس | لماذا |
+|---|---|---|
+| مشاركون لكل مهمة | واحد | إذا فشل مشارك لا يتوقف الباقون، وتعيد تشغيله وحده. نفس فكرة تسجيل الأخطاء في درس الدفعات. |
+| طريقة التشغيل | `matlab -batch` | يعمل بلا واجهة، ويغلق MATLAB في النهاية، ويعطي رمز خطأ عند الفشل. |
+| الذاكرة | 16G في المثال | بيانات مشارك واحد من D4 حوالي 234 ميجابايت على القرص، لكن الفلتر و ICA ينشئان نسخاً في الذاكرة. ابدأ بقيمة واسعة، ثم اقرأ ما استُخدم فعلاً في تقرير المهمة. |
+| الوقت المسموح | 4 ساعات في المثال | قِس وقت مشارك واحد على جهازك، واطلب ضعفه. المهمة التي تتجاوز وقتها يوقفها العنقود. |
+| ما يُحفظ | أوزان ICA فقط | ملف صغير يُنقل بسرعة من العنقود. حُسب بعد نفس خطوات `process_subject` في درس الدفعات (نفس القنوات والمرجع والاستيفاء)، فتنسخه إلى النسخة الرئيسية في ذلك الدرس كما في درس نسخ أوزان ICA. الأوزان لا تناسب إلا بيانات بنفس القنوات ونفس المعالجة المكانية. |
+
+## أخطاء شائعة
+
+- **أمر يفتح نافذة.** أي `pop_` بلا معاملات كافية، أو `eeglab` بدل `eeglab nogui`، يحاول فتح نافذة فيتوقف السكربت أو يفشل. جرّب بـ `matlab -batch` على جهازك قبل الإرسال.
+- **مسارات من جهازك.** `C:\Users\...` لا يوجد على العنقود. ابنِ كل مسار من مجلد المشروع.
+- **حلقة على كل المشاركين في مهمة واحدة.** تفقد التوازي، وخطأ في مشارك واحد يوقف الكل إذا لم تلتقطه.
+- **طلب وقت أو ذاكرة أقل من الحاجة.** يُوقَف العنقود المهمة بلا نتيجة. اقرأ ملف `logs` وتقرير المهمة قبل إعادة الإرسال.
+- **نسيان الإصدارات.** إصدار EEGLAB أو MATLAB على العنقود قد يختلف عن جهازك. اطبع `eeg_getversion` و `version` في بداية السكربت، واكتبهما في Methods.
+
+{/* صندوق "من التجربة": بانتظار قصة من صاحب المشروع. لا يُكتب قبل وصولها. */}
+
+## كيف تتأكد أن الخطوة نجحت؟
+
+- `matlab -batch "run_ica_d4"` على جهازك يطبع `Job 1: sub-002` ثم مدة ICA، ويُنهي MATLAB بلا خطأ.
+- في `derivatives/eeglab/sub-002/eeg` ملف `sub-002_task-FaceRecognition_desc-ica.mat`.
+- على العنقود: ثلاث مهام، وثلاثة ملفات أوزان، ولا ملف خطأ في `logs`.
+- `size(icaweights)` في كل ملف رتبة البيانات × 72، أي 71 × 72 إذا لم تُستوفَ قناة (المرجع المتوسط ينقص الرتبة واحداً).
+
+<Methods>
+Independent component analysis (extended Infomax; Lee et al., 1999) was computed with runica (EEGLAB 2026.1) for each participant on a copy of the preprocessed data high-pass filtered at 1 Hz, and the resulting weights were applied to the 0.1 Hz high-pass filtered data; jobs ran one per participant on [computing cluster] with MATLAB [version].
+</Methods>

@@ -1,0 +1,167 @@
+{
+  "v": 1,
+  "station": 1,
+  "lang": "ar",
+  "passPercent": 80,
+  "questions": [
+    {
+      "id": "s01-q01",
+      "type": "single",
+      "lesson": "install-eeglab",
+      "objective": 3,
+      "prompt": "تحتاج إضافة Biosig لتقرأ ملف EDF. من أين تثبّتها داخل EEGLAB؟",
+      "options": [
+        {
+          "id": "a",
+          "text": "`File > Manage EEGLAB extensions`"
+        },
+        {
+          "id": "b",
+          "text": "`Tools > Filter the data`"
+        },
+        {
+          "id": "c",
+          "text": "`Help > EEGLAB functions`"
+        },
+        {
+          "id": "d",
+          "text": "`Edit > Preferences`"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "مدير الإضافات في قائمة File: ابحث عن Biosig واضغط `Install/Update`، ويحتاج اتصالاً بالإنترنت. أما `Edit > Preferences` ففيه خيارات EEGLAB، لا الإضافات."
+    },
+    {
+      "id": "s01-q02",
+      "type": "image",
+      "lesson": "eeglab-gui",
+      "objective": 3,
+      "prompt": "هذه النافذة الرئيسية بعد فتح `eeglab_data.set`. ماذا يعني أن قيمة `Epochs` هنا 1؟",
+      "image": {
+        "src": "/quiz/01/s01-q02.webp",
+        "w": 720,
+        "h": 480,
+        "status": "pending",
+        "alt": "نافذة EEGLAB الرئيسية وفي أعلاها اسم الداتاست Continuous EEG Data، وتحته أسطر القيم: Channels per frame، و Frames per epoch، و Epochs، و Events، و Sampling rate (Hz)، و Epoch start (sec)، و Epoch end (sec)، و Reference، و Channel locations، و ICA weights.",
+        "spec": "لقطة حقيقية من EEGLAB 2026.1 (المصدر: eeglab-ui) للنافذة الرئيسية بعد فتح eeglab_data.set، مثل صورة \"بعد\" في درس eeglab-gui لكن **بلا أرقام ولا أسهم** فوقها. القيم المتوقعة: 32 و 30504 و 1 و 154 و 128 و 0.000 و 238.305. نصوص الواجهة إنجليزية، فتكفي نسخة واحدة للغتين."
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": "البيانات مستمرة ولم تُقطّع إلى epochs بعد"
+        },
+        {
+          "id": "b",
+          "text": "في الداتاست قناة واحدة فقط"
+        },
+        {
+          "id": "c",
+          "text": "في الداتاست حدث واحد فقط"
+        },
+        {
+          "id": "d",
+          "text": "التسجيل طوله ثانية واحدة"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "`Epochs` عدد المقاطع، والقيمة 1 تعني تسجيلاً مستمراً واحداً لم يُقطّع. عدد القنوات في سطر `Channels per frame`، وعدد الأحداث في سطر `Events`، والطول في سطر `Epoch end (sec)`."
+    },
+    {
+      "id": "s01-q03",
+      "type": "single",
+      "lesson": "eeg-struct",
+      "objective": 2,
+      "prompt": "الأمر `size(EEG.data)` يطبع `32 30504`. ماذا يعني الرقمان؟",
+      "options": [
+        {
+          "id": "a",
+          "text": "32 قناة، و 30504 عيّنة في كل قناة"
+        },
+        {
+          "id": "b",
+          "text": "32 عيّنة، و 30504 قناة"
+        },
+        {
+          "id": "c",
+          "text": "32 ثانية، و 30504 حدثاً"
+        },
+        {
+          "id": "d",
+          "text": "32 epoch، و 30504 قناة"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "في EEGLAB القنوات في الصفوف والعيّنات في الأعمدة. لذلك `EEG.data(1, :)` القناة الأولى كاملة، و `EEG.data(:, 1)` كل القنوات عند أول عيّنة."
+    },
+    {
+      "id": "s01-q04",
+      "type": "multiple",
+      "lesson": "eeg-struct",
+      "objective": 1,
+      "prompt": "أي العبارات صحيحة عن حقول `EEG`؟ (اختر كل ما ينطبق)",
+      "options": [
+        {
+          "id": "a",
+          "text": "`EEG.srate` معدل العيّنات بالهرتز"
+        },
+        {
+          "id": "b",
+          "text": "`EEG.event(1).latency` توقيت الحدث بالعيّنات لا بالثواني"
+        },
+        {
+          "id": "c",
+          "text": "`EEG.times` بالثواني"
+        },
+        {
+          "id": "d",
+          "text": "`EEG.trials` = 1 تعني بيانات مستمرة"
+        },
+        {
+          "id": "e",
+          "text": "`EEG.icaweights` ممتلئ دائماً بعد فتح أي داتاست"
+        }
+      ],
+      "answer": [
+        "a",
+        "b",
+        "d"
+      ],
+      "explanation": "`EEG.times` بالميلي ثانية، بينما `EEG.xmin` و `EEG.xmax` بالثواني. و `EEG.icaweights` فارغ حتى تحسب ICA في المحطة 4. ولتحويل التوقيت إلى ثوانٍ: (رقم العيّنة − 1) ÷ معدل العيّنات."
+    },
+    {
+      "id": "s01-q05",
+      "type": "single",
+      "lesson": "eeglab-gui",
+      "objective": 3,
+      "prompt": "في النافذة الرئيسية: `Frames per epoch` = 30504، و `Sampling rate (Hz)` = 128، و `Epochs` = 1. كم طول التسجيل تقريباً؟",
+      "options": [
+        {
+          "id": "a",
+          "text": "30504 ثانية"
+        },
+        {
+          "id": "b",
+          "text": "238 ثانية، أي 4 دقائق تقريباً"
+        },
+        {
+          "id": "c",
+          "text": "128 ثانية"
+        },
+        {
+          "id": "d",
+          "text": "0.004 ثانية"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "`Frames per epoch` عدد عيّنات، لا ثوانٍ. اقسمه على معدل العيّنات: 30504 ÷ 128 ≈ 238 ثانية، وهو تقريباً الرقم في سطر `Epoch end (sec)`."
+    }
+  ]
+}

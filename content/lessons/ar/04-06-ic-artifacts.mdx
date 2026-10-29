@@ -1,0 +1,169 @@
+---
+title: قراءة مكوّنات الآرتفاكت
+titleEn: Reading artifact components
+description: كيف تميّز فئات ICLabel السبع في EEGLAB من خريطة الرأس والطيف والسلسلة الزمنية، وأي المكوّنات تحذف.
+station: 4
+order: 6
+level: core
+status: approved
+objectives:
+  - يميّز مكوّنات العين والعضلة والقلب وضوضاء الكهرباء وضوضاء القناة عن مكوّنات الدماغ، من خريطة الرأس والطيف والسلسلة الزمنية.
+  - يذكر العلامة الفارقة لكل فئة من فئات ICLabel السبع.
+  - يقرّر أي المكوّنات يحذف وأيها يُبقي، مع سبب لكل واحد.
+prerequisites: [iclabel]
+references:
+  - title: EEGLAB Tutorial
+    url: https://eeglab.org/tutorials/06_RejectArtifacts/RunICA.html
+    section: "Studying and flagging artifactual ICA components"
+  - title: EEGLAB plugin
+    url: https://eeglab.org/plugins/ICLabel/
+    section: "ICLabel"
+  - title: Luck, Applied Event-Related Potential Data Analysis (الطبعة الأولى)
+    url: https://socialsci.libretexts.org/Bookshelves/Psychology/Biological_Psychology/Applied_Event-Related_Potential_Data_Analysis_(Luck)
+    section: "الفصل 9: Artifact Correction with ICA"
+  - title: "Learning to recognize ICA components of EEG and mobile EEG"
+    url: https://www.youtube.com/watch?v=AXCxrDikpaM
+    section: "الفيديو كاملاً"
+    duration: "26:13"
+datasets: [D1]
+startingPoint:
+  dataset: D1
+  file: eeglab_data.set
+  applied: [filtering, line-noise, bad-channels, interpolation, rereferencing, run-ica, ica-1hz-copy-weights]
+  script: |
+    % Shortcut: if you saved D1_main_ica.set in the 1-Hz filtering lesson, keep
+    % the first line and the last two lines, and replace every line between them with:
+    % EEG = pop_loadset('D1_main_ica.set', pwd);
+    [ALLEEG, EEG, CURRENTSET, ALLCOM] = eeglab;
+    eeglabRoot = fileparts(which('eeglab'));
+    EEG = pop_loadset('eeglab_data.set', fullfile(eeglabRoot, 'sample_data'));
+    fullLocs = EEG.chanlocs;
+
+    % Main dataset: high-pass at 0.1 Hz, then 60 Hz line-noise removal
+    EEG = pop_eegfiltnew(EEG, 'locutoff', 0.1);
+    EEG = pop_eegfiltnew(EEG, 'locutoff', 58, 'hicutoff', 62, 'revfilt', 1);
+
+    % Bad channels you removed earlier, e.g. {'T7'}; leave empty if none
+    badChans = {};
+    if ~isempty(badChans)
+        EEG = pop_select(EEG, 'rmchannel', badChans);
+        EEG = pop_interp(EEG, fullLocs, 'spherical');
+    end
+
+    % Average reference, EOG channels excluded
+    eogIdx = find(ismember({EEG.chanlocs.labels}, {'EOG1', 'EOG2'}));
+    EEG = pop_reref(EEG, [], 'exclude', eogIdx);
+
+    % ICA on a 1-Hz copy, then copy the weights back
+    EEG_ica = pop_eegfiltnew(EEG, 'locutoff', 1);
+    EEG_ica = pop_runica(EEG_ica, 'icatype', 'runica', 'extended', 1);
+    EEG.icaweights  = EEG_ica.icaweights;
+    EEG.icasphere   = EEG_ica.icasphere;
+    EEG.icachansind = EEG_ica.icachansind;
+    EEG.icawinv     = [];
+    EEG.icaact      = [];
+    EEG = eeg_checkset(EEG);
+    EEG.filename = ''; EEG.filepath = ''; EEG.datfile = ''; EEG.saved = 'no';
+    [ALLEEG, EEG, CURRENTSET] = pop_newset(ALLEEG, EEG, 0, 'setname', 'D1 main', 'gui', 'off');
+    eeglab redraw;
+interactive: [IcaGameTeaser]
+eeglabVersion: "2026.1"
+updated: 2026-10-28
+---
+
+## لماذا هذه الخطوة مهمة؟
+
+ICLabel يعطي كل مكوّن ICA احتمالاً لكل فئة من سبع فئات. لكنه قد يخطئ، وقرار حذف المكوّن قرارك أنت. في درس ICLabel قرأت ثلاث فئات: العين والعضلة والدماغ. هذا الدرس يغطّي الفئات السبع، مع العلامة التي تميّز كل واحدة.
+
+التوتوريال الرسمي يعطي ترتيب النظر إلى المكوّن:
+
+1. خريطة الرأس.
+2. السلسلة الزمنية للمكوّن.
+3. طيف القدرة لنشاط المكوّن.
+4. في البيانات المقطّعة، صورة الـ ERP (<En>ERP image</En>).
+
+لوحة واحدة لا تكفي. المكوّن آرتفاكت عندما تتفق اللوحات.
+
+<Callout type="note">
+**اللون والإشارة لا يهمّان.** في ICA إشارة المكوّن اعتباطية: الأحمر والأزرق في الخريطة قد ينقلبان، والسلسلة الزمنية قد تنقلب، دون أن يتغيّر المعنى. انظر إلى الشكل، لا إلى اللون.
+</Callout>
+
+## قبل وبعد
+
+هذا الدرس يقرأ المكوّنات ولا يغيّر البيانات. المثال تحته محلول، ورابطه يفتح لعبة ICA كاملة: كل مثال فيها يعرض اللوحات الثلاث، وبعد إجابتك يعرض احتمالات ICLabel وسببها.
+
+<IcaGameTeaser />
+
+## الخطوات من الواجهة
+
+ابدأ والنسخة الرئيسية مفتوحة وفيها أوزان ICA، كما في "نقطة البداية". إذا كنت تكمل من درس ICLabel، فاختر `D1 main` من قائمة <MenuPath>Datasets</MenuPath>، لا `D1 main clean`، لأن مكوّنات الآرتفاكت ما زالت فيها.
+
+1. افتح <MenuPath>Tools > Classify components using ICLabel > Label components</MenuPath>، واترك <UiLabel>Default (recommended)</UiLabel>، ثم اضغط <UiLabel>OK</UiLabel>. تظهر الخرائط وفوق كل واحدة الفئة الأرجح.
+2. افتح <MenuPath>Tools > Classify components using ICLabel > View extended component properties</MenuPath> واختر مكوّناً. نافذته تعرض خريطة الرأس، وطيف النشاط، والسلسلة الزمنية، واحتمال كل فئة.
+3. لترى السلاسل الزمنية متجاورة، افتح <MenuPath>Plot > Component activations (scroll)</MenuPath>. الرمش ونبض القلب أسهل ما يُرى هنا.
+4. لكل مكوّن، اقرأ اللوحات بالترتيب السابق وقارنها بالجدول في القسم التالي.
+5. اكتب المكوّنات التي ستحذفها وسبب كل واحد. لا تحذف شيئاً في هذا الدرس؛ الحذف في درس ICLabel.
+
+## السكربت المقابل
+
+```matlab
+% Classify the components, then find the clearest example of each class
+EEG = pop_iclabel(EEG, 'default');
+classes = EEG.etc.ic_classification.ICLabel.classes;
+probs   = EEG.etc.ic_classification.ICLabel.classifications;
+[~, bestClass] = max(probs, [], 2);   % most likely class of each component
+
+for c = 1:numel(classes)
+    [p, comp] = max(probs(:, c));
+    fprintf('%-14s components: %2d | clearest: %2d (%.0f%%)\n', ...
+        classes{c}, sum(bestClass == c), comp, 100 * p);
+end
+
+% Panels of the clearest Eye, Muscle, and Brain components
+% Column order: Brain, Muscle, Eye, Heart, Line Noise, Channel Noise, Other
+[~, examples] = max(probs(:, [3 2 1]));
+% pop_viewprops is in the ICLabel plugin folder; the menu adds it to the path, a script must add it
+addpath(fullfile(fileparts(which('iclabel')), 'viewprops'));
+pop_viewprops(EEG, 0, examples);
+```
+
+الحلقة تطبع لكل فئة عدد المكوّنات التي هي فئتها الأرجح، والمكوّن صاحب أعلى احتمال لها. والسطر الأخير يفتح لوحات أوضح مكوّن للعين والعضلة والدماغ. إذا كان أعلى احتمال لفئة أقل من 50%، فالأرجح أن D1 ليس فيها مكوّن واضح من هذه الفئة.
+
+في D1 توقّع عدة مكوّنات دماغ، ومكوّن عين واحداً على الأقل بين الأوائل. وقد لا تجد قلباً أو ضوضاء قناة: ليست كل داتاست فيها كل الفئات.
+
+## أي قيمة أختار؟
+
+علامات فئات ICLabel السبع:
+
+| الفئة | خريطة الرأس | الطيف | السلسلة الزمنية |
+|---|---|---|---|
+| دماغ (<En>Brain</En>) | ناعمة وعريضة، كأنها مصدر واحد في الدماغ | ينخفض مع ارتفاع التردد، وكثيراً فيه قمة قرب 10 هرتز | تذبذب مستمر بلا قمم حادة |
+| العين (<En>Eye</En>) | أمامية جداً. الرمش: متماثلة في المقدمة. الحركة الجانبية: لونان متعاكسان بين يسار المقدمة ويمينها | أعلى ما يكون عند الترددات المنخفضة، ثم ينخفض بنعومة | قمم كبيرة منفصلة للرمش، أو درجات للحركة الجانبية |
+| عضلة (<En>Muscle</En>) | بقعة صغيرة مركّزة عند الحافة، قرب الصدغ أو الرقبة | يرتفع أو يبقى عالياً من نحو 20 هرتز فما فوق | نشاط سريع خشن، كثيراً في دفعات |
+| قلب (<En>Heart</En>) | عريضة، وكثيراً تدرّج على الرأس كله | بلا قمة مميزة | نبضات حادة منتظمة، نحو واحدة كل ثانية |
+| ضوضاء الكهرباء (<En>Line Noise</En>) | أي شكل | قمة ضيقة عالية عند 50 أو 60 هرتز حسب بلد التسجيل | تذبذب سريع مستمر |
+| ضوضاء قناة (<En>Channel Noise</En>) | مركّزة على قطب واحد | غير منتظم غالباً | قفزات أو انجراف، مثل قناة سيئة واحدة |
+| أخرى (<En>Other</En>) | مختلطة أو مبعثرة | مختلط | بلا نمط واضح |
+
+**أي الفئات تحذف؟** في مسارنا: المكوّنات فوق 0.9 للعين أو العضلة، بعد المراجعة (درس ICLabel). القلب وضوضاء الكهرباء وضوضاء القناة تُحذف فقط بعد مراجعة واضحة. لا تحذف "أخرى" ولا "دماغ".
+
+<Callout type="expert">
+**تدريب العين:** التوتوريال الرسمي يحيل إلى موقع ICLabel، وفيه تتدرّب على تصنيف المكوّنات وتقارن إجاباتك بإجابات الخبراء. ويذكر التوتوريال أيضاً مصنّفات آلية أخرى، مثل MARA و FASTER و SASICA و ADJUST.
+</Callout>
+
+## أخطاء شائعة
+
+- **الحكم باللون.** الإشارة اعتباطية في ICA. خريطة رمش زرقاء مثل الحمراء تماماً.
+- **الحكم من لوحة واحدة.** الخريطة الأمامية وحدها لا تكفي: يوجد مكوّن دماغ أمامي أيضاً. طيفه فيه قمة، لا انخفاض ناعم من أدنى الترددات.
+- **اعتبار احتمال ICLabel حقيقة.** هو تقدير من مصنّف مدرَّب. مكوّن بـ 55% عين و40% دماغ يحتاج مراجعتك قبل أي قرار.
+- **توقّع كل الفئات في كل داتاست.** مكوّنات القلب تحتاج غالباً أثر قلب قوياً يصل إلى الـ EEG، وضوضاء الكهرباء تضعف كثيراً بعد فلتر notch.
+- **حذف مكوّنات "أخرى".** "أخرى" تعني أن ICLabel لم يحسم. حذفها قد يحذف معها نشاطاً دماغياً.
+
+{/* صندوق "من التجربة": بانتظار قصة من صاحب المشروع. لا يُكتب قبل وصولها. */}
+
+## كيف تتأكد أن الخطوة نجحت؟
+
+1. **تعرف العلامة** لكل فئة من السبع: الخريطة والطيف والسلسلة الزمنية.
+2. **في D1** وجدت أوضح مكوّن للعين، وأكّدته باللوحات الثلاث.
+3. **قائمتك مكتوبة:** المكوّنات التي ستحذفها مع سبب لكل واحد، وليس فيها مكوّن دماغ أو "أخرى".
+4. **في لعبة ICA** صنّفت الأمثلة وقرأت الشرح بعد كل إجابة.

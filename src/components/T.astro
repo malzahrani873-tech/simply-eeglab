@@ -1,0 +1,6 @@
+---
+import { iso } from '../lib/bidi';
+interface Props { s: string; lang?: 'ar' | 'en' }
+const { s, lang = 'ar' } = Astro.props;
+---
+<Fragment set:html={iso(s, lang)} />

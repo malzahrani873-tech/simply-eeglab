@@ -1,0 +1,33 @@
+# Written exception (decision ق-36): run-day figures published as PNG, byte for byte, because converting them
+# would drop their C2PA record. Only these files; any other PNG or oversized image still fails. Paths are inside dist/.
+img/lessons/automated-pipelines/prep-spectra.png
+img/lessons/bad-channels/bad-channels-d3-scroll.png
+img/lessons/baseline-correction/baseline-correction-pz-after.png
+img/lessons/baseline-correction/baseline-correction-pz-before.png
+img/lessons/channel-erp-plot/channel-erp-after.png
+img/lessons/channel-erp-plot/channel-erp-before.png
+img/lessons/channel-locations/channel-locations-by-name.png
+img/lessons/dipfit/dipfit-dipplot.png
+img/lessons/dipfit/dipfit-maps-12.png
+img/lessons/eegh-history/S6-filter-dialog.png
+img/lessons/eeglab-gui/S2-eeglab-empty.png
+img/lessons/erp-average/erp-average-1-10-all.png
+img/lessons/ersp-itc/ersp-itc-cz.png
+img/lessons/ica-1hz-copy-weights/ica-1hz-erp-pz.png
+img/lessons/iclabel/iclabel-before-after.png
+img/lessons/import-raw/S2-eeglab-empty.png
+img/lessons/import-raw/S5-main-after-import.png
+img/lessons/interpolation/interpolation-map-C3-back.png
+img/lessons/interpolation/interpolation-map-noC3.png
+img/lessons/line-noise/line-noise-spectra-after.png
+img/lessons/line-noise/line-noise-spectra-before.png
+img/lessons/mne-fieldtrip/mne-fieldtrip-cz.png
+img/lessons/power-spectrum/power-spectrum-spectopo-10hz.png
+img/lessons/publication-figures/publication-after.png
+img/lessons/publication-figures/publication-before.png
+img/lessons/rereferencing/rereferencing-scroll-after.png
+img/lessons/rereferencing/rereferencing-scroll-before.png
+img/lessons/resampling/resampling-cz-128-64.png
+img/lessons/run-ica/run-ica-maps-20.png
+img/lessons/topoplot/topoplot-scales-after.png
+img/lessons/topoplot/topoplot-scales-before.png

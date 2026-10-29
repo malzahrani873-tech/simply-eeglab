@@ -1,0 +1,25 @@
+---
+import Base from '../layouts/Base.astro';
+import Icon from './Icon.astro';
+import { t, type Lang } from '../i18n';
+import { url } from '../lib/url';
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+---
+<Base lang={lang} title={t(lang, 'search.title')} path="search/" current="search">
+  <div class="wrap narrow simple">
+    <h1>{t(lang, 'search.title')}</h1>
+    <form class="sform" role="search" action={url('search/', lang)} method="get">
+      <label class="sr" for="q">{t(lang, 'search.title')}</label>
+      <Icon name="search" class="ico s20" />
+      <input id="q" name="q" type="search" autocomplete="off" enterkeyhint="search" placeholder={t(lang, 'search.placeholder')} />
+    </form>
+    <p class="muted" id="s-status" role="status" aria-live="polite"
+      data-l-loading={t(lang, 'search.loading')} data-l-none={t(lang, 'search.none')} data-l-count={t(lang, 'search.count', { n: '{n}' })}></p>
+    <noscript><p>{t(lang, 'common.noJs')} <a href={url('', lang)}>{t(lang, 'nav.map')}</a></p></noscript>
+    <ol class="sres" id="s-res" data-pf={import.meta.env.BASE_URL + 'pagefind/pagefind.js'}></ol>
+  </div>
+  <script>
+    import '../scripts/search.ts';
+  </script>
+</Base>

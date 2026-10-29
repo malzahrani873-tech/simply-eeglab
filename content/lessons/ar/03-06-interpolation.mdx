@@ -1,0 +1,158 @@
+---
+title: الاستيفاء (interpolation)
+titleEn: Channel interpolation
+description: كيف تعيد بناء القنوات المحذوفة في EEGLAB بالاستيفاء الكروي من مواقعها الأصلية، وتتحقق أن عدد القنوات رجع كاملاً قبل إعادة المرجع.
+station: 3
+order: 6
+level: core
+status: approved
+objectives:
+  - يستوفي القنوات المحذوفة من مواقعها الأصلية بالاستيفاء الكروي، من الواجهة ومن السكربت.
+  - يتحقق أن عدد القنوات رجع كاملاً قبل إعادة المرجع.
+  - يشرح لماذا تنقص كل قناة مستوفاة رتبة البيانات بواحد.
+prerequisites: [bad-channels]
+references:
+  - title: EEGLAB Tutorial
+    url: https://eeglab.org/tutorials/06_RejectArtifacts/RunICA.html
+    section: "Issues with data rank deficiencies"
+  - title: Makoto's preprocessing pipeline
+    url: https://eeglab.ucsd.edu/wiki/Makoto%27s_preprocessing_pipeline
+    section: "§7 Interpolate all the removed channels؛ §7.2"
+  - title: Luck, Applied Event-Related Potential Data Analysis (الطبعة الأولى)
+    url: https://socialsci.libretexts.org/Bookshelves/Psychology/Biological_Psychology/Applied_Event-Related_Potential_Data_Analysis_(Luck)
+    section: "الفصل 7: Inspecting the EEG and Interpolating Bad Channels"
+datasets: [D1]
+startingPoint:
+  dataset: D1
+  file: eeglab_data.set
+  applied: [filtering, line-noise, bad-channels]
+  script: |
+    [ALLEEG, EEG, CURRENTSET, ALLCOM] = eeglab;
+    eeglabRoot = fileparts(which('eeglab'));
+    EEG = pop_loadset('eeglab_data.set', fullfile(eeglabRoot, 'sample_data'));
+    fullLocs = EEG.chanlocs;
+
+    % Main dataset: high-pass at 0.1 Hz, then 60 Hz line-noise removal
+    EEG = pop_eegfiltnew(EEG, 'locutoff', 0.1);
+    EEG = pop_eegfiltnew(EEG, 'locutoff', 58, 'hicutoff', 62, 'revfilt', 1);
+    EEG.filename = ''; EEG.filepath = ''; EEG.datfile = ''; EEG.saved = 'no';
+    [ALLEEG, EEG, CURRENTSET] = pop_newset(ALLEEG, EEG, 0, 'setname', 'D1 hp0.1 notch60', 'gui', 'off');
+
+    % Bad channels you removed earlier, e.g. {'T7'}; leave empty if none
+    badChans = {};
+    if ~isempty(badChans)
+        EEG = pop_select(EEG, 'rmchannel', badChans);
+    end
+    EEG.filename = ''; EEG.filepath = ''; EEG.datfile = ''; EEG.saved = 'no';
+    [ALLEEG, EEG, CURRENTSET] = pop_newset(ALLEEG, EEG, CURRENTSET, 'setname', 'D1 badch', 'gui', 'off');
+    eeglab redraw;
+interactive: []
+eeglabVersion: "2026.1"
+updated: 2026-10-29
+---
+
+## لماذا هذه الخطوة مهمة؟
+
+في الدرس السابق حذفت القنوات السيئة. الآن تعيد بناءها بالاستيفاء (<En>interpolation</En>): يحسب EEGLAB قيمة كل قناة محذوفة من القنوات المحيطة بها، حسب مواقع الأقطاب على الرأس. وفي D1 لا قناة سيئة، فتتدرّب على نسخة مؤقتة لا تحفظها.
+
+لماذا لا تكمل بدونها؟ لثلاثة أسباب:
+
+1. **المرجع المتوسط** يحتاج قنوات موزّعة على الرأس كله. قناة ناقصة في جهة تجعل المتوسط مائلاً نحو الجهة الأخرى.
+2. **المقارنة بين المشاركين** تحتاج نفس القنوات عند الجميع.
+3. **خرائط الرأس** ترسم فراغاً مكان القناة الناقصة.
+
+لكن للاستيفاء ثمن. القناة المستوفاة خليط من القنوات الأخرى، فلا تضيف معلومة جديدة. لذلك تنقص كل قناة مستوفاة رتبة البيانات (<En>rank</En>) بواحد. ستحتاج هذه المعلومة في درس ICA.
+
+<Callout type="warning">
+**عن D1:** لم نجد فيها قناة سيئة، فلا شيء لتستوفيه في المسار. ستتدرّب على نسخة مؤقتة: تحذف قناة سليمة هي `C3`، ثم تعيد بناءها، وتقارنها بالأصل. هكذا ترى بنفسك مدى دقة الاستيفاء. لا تحفظ نسخ التمرين، فالمسار يكمل من `D1 badch`.
+</Callout>
+
+## قبل وبعد
+
+<BeforeAfter>
+<Figure src="interpolation/interpolation-map-noC3.png" alt="خريطة فروة الرأس بعد حذف القناة C3: لا نقطة في موضع C3، والألوان حوله من تنعيم الرسم." caption="قبل: D1 noC3" source="D1" />
+<Figure src="interpolation/interpolation-map-C3-back.png" alt="الخريطة نفسها بعد الاستيفاء بنفس الزمن ونفس حدود الألوان: عادت نقطة C3، والنمط قريب جداً من الخريطة الأصلية." caption="بعد: D1 C3 back" source="D1" />
+</BeforeAfter>
+
+## الخطوات من الواجهة
+
+ابدأ من "نقطة البداية". سكربتها يضع الداتاست التي قبل حذف القنوات، أي `D1 hp0.1 notch60`، في الداتاست 1، والنسخة الرئيسية `D1 badch` في الداتاست 2. ستحتاج رقم الداتاست 1 مع بياناتك، لأن مواقع كل القنوات محفوظة فيها.
+
+**أولاً: تمرين على قناة سليمة**
+
+1. والداتاست `D1 badch` هي الحالية، افتح <MenuPath>Edit > Select data</MenuPath>. اكتب `C3` في خانة <UiLabel>Channel(s)</UiLabel>، وفعّل المربع تحت <UiLabel>on->remove these</UiLabel>، ثم اضغط <UiLabel>OK</UiLabel>.
+2. سمِّ الداتاست الجديدة `D1 noC3`. في النافذة الرئيسية صار <UiLabel>Channels per frame</UiLabel> يساوي 31.
+3. افتح <MenuPath>Tools > Interpolate electrodes</MenuPath>. تظهر نافذة بعنوان <UiLabel>Interpolate channel(s) -- pop_interp()</UiLabel>.
+4. اضغط <UiLabel>Use all channels from other dataset</UiLabel>، واكتب `2`، أي رقم الداتاست `D1 badch`، في خانة <UiLabel>Dataset index</UiLabel>، ثم <UiLabel>OK</UiLabel>. يظهر اسم `C3` تحت <UiLabel>What channel(s) do you want to interpolate</UiLabel>.
+5. في <UiLabel>Interpolation method</UiLabel> اترك <UiLabel>Spherical</UiLabel>، واترك <UiLabel>Time range [min max] (s)</UiLabel> فارغة، ثم اضغط <UiLabel>OK</UiLabel>.
+6. تطبع نافذة الأوامر `Interpolating 1 channels...`. سمِّ الداتاست `D1 C3 back`. صار عدد القنوات 32 من جديد.
+7. قارن `C3` في `D1 badch` وفي `D1 C3 back` من <MenuPath>Plot > Channel data (scroll)</MenuPath>. الإشارتان متشابهتان جداً.
+8. هذه نسخ تمرين، فلا تحفظها. ارجع إلى `D1 badch`.
+
+**ثانياً: الاستيفاء على بياناتك**
+
+1. والداتاست التي حذفت منها القنوات السيئة هي الحالية، افتح <MenuPath>Tools > Interpolate electrodes</MenuPath>.
+2. اضغط <UiLabel>Use all channels from other dataset</UiLabel>، واكتب رقم الداتاست التي قبل الحذف. تظهر أسماء القنوات المحذوفة.
+3. اترك <UiLabel>Spherical</UiLabel>، واضغط <UiLabel>OK</UiLabel>. سمِّ الناتج `D1 interp` واحفظه.
+4. في D1 لم تُحذف قناة، فإذا جرّبت يقول EEGLAB `No new channels selected`. النسخة الرئيسية تبقى `D1 badch`، ودرس إعادة المرجع يبدأ منها.
+
+<Callout type="warning">
+**تحذير ستراه عند فتح النافذة:** عندما تفتح نافذة الاستيفاء من القائمة، يطبع EEGLAB في نافذة الأوامر `Warning: do not interpolate channels before running ICA`. السكربت الذي يستدعي `pop_interp` لا يطبعه. وحول التحذير يطبع EEGLAB تلميحين لطريقة أخرى: أن تعرّف القنوات الناقصة في محرّر القنوات قنواتٍ غير بيانات وتستوفيها لاحقاً، أو أن تستوفيها أثناء التحليل في STUDY. فالتحذير يتعلّق برتبة البيانات، ولا يعني أن الاستيفاء خطأ.
+
+في مسارنا نستوفي قبل ICA عن قصد، لأن المرجع المتوسط يحتاج كل القنوات. والثمن: `pop_runica` يحاول اكتشاف الرتبة الناقصة، لكن تقديره قد يفشل. لذلك إذا كان في بياناتك قنوات سيئة، احسب الرتبة المتوقّعة بنفسك: عدد القنوات، ناقص القنوات المستوفاة، ناقص 1 للمرجع المتوسط. مثلاً 32 قناة استوفيت منها 2 تعطي رتبة 29. ستقارن هذا الرقم بما يطبعه `pop_runica` في درس تشغيل ICA. في D1 لم نستوفِ شيئاً، فالرتبة 31.
+
+والطريقة الأخرى الصحيحة في جملة واحدة: شغّل ICA بدون القنوات المحذوفة، واستوفِها بعد حذف المكوّنات، ثم أعد المرجع إلى المتوسط من جديد.
+</Callout>
+
+## السكربت المقابل
+
+```matlab
+% Rebuild the removed channels from the full channel list (fullLocs)
+if ~isempty(badChans)
+    EEG = pop_interp(EEG, fullLocs, 'spherical');
+end
+EEG.setname = 'D1 interp';
+fprintf('Channels after interpolation: %d\n', EEG.nbchan);
+EEG = pop_saveset(EEG, 'filename', 'D1_interp.set', 'filepath', pwd);
+
+% Exercise: remove a good channel, rebuild it, compare with the original
+testChan = 'C3';
+EEG_drop = pop_select(EEG, 'rmchannel', {testChan});
+EEG_back = pop_interp(EEG_drop, fullLocs, 'spherical');
+iOrig = find(strcmp({EEG.chanlocs.labels}, testChan));
+iBack = find(strcmp({EEG_back.chanlocs.labels}, testChan));
+r = corrcoef(double(EEG.data(iOrig, :)), double(EEG_back.data(iBack, :)));
+fprintf('Correlation between original and interpolated %s: %.2f\n', testChan, r(1, 2));
+```
+
+المتغيّر `fullLocs` من سكربت نقطة البداية: نسخة من مواقع كل القنوات قبل أي حذف. احفظها دائماً في بداية المعالجة.
+
+## أي قيمة أختار؟
+
+| الإعداد | القيمة | لماذا |
+|---|---|---|
+| طريقة الاستيفاء | <UiLabel>Spherical</UiLabel> | الخيار الأول في النافذة، وهو الافتراضي في `pop_interp`. يستخدم مواقع الأقطاب على سطح الرأس. |
+| مصدر المواقع | كل القنوات من الداتاست التي قبل الحذف، أو `fullLocs` في السكربت | هكذا يعرف EEGLAB أسماء القنوات الناقصة ومواقعها، ويعيدها بترتيبها الأصلي. |
+| مكان الخطوة | بعد حذف القنوات السيئة، وقبل إعادة المرجع | المرجع المتوسط يحتاج كل القنوات. |
+| عدد القنوات المستوفاة | قليل | كل قناة مستوفاة تنقص رتبة البيانات بواحد، ولا تضيف معلومة جديدة. |
+| <UiLabel>Interpolate removed channel(s)</UiLabel> في نافذة إعادة المرجع | ليس في مسارنا | يستوفي ويعيد المرجع في خطوة واحدة. نحن نفصل الخطوتين حتى تتحقق من كل واحدة. |
+
+## أخطاء شائعة
+
+- **إعادة المرجع قبل الاستيفاء.** المرجع المتوسط على قنوات ناقصة يميل نحو الجهة التي فيها قنوات أكثر. استوفِ أولاً، ثم أعد المرجع.
+- **فقدان المواقع الأصلية.** بعد حذف القناة لا يعرف EEGLAB أين كانت إلا من داتاست سابقة أو من `fullLocs`. احفظ المواقع قبل أي حذف.
+- **نسيان أن الرتبة نقصت.** إذا استوفيت قناتين، فرتبة البيانات أقل من عدد القنوات باثنين، وبعد المرجع المتوسط بثلاثة: 32 قناة تعطي رتبة 29. اكتب هذا الرقم وقارنه بما يطبعه `pop_runica` عند تشغيل ICA.
+- **الثقة الزائدة بالقنوات الطرفية.** القناة على حافة الشبكة، مثل `T7`، لها جيران من جهة واحدة فقط، فاستيفاؤها أقل دقة من قناة في الوسط مثل `C3`.
+
+{/* صندوق "من التجربة": بانتظار قصة من صاحب المشروع. لا يُكتب قبل وصولها. */}
+
+## كيف تتأكد أن الخطوة نجحت؟
+
+1. **عدد القنوات رجع كاملاً:** <UiLabel>Channels per frame</UiLabel> في النافذة الرئيسية يساوي العدد الأصلي. في D1 يساوي 32.
+2. **نفس الترتيب:** في <MenuPath>Plot > Channel locations > By name</MenuPath> تظهر القنوات المستوفاة في أماكنها.
+3. **التمرين:** السكربت يطبع ارتباطاً قريباً من 0.98 بين `C3` الأصلية والمستوفاة.
+4. **الإشارة منطقية:** في <MenuPath>Plot > Channel data (scroll)</MenuPath> تشبه القناة المستوفاة جاراتها، بلا خط مسطّح ولا قفزات.
+
+<Methods>
+Removed channels were interpolated using spherical spline interpolation (pop_interp, EEGLAB 2026.1).
+</Methods>

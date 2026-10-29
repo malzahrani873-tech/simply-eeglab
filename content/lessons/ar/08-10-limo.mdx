@@ -1,0 +1,276 @@
+---
+title: LIMO
+titleEn: LIMO EEG
+description: "كيف تشغّل نموذج LIMO الخطي على مستويين في EEGLAB: نموذج لكل مشارك، ثم اختبار جماعي متين في كل القنوات والأزمنة مع تصحيح العناقيد."
+station: 8
+order: 10
+level: recommended
+status: review
+objectives:
+  - يثبّت إضافة LIMO ويجد قوائمها في EEGLAB.
+  - يقدّر نموذج المستوى الأول لكل مشارك على ERP المحاولات المفردة، مع نوعي الصور في ملف واحد.
+  - يجري اختباراً مزدوجاً في المستوى الثاني لنوعي الصور مع تصحيح العناقيد، ويقرأ صورة النتيجة.
+  - يشرح ما يضيفه المستويان مقارنة بأخذ متوسط المحاولات واختبار المتوسطات.
+prerequisites: [study-statistics]
+references:
+  - title: EEGLAB Tutorial
+    url: https://eeglab.org/tutorials/10_Group_analysis/advanced_statistics.html
+    section: "10. Group analysis > g. Advanced statistics"
+  - title: LIMO MEEG documentation
+    url: https://github.com/LIMO-EEG-Toolbox/limo_meeg/wiki
+    section: "Paired t-test"
+  - title: "General Linear Modeling of EEG in EEGLAB/LIMO part 2: Practicum"
+    url: https://www.youtube.com/watch?v=7EWN2w0kSy4
+    section: "الفيديو كاملاً"
+    duration: "17:26"
+  - title: "Pernet, Chauveau, Gaspar & Rousselet (2011). LIMO EEG: a toolbox for hierarchical LInear MOdeling of ElectroEncephaloGraphic data. Computational Intelligence and Neuroscience, 831409"
+    url: https://doi.org/10.1155/2011/831409
+    section: "Methods"
+datasets: [D6]
+startingPoint:
+  dataset: D6
+  file: animal_limo.study
+  applied: [create-study]
+  script: |
+    [ALLEEG, EEG, CURRENTSET, ALLCOM] = eeglab;
+    % Folder for the course data (change it)
+    dataFolder = 'C:\Users\me\Documents\eeg-course';
+
+    % Download the ready Go-nogo STUDY once and unzip it in its own folder
+    zipDir = fullfile(dataFolder, 'animal_study');
+    studyFile = dir(fullfile(zipDir, '**', 'animal.study'));
+    if isempty(studyFile)
+        zipFile = fullfile(dataFolder, 'animal_study.zip');
+        websave(zipFile, 'https://sccn.ucsd.edu/eeglab/download/animal_study.zip');
+        unzip(zipFile, zipDir);
+        studyFile = dir(fullfile(zipDir, '**', 'animal.study'));
+    end
+    studyDir = studyFile(1).folder;
+
+    % Convert the old .dat data files to .fdt once: resaving them in their old format damages the data in EEGLAB 2026.1
+    setFiles = dir(fullfile(studyDir, '*', '*.set'));
+    for k = 1:numel(setFiles)
+        [~, base] = fileparts(setFiles(k).name);
+        folder = setFiles(k).folder;
+        if ~exist(fullfile(folder, [base '.fdt']), 'file')
+            TMP = pop_loadset('filename', setFiles(k).name, 'filepath', folder);
+            pop_saveset(TMP, 'filename', setFiles(k).name, 'filepath', folder, 'savemode', 'twofiles');
+            if exist(fullfile(folder, [base '.fdt']), 'file') && exist(fullfile(folder, [base '.dat']), 'file')
+                delete(fullfile(folder, [base '.dat']));
+            end
+        end
+    end
+
+    % Rebuild animal_mine.study (create-study lesson) if it is missing
+    if ~exist(fullfile(studyDir, 'animal_mine.study'), 'file')
+        gender = containers.Map( ...
+            {'cba','clm','ega','fsa','gro','hth','lmi','mba','mma','mta','pla','sce','sph','wpa'}, ...
+            {'F',  'F',  'F',  'M',  'M',  'M',  'F',  'F',  'M',  'F',  'M',  'F',  'M',  'M'});
+        files = dir(fullfile(studyDir, '*', '*.set'));
+        commands = {};
+        for k = 1:numel(files)
+            hdr = pop_loadset('filename', files(k).name, 'filepath', files(k).folder, 'loadmode', 'info');
+            subj = hdr.subject;
+            if isempty(subj), [~, subj] = fileparts(files(k).folder); end
+            cond = hdr.condition;
+            if isempty(cond)
+                if contains(files(k).name, 'distractor'), cond = 'distractor'; else, cond = 'animal'; end
+            end
+            if ~isKey(gender, lower(subj))
+                error('No gender entry for subject %s (%s)', subj, files(k).name);
+            end
+            commands{end+1} = {'index', k, 'load', fullfile(files(k).folder, files(k).name), ...
+                'subject', subj, 'condition', cond, 'group', gender(lower(subj))};
+        end
+        [STUDY, ALLEEG] = std_editset([], [], 'name', 'Go-nogo animal (mine)', ...
+            'task', 'Go-nogo categorization', 'commands', commands, 'updatedat', 'on');
+        STUDY = pop_savestudy(STUDY, ALLEEG, 'filename', 'animal_mine.study', ...
+            'filepath', studyDir, 'resavedatasets', 'on');
+    end
+    [STUDY, ALLEEG] = pop_loadstudy('filename', 'animal_mine.study', 'filepath', studyDir);
+
+    % LIMO needs one dataset per participant: merge the animal and distractor files
+    limoDir = fullfile(studyDir, 'limo');
+    if ~exist(fullfile(limoDir, 'animal_limo.study'), 'file')
+        if ~exist(limoDir, 'dir'), mkdir(limoDir); end
+        info = STUDY.datasetinfo;
+        subjects = unique({info.subject});
+        commands = {};
+        for s = 1:numel(subjects)
+            idx = find(strcmp({info.subject}, subjects{s}));
+            for k = 1:numel(idx)
+                part = pop_loadset('filename', info(idx(k)).filename, 'filepath', info(idx(k)).filepath);
+                [part.event.image] = deal(info(idx(k)).condition);   % picture type of every trial
+                if k == 1, merged = part; else, merged = pop_mergeset(merged, part); end
+            end
+            merged.subject = subjects{s};
+            merged.group = info(idx(1)).group;
+            merged.condition = '';
+            mergedFile = [subjects{s} '_merged.set'];
+            pop_saveset(merged, 'filename', mergedFile, 'filepath', limoDir);
+            commands{end+1} = {'index', s, 'load', fullfile(limoDir, mergedFile), ...
+                'subject', subjects{s}, 'group', info(idx(1)).group};
+        end
+        [STUDY, ALLEEG] = std_editset([], [], 'name', 'Go-nogo animal (LIMO)', ...
+            'task', 'Go-nogo categorization', 'commands', commands, 'updatedat', 'on');
+        if ~isfield(STUDY.datasetinfo, 'trialinfo') || ~isfield(STUDY.datasetinfo(1).trialinfo, 'image')
+            error('The picture type of each trial was not found in the merged datasets');
+        end
+
+        % One design: picture type of each trial (animal, distractor)
+        STUDY = std_makedesign(STUDY, ALLEEG, 1, 'name', 'image', ...
+            'variable1', 'image', 'values1', {'animal', 'distractor'}, 'vartype1', 'categorical');
+        STUDY = pop_savestudy(STUDY, ALLEEG, 'filename', 'animal_limo.study', 'filepath', limoDir);
+
+        % Single-trial ERPs at every channel, as in the precompute lesson
+        baseline = [round(ALLEEG(1).xmin*1000) 0];
+        [STUDY, ALLEEG] = std_precomp(STUDY, ALLEEG, {}, 'savetrials', 'on', 'interp', 'on', 'recompute', 'on', ...
+            'erp', 'on', 'erpparams', {'rmbase', baseline});
+        STUDY = pop_savestudy(STUDY, ALLEEG, 'savemode', 'resave');
+    end
+    [STUDY, ALLEEG] = pop_loadstudy('filename', 'animal_limo.study', 'filepath', limoDir);
+
+    CURRENTSTUDY = 1; EEG = ALLEEG; CURRENTSET = 1:length(EEG);
+    eeglab redraw;
+eeglabVersion: "2026.1"
+updated: 2026-10-29
+---
+
+## لماذا هذه الخطوة مهمة؟
+
+في درس الإحصاء أخذ EEGLAB أولاً متوسط محاولات كل مشارك، ثم قارن المتوسطات. أما LIMO فيعمل على **مستويين**:
+
+1. **المستوى الأول، داخل كل مشارك:** يُطابَق نموذج خطي على كل محاولة مفردة، في كل قناة ونقطة زمنية. نتائجه "betas": ERP مقدّر لكل شرط لهذا الشخص.
+2. **المستوى الثاني، عبر المشاركين:** تُختبر betas كل المشاركين بطرق متينة (المتوسطات المشذّبة و bootstrap)، مع تصحيح على كل القنوات والنقاط الزمنية معاً.
+
+مع متغيّر فئوي واحد وأبسط طريقة تقدير، لا يضيف المستوى الأول وحده الكثير هنا: عند كل مشارك، الفرق بين الـ betas الاثنين يساوي الفرق بين المتوسطين. الفائدة تأتي مما يسمح به LIMO بعد ذلك: إعطاء المحاولات المضطربة وزناً أقل، وإضافة متغيّر مستمر لكل محاولة (مثل زمن الاستجابة)، واختبار جماعي لا يعتمد على أن تكون البيانات طبيعية التوزيع. هذا الدرس يبني النموذج البسيط، لتعرف الطريق قبل أن تضيف إليه.
+
+## قبل وبعد
+
+<Figure src="limo/limo-two-levels.svg" alt="مستويان في LIMO. في الأعلى 14 مربعاً صغيراً، مربع لكل مشارك من cba إلى wpa، مكتوب على كل منها المستوى الأول، وفيها منحنيات محاولات رفيعة كثيرة تتحول إلى عمودين قصيرين: beta animal و beta distractor. أسهم تنزل إلى مربع عريض: المستوى الثاني، اختبار paired عبر المشاركين، وينتهي بصورة صغيرة للقنوات مقابل الزمن فيها بقع ملوّنة قليلة عليها كتل دالّة. الشكل توضيحي بلا بيانات." caption="رسم توضيحي، بلا بيانات" source="original" />
+
+## الخطوات من الواجهة
+
+**عن البيانات (D6):** LIMO يحتاج **ملفاً واحداً لكل مشارك**. في `animal_mine.study` لكل مشارك ملفان، ملف لكل نوع صور، فيتوقف LIMO بالرسالة `Cannot estimate the model because there is more than 1 dataset per session per subject. Merge datasets for each subject and try again.` لذلك يبني سكربت "نقطة البداية" STUDY ثانية، `animal_limo.study`، في مجلدها الخاص `limo` بجانب `animal_mine.study`:
+
+- لكل مشارك يعلّم كل محاولة بنوع صورتها (حقل حدث جديد `image`)، ثم يدمج الملفين في ملف واحد (مثل `cba_merged.set`). الدمج يحذف ICA، و LIMO لا يحتاجه لـ ERP.
+- الجنس يبقى في `group`. التصميم الوحيد، `image`، فيه متغيّر فئوي واحد على مستوى المحاولة، بالقيمتين `animal` و `distractor`.
+- يحسب ERP المحاولات المفردة لكل القنوات (`savetrials` مفعّل)، كما في درس الحساب المسبق. LIMO لا يعمل بدونها.
+
+التشغيل الأول يستغرق بضع دقائق ويضيف نحو 1 GB إلى مجلد الدورة (تقدير). `animal_limo.study` نسخة خاصة بهذا الدرس فقط: لا تمس `animal.study` المنزّلة ولا `animal_mine.study`، وبقية الدروس تستمر على `animal_mine.study`.
+
+**أولاً: ثبّت LIMO**
+
+1. LIMO ليست جزءاً من تثبيت EEGLAB الأساسي. افتح <MenuPath>File > Manage EEGLAB extensions</MenuPath>، واضغط `LIMO` في <UiLabel>List of plugins (bolded means installed)</UiLabel>، ثم <UiLabel>Install/Update</UiLabel>.
+2. LIMO تحتاج أيضاً Fieldtrip-lite لبناء جيران القنوات الذي يستخدمه تصحيح العناقيد. ثبّتها بنفس الطريقة إذا لم يثبّتها درس الإحصاء.
+3. بعد التثبيت تظهر في قائمة <MenuPath>Study</MenuPath> قائمة جديدة <UiLabel>LInear MOdeling of EEG Data</UiLabel>، وفي قائمة <MenuPath>Tools</MenuPath> بند LIMO باسم إصدارها.
+
+**ثانياً: المستوى الأول، نموذج لكل مشارك**
+
+1. شغّل سكربت "نقطة البداية".
+2. تأكد أن STUDY الظاهرة في نافذة EEGLAB هي `Go-nogo animal (LIMO)`، وفيها 14 ملفاً. تصميمها الوحيد `image` هو التصميم الحالي.
+3. افتح <MenuPath>Study > LInear MOdeling of EEG Data > Estimate Model Parameters (channel)</MenuPath>.
+4. يظهر تحذير يقول إن في STUDY مجموعات من المشاركين، وإن المجموعات تُهمل في المستوى الأول. هذا متوقع: الجنس بين المشاركين، فمكانه المستوى الثاني. اضغط <UiLabel>OK</UiLabel>.
+5. في نافذة <UiLabel>LInear MOdeling of EEG data -- pop_limo()</UiLabel> اختر `ERP` في <UiLabel>Input data to use for the GLM</UiLabel> و `OLS` في <UiLabel>Estimation method</UiLabel>. اترك <UiLabel>Options</UiLabel> فارغاً وأبقِ <UiLabel>Erase previous model</UiLabel> مفعّلاً. اضغط <UiLabel>Ok</UiLabel>.
+6. تعرض نافذة الأوامر كل مشارك أثناء مطابقة النموذج. يظهر مجلد `derivatives` بجانب `animal_limo.study`، وفيه `LIMO_animal_limo` وملف يبدأ اسمه بـ `Beta_files_`.
+
+**ثالثاً: المستوى الثاني، اختبار المجموعة**
+
+1. افتح <MenuPath>Study > LInear MOdeling of EEG Data > 2nd level analysis</MenuPath>. تفتح نافذة <UiLabel>LIMO Random Effects (2nd level analysis)</UiLabel>.
+2. اضغط <UiLabel>Working Directory</UiLabel> وأنشئ أو اختر مجلداً فارغاً لهذا الاختبار، مثل `paired_animal_distractor` داخل `LIMO_animal_limo`. LIMO يكتب نتائجه في هذا المجلد.
+3. اضغط <UiLabel>Load expected chan / neighbours</UiLabel> واختر `limo_gp_level_chanlocs.mat` في مجلد `derivatives`.
+4. أبقِ bootstrap مفعّلاً بـ `1000` (الجزء <UiLabel>Precompute bootstrap (FWE correction)</UiLabel>). الـ bootstrap هو ما يجعل تصحيح العناقيد ممكناً.
+5. اضغط <UiLabel>Paired t-test</UiLabel>. عندما يطلب LIMO الملفات، اختر ملف `Beta_files_`. وعندما يطلب المعاملات، اكتب `1 2`: الـ beta 1 هي `animal` والـ beta 2 هي `distractor`. يجري LIMO اختبار Yuen t-test على المتوسطات المشذّبة بنسبة 20% في كل قناة ونقطة زمنية، ثم الـ bootstrap. يستغرق هذا بضع دقائق.
+
+**رابعاً: اقرأ النتيجة**
+
+1. افتح <MenuPath>Study > LInear MOdeling of EEG Data > LIMO EEG results (1st and 2nd level)</MenuPath>. تفتح نافذة <UiLabel>LINEAR MODELING TOOLBOX: Results</UiLabel>.
+2. أبقِ <UiLabel>P value</UiLabel> على `0.05`، واختر `Clustering` في <UiLabel>MC Correction</UiLabel>.
+3. اضغط <UiLabel>Image all</UiLabel> واختر `Paired_Samples_Ttest_parameter_1_2.mat` في مجلد نتيجتك. تظهر صورة: القنوات على محور، والزمن على الآخر، واللون فقط حيث يبقى عنقود بعد التصحيح.
+4. اضغط نقطة تهمك، أو <UiLabel>Course plot</UiLabel>، لترى الشرطين في قناة واحدة عبر الزمن.
+
+<Callout type="note">
+**لماذا OLS هنا؟** نافذة LIMO تعرض `WLS` أولاً، وهي تعطي المحاولات غير المعتادة وزناً أقل، وغالباً هي الاختيار الأفضل. لكن توثيق LIMO يذكر أن WLS تحتاج محاولات أكثر من النقاط الزمنية عند كل مشارك. في إيبوكاتنا 750 نقطة زمنية (3 ثوانٍ بمعدل 250 Hz). في كل ملف أصلي من 87 إلى 192 محاولة، فحتى بعد الدمج لا يزيد ما عند المشارك عن 384 محاولة، أي أقل من النقاط الزمنية. لذلك نستخدم `OLS` التي ليس لها هذا الحد. في بياناتك جرّب `WLS` مع نافذة أقصر (خانة <UiLabel>Options</UiLabel> تقبل مثلاً `'timelim', [-100 600]`).
+</Callout>
+
+## السكربت المقابل
+
+```matlab
+% STUDY and ALLEEG come from the starting point script
+if ~exist('limo_random_select', 'file')
+    error('Install the LIMO plugin first: File > Manage EEGLAB extensions');
+end
+if ~exist('ft_prepare_neighbours', 'file')
+    error('Install Fieldtrip-lite first: LIMO needs it for the channel neighbours');
+end
+
+% 1st level: one linear model per participant on the single-trial ERPs (design 1, image)
+STUDY = std_selectdesign(STUDY, ALLEEG, 1);
+[STUDY, ~, limoFiles] = pop_limo(STUDY, ALLEEG, 'dat', 'method', 'OLS', 'measure', 'daterp', ...
+    'erase', 'on', 'splitreg', 'off');
+designName = STUDY.design(1).name(~isspace(STUDY.design(1).name));
+glmName = [STUDY.filename(1:end-6) '_' designName '_GLM_Channels_Time_OLS'];
+betaFile = fullfile(limoFiles.LIMO, ['Beta_files_' glmName '.txt']);
+betaList = strtrim(splitlines(fileread(betaFile)));
+fprintf('1st level done: %d participants listed in %s\n', nnz(~cellfun(@isempty, betaList)), betaFile);
+
+% 2nd level: paired test of beta 1 (animal) against beta 2 (distractor), 1000 bootstraps
+resDir = fullfile(limoFiles.LIMO, 'paired_animal_distractor');
+if ~exist(resDir, 'dir'), mkdir(resDir); end
+startDir = pwd;
+cd(resDir);   % LIMO writes the 2nd-level files in the current folder
+try
+    limo_random_select('paired t-test', STUDY.limo.chanloc, 'LIMOfiles', {betaFile}, ...
+        'parameters', {[1 2]}, 'analysis_type', 'Full scalp analysis', 'type', 'Channels', ...
+        'nboot', 1000, 'tfce', 0);
+
+    % Spatio-temporal cluster correction at p = 0.05
+    load(fullfile(resDir, 'LIMO.mat'), 'LIMO');
+    [~, mask] = limo_stat_values('Paired_Samples_Ttest_parameter_1_2.mat', 0.05, 2, LIMO);
+catch err
+    cd(startDir);   % return to the start folder even if LIMO stops with an error
+    rethrow(err);
+end
+cd(startDir);
+neighbours = load(STUDY.limo.chanloc);
+chanNames = {neighbours.expected_chanlocs.labels};
+fprintf('Significant channel x time points after cluster correction: %d\n', nnz(mask));
+fprintf('Channels inside a significant cluster: %s\n', strjoin(chanNames(any(mask, 2)), ' '));
+```
+
+## أي قيمة أختار؟
+
+| الخيار | في هذا الدرس | متى تغيّره |
+|---|---|---|
+| <UiLabel>Input data to use for the GLM</UiLabel> | `ERP` | `Spectrum` لأسئلة القدرة، مع نطاق ترددات في <UiLabel>Options</UiLabel>، مثل `'freqlim', [1 40]`. |
+| <UiLabel>Estimation method</UiLabel> | `OLS` | `WLS` عندما يكون عند كل مشارك محاولات أكثر من النقاط الزمنية. `IRLS` أبطأ بكثير، وفائدته قليلة. |
+| التصميم | `image`، نوع صورة كل محاولة | أضف متغيّرات مستمرة لكل محاولة (مثل زمن الاستجابة) في تصميم STUDY. الجنس يبقى للمستوى الثاني. |
+| اختبار المستوى الثاني | Paired t-test على الـ betas 1 و 2 | Repeated-measures ANOVA مع الجنس مجموعةً للتصميم المختلط، الذي لم يعالجه الاختبار الثنائي في EEGLAB كما يجب. |
+| bootstrap | 1000 | أبقِ 1000 أو أكثر لتصحيح العناقيد. العدد الأقل يجعل قيم p المصحّحة غير مستقرة. |
+| <UiLabel>MC Correction</UiLabel> | `Clustering` | `TFCE` موجود أيضاً في LIMO (يحتاج <UiLabel>Apply TFCE</UiLabel> قبل الاختبار). `Max` أشدّ. `None` للاستكشاف فقط. |
+
+## أخطاء شائعة
+
+- **ملفان لكل مشارك.** يتوقف LIMO بالرسالة `Merge datasets for each subject and try again.` ادمج ملفات كل مشارك أولاً، بعد أن تعلّم كل محاولة بشرطها في حقل حدث، كما يفعل سكربت "نقطة البداية".
+- **لا توجد محاولات مفردة.** LIMO يقرأ المحاولات التي حفظها `savetrials` في درس الحساب المسبق. بدونها يتوقف بالرسالة `Measures must be computed first`.
+- **عدم تحديد مجلد العمل.** LIMO يكتب ملفات المستوى الثاني في المجلد الحالي. اختر مجلداً فارغاً لكل اختبار، وإلا اختلطت نتائج الاختبارات.
+- **أرقام معاملات خاطئة.** ترتيب الـ betas يتبع قيم متغيّر التصميم. تحقق منه بـ <UiLabel>See GLM variables</UiLabel> في نافذة المستوى الأول قبل أن تكتب `1 2`.
+- **توقّع أثر مختلف عن المتوسطات مع OLS ومتغيّر واحد.** في هذه الحالة البسيطة الفرق بين الـ betas هو الفرق بين المتوسطات. الذي يتغيّر هو المستوى الثاني المتين، ثم لاحقاً نماذج المستوى الأول الأغنى.
+- **ترك ملف الجيران.** بدون `limo_gp_level_chanlocs.mat` لا يستطيع LIMO أن يكوّن عناقيد عبر القنوات.
+
+{/* صندوق "من التجربة": بانتظار قصة من صاحب المشروع. لا يُكتب قبل وصولها. */}
+
+## كيف تتأكد أن الخطوة نجحت؟
+
+- **نافذة الأوامر** تطبع `1st level done: 14 participants listed in` ثم مسار ملف `Beta_files_`.
+- **مجلد النتيجة** فيه `LIMO.mat` و `Paired_Samples_Ttest_parameter_1_2.mat` ومجلد `H0` فيه الـ bootstrap.
+- **السكربت يطبع** عدد نقاط قناة × زمن الدالة بعد تصحيح العناقيد، والقنوات داخل عنقود (وقد تكون القائمة فارغة).
+- **صورة النتيجة** التي يفتحها <UiLabel>Image all</UiLabel> تعرض القنوات مقابل الزمن، واللون فقط داخل العناقيد المصحّحة.
+
+<Methods>
+A two-level hierarchical linear model was estimated with LIMO EEG [version] (Pernet et al., 2011) in EEGLAB 2026.1. At the first level, the animal and distractor epochs of each participant were merged into one dataset, and the single-trial ERPs were modeled at every channel and time point with image category as a categorical regressor (ordinary least squares). At the second level, the animal and distractor parameter estimates were compared across [14] participants with a paired Yuen t-test on 20% trimmed means, with spatio-temporal cluster correction based on [1000] bootstrap samples at a threshold of 0.05.
+</Methods>
+
+<Callout type="note" title="مصدر البيانات">
+البيانات: نسخة STUDY من SCCN/Delorme. البيانات الأصلية: OpenNeuro ds002680 (CC0).
+</Callout>

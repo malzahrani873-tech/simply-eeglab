@@ -1,0 +1,153 @@
+---
+title: استخراج epochs
+titleEn: Extracting epochs
+description: كيف تقطّع بيانات EEG المستمرة إلى مقاطع زمنية حول حدث محدد في EEGLAB، وكيف تختار طول النافذة وتتأكد من عدد المقاطع.
+station: 5
+order: 1
+level: core
+status: approved
+objectives:
+  - يستخرج epochs حول نوع حدث محدد من الواجهة ومن السكربت.
+  - يختار نافذة زمنية تناسب سؤاله (ERP أو تحليل زمني-ترددي).
+  - يتحقق من عدد الـ epochs الناتجة وحدود النافذة وأبعاد البيانات.
+prerequisites: [events, iclabel]
+references:
+  - title: EEGLAB Tutorial
+    url: https://eeglab.org/tutorials/07_Extract_epochs/Extracting_Data_Epochs.html
+    section: "7. Extract Data Epochs: Extracting data epochs"
+  - title: Makoto's preprocessing pipeline
+    url: https://eeglab.ucsd.edu/wiki/Makoto%27s_preprocessing_pipeline
+    section: "§10 Epoch data"
+  - title: Applied Event-Related Potential Data Analysis (Luck)
+    url: https://socialsci.libretexts.org/Bookshelves/Psychology/Biological_Psychology/Applied_Event-Related_Potential_Data_Analysis_(Luck)
+    section: "2.07 Exercise: Epoching and Baseline Correction"
+datasets: [D1]
+startingPoint:
+  dataset: D1
+  file: eeglab_data.set
+  applied: [filtering, line-noise, bad-channels, interpolation, rereferencing, run-ica, ica-1hz-copy-weights, iclabel]
+  script: |
+    % Shortcut: if you saved D1_main_clean_lp30.set in the ICLabel lesson, keep
+    % the first line and the last three lines, and replace every line between them with:
+    % EEG = pop_loadset('D1_main_clean_lp30.set', pwd);
+    [ALLEEG, EEG, CURRENTSET, ALLCOM] = eeglab;
+    eeglabRoot = fileparts(which('eeglab'));
+    EEG = pop_loadset('eeglab_data.set', fullfile(eeglabRoot, 'sample_data'));
+    fullLocs = EEG.chanlocs;
+
+    % Main dataset: high-pass at 0.1 Hz, then 60 Hz line-noise removal
+    EEG = pop_eegfiltnew(EEG, 'locutoff', 0.1);
+    EEG = pop_eegfiltnew(EEG, 'locutoff', 58, 'hicutoff', 62, 'revfilt', 1);
+
+    % Bad channels you removed earlier, e.g. {'T7'}; leave empty if none
+    badChans = {};
+    if ~isempty(badChans)
+        EEG = pop_select(EEG, 'rmchannel', badChans);
+        EEG = pop_interp(EEG, fullLocs, 'spherical');
+    end
+
+    % Average reference, EOG channels excluded
+    eogIdx = find(ismember({EEG.chanlocs.labels}, {'EOG1', 'EOG2'}));
+    EEG = pop_reref(EEG, [], 'exclude', eogIdx);
+
+    % ICA on a 1-Hz copy, then copy the weights back
+    EEG_ica = pop_eegfiltnew(EEG, 'locutoff', 1);
+    EEG_ica = pop_runica(EEG_ica, 'icatype', 'runica', 'extended', 1);
+    EEG.icaweights  = EEG_ica.icaweights;
+    EEG.icasphere   = EEG_ica.icasphere;
+    EEG.icachansind = EEG_ica.icachansind;
+    EEG.icawinv     = [];
+    EEG.icaact      = [];
+    EEG = eeg_checkset(EEG);
+
+    % Remove components ICLabel rates above 90% Eye or Muscle
+    EEG = pop_iclabel(EEG, 'default');
+    EEG = pop_icflag(EEG, [NaN NaN; 0.9 1; 0.9 1; NaN NaN; NaN NaN; NaN NaN; NaN NaN]);
+    artifactComps = find(EEG.reject.gcompreject);
+    if ~isempty(artifactComps)
+        EEG = pop_subcomp(EEG, artifactComps, 0);
+    end
+
+    % Low-pass at 30 Hz
+    EEG = pop_eegfiltnew(EEG, 'hicutoff', 30);
+    EEG.setname = 'D1 main clean lp30';
+    EEG.filename = ''; EEG.filepath = ''; EEG.datfile = ''; EEG.saved = 'no';
+    [ALLEEG, EEG, CURRENTSET] = pop_newset(ALLEEG, EEG, 0, 'setname', 'D1 main clean lp30', 'gui', 'off');
+    eeglab redraw;
+eeglabVersion: "2026.1"
+updated: 2026-10-28
+---
+
+## لماذا هذه الخطوة مهمة؟
+
+بياناتك الآن تسجيل واحد مستمر طوله حوالي 4 دقائق. لكن سؤالك في تجربة ERP عن لحظات محددة: ماذا يفعل الدماغ بعد ظهور المثير مباشرة؟
+
+لذلك تقطع حول كل حدث مقطعاً قصيراً، يسمّى مقطعاً زمنياً حول حدث (<En>epoch</En>)، يبدأ قبل الحدث بقليل وينتهي بعده بقليل. كل مقطع يبدأ عند نفس الزمن بالنسبة لحدثه، فتستطيع مقارنة المقاطع ببعضها وحساب متوسطها لاحقاً.
+
+في D1 ظهر المربع (`square`) على الشاشة 80 مرة، وضغط المشارك زراً بعد بعضها (حدث `rt`). سنقطع حول المربع فقط.
+
+## قبل وبعد
+
+<Figure src="extract-epochs/extract-epochs-concept.svg" alt="قناة Cz من D1 لمدة 15 ثانية، وعليها خمسة أحداث square كل 3 ثوانٍ، وحول كل حدث نافذة من ثانية قبله إلى ثانيتين بعده. بعد التقطيع تصير النوافذ صفوفاً فوق بعض تبدأ كلها عند -1 ثانية، والصفر عند الحدث. الحجم الكلي 32 قناة × 384 نقطة زمنية × 80 epoch." source="D1" />
+
+## الخطوات من الواجهة
+
+ابدأ والداتاست `D1 main clean lp30` مفتوحة، كما في "نقطة البداية".
+
+1. افتح <MenuPath>Tools > Extract epochs</MenuPath>.
+2. تظهر نافذة <UiLabel>Extract data epochs - pop_epoch()</UiLabel>. اضغط الزر <UiLabel>...</UiLabel> بجانب <UiLabel>Time-locking event type(s) ([]=all)</UiLabel>.
+3. تظهر قائمة أنواع الأحداث: `rt` و `square`. اختر `square` واضغط <UiLabel>Ok</UiLabel>. يمكنك أيضاً كتابة `square` في الخانة مباشرة.
+4. في <UiLabel>Epoch limits [start, end] in seconds</UiLabel> اترك القيمة الافتراضية `-1 2`، أي من ثانية قبل الحدث إلى ثانيتين بعده.
+5. في <UiLabel>Name for the new dataset</UiLabel> اكتب `D1 epochs`.
+6. اترك <UiLabel>Out-of-bounds EEG limits if any [min max]</UiLabel> فارغة. رفض المقاطع السيئة له درس خاص بعد درسين.
+7. اضغط <UiLabel>Ok</UiLabel>. تظهر نافذة الداتاست الجديدة وفيها <UiLabel>Name it:</UiLabel> بالاسم الذي كتبته. اترك <UiLabel>Overwrite it in memory (set=yes; unset=create a new dataset)</UiLabel> غير مفعّل، واضغط <UiLabel>Ok</UiLabel>.
+
+<Callout type="note" title="نافذة baseline لا تظهر">
+التوتوريال الرسمي يذكر أن نافذة تصحيح baseline تظهر تلقائياً بعد التقطيع. في كود EEGLAB 2026.1 لا تظهر، والتصحيح خطوة مستقلة من قائمة <MenuPath>Tools > Remove epoch baseline</MenuPath>، وهي موضوع الدرس التالي.
+
+بدل النافذة، ستظهر في نافذة الأوامر رسالة تبدأ بـ `Warning: Do you also want to remove the single-trial ERP baseline`. هذا تذكير فقط، وليس خطأ.
+</Callout>
+
+## السكربت المقابل
+
+```matlab
+% Cut 3-s epochs around every 'square' event: 1 s before to 2 s after
+EEG = pop_epoch(EEG, {'square'}, [-1 2], 'newname', 'D1 epochs', 'epochinfo', 'yes');
+EEG = eeg_checkset(EEG);
+
+% Channels x time points x epochs
+disp(size(EEG.data));
+fprintf('Epochs: %d, from %.3f s to %.3f s\n', EEG.trials, EEG.xmin, EEG.xmax);
+```
+
+## أي قيمة أختار؟
+
+| الهدف | النافذة | لماذا |
+|---|---|---|
+| ERP فقط | تبدأ 200 ميلي ثانية على الأقل قبل الحدث، وتنتهي بعد آخر مكوّن ERP يهمّك | الجزء قبل الحدث يُستخدم baseline في الدرس التالي. مثال: تجربة N400 في بيانات ERP CORE تُقطع من -200 إلى 800 ميلي ثانية. |
+| ERP مع تحليل زمني-ترددي | أطول، مثل `-1 2` هنا | التوتوريال الرسمي يوصي بمقاطع طويلة ليمكن تحليل الترددات المنخفضة (تحت 10 هرتز). |
+| مسارنا في هذا الموقع | `-1 2` | القيمة الافتراضية في EEGLAB والتوتوريال الرسمي، وتكفي لدرسي ERP و ERSP. |
+
+**قاعدة البداية:** النافذة أقصر من المسافة بين حدثين متتاليين قدر الإمكان. في D1 بين كل مربع والذي يليه 3 ثوانٍ تقريباً، ونافذتنا 3 ثوانٍ، فلا يتكرر نفس الجزء من البيانات في مقطعين إلا في حالة واحدة (مربعان بينهما 0.7 ثانية في بداية التسجيل).
+
+**تجربة فيها أكثر من شرط:** اقطع حول كل الشروط معاً، ثم اختر شرطاً واحداً قبل المتوسط. في EEGLAB قائمة لهذا، <MenuPath>Edit > Select epochs or events</MenuPath>، لكنها في 2026.1 تتوقف برسالة خطأ على البيانات المقطّعة. درس `channel-erp-plot` يعرض سكربتاً قصيراً يقوم بالشيء نفسه. في D1 موقعا المربع هما الشرطان، ونقارن بينهما في ذلك الدرس.
+
+## أخطاء شائعة
+
+- **التقطيع قبل الفلترة.** الفلتر على مقاطع قصيرة يصنع تشوّهاً عند أطرافها. افلتر البيانات المستمرة أولاً، ثم قطّع، كما فعلنا في المحطة 3.
+- **ترك نوع الحدث فارغاً.** الخانة الفارغة تعني "كل الأحداث"، فتحصل على 153 مقطعاً تخلط بين ظهور المربع وضغطة الزر (من 154 حدثاً، لأن آخر ضغطة زر قريبة جداً من نهاية التسجيل فيضيع مقطعها). اكتب النوع دائماً.
+- **نافذة قصيرة جداً.** إذا بدأت النافذة عند الحدث نفسه، فلا توجد فترة قبله لتصحيح baseline. وإذا كانت قصيرة بعده، تقطع مكوّنات ERP المتأخرة.
+- **توقّع أن عدد الأحداث يساوي عدد المقاطع.** كل مقطع يحمل كل الأحداث التي تقع داخله، ومنها ضغطة الزر بعد المربع. لذلك `length(EEG.event)` أكبر من `EEG.trials`.
+- **مقاطع تضيع عند أطراف التسجيل.** إذا كان الحدث قريباً جداً من بداية التسجيل أو نهايته، يحذف EEGLAB مقطعه ويكتب تحذيراً في نافذة الأوامر. في D1 أول مربع بعد ثانية واحدة من البداية، فلا يضيع أي مقطع، لكن بلا هامش: لو بدأت النافذة من -1.1 ثانية لضاع المقطع الأول.
+
+{/* صندوق "من التجربة": بانتظار قصة من صاحب المشروع. لا يُكتب قبل وصولها. */}
+
+## كيف تتأكد أن الخطوة نجحت؟
+
+- في نافذة EEGLAB الرئيسية: <UiLabel>Epochs</UiLabel> تساوي 80، و<UiLabel>Frames per epoch</UiLabel> تساوي 384، و<UiLabel>Epoch start (sec)</UiLabel> تساوي -1، و<UiLabel>Epoch end (sec)</UiLabel> تساوي 1.992 تقريباً.
+- في نافذة الأوامر: `size(EEG.data)` يعطي `32 384 80`، وتظهر رسالة التذكير بـ baseline التي تبدأ بـ `Warning:`، وهذا متوقع.
+- افتح <MenuPath>Plot > Channel data (scroll)</MenuPath>: البيانات تظهر الآن مقاطع منفصلة بخطوط فاصلة، وكل مقطع فيه حدث `square` عند الصفر.
+
+<Methods>
+Continuous data were segmented into epochs from -1 to 2 s relative to the onset of each square stimulus (pop_epoch, EEGLAB 2026.1), yielding [80] epochs.
+</Methods>

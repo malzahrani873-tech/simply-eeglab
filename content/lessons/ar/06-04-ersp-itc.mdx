@@ -1,0 +1,180 @@
+---
+title: التحليل الزمني-الترددي ERSP و ITC
+titleEn: "Time-frequency: ERSP & ITC"
+description: كيف تحسب ERSP و ITC لقناة واحدة في EEGLAB من Channel time-frequency، وتقرأ لون الخريطة، وتفرّق بين تغيّر القدرة وثبات الطور.
+station: 6
+order: 4
+level: recommended
+status: approved
+objectives:
+  - يحسب ERSP و ITC لقناة واحدة من الواجهة ومن السكربت.
+  - يفسّر لون خريطة ERSP كزيادة أو نقص في القدرة عن فترة baseline، بالـ dB.
+  - يشرح الفرق بين ERSP (تغيّر القدرة) و ITC (ثبات الطور عبر المحاولات)، وعلاقة ITC بالـ ERP.
+prerequisites: [erp-average, power-spectrum]
+references:
+  - title: EEGLAB Tutorial
+    url: https://eeglab.org/tutorials/08_Plot_data/Time-Frequency_decomposition.html
+    section: "8. Plot data > d. Time-Frequency"
+  - title: EEGLAB Tutorial
+    url: https://eeglab.org/tutorials/ConceptsGuide/Time_frequency_tutorial.html
+    section: "Concepts guide: time-frequency"
+  - title: "Time-Frequency Analysis of EEG Time Series Part 5: Practicum in EEGLAB"
+    url: https://www.youtube.com/watch?v=b0430f_W0mo
+    section: "الفيديو كاملاً"
+    duration: "8:55"
+datasets: [D1]
+startingPoint:
+  dataset: D1
+  file: eeglab_data.set
+  applied: [filtering, line-noise, bad-channels, interpolation, rereferencing, run-ica, ica-1hz-copy-weights, iclabel, extract-epochs, baseline-correction, epoch-rejection]
+  script: |
+    % Shortcut: if you saved D1_epochs_clean.set in the epoch rejection lesson,
+    % keep the first line and the last three lines, and replace every line between them with:
+    % EEG = pop_loadset('D1_epochs_clean.set', pwd);
+    [ALLEEG, EEG, CURRENTSET, ALLCOM] = eeglab;
+    eeglabRoot = fileparts(which('eeglab'));
+    EEG = pop_loadset('eeglab_data.set', fullfile(eeglabRoot, 'sample_data'));
+    fullLocs = EEG.chanlocs;
+
+    % Main dataset: high-pass at 0.1 Hz, then 60 Hz line-noise removal
+    EEG = pop_eegfiltnew(EEG, 'locutoff', 0.1);
+    EEG = pop_eegfiltnew(EEG, 'locutoff', 58, 'hicutoff', 62, 'revfilt', 1);
+
+    % Bad channels you removed earlier, e.g. {'T7'}; leave empty if none
+    badChans = {};
+    if ~isempty(badChans)
+        EEG = pop_select(EEG, 'rmchannel', badChans);
+        EEG = pop_interp(EEG, fullLocs, 'spherical');
+    end
+
+    % Average reference, EOG channels excluded
+    eogIdx = find(ismember({EEG.chanlocs.labels}, {'EOG1', 'EOG2'}));
+    EEG = pop_reref(EEG, [], 'exclude', eogIdx);
+
+    % ICA on a 1-Hz copy, then copy the weights back
+    EEG_ica = pop_eegfiltnew(EEG, 'locutoff', 1);
+    EEG_ica = pop_runica(EEG_ica, 'icatype', 'runica', 'extended', 1);
+    EEG.icaweights  = EEG_ica.icaweights;
+    EEG.icasphere   = EEG_ica.icasphere;
+    EEG.icachansind = EEG_ica.icachansind;
+    EEG.icawinv     = [];
+    EEG.icaact      = [];
+    EEG = eeg_checkset(EEG);
+
+    % Remove components ICLabel rates above 90% Eye or Muscle
+    EEG = pop_iclabel(EEG, 'default');
+    EEG = pop_icflag(EEG, [NaN NaN; 0.9 1; 0.9 1; NaN NaN; NaN NaN; NaN NaN; NaN NaN]);
+    artifactComps = find(EEG.reject.gcompreject);
+    if ~isempty(artifactComps)
+        EEG = pop_subcomp(EEG, artifactComps, 0);
+    end
+
+    % Low-pass at 30 Hz
+    EEG = pop_eegfiltnew(EEG, 'hicutoff', 30);
+    EEG.setname = 'D1 main clean lp30';
+
+    % Epochs around 'square', baseline -200 to 0 ms
+    EEG = pop_epoch(EEG, {'square'}, [-1 2], 'newname', 'D1 epochs', 'epochinfo', 'yes');
+    EEG = pop_rmbase(EEG, [-200 0]);
+
+    % Reject epochs beyond +/-100 uV
+    EEG = pop_eegthresh(EEG, 1, 1:EEG.nbchan, -100, 100, EEG.xmin, EEG.xmax, 0, 0);
+    if any(EEG.reject.rejthresh)
+        EEG = pop_rejepoch(EEG, EEG.reject.rejthresh, 0);
+    end
+    EEG.setname = 'D1 epochs clean';
+    EEG = eeg_checkset(EEG);
+    EEG.filename = ''; EEG.filepath = ''; EEG.datfile = ''; EEG.saved = 'no';
+    [ALLEEG, EEG, CURRENTSET] = pop_newset(ALLEEG, EEG, 0, 'setname', 'D1 epochs clean', 'gui', 'off');
+    eeglab redraw;
+eeglabVersion: "2026.1"
+updated: 2026-10-28
+---
+
+## لماذا هذه الخطوة مهمة؟
+
+الـ ERP يجمع ما يتكرر بنفس الشكل والتوقيت في كل محاولة. لكن بعض نشاط الدماغ بعد المثير يتغيّر في قوته دون أن يكون في نفس الطور كل مرة، مثل انخفاض ألفا. هذا النشاط يلغي بعضه بعضاً في المتوسط، فلا تراه في الـ ERP.
+
+التحليل الزمني-الترددي يحسب لكل تردد ولكل لحظة في كل محاولة أمرين: القدرة، والطور. ثم يعطيك خريطتين:
+
+- **<En>ERSP</En>:** تغيّر القدرة عند كل تردد وزمن مقارنة بفترة baseline، بالـ dB. يرى النشاط سواء كان في نفس الطور أم لا.
+- **<En>ITC</En>:** مقياس لثبات الطور عبر المحاولات عند كل تردد وزمن، من 0 (طور عشوائي) إلى 1 (نفس الطور في كل محاولة). الـ ITC المرتفع شرط لظهور النشاط في الـ ERP: النشاط الذي طوره عشوائي يلغي بعضه بعضاً في المتوسط.
+
+## قبل وبعد
+
+<Figure src="ersp-itc/ersp-itc-cz.png" alt="نافذة الزمن والتردد للقناة Cz من 3 إلى 30 هرتز: في الأعلى خريطة ERSP بالديسيبل، وفي الأسفل خريطة ITC وتحتها الموجة المتوسطة. منطقة حمراء في الخريطتين عند الترددات المنخفضة بعد المنبه." source="D1" />
+
+## الخطوات من الواجهة
+
+ابدأ والداتاست `D1 epochs clean` مفتوحة، كما في "نقطة البداية".
+
+1. افتح القائمة. مكانها يعتمد على إعدادك:
+   - إذا فعّلت القوائم القديمة في درس رفض الـ epochs: <MenuPath>Plot > Time-frequency transforms > Channel time-frequency</MenuPath>.
+   - إذا لم تفعّلها: <MenuPath>Plot > Channel time-frequency</MenuPath>.
+2. تظهر نافذة <UiLabel>Plot channel time frequency -- pop_newtimef()</UiLabel>. في <UiLabel>Channel number</UiLabel> اكتب `14`، أي القناة <En>Cz</En>، أو اخترها بالزر <UiLabel>...</UiLabel>.
+3. اترك <UiLabel>Sub epoch time limits [min max] (msec)</UiLabel> على قيمته، أي كل الـ epoch.
+4. في <UiLabel>Frequency limits [min max] (Hz) or sequence</UiLabel> اكتب `3 30`. البيانات مفلترة بـ low-pass 30، فلا معنى لما فوقه.
+5. اترك <UiLabel>Baseline limits [min max] (msec) (0->pre-stim.)</UiLabel> على `0`، أي كل الفترة قبل المثير.
+6. اترك <UiLabel>Wavelet cycles [min max/fact] or sequence</UiLabel> على `3 0.8`.
+7. في <UiLabel>Optional newtimef() arguments (see Help)</UiLabel> اكتب `'winsize', 128`، أي نافذة بطول ثانية واحدة، حتى يبدأ التحليل من 3 هرتز.
+8. اترك <UiLabel>Plot Event Related Spectral Power</UiLabel> و<UiLabel>Plot Inter Trial Coherence</UiLabel> مفعّلين، واضغط <UiLabel>Ok</UiLabel>. الحساب يأخذ بعض الثواني.
+9. اقرأ الرسم:
+   - **فوق (ERSP):** الأحمر زيادة في القدرة عن baseline، والأزرق نقص، والأخضر لا تغيير. على اليسار طيف فترة baseline.
+   - **تحت (ITC):** الأحمر طور ثابت عبر المحاولات. تحت الخريطة موجة الـ ERP لنفس القناة.
+   - قارن الخريطتين: المنطقة الحمراء عند الترددات المنخفضة حوالي 200 إلى 400 ميلي ثانية تظهر في الاثنتين. هذا هو الـ ERP نفسه بلغة الترددات.
+
+<Callout type="note" title="حواف الخريطة">
+الخريطة لا تبدأ من -1000 ولا تنتهي عند 1992 ميلي ثانية. كل نقطة تحتاج نافذة بطول ثانية حولها، فيضيع نصف ثانية من كل طرف. لذلك قطعنا epochs طويلة في درس التقطيع.
+</Callout>
+
+## السكربت المقابل
+
+```matlab
+% ERSP and ITC at Cz, 3 to 30 Hz, wavelets from 3 cycles
+cz = find(strcmp({EEG.chanlocs.labels}, 'Cz'));
+figure;
+[ersp, itc, powbase, times, freqs] = pop_newtimef(EEG, 1, cz, ...
+    [EEG.xmin EEG.xmax]*1000, [3 0.8], 'freqs', [3 30], 'winsize', 128, ...
+    'baseline', 0, 'padratio', 1, 'plotphase', 'off');
+
+% ersp: frequencies x times in dB; itc: complex, its magnitude is 0 to 1
+itcMag = abs(itc);
+fprintf('Frequencies %.1f to %.1f Hz, times %.0f to %.0f ms\n', ...
+    freqs(1), freqs(end), times(1), times(end));
+
+% Where is the phase locking strongest?
+[maxItc, idx] = max(itcMag(:));
+[fi, ti] = ind2sub(size(itcMag), idx);
+fprintf('Max ITC %.2f at %.1f Hz, %.0f ms\n', maxItc, freqs(fi), times(ti));
+```
+
+## أي قيمة أختار؟
+
+| الإعداد | القيمة | لماذا |
+|---|---|---|
+| عدد الدورات | `3 0.8` (الافتراضي) | 3 دورات عند أدنى تردد، وتزيد ببطء مع التردد. دورات أقل تعني دقة زمنية أفضل ودقة ترددية أسوأ، والعكس. |
+| طول النافذة | `'winsize', 128` (ثانية عند 128 هرتز) | أدنى تردد = عدد الدورات ÷ طول النافذة بالثواني، أي 3 هرتز هنا. نافذة أقصر ترفع أدنى تردد. |
+| نطاق الترددات | من 3 إلى 30 هرتز | أدنى من 3 لا تسمح به النافذة، وفوق 30 أزاله الـ low-pass. |
+| baseline | `0` (كل ما قبل المثير) | الـ ERSP نسبة لهذه الفترة. لا تجعلها تضم أي استجابة. |
+| القناة | Cz هنا | الـ ERP في D1 كبير في القنوات الوسطى والجدارية. لسؤال عن ألفا، جرّب القنوات الخلفية مثل POz. |
+
+## أخطاء شائعة
+
+- **epochs قصيرة.** نافذة ثانية واحدة تأكل نصف ثانية من كل طرف. epoch من -200 إلى 800 لا يترك شيئاً تقريباً. قطّع epochs أطول للتحليل الزمني-الترددي.
+- **قراءة الأحمر كـ "نشاط أكثر" دائماً.** الأحمر زيادة **نسبة لـ baseline**. إذا كانت فترة baseline نفسها غير عادية، تتغيّر الخريطة كلها.
+- **الخلط بين ERSP و ITC.** زيادة في ERSP بلا ITC تعني نشاطاً أقوى لكن بطور مختلف كل مرة، فلن يظهر في الـ ERP. ITC مرتفع يعني أن الطور ثابت، وهذا شرط لظهور النشاط في الـ ERP، مع سعة كافية.
+- **تحليل ترددات أعلى من الـ low-pass.** فوق 30 هرتز في بياناتنا لا توجد إشارة، والنسب هناك ضوضاء.
+- **الحكم بلا إحصاء.** الخريطة بلا اختبار تبيّن كل تغيّر، حتى العشوائي. خانة <UiLabel>Bootstrap significance level (Ex: 0.01 -> 1%)</UiLabel> تخفي ما ليس دالاً، والإحصاء الكامل في المحطة 8.
+
+{/* صندوق "من التجربة": بانتظار قصة من صاحب المشروع. لا يُكتب قبل وصولها. */}
+
+## كيف تتأكد أن الخطوة نجحت؟
+
+- `freqs(1)` حوالي 3 و`freqs(end)` حوالي 30، و`times` من حوالي -500 إلى 1500 ميلي ثانية.
+- `size(ersp)` و`size(itc)` متساويان: عدد الترددات × 200 نقطة زمنية.
+- أعلى ITC عند تردد منخفض (حوالي 3 إلى 7 هرتز) بين 200 و 400 ميلي ثانية تقريباً، وقيمته بين 0.5 و 0.8 تقريباً.
+- في الـ ERSP، نفس المنطقة حمراء: زيادة بضعة dB عن baseline.
+
+<Methods>
+Event-related spectral perturbation and inter-trial coherence were computed at Cz with newtimef using Morlet wavelets whose number of cycles increased linearly from 3 at 3 Hz to 6 at 30 Hz, relative to a −500 to 0 ms prestimulus baseline (EEGLAB 2026.1).
+</Methods>

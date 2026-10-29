@@ -1,0 +1,23 @@
+% Copied from lessons/en/07-03-erp-image.md. The lesson is the reference.
+EEG = pop_loadset('D1_epochs_clean.set', pwd);
+chan = find(strcmp({EEG.chanlocs.labels}, 'Pz'));
+
+% Response latency per epoch, NaN when no response follows the stimulus
+rt = eeg_getepochevent(EEG, 'type', {'rt'}, 'timewin', [0 1000]);
+fprintf('%d of %d epochs have a response, median RT %.0f ms\n', ...
+    sum(~isnan(rt)), EEG.trials, median(rt, 'omitnan'));
+
+% Trials in recording order, no smoothing
+figure; pop_erpimage(EEG, 1, chan, [], 'Pz', 1, 1, {}, [], '', ...
+    'erp', 'on', 'cbar', 'on', 'limits', [-200 800], ...
+    'topo', {chan EEG.chanlocs EEG.chaninfo});
+
+% Trials sorted by response latency, 10-trial moving average
+figure; pop_erpimage(EEG, 1, chan, [], 'Pz sorted by RT', 10, 1, {'rt'}, [0 1000], 'latency', ...
+    'erp', 'on', 'cbar', 'on', 'limits', [-200 800], ...
+    'topo', {chan EEG.chanlocs EEG.chaninfo});
+
+% Same trials aligned to the median response latency
+figure; pop_erpimage(EEG, 1, chan, [], 'Pz aligned to response', 10, 1, {'rt'}, [0 1000], 'latency', ...
+    'align', Inf, 'erp', 'on', 'cbar', 'on', ...
+    'topo', {chan EEG.chanlocs EEG.chaninfo});

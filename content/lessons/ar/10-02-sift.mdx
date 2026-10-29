@@ -1,0 +1,221 @@
+---
+title: الاتصال الوظيفي SIFT
+titleEn: Connectivity with SIFT
+description: كيف تشغّل أول تحليل اتصال وظيفي بين مكوّنات ICA بإضافة SIFT، وتتحقق من صحة النموذج قبل أن تقرأ أسهم الاتصال.
+station: 10
+order: 2
+level: optional
+status: review
+objectives:
+  - يثبّت إضافة SIFT ويجهّز مكوّنات ICA مختارة لتحليل الاتصال.
+  - يختار رتبة النموذج ويطابق نموذجاً ذاتي الانحدار متعدد المتغيّرات ويتحقق من صحته.
+  - يحسب نسبة المعاملات إلى نقاط البيانات ويحكم هل تكفي بياناته.
+  - يرسم شبكة الاتصال عبر الزمن والتردد ويقرأها بحذر.
+prerequisites: [run-ica, ersp-itc]
+references:
+  - title: SIFT (GitHub)
+    url: https://github.com/sccn/SIFT
+    section: "README, Documentation"
+  - title: SIFT scripting example (epoched data)
+    url: https://github.com/sccn/SIFT/blob/master/scripts/ScriptingExample_2_0_forEpoched.m
+    section: "STEP 1 to STEP 7"
+  - title: Makoto's preprocessing pipeline
+    url: https://eeglab.ucsd.edu/wiki/Makoto%27s_preprocessing_pipeline
+    section: "SIFT tips"
+  - title: "SIFT Intro: Building and Visualizing Source Connectivity by Tim Mullen"
+    url: https://www.youtube.com/watch?v=6_WW6EMHmWo
+    section: "الفيديو كاملاً"
+    duration: "13:34"
+datasets: [D1]
+startingPoint:
+  dataset: D1
+  file: eeglab_data.set
+  applied: [filtering, line-noise, bad-channels, interpolation, rereferencing, run-ica, ica-1hz-copy-weights, iclabel, extract-epochs, baseline-correction, epoch-rejection]
+  script: |
+    [ALLEEG, EEG, CURRENTSET, ALLCOM] = eeglab;
+    eeglabRoot = fileparts(which('eeglab'));
+    EEG = pop_loadset('eeglab_data.set', fullfile(eeglabRoot, 'sample_data'));
+    fullLocs = EEG.chanlocs;
+
+    % Main dataset: high-pass at 0.1 Hz, then 60 Hz line-noise removal
+    EEG = pop_eegfiltnew(EEG, 'locutoff', 0.1);
+    EEG = pop_eegfiltnew(EEG, 'locutoff', 58, 'hicutoff', 62, 'revfilt', 1);
+
+    % Bad channels you removed earlier, e.g. {'T7'}; leave empty if none
+    badChans = {};
+    if ~isempty(badChans)
+        EEG = pop_select(EEG, 'rmchannel', badChans);
+        EEG = pop_interp(EEG, fullLocs, 'spherical');
+    end
+
+    % Average reference, EOG channels excluded
+    eogIdx = find(ismember({EEG.chanlocs.labels}, {'EOG1', 'EOG2'}));
+    EEG = pop_reref(EEG, [], 'exclude', eogIdx);
+    EEG.setname = 'D1 main';
+
+    % ICA on a 1-Hz copy, then copy the weights back
+    EEG_ica = pop_eegfiltnew(EEG, 'locutoff', 1);
+    EEG_ica = pop_runica(EEG_ica, 'icatype', 'runica', 'extended', 1);
+    EEG.icaweights  = EEG_ica.icaweights;
+    EEG.icasphere   = EEG_ica.icasphere;
+    EEG.icachansind = EEG_ica.icachansind;
+    EEG.icawinv     = [];
+    EEG.icaact      = [];
+    EEG = eeg_checkset(EEG);
+
+    % Remove eye and muscle components flagged by ICLabel
+    EEG = pop_iclabel(EEG, 'default');
+    EEG = pop_icflag(EEG, [NaN NaN; 0.9 1; 0.9 1; NaN NaN; NaN NaN; NaN NaN; NaN NaN]);
+    artifactComps = find(EEG.reject.gcompreject);
+    if ~isempty(artifactComps)
+        EEG = pop_subcomp(EEG, artifactComps, 0);
+    end
+    % Side branch: no 30 Hz low-pass here, MVAR models need the full spectrum
+
+    % Epochs, baseline, rejection of epochs beyond +/-100 microvolts
+    EEG = pop_epoch(EEG, {'square'}, [-1 2], 'newname', 'D1 epochs', 'epochinfo', 'yes');
+    EEG = pop_rmbase(EEG, [-200 0]);
+    EEG = pop_eegthresh(EEG, 1, 1:EEG.nbchan, -100, 100, EEG.xmin, EEG.xmax, 0, 0);
+    badEpochs = find(EEG.reject.rejthresh);
+    if ~isempty(badEpochs)
+        EEG = pop_rejepoch(EEG, EEG.reject.rejthresh, 0);
+    end
+
+    % Show the dataset in the main EEGLAB window
+    EEG.filename = ''; EEG.filepath = ''; EEG.datfile = ''; EEG.saved = 'no';
+    [ALLEEG, EEG, CURRENTSET] = pop_newset(ALLEEG, EEG, 0, 'setname', 'D1 epochs clean nolp', 'gui', 'off');
+    eeglab redraw;
+eeglabVersion: "2026.1"
+updated: 2026-10-28
+---
+
+## لماذا هذه الخطوة مهمة؟
+
+الـ ERP والطيف يصفان كل مصدر وحده. الاتصال الوظيفي (<En>connectivity</En>) يسأل سؤالاً آخر: هل نشاط مصدر يساعد على التنبؤ بنشاط مصدر آخر بعد لحظات؟ وفي أي تردد؟ ومتى بعد المثير؟
+
+إضافة SIFT تجيب بنموذج ذاتي الانحدار متعدد المتغيّرات (<En>MVAR</En>). النموذج يتنبأ بكل قيمة في كل مكوّن من القيم السابقة في كل المكوّنات. من معاملاته تُحسب مقاييس اتجاهية مثل dDTF، فترسم أسهماً بين المصادر عبر الزمن والتردد.
+
+الحساب سهل التشغيل وسهل الخطأ. لهذا يركّز الدرس على شرطين قبل أي رسم: بيانات كافية لعدد المعاملات، ونموذج اجتاز فحوص الصحة.
+
+<Callout type="warning">
+السهم بين مكوّنين يعني أن نشاط الأول يحسّن التنبؤ بالثاني في هذا النموذج. لا يعني أن منطقة تتحكم في الأخرى. اكتب نتائجك بهذه الحدود.
+</Callout>
+
+بديل أحدث: إضافة ROIconnect تحسب الاتصال بين مناطق دماغية محددة بعد تقدير المصادر، لا بين مكوّنات ICA. تجدها في مدير الإضافات.
+
+## قبل وبعد
+
+<ImageSpec>
+شبكة SIFT من نافذة Visualization > Time-Frequency Grid لأربعة مكوّنات ICA من D1 بعد التقطيع: مصفوفة 4 × 4، في كل خلية خارج القطر رسم زمني-ترددي لمقياس dDTF08 من مكوّن العمود إلى مكوّن الصف، الزمن عبر الإيبوك (مراكز النوافذ من نحو -0.75 إلى 1.75 ثانية)، والتردد من 2 إلى 30 هرتز، وخط عمودي عند الصفر. فوق كل عمود وعلى يسار كل صف خريطة رأس المكوّن. المصدر: لقطة من EEGLAB 2026.1 مع SIFT على جهاز صاحب المشروع.
+</ImageSpec>
+
+## الخطوات من الواجهة
+
+**أولاً: ثبّت SIFT**
+
+1. افتح <MenuPath>File > Manage EEGLAB extensions</MenuPath>، وابحث عن SIFT، وثبّته. سجّل رقم الإصدار الذي ثبّته (آخر إصدار في مستودع SIFT عند كتابة الدرس 1.6).
+2. أعد تشغيل `eeglab`. تظهر قائمة جديدة: <MenuPath>Tools > SIFT</MenuPath>.
+
+**ثانياً: اختر أربعة مكوّنات دماغية**
+
+3. ابدأ من `D1 epochs clean nolp` كما في "نقطة البداية". هذا فرع جانبي: نفس مسار المحطة 5 بدون فلتر الـ <En>low-pass</En> عند 30 هرتز.
+4. افتح <MenuPath>Tools > Classify components using ICLabel > Label components</MenuPath>، واختر أربعة مكوّنات أعلى فئاتها <En>Brain</En>. سجّل أرقامها.
+5. افتح <MenuPath>Tools > Remove components from data</MenuPath>، واكتب الأرقام الأربعة في خانة <UiLabel>Or list of component(s) to retain</UiLabel>، وامسح خانة <UiLabel>List of component(s) to remove from data</UiLabel> إن كان فيها أرقام. اضغط <UiLabel>Ok</UiLabel> ثم <UiLabel>Accept</UiLabel>، وسمِّ الداتاست الجديدة `D1 sift`.
+
+لماذا أربعة فقط؟ عدد معاملات النموذج يساوي مربع عدد المكوّنات مضروباً في رتبة النموذج. ستحسبه في قسم "أي قيمة أختار؟".
+
+**ثالثاً: جهّز البيانات وطابق النموذج**
+
+6. افتح <MenuPath>Tools > SIFT > Pre-processing</MenuPath>. اختر الإشارة من نوع <UiLabel>Components</UiLabel>، وفعّل إزالة الاتجاه (<UiLabel>Detrend</UiLabel>) والتطبيع (<UiLabel>NormalizeData</UiLabel>)، واضغط <UiLabel>OK</UiLabel>.
+7. افتح <MenuPath>Tools > SIFT > Model fitting and validation > Model Order Selection</MenuPath>. اكتب طول النافذة `0.5` ثانية، ونطاق الرتبة من `1` إلى `15`، واضغط <UiLabel>OK</UiLabel>. تظهر منحنيات معايير اختيار الرتبة. اختر الرتبة عند انحناء المنحنى (<En>elbow</En>)، لا عند أقل نقطة فقط.
+8. افتح <MenuPath>Tools > SIFT > Model fitting and validation > Fit AMVAR Model</MenuPath>، واكتب الرتبة التي اخترتها، وأبقِ طول النافذة `0.5` ثانية.
+9. اقرأ ما تطبعه نافذة الأوامر: <UiLabel>Ratio of number of parameters to datapoints</UiLabel>. يجب أن يكون أقل من 0.1.
+
+**رابعاً: تحقق من النموذج، ثم ارسم**
+
+10. افتح <MenuPath>Tools > SIFT > Model fitting and validation > Validate model</MenuPath>. تظهر ثلاثة فحوص لكل نافذة زمنية: بياض البواقي (<En>whiteness</En>)، والثبات (<En>stability</En>)، والاتساق (<En>consistency</En>). لا تكمل إذا فشلت أغلب النوافذ.
+11. افتح <MenuPath>Tools > SIFT > Connectivity</MenuPath>، واختر المقياس `dDTF08`، والترددات من `2` إلى `30`. نحصر الترددات في 2 إلى 30 هرتز حيث أغلب نشاط D1، ونبتعد عن فلتر ضوضاء الكهرباء عند 58 إلى 62 هرتز.
+12. افتح <MenuPath>Tools > SIFT > Visualization > Time-Frequency Grid</MenuPath>، واضغط <UiLabel>OK</UiLabel>.
+13. اكتب `eegh` في نافذة الأوامر، واحفظ السطور التي ولّدتها SIFT. هي سكربتك الكامل بكل الخيارات، كما تعلّمت في درس سجل الأوامر.
+
+## السكربت المقابل
+
+نسخة مختصرة تستخدم القيم الافتراضية لـ SIFT في كل ما لم يُذكر. للنسخة الكاملة بكل الخيارات، شغّل الخطوات من الواجهة واحفظ `eegh`.
+
+```matlab
+% Install SIFT from the extension manager if it is missing
+plugin_askinstall('SIFT', 'pop_est_fitMVAR', true);
+
+% Pick the four components with the highest Brain probability
+EEG = pop_iclabel(EEG, 'default');
+brainProb = EEG.etc.ic_classification.ICLabel.classifications(:, 1);
+[~, order] = sort(brainProb, 'descend');
+comps = sort(order(1:4))';
+fprintf('Components used: %s\n', num2str(comps));
+
+% Keep only these components in a copy of the data
+EEG = pop_subcomp(EEG, comps, 0, 1);
+EEG.setname = 'D1 sift';
+
+% Pre-process: detrend and normalize each component
+EEG = pop_pre_prepData(EEG, 'nogui', ...
+    'SignalType', {'Components'}, ...
+    'Detrend', {'method', {'linear'}}, ...
+    'NormalizeData', {'method', {'time', 'ensemble'}});
+
+% Model order selection over orders 1 to 15, 0.5 s sliding windows
+EEG = pop_est_selModelOrder(EEG, 'nogui', ...
+    'modelingApproach', {'Segmentation VAR', 'algorithm', {'ARfit'}, ...
+                         'winlen', 0.5, 'winstep', 0.03}, ...
+    'morderRange', [1 15]);
+modelOrder = ceil(mean(EEG.CAT.IC.hq.pelbow));
+
+% Data points per free parameter: aim for a ratio below 0.1
+M = numel(comps);
+ratio = (M^2 * modelOrder) / (0.5 * EEG.srate * EEG.trials);
+fprintf('Model order %d, parameters/datapoints = %.3f\n', modelOrder, ratio);
+
+% Fit the model, then validate it before reading any connectivity
+EEG = pop_est_fitMVAR(EEG, 'nogui', ...
+    EEG.CAT.configs.est_selModelOrder.modelingApproach, ...
+    'ModelOrder', modelOrder);
+EEG = pop_est_validateMVAR(EEG, 'nogui');
+
+% Directed connectivity (dDTF08) from 2 to 30 Hz
+EEG = pop_est_mvarConnectivity(EEG, 'nogui', ...
+    'connmethods', {'dDTF08'}, 'freqs', 2:30);
+
+% Time-frequency grid (opens the options window)
+pop_vis_TimeFreqGrid(EEG);
+```
+
+## أي قيمة أختار؟
+
+| الإعداد | القيمة في الدرس | لماذا |
+|---|---|---|
+| عدد المكوّنات | 4 | المعاملات = (عدد المكوّنات)² × الرتبة. بأربعة مكوّنات ورتبة 10: 160 معاملاً. بثلاثين مكوّناً: 9000 معامل، أكثر من نقاط بياناتنا. |
+| نسبة المعاملات إلى نقاط البيانات | أقل من 0.1، ولا تتجاوز 1 أبداً | القاعدة التي يفحصها SIFT نفسه ويطبع تحذيره عند تجاوزها (`est_checkMVARParams.m`، عن Korzeniewska وآخرين 2008). مع D1: 0.5 ثانية × 128 عيّنة × حوالي 80 epoch تقريباً 5120 نقطة، فالنسبة حوالي 0.03. |
+| طول النافذة | 0.5 ثانية | القيمة الافتراضية في SIFT. أقصر يعني دقة زمنية أعلى وبيانات أقل لكل نافذة. |
+| الرتبة | عند انحناء منحنى المعيار (HQ مثلاً) | طريقة مثال SIFT الرسمي للبيانات المقطّعة. أقل نقطة قد تختار رتبة عالية جداً. |
+| المقياس | dDTF08 | مقياس اتجاهي يركّز على التأثير المباشر، ويستخدمه مثال SIFT الرسمي. |
+
+## أخطاء شائعة
+
+- **إدخال كل المكوّنات.** عدد المعاملات ينفجر مع مربع عدد المكوّنات، فيفشل النموذج أو يعطي أسهماً بلا معنى. ابدأ بعدد قليل من المكوّنات الدماغية.
+- **قراءة الأسهم قبل فحص النموذج.** إذا فشل فحص البياض أو الثبات، فالنموذج لا يمثّل البيانات، والرسم بعده لا يُعتمد.
+- **تفسير السهم كسببية تشريحية.** المقياس يقول إن ماضي مصدر يحسّن التنبؤ بمصدر آخر في هذا النموذج فقط.
+- **حساب الاتصال على بيانات بفلترة قوية.** فلتر الـ low-pass عند 30 هرتز يفرّغ الطيف فوقه، فيرفع الرتبة التي يختارها المعيار، وقد يُفشل فحص الثبات، ويشوّه مقاييس الاتجاه. لهذا يبدأ الدرس من فرع بدون هذا الفلتر. في بحثك، احسب الاتصال على بيانات بأقل فلترة ممكنة.
+- **مكوّنات آرتفاكت في الشبكة.** مكوّن عين أو عضلة يخلق اتصالاً زائفاً مع كل ما حوله. اختر مكوّنات دماغية فقط، وراجعها بعينك.
+
+{/* صندوق "من التجربة": بانتظار قصة من صاحب المشروع. لا يُكتب قبل وصولها. */}
+
+## كيف تتأكد أن الخطوة نجحت؟
+
+- نافذة الأوامر تطبع نسبة المعاملات إلى نقاط البيانات أقل من 0.1.
+- فحص <UiLabel>Validate model</UiLabel> ناجح في أغلب النوافذ: البواقي بيضاء والنموذج ثابت.
+- `size(EEG.CAT.Conn.dDTF08)` أبعاده: 4 × 4 × عدد الترددات (29) × عدد النوافذ الزمنية.
+- الشبكة الزمنية-الترددية تظهر لكل زوج من المكوّنات الأربعة.
+
+<Methods>
+Directed connectivity between four brain independent components was estimated with SIFT [version] (EEGLAB 2026.1) using a sliding-window multivariate autoregressive model (ARfit, 0.5-s windows, 0.03-s steps, model order [p] chosen at the elbow of the Hannan-Quinn criterion, averaged across windows) and the dDTF08 measure from 2 to 30 Hz, on epochs from −1 to 2 s without low-pass filtering.
+</Methods>

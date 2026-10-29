@@ -1,0 +1,175 @@
+---
+title: What a STUDY is and when you need one
+titleEn: What a STUDY is and when you need one
+description: The difference between a STUDY and ALLEEG in EEGLAB, when you need a STUDY, and what must match across all participants' files before you create one.
+station: 8
+order: 1
+level: core
+status: approved
+objectives:
+  - Explain the difference between a STUDY and ALLEEG, and when a STUDY is needed instead of a single dataset.
+  - Check two files from different participants and compare sampling rate, epoch window, channels and event types.
+  - Identify what the files must contain to analyze or cluster ICA components.
+prerequisites: [erp-average]
+references:
+  - title: EEGLAB Tutorial
+    url: https://eeglab.org/tutorials/10_Group_analysis/multiple_subject_proccessing_overview.html
+    section: "10. Group analysis > a. Multiple subject processing overview"
+  - title: EEGLAB Tutorial
+    url: https://eeglab.org/tutorials/10_Group_analysis/study_creation.html
+    section: "10. Group analysis > b. STUDY creation"
+  - title: "From raw data to group level analysis in EEGLAB"
+    url: https://www.youtube.com/watch?v=-jL3PuHD3aY
+    section: "Full video"
+    duration: "16:20"
+  - title: Go-nogo categorization and detection task (OpenNeuro ds002680)
+    url: https://openneuro.org/datasets/ds002680
+    section: "README; dataset_description.json"
+datasets: [D6]
+startingPoint:
+  dataset: D6
+  file: animal.study
+  applied: []
+  script: |
+    [ALLEEG, EEG, CURRENTSET, ALLCOM] = eeglab;
+    % Folder for the course data (change it)
+    dataFolder = 'C:\Users\me\Documents\eeg-course';
+
+    % Download the ready Go-nogo STUDY once and unzip it in its own folder
+    zipDir = fullfile(dataFolder, 'animal_study');
+    studyFile = dir(fullfile(zipDir, '**', 'animal.study'));
+    if isempty(studyFile)
+        zipFile = fullfile(dataFolder, 'animal_study.zip');
+        websave(zipFile, 'https://sccn.ucsd.edu/eeglab/download/animal_study.zip');
+        unzip(zipFile, zipDir);
+        studyFile = dir(fullfile(zipDir, '**', 'animal.study'));
+    end
+    studyDir = studyFile(1).folder;
+    fprintf('Go-nogo STUDY folder: %s\n', studyDir);
+    eeglab redraw;
+eeglabVersion: "2026.1"
+updated: 2026-10-28
+---
+
+## Why this step matters
+
+So far you have worked on one recording from one participant. A research question, though, is usually about a group: does the ERP differ between two kinds of image in most participants, not just in one person?
+
+In EEGLAB, a STUDY is an index file for that question. It stores the list of participant files, and for each file the subject, condition, group and session. It also stores designs and precomputed measures. It does not merge the data, and it does not process it again.
+
+So a STUDY trusts that your files match in everything that matters. If the sampling rate, the epoch window or the event names differ between participants, functions crash or silently give wrong results. This lesson teaches you to check before you create one.
+
+## Before and after
+
+<Figure src="study-concepts/study-concepts-gates.svg" alt="Four .set files from four participants pass three gates in a row: same rate and window, then same channels and events, then same processing steps. Participant 2's file stops at the first gate with a red mark because its sampling rate differs; the other three pass and are linked by lines to one file named STUDY." caption="Illustration, no data" source="original" />
+
+## Steps in the GUI
+
+**About the data (D6):** a Go-nogo experiment with 14 participants (Delorme et al.). A picture is flashed for 20 ms, and the participant lifts a finger off a button as fast as possible if it contains an animal, and keeps it down if not. The EEGLAB copy, ready as a STUDY, is already processed and epoched, with one file per participant for animal pictures (`animal`) and one for the other pictures (`distractor`). The raw data are on OpenNeuro in BIDS format, and we use them in the lesson on creating a STUDY from BIDS.
+
+Why not continue with D1? Because D1 is one participant's recording, and a STUDY needs several participants.
+
+**1. Download the data and open the folder**
+
+1. Run the "Starting point" script. It downloads `animal_study.zip` from the EEGLAB data page, unzips it once, and prints the folder location.
+2. Open the folder in your file browser. It holds the ready file `animal.study` and one folder per participant named by its code, from `cba` to `wpa`. Each folder holds two datasets, such as `sphanimal.set` and `sphdistractor.set`. The data of each dataset are in a `.dat` file next to it (the older EEGLAB format; only `cba` keeps its data inside the `.set`). You will also see files such as `sphanimal.daterp` and `sphanimal.icaerp`: measures precomputed with EEGLAB 6 in 2007. We do not use them, and the precompute lesson explains why.
+3. Do not open `animal.study` yet. We check the files before any STUDY.
+
+**2. Check one participant's file**
+
+1. Open <MenuPath>File > Load existing dataset</MenuPath> and choose `animal_study/cba/cbaanimal.set`, the animal-condition file of the first participant.
+2. Read the main window and note these values on paper: <UiLabel>Channels per frame</UiLabel>, <UiLabel>Frames per epoch</UiLabel>, <UiLabel>Epochs</UiLabel>, <UiLabel>Sampling rate (Hz)</UiLabel>, <UiLabel>Epoch start (sec)</UiLabel>, <UiLabel>Epoch end (sec)</UiLabel>, <UiLabel>Reference</UiLabel>, <UiLabel>Channel locations</UiLabel>, <UiLabel>ICA weights</UiLabel>.
+
+**3. Check another participant's file and compare**
+
+1. Open `animal_study/wpa/wpaanimal.set`, the animal-condition file of the last participant, the same way.
+2. Compare the values with your notes. All of them must match except <UiLabel>Epochs</UiLabel>, because the number of trials left after rejection naturally differs between people. In this copy you should read 32 channels, 750 frames per epoch, 250 Hz, and an epoch from -1 to 1.996 sec.
+3. The script below compares the same two files, on the same values, plus channel names, event types, ICLabel results and dipoles, which the main window does not show.
+
+**4. STUDY or ALLEEG?**
+
+| | ALLEEG | STUDY |
+|---|---|---|
+| What it is | The list of datasets open in memory right now | A `.study` file that describes a set of files and how they relate |
+| Knows subject and condition | No, only what you wrote in each dataset | Yes, for every file |
+| Stores designs and precomputed measures | No | Yes |
+| Survives closing EEGLAB | No | Yes, and opening it fills ALLEEG again |
+| When to use it | A quick comparison of two or three files from one participant | Any analysis of a group of participants |
+
+<Callout type="note" title="Memory with many participants">
+With dozens of participants, memory cannot hold every file. In <MenuPath>File > Preferences</MenuPath>, turn on <UiLabel>If set, keep at most one dataset in memory. This allows processing hundreds of datasets within studies.</UiLabel>, and EEGLAB reads files from disk when needed. With the 14 participants here you usually do not need it. When you create or open a STUDY, a <UiLabel>Study warning</UiLabel> window suggests this option, and the next lesson, on creating a STUDY, explains what to press.
+</Callout>
+
+## The equivalent script
+
+```matlab
+% studyDir comes from the starting point script
+files = dir(fullfile(studyDir, '*', '*.set'));
+fprintf('%d dataset files under %s\n', numel(files), studyDir);
+
+% Header only (no data) of the animal file of the first and the last participant
+animalFiles = files(contains({files.name}, 'animal'));
+A = pop_loadset('filename', animalFiles(1).name,   'filepath', animalFiles(1).folder,   'loadmode', 'info');
+B = pop_loadset('filename', animalFiles(end).name, 'filepath', animalFiles(end).folder, 'loadmode', 'info');
+
+% Side-by-side check of what must match before a STUDY
+show = @(label, a, b) fprintf('%-20s %-14s %-14s\n', label, num2str(a), num2str(b));
+fprintf('%-20s %-14s %-14s\n', 'Property', animalFiles(1).name, animalFiles(end).name);
+show('Sampling rate (Hz)', A.srate,  B.srate);
+show('Channels',           A.nbchan, B.nbchan);
+show('Points per epoch',   A.pnts,   B.pnts);
+show('Epoch start (s)',    A.xmin,   B.xmin);
+show('Epoch end (s)',      A.xmax,   B.xmax);
+show('Epochs',             A.trials, B.trials);
+show('ICA weights',        ~isempty(A.icaweights), ~isempty(B.icaweights));
+show('ICA components',     size(A.icaweights, 1), size(B.icaweights, 1));
+show('ICLabel results',    isfield(A.etc, 'ic_classification'), isfield(B.etc, 'ic_classification'));
+show('Dipoles',            isfield(A.dipfit, 'model'), isfield(B.dipfit, 'model'));
+fprintf('Same channel labels in the same order: %d\n', ...
+    isequal({A.chanlocs.labels}, {B.chanlocs.labels}));
+
+% Event types and their counts in each file
+eeg_eventtypes(A);
+eeg_eventtypes(B);
+```
+
+## Which value should I choose?
+
+This is the checklist before any STUDY. "Must" means functions crash or go wrong if it differs.
+
+| What to check | Rule | Why |
+|---|---|---|
+| Sampling rate | Must match | EEGLAB prints a warning over several lines on creation, starting with `IMPORTANT WARNING: SOME DATASETS DO NOT HAVE THE SAME SAMPLING`, and most STUDY functions then crash. |
+| Epoch window and number of points | Must match | Precomputing compares time point with time point across participants. |
+| Channel names | Must use the same naming system | A STUDY matches channels by name (ignoring upper and lower case). `T7` in one file and `T3` (the old name for the same site) in another are two different channels to it. |
+| Removed channels | Best interpolated in each participant's file before the STUDY | Precomputing has an interpolation option, but interpolating in the file itself is clearer and you can check it by eye. |
+| Event and condition names | Must be spelled the same | Each different spelling becomes a new condition. |
+| Processing steps (filters, reference, rejection) | Must be the same | A STUDY never checks them. This is why the shared processing script comes in station 9. |
+| ICA weights and ICLabel results | Needed to remove flagged components during precomputing | Without them there is nothing to remove. |
+| Dipoles | Needed to cluster components by location | They are the basis of the IC clustering lesson. |
+| Number of epochs | Naturally differs | But a participant with very few epochs left has a weak average. Note the count for each participant. |
+
+## Common mistakes
+
+- **Creating the STUDY before checking.** A STUDY is created without error even if the files differ, and the problem shows up an hour later during precomputing.
+- **Trusting the file name alone.** Two files both called `clean` may have gone through different filters. Look at `EEG.history` or the command history if in doubt.
+- **Mixing old and new processing.** A participant processed a year ago with old settings stays different even if everything in the main window matches.
+- **Forgetting that ICLabel runs per file.** If you ran it for some participants only, precomputing removes components from some and leaves the rest.
+- **Data with a different mains frequency.** D6 was recorded in France, where mains is 50 Hz. Your data in Saudi Arabia have 60 Hz. This does not matter within one STUDY whose files all went through the same steps, but it does when you combine data from two labs.
+
+{/* "From experience" box: waiting for a story from the project owner. Do not write it before it arrives. */}
+
+## How to check it worked
+
+- **The script prints the number of files** in the folder, 28 if each of the 14 participants has two files.
+- **Every line matches between the two files** except `Epochs` and `ICA components`, and the channel-name line prints 1. `cba` has 29 components and `wpa` 31: the number of components can differ between participants, and clustering does not need it to match.
+- **`eeg_eventtypes`** prints the same event types for both animal files, `Animal` and `rt`, even if the counts differ. A distractor file has `Distractor` only, because there is no response on no-go trials.
+- **You know the answer** to: do the files have ICA weights and dipoles? Here the authors' ICA weights and dipoles are present (`1` on both lines) and ICLabel results are not (`0`). The clustering lesson keeps the ICA and the dipoles, and runs ICLabel.
+
+<Methods>
+Before group analysis, the datasets of all [14] participants were checked for identical sampling rate, epoch limits, channel labels and event types (EEGLAB 2026.1).
+</Methods>
+
+<Callout type="note" title="About the data">
+Data: STUDY version: SCCN/Delorme. Original data: OpenNeuro ds002680 (CC0).
+</Callout>

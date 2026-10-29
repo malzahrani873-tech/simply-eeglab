@@ -1,0 +1,35 @@
+{
+  "v": 1,
+  "source": {
+    "dataset": "ds002718",
+    "subjects": [
+      "sub-002",
+      "sub-003",
+      "sub-004",
+      "sub-005",
+      "sub-006",
+      "sub-007",
+      "sub-008",
+      "sub-009",
+      "sub-010",
+      "sub-011"
+    ],
+    "license": "CC0",
+    "url": "https://openneuro.org/datasets/ds002718",
+    "eeglab": "2026.1",
+    "iclabel": "1.7",
+    "matlab": "",
+    "colormap": "turbo",
+    "generated": "2026-10-29"
+  },
+  "classes": [
+    "brain",
+    "eye",
+    "muscle",
+    "heart",
+    "line",
+    "chan",
+    "other"
+  ],
+  "items": []
+}

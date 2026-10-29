@@ -1,0 +1,175 @@
+{
+  "v": 1,
+  "station": 7,
+  "lang": "en",
+  "passPercent": 80,
+  "questions": [
+    {
+      "id": "s07-q01",
+      "type": "image",
+      "lesson": "topoplot",
+      "objective": 3,
+      "prompt": "Two scalp maps of the same dataset at two different times, and the colors look equally strong. What do you conclude?",
+      "image": {
+        "src": "/quiz/07/s07-q01.webp",
+        "w": 720,
+        "h": 360,
+        "status": "pending",
+        "alt": "Two side-by-side scalp maps, nose up, with strong colors in both. Under each map is its own color bar: the first bar's limits are small numbers, and the second bar's limits are much larger numbers.",
+        "spec": "Script figure on D1 epochs clean scalp (source: script): two topoplot maps of the ERP at 0 ms and at 400 ms, **each with 'maplimits', 'maxmin'** and its own numbered color bar in µV. No title naming the time, and no text other than the color bar numbers. Like the \"before\" image of the topoplot lesson, but with two maps only. One version for both languages."
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": "The amplitude is about the same at both times, because the colors are similar"
+        },
+        {
+          "id": "b",
+          "text": "Do not compare by color: each map has its own scale, so read the color bar numbers first, or plot both on one scale"
+        },
+        {
+          "id": "c",
+          "text": "The first map has a bad channel"
+        },
+        {
+          "id": "d",
+          "text": "The reference differs between the two maps"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "Each map was drawn with its own color limits, so a weak map looks as strong as a strong one. Read the numbers before the colors, and to compare, plot the maps on one scale symmetric around zero, as `Plot > ERP map series > In 2-D` does."
+    },
+    {
+      "id": "s07-q02",
+      "type": "image",
+      "lesson": "channel-erp-plot",
+      "objective": 3,
+      "prompt": "This is an ERP plot of two conditions at channel Pz. What is it missing so that others read it correctly?",
+      "image": {
+        "src": "/quiz/07/s07-q02.webp",
+        "w": 720,
+        "h": 400,
+        "status": "pending",
+        "alt": "Two curves in two colors from -200 to 800, with no labels on either axis, no line at time zero or at 0 µV, no legend naming the curves, and the vertical axis flipped with no sign of it.",
+        "spec": "The same \"before\" image of the channel-erp-plot lesson (the Pz ERP for position 1 and position 2 from D1 epochs clean, with no labels, no zero lines, no legend, and the vertical axis flipped). One version for both languages."
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": "Only a bigger title"
+        },
+        {
+          "id": "b",
+          "text": "Axis labels with units, the zero lines, the polarity direction, and a legend with each condition's name and trial count"
+        },
+        {
+          "id": "c",
+          "text": "More colors for the curves"
+        },
+        {
+          "id": "d",
+          "text": "Nothing, the plot is complete"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "A reader needs three things: which direction is positive, what unit each axis has, and how many trials are in each average. Without them a positive peak may be read as negative, and a difference between conditions may be blamed on the brain when it comes from different trial counts."
+    },
+    {
+      "id": "s07-q03",
+      "type": "single",
+      "lesson": "topoplot",
+      "objective": 3,
+      "prompt": "In an EEGLAB scalp map, where is the nose, and which side of the map is the participant's left?",
+      "options": [
+        {
+          "id": "a",
+          "text": "The nose is at the top, and the left of the map is the participant's left"
+        },
+        {
+          "id": "b",
+          "text": "The nose is at the top, and the left of the map is the participant's right"
+        },
+        {
+          "id": "c",
+          "text": "The nose is at the bottom, and the left of the map is the participant's left"
+        },
+        {
+          "id": "d",
+          "text": "It depends on the site's language"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "The map is a view from above the head: the small triangle at the top is the nose, with the ears at the sides. Scientific plots are never mirrored, not even on the Arabic page."
+    },
+    {
+      "id": "s07-q04",
+      "type": "single",
+      "lesson": "channel-erp-plot",
+      "objective": 3,
+      "prompt": "A script calls `plottopo` without writing `'ydir'`. What do you expect?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Positive up, like the menu"
+        },
+        {
+          "id": "b",
+          "text": "Negative up, the opposite of the menu"
+        },
+        {
+          "id": "c",
+          "text": "An error that stops the script"
+        },
+        {
+          "id": "d",
+          "text": "The vertical axis is not drawn"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "The menu plots positive up, but `plottopo` without `'ydir'` plots negative up. So write `'ydir', 1` explicitly in every script, and state the polarity on the axis or in the caption."
+    },
+    {
+      "id": "s07-q05",
+      "type": "multiple",
+      "lesson": "topoplot",
+      "objective": 1,
+      "prompt": "You are comparing scalp maps and ERP waveforms between two conditions. Which of these are good practice? (Select all that apply)",
+      "options": [
+        {
+          "id": "a",
+          "text": "One color scale, symmetric around zero, for all maps"
+        },
+        {
+          "id": "b",
+          "text": "The same vertical-axis limits for all waveforms"
+        },
+        {
+          "id": "c",
+          "text": "Stating the number of trials in each condition"
+        },
+        {
+          "id": "d",
+          "text": "Treating a sharp spot around one electrode as a brain source under that electrode"
+        },
+        {
+          "id": "e",
+          "text": "Keeping `EOG1` and `EOG2` on the map with the scalp channels"
+        }
+      ],
+      "answer": [
+        "a",
+        "b",
+        "c"
+      ],
+      "explanation": "A sharp spot around one electrode is usually a bad channel, and a map does not locate the source anyway, because voltage spreads through the skull. `EOG1` and `EOG2` are not on the average reference, so they are removed before plotting maps so they do not distort the scale."
+    }
+  ]
+}

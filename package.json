@@ -1,0 +1,43 @@
+{
+  "name": "simply-eeglab",
+  "version": "0.1.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/malzahrani873-tech/simply-eeglab.git"
+  },
+  "bugs": {
+    "url": "https://github.com/malzahrani873-tech/simply-eeglab/issues"
+  },
+  "private": true,
+  "type": "module",
+  "description": "Learn EEGLAB as a roadmap, in Arabic and English.",
+  "license": "MIT",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "dev": "astro dev",
+    "check:content": "node scripts/check-content.mjs",
+    "build": "node scripts/prepare-assets.mjs && node scripts/check-content.mjs && astro build && node scripts/postbuild.mjs && pagefind --site dist && node scripts/check-budget.mjs dist && node scripts/check-depth.mjs dist && node scripts/check-text.mjs dist",
+    "preview": "astro preview",
+    "test": "node --test \"tests/unit/**/*.test.mjs\"",
+    "predev": "node scripts/prepare-assets.mjs",
+    "test:a11y": "node tests/a11y/axe.mjs",
+    "check:policy": "node scripts/check-policy.mjs",
+    "check:locks": "node scripts/check-locks.mjs",
+    "test:e2e": "node tests/e2e/console.mjs",
+    "test:build": "node tests/build/empty-daily.mjs"
+  },
+  "dependencies": {
+    "@astrojs/markdown-remark": "7.3.5",
+    "@astrojs/mdx": "8.1.2",
+    "@astrojs/sitemap": "3.7.4",
+    "astro": "7.4.3",
+    "js-yaml": "5.4.3",
+    "pagefind": "1.5.2"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "4.11.0",
+    "playwright": "1.63.0"
+  }
+}

@@ -1,0 +1,197 @@
+---
+title: تشغيل ICA
+titleEn: Running ICA
+description: كيف تشغّل تحليل المكوّنات المستقلة (ICA) في EEGLAB على نسخة مفلترة عند 1 هرتز، ثم تنسخ أوزانه إلى بياناتك الأصلية.
+station: 4
+order: 3
+level: core
+status: approved
+objectives:
+  - يشغّل تفكيك ICA من الواجهة ومن السكربت على نسخة مفلترة عند 1 هرتز، وينسخ الأوزان للبيانات الأصلية.
+  - يعرض خرائط رأس مكوّنات ICA ويتعرّف على مكوّن رمش واضح.
+  - يتحقق أن أوزان ICA حُفظت في الداتاست.
+prerequisites: [ica-concept, filtering]
+references:
+  - title: EEGLAB Tutorial
+    url: https://eeglab.org/tutorials/06_RejectArtifacts/RunICA.html
+    section: "6. Reject artifacts > d. Indep. Comp. Analysis: Running ICA decompositions"
+  - title: EEGLAB Tutorial
+    url: https://eeglab.org/tutorials/06_RejectArtifacts/RunICA.html
+    section: "How to deal with the aggressive high-pass filter applied before running ICA"
+  - title: EEGLAB Tutorial
+    url: https://eeglab.org/tutorials/06_RejectArtifacts/RunICA.html
+    section: "Issues with data rank deficiencies"
+  - title: Luck, Applied Event-Related Potential Data Analysis (الطبعة الأولى)
+    url: https://socialsci.libretexts.org/Bookshelves/Psychology/Biological_Psychology/Applied_Event-Related_Potential_Data_Analysis_(Luck)
+    section: "الفصل 9: Artifact Correction with ICA"
+  - title: "ICA applied to EEG part 7: Running ICA in EEGLAB and visualizing components"
+    url: https://www.youtube.com/watch?v=2hrYEYSycGI
+    section: "الفيديو كاملاً"
+    duration: "11:55"
+datasets: [D1]
+startingPoint:
+  dataset: D1
+  file: eeglab_data.set
+  applied: [filtering, line-noise, bad-channels, interpolation, rereferencing]
+  script: |
+    [ALLEEG, EEG, CURRENTSET, ALLCOM] = eeglab;
+    eeglabRoot = fileparts(which('eeglab'));
+    EEG = pop_loadset('eeglab_data.set', fullfile(eeglabRoot, 'sample_data'));
+    fullLocs = EEG.chanlocs;
+
+    % Main dataset: high-pass at 0.1 Hz, then 60 Hz line-noise removal
+    EEG = pop_eegfiltnew(EEG, 'locutoff', 0.1);
+    EEG = pop_eegfiltnew(EEG, 'locutoff', 58, 'hicutoff', 62, 'revfilt', 1);
+
+    % Bad channels you removed earlier, e.g. {'T7'}; leave empty if none
+    badChans = {};
+    if ~isempty(badChans)
+        EEG = pop_select(EEG, 'rmchannel', badChans);
+        EEG = pop_interp(EEG, fullLocs, 'spherical');
+    end
+
+    % Average reference, EOG channels excluded
+    eogIdx = find(ismember({EEG.chanlocs.labels}, {'EOG1', 'EOG2'}));
+    EEG = pop_reref(EEG, [], 'exclude', eogIdx);
+    EEG.filename = ''; EEG.filepath = ''; EEG.datfile = ''; EEG.saved = 'no';
+    [ALLEEG, EEG, CURRENTSET] = pop_newset(ALLEEG, EEG, 0, 'setname', 'D1 main', 'gui', 'off');
+    eeglab redraw;
+interactive: []
+eeglabVersion: "2026.1"
+updated: 2026-10-28
+---
+
+## لماذا هذه الخطوة مهمة؟
+
+كل قناة تسجّل خليطاً من مصادر: نشاط الدماغ، ورمش العين، والعضلات، والقلب. تحليل المكوّنات المستقلة (ICA) يفكّ هذا الخليط إلى مصادر منفصلة، اسم كل واحد منها "مكوّن ICA".
+
+بعد ذلك تحذف مكوّنات الآرتفاكت، أي الإشارات غير الدماغية، وتُبقي الباقي. لا تحذف قناة ولا مقطعاً من التسجيل.
+
+في هذا الدرس تشغّل ICA فقط. التصنيف والحذف في درس ICLabel.
+
+<Callout type="warning">
+**قاعدة هذا الدرس:** ICA يُحسب على نسخة مفلترة عند 1 هرتز، لا على بيانات الـ ERP المفلترة عند 0.1 هرتز.
+</Callout>
+
+السبب أن الانجراف البطيء يربك ICA، والتوثيق الرسمي يقول إن جودة التفكيك أعلى بوضوح مع <En>high-pass</En> فوق 1 هرتز. لكن فلتر 1 هرتز يشوّه مكوّنات ERP البطيئة مثل P3.
+
+الحل نسختان من نفس البيانات:
+
+1. **نسخة ICA** مفلترة عند 1 هرتز، نحسب عليها ICA فقط.
+2. **النسخة الرئيسية** مفلترة عند 0.1 هرتز، ننسخ لها نتيجة ICA ونكمل عليها التحليل.
+
+نتيجة ICA مجموعة أوزان، أي طريقة ثابتة لخلط القنوات. لذلك يصح تطبيقها على النسخة الرئيسية، كما يوضّح التوثيق الرسمي.
+
+## قبل وبعد
+
+تشغيل ICA وحده لا يغيّر إشارتك. الأثر قبل الحذف وبعده تراه في درس ICLabel.
+
+<Figure src="run-ica/ica-two-copies.svg" alt="نسختان من نفس البيانات: النسخة الرئيسية بفلتر high-pass 0.1 هرتز، ونسخة ICA بفلتر 1 هرتز. نشغّل ICA على نسخة ICA، ثم ننسخ الأوزان إلى النسخة الرئيسية." source="original" />
+
+<Figure src="run-ica/run-ica-maps-20.png" alt="خرائط فروة الرأس لأول 20 مكوناً من ICA على D1، مرقمة IC 1 إلى IC 20، بألوان EEGLAB الافتراضية." source="D1" />
+
+## الخطوات من الواجهة
+
+ابدأ والنسخة الرئيسية مفتوحة كما في "نقطة البداية". سنسمّيها الداتاست 1.
+
+**أولاً: اصنع نسخة ICA**
+
+1. تأكد أن الداتاست 1 هي الحالية من قائمة <MenuPath>Datasets</MenuPath>.
+2. افتح <MenuPath>Tools > Filter the data > Basic FIR filter (new, default)</MenuPath>.
+3. في <UiLabel>Lower edge of the frequency pass band (Hz)</UiLabel> اكتب `1`، واترك باقي الخانات كما هي، ثم اضغط <UiLabel>OK</UiLabel>.
+4. سمِّ الداتاست الجديدة `D1 ica1hz`، واترك <UiLabel>Overwrite it in memory (set=yes; unset=create a new dataset)</UiLabel> غير مفعّل. صارت عندك الداتاست 2، والداتاست 1 لم تتغيّر.
+
+<Callout type="note" title="لماذا 1 هرتز فوق 0.1؟">
+النسخة الرئيسية مفلترة عند 0.1 هرتز. فلتر 1 هرتز فوقها يعطي تقريباً نفس نتيجة فلترة البيانات الخام عند 1 هرتز، لأن الفلتر الأعلى هو الذي يحدد ما يبقى.
+</Callout>
+
+**ثانياً: شغّل ICA على نسخة ICA**
+
+1. والداتاست 2 هي الحالية، افتح <MenuPath>Tools > Decompose data by ICA</MenuPath>.
+2. في <UiLabel>ICA algorithm to use (click to select)</UiLabel> اترك الخيار الأول <UiLabel>Extended Infomax (runica.m; default)</UiLabel>. خانة الخيارات تحته تكون `'extended', 1`.
+3. أبقِ <UiLabel>Reorder components by variance (if that's not already the case)</UiLabel> مفعّلاً، واترك خانة <UiLabel>Use only channel type(s) or indices</UiLabel> فارغة، ثم اضغط <UiLabel>OK</UiLabel>.
+4. قد تظهر نافذة تقول إن رتبة البيانات (<En>rank</En>) أقل من عدد القنوات، وفيها خانة <UiLabel>Proposed rank:</UiLabel>. قارن رقمها بالرتبة المتوقّعة: عدد القنوات، ناقص القنوات المستوفاة، ناقص 1 للمرجع المتوسط. في D1 هي 31 من 32. إذا اختلف الرقم فاكتب الرقم المتوقّع، ثم اضغط <UiLabel>OK</UiLabel>.
+5. انتظر. ستطبع نافذة الأوامر خطوات التدريب، وقد يستغرق ذلك من أقل من دقيقة إلى بضع دقائق حسب جهازك.
+
+**ثالثاً: اعرض خرائط المكوّنات**
+
+1. افتح <MenuPath>Plot > Component maps > In 2-D</MenuPath> واترك الإعدادات الافتراضية.
+2. ابحث عن مكوّن الرمش: خريطة قوية في مقدمة الرأس، متماثلة بين اليمين واليسار. غالباً يكون بين المكوّنات الأولى.
+
+**رابعاً: انسخ الأوزان إلى النسخة الرئيسية**
+
+1. ارجع للداتاست 1 من قائمة <MenuPath>Datasets</MenuPath>.
+2. افتح <MenuPath>Edit > Dataset info</MenuPath>.
+3. بجانب <UiLabel>ICA weights array or text/binary file (if any):</UiLabel> اضغط <UiLabel>from other dataset</UiLabel>، واكتب `2` ثم <UiLabel>OK</UiLabel>. تمتلئ ثلاث خانات تلقائياً: `ALLEEG(2).icaweights` و `ALLEEG(2).icasphere` و `ALLEEG(2).icachansind`.
+4. اضغط <UiLabel>OK</UiLabel> لإغلاق النافذة.
+5. احفظ النسخة الرئيسية من <MenuPath>File > Save current dataset as</MenuPath>. درس ICLabel يبدأ منها.
+
+## السكربت المقابل
+
+```matlab
+% Main dataset (high-pass 0.1 Hz, line noise removed, average reference) is in EEG
+EEG_main = EEG;
+
+% ICA copy: same data, high-pass at 1 Hz
+EEG_ica = pop_eegfiltnew(EEG_main, 'locutoff', 1);
+EEG_ica.setname = 'D1 ica1hz';
+
+% Expected rank: channels - interpolated channels - 1 (average reference)
+expectedRank = EEG_ica.nbchan - numel(badChans) - 1;
+fprintf('Expected data rank: %d\n', expectedRank);
+
+% Extended Infomax on the ICA copy
+EEG_ica = pop_runica(EEG_ica, 'icatype', 'runica', 'extended', 1);
+% If "Data rank (N)" is missing or N differs from expectedRank, run instead:
+% EEG_ica = pop_runica(EEG_ica, 'icatype', 'runica', 'extended', 1, 'pca', expectedRank);
+
+% Copy the decomposition back to the main dataset
+EEG_main.icaweights  = EEG_ica.icaweights;
+EEG_main.icasphere   = EEG_ica.icasphere;
+EEG_main.icachansind = EEG_ica.icachansind;
+EEG_main.icawinv     = [];   % recomputed by eeg_checkset
+EEG_main.icaact      = [];
+EEG = eeg_checkset(EEG_main);
+
+% Scalp maps of the first 20 components
+pop_topoplot(EEG, 0, 1:20);
+
+EEG = pop_saveset(EEG, 'filename', 'D1_main_ica.set', 'filepath', pwd);
+```
+
+في السكربت لا تظهر نافذة الرتبة. `pop_runica` يحاول اكتشاف الرتبة الناقصة، لكن تقديره قد يفشل. وإذا اكتشفها يطبع سطراً مثل `Data rank (31) is smaller than the number of channels (32)`. قارن هذا الرقم بسطر `Expected data rank` الذي طبعه السكربت. إذا لم يظهر السطر أو اختلف الرقمان، استخدم السطر المعلَّق الذي يمرّر `'pca'` بالقيمة المتوقّعة. وإذا كان في بياناتك قنوات سيئة، مثلاً 32 قناة استوفيت منها 2، فالرتبة المتوقّعة 29.
+
+<Callout type="note" title="طريقة النسختين">
+الشرح المفصّل لطريقة النسختين، ومتى تحتاج 2 هرتز بدل 1، في الدرس التالي: فلتر 1 هرتز قبل ICA ونسخ الأوزان.
+</Callout>
+
+## أي قيمة أختار؟
+
+| الإعداد | القيمة | لماذا |
+|---|---|---|
+| high-pass لنسخة ICA | 1 هرتز، و2 إذا بقيت المكوّنات غامضة | التوثيق الرسمي: جودة ICA أعلى بوضوح فوق 1 هرتز، وأحياناً 2 (صفحة RunICA). |
+| الخوارزمية | Extended Infomax (`runica`) | الخيار الافتراضي في EEGLAB 2026.1، ويستخدمه التوتوريال الرسمي. البدائل مثل AMICA و Picard في درس اختياري. |
+| القنوات | كل قنوات EEG. في D1 نُبقي `EOG1` و `EOG2` | قناتا العين تسجّلان نفس الرمش الذي نريد عزله، والتوتوريال الرسمي يشغّل ICA على قنوات D1 الـ 32 كلها. |
+| عدد المكوّنات | مساوٍ لرتبة البيانات، أي 31 في D1 بعد المرجع المتوسط | المرجع المتوسط ينقص الرتبة بواحد، و ICA لا يعمل جيداً إذا طلب مكوّنات أكثر من الرتبة (صفحة RunICA). |
+
+## أخطاء شائعة
+
+- **حساب ICA على بيانات 0.1 هرتز، أو إكمال الـ ERP على نسخة 1 هرتز.** الأول يعطي تفكيكاً أضعف، والثاني يشوّه P3 و N400. النسختان معاً هما الحل.
+- **الاعتماد على التقدير التلقائي للرتبة.** `pop_runica` يحاول اكتشاف الرتبة، لكن تقديره قد يفشل. علامات الرتبة الفائتة: عدة مكوّنات متشابهة جداً أو تشبه الضجيج، أو ICA لا يتقارب. قارن دائماً `Data rank` المطبوع بالرتبة المتوقّعة (القنوات ناقص المستوفاة ناقص 1). إذا اختلفا، اكتب في خانة الخيارات `'pca', 31` برقمك المتوقّع بدل 31.
+- **دخول قنوات غير دماغية بالغلط.** استبعد قنوات EOG و ECG حسب هدفك، ولا تتركها تدخل بدون قرار. استخدم خانة <UiLabel>Use only channel type(s) or indices</UiLabel> لتحديد القنوات. في D1 قرّرنا إبقاء قناتي العين لسبب واضح.
+- **توقّع نفس النتيجة في كل مرة.** ICA يخلط ترتيب البيانات عشوائياً أثناء التدريب، فيختلف ترتيب المكوّنات وشكلها قليلاً بين تشغيل وآخر. لذلك قد لا يطابق ترتيب مكوّناتك الصورة في هذا الدرس: مكوّن الرمش قد يكون رقم 1 عندنا ورقم 3 عندك. ابحث عن المكوّن بشكله، لا برقمه.
+- **تغيير المرجع بعد ICA.** الأوزان مرتبطة بالمرجع الذي حُسب عليه ICA. أعد المرجع قبل ICA واتركه بعده. EEGLAB نفسه يحذّرك إذا غيّرته.
+
+{/* صندوق "من التجربة": بانتظار قصة من صاحب المشروع. لا يُكتب قبل وصولها. */}
+
+## كيف تتأكد أن الخطوة نجحت؟
+
+1. **في نافذة EEGLAB الرئيسية**، والداتاست 1 هي الحالية، يجب أن تظهر <UiLabel>ICA weights</UiLabel> بقيمة <UiLabel>Yes</UiLabel>.
+2. **في نافذة الأوامر** اكتب `size(EEG.icawinv)`. في D1 بدون قنوات مستوفاة يظهر `32 31`: 32 قناة و31 مكوّناً. كل قناة مستوفاة تنقص عدد المكوّنات بواحد.
+3. **افتح خرائط المكوّنات** من <MenuPath>Plot > Component maps > In 2-D</MenuPath> على الداتاست 1. يجب أن ترى نفس الخرائط التي ظهرت على نسخة ICA، ومنها مكوّن الرمش.
+4. **افتح الملف المحفوظ من جديد** من <MenuPath>File > Load existing dataset</MenuPath>، وتأكد أن <UiLabel>ICA weights</UiLabel> ما زالت <UiLabel>Yes</UiLabel>.
+5. **الرتبة مطابقة:** رقم `Data rank` الذي طبعه `pop_runica` يساوي `Expected data rank`. في D1 كلاهما 31.
+
+<Methods>
+Independent component analysis (extended Infomax; Lee et al., 1999) was computed with runica ([31] components after PCA reduction to the data rank) on a copy of the data high-pass filtered at 1 Hz, and the resulting weights were applied to the 0.1 Hz high-pass filtered data.
+</Methods>

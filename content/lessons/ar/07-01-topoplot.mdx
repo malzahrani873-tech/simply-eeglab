@@ -1,0 +1,210 @@
+---
+title: خرائط الرأس topoplot
+titleEn: Scalp maps (topoplot)
+description: كيف ترسم خريطة رأس لـ ERP عند زمن محدد أو كمتوسط لنافذة زمنية في EEGLAB، وتقرأ اتجاهها ومقياس ألوانها بدون أن تخدعك.
+station: 7
+order: 1
+level: core
+status: approved
+objectives:
+  - يرسم سلسلة خرائط رأس لـ ERP عند أزمنة محددة بمقياس ألوان موحّد.
+  - يرسم خريطة رأس لمتوسط نافذة زمنية من السكربت.
+  - يقرأ اتجاه الخريطة (الأنف للأعلى) وحدود مقياس الألوان ووحدته.
+prerequisites: [erp-average, channel-locations]
+references:
+  - title: EEGLAB Tutorial
+    url: https://eeglab.org/tutorials/08_Plot_data/Data_Averaging.html
+    section: "8. Plot data > a. ERPs: Plotting all-channel ERPs; Plotting a series of 2-D ERP scalp maps"
+  - title: EEGLAB Tutorial
+    url: https://eeglab.org/tutorials/11_Scripting/EEG_scalp_measures.html
+    section: "11. Write scripts > d. Advanced plots"
+datasets: [D1]
+startingPoint:
+  dataset: D1
+  file: eeglab_data.set
+  applied: [filtering, line-noise, bad-channels, interpolation, rereferencing, run-ica, ica-1hz-copy-weights, iclabel, extract-epochs, baseline-correction, epoch-rejection]
+  script: |
+    % Shortcut: if you saved D1_epochs_clean.set in the epoch rejection lesson, keep
+    % the first line and the last two lines (pop_newset, eeglab redraw), and replace
+    % every line between them with:
+    % EEG = pop_loadset('D1_epochs_clean.set', pwd);
+    [ALLEEG, EEG, CURRENTSET, ALLCOM] = eeglab;
+    eeglabRoot = fileparts(which('eeglab'));
+    EEG = pop_loadset('eeglab_data.set', fullfile(eeglabRoot, 'sample_data'));
+    fullLocs = EEG.chanlocs;
+
+    % Main dataset: high-pass at 0.1 Hz, then 60 Hz line-noise removal
+    EEG = pop_eegfiltnew(EEG, 'locutoff', 0.1);
+    EEG = pop_eegfiltnew(EEG, 'locutoff', 58, 'hicutoff', 62, 'revfilt', 1);
+
+    % Bad channels you removed earlier, e.g. {'T7'}; leave empty if none
+    badChans = {};
+    if ~isempty(badChans)
+        EEG = pop_select(EEG, 'rmchannel', badChans);
+        EEG = pop_interp(EEG, fullLocs, 'spherical');
+    end
+
+    % Average reference, EOG channels excluded
+    eogIdx = find(ismember({EEG.chanlocs.labels}, {'EOG1', 'EOG2'}));
+    EEG = pop_reref(EEG, [], 'exclude', eogIdx);
+
+    % ICA on a 1-Hz copy, then copy the weights back
+    EEG_ica = pop_eegfiltnew(EEG, 'locutoff', 1);
+    EEG_ica = pop_runica(EEG_ica, 'icatype', 'runica', 'extended', 1);
+    EEG.icaweights  = EEG_ica.icaweights;
+    EEG.icasphere   = EEG_ica.icasphere;
+    EEG.icachansind = EEG_ica.icachansind;
+    EEG.icawinv     = [];
+    EEG.icaact      = [];
+    EEG = eeg_checkset(EEG);
+
+    % Remove eye and muscle components, then low-pass at 30 Hz
+    EEG = pop_iclabel(EEG, 'default');
+    EEG = pop_icflag(EEG, [NaN NaN; 0.9 1; 0.9 1; NaN NaN; NaN NaN; NaN NaN; NaN NaN]);
+    artifactComps = find(EEG.reject.gcompreject);
+    if ~isempty(artifactComps)
+        EEG = pop_subcomp(EEG, artifactComps, 0);
+    end
+    EEG = pop_eegfiltnew(EEG, 'hicutoff', 30);
+
+    % Epochs around 'square', baseline, and +/-100 uV rejection
+    EEG = pop_epoch(EEG, {'square'}, [-1 2], 'newname', 'D1 epochs', 'epochinfo', 'yes');
+    EEG = pop_rmbase(EEG, [-200 0]);
+    EEG = pop_eegthresh(EEG, 1, 1:EEG.nbchan, -100, 100, EEG.xmin, EEG.xmax, 0, 0);
+    badEpochs = find(EEG.reject.rejthresh);
+    if ~isempty(badEpochs)
+        EEG = pop_rejepoch(EEG, EEG.reject.rejthresh, 0);
+    end
+    EEG.setname = 'D1 epochs clean';
+    EEG = eeg_checkset(EEG);
+    EEG = pop_saveset(EEG, 'filename', 'D1_epochs_clean.set', 'filepath', pwd);
+    EEG.filename = ''; EEG.filepath = ''; EEG.datfile = ''; EEG.saved = 'no';
+    [ALLEEG, EEG, CURRENTSET] = pop_newset(ALLEEG, EEG, 0, 'setname', 'D1 epochs clean', 'gui', 'off');
+    eeglab redraw;
+eeglabVersion: "2026.1"
+updated: 2026-10-28
+---
+
+## لماذا هذه الخطوة مهمة؟
+
+موجة الـ ERP تجيب عن سؤال "متى": في أي زمن ترتفع الإشارة أو تنخفض. خريطة الرأس تجيب عن سؤال "أين": كيف يتوزّع الجهد على فروة الرأس في لحظة واحدة.
+
+لكل مكوّن ERP توزيع معروف تقريباً. فالخريطة تساعدك أن تميّز مكوّناً عن آخر يقع في نفس الزمن، وأن تكتشف قناة سيئة تظهر كبقعة وحيدة غريبة.
+
+والخريطة سهلة أن تخدع: مقياس ألوان مختلف بين خريطتين قد يصنع فرقاً غير موجود. هذا الدرس يعلّمك الرسم والقراءة معاً.
+
+## قبل وبعد
+
+<BeforeAfter>
+<Figure src="topoplot/topoplot-scales-before.png" alt="ست خرائط لفروة الرأس عند 0 و 100 و 200 و 300 و 400 و 500 ملي ثانية، لكل خريطة مقياس ألوان خاص بها. خريطة 0 ملي ثانية تبدو قوية رغم أن سعتها صغيرة." caption="قبل: مقياس مختلف لكل خريطة" source="D1" />
+<Figure src="topoplot/topoplot-scales-after.png" alt="الخرائط الست نفسها بمقياس ألوان واحد مشترك من -15.5 إلى 15.5 ميكروفولت: خريطة 0 ملي ثانية قريبة من المحايد، وخرائط 300 و 400 ملي ثانية تبرز." caption="بعد: مقياس واحد مشترك" source="D1" />
+</BeforeAfter>
+
+## الخطوات من الواجهة
+
+ابدأ والداتاست `D1 epochs clean` مفتوحة، كما في "نقطة البداية". هي 32 قناة بمواقعها، ومقطّعة حول حدث `square`.
+
+**قبل البدء: أبقِ قنوات الرأس فقط**
+
+قناتا EOG1 و EOG2 استُبعدتا من المرجع المتوسط في درس إعادة المرجع، فبقيتا بالمرجع الأصلي. ولهما مواقع في D1، فيرسمهما EEGLAB على الخريطة، وقد يأخذ حدود مقياس الألوان منهما. اصنع نسخة بدونهما أولاً.
+
+1. افتح <MenuPath>Edit > Select data</MenuPath>.
+2. في صف <UiLabel>Channel(s)</UiLabel> اكتب `EOG1 EOG2`، وفعّل المربع في عمود <UiLabel>on->remove these</UiLabel> لنفس الصف. اضغط <UiLabel>Ok</UiLabel>.
+3. في النافذة التالية سمِّ الداتاست الجديدة `D1 epochs clean scalp`، ولا تحفظها على القرص. فيها 30 قناة، كلها بالمرجع المتوسط.
+
+استخدم هذه الداتاست لكل خرائط الدرس.
+
+**أولاً: الموجة وخرائطها معاً**
+
+1. افتح <MenuPath>Plot > Channel ERPs > With scalp maps</MenuPath>.
+2. في <UiLabel>Plotting time range (ms):</UiLabel> اكتب `-200 800`.
+3. اترك <UiLabel>Scalp map latencies (ms, NaN -> max-RMS)</UiLabel> على `NaN`. بهذا يختار EEGLAB الزمن الذي يكون فيه الـ ERP أقوى عبر القنوات.
+4. اترك <UiLabel>Window size at latencies in ms</UiLabel> على `0`. اضغط <UiLabel>Ok</UiLabel>.
+5. تظهر موجات القنوات الـ 30 فوق بعض، وفوقها خريطة عند الزمن المختار، وخط يربطها بمكانها على المحور. اضغط على أي نقطة في الموجات لترسم خريطة ذلك الزمن.
+6. أعد الخطوات، واكتب هذه المرة `100 200 400` في خانة الأزمنة لترى ثلاث خرائط فوق الموجات.
+
+**ثانياً: سلسلة خرائط بمقياس واحد**
+
+1. افتح <MenuPath>Plot > ERP map series > In 2-D</MenuPath>.
+2. في <UiLabel>Plotting ERP scalp maps at these latencies</UiLabel> اكتب `0:100:500`. الخانة تقبل أي تعبير MATLAB، فهذا يعني 0 و 100 و 200 و 300 و 400 و 500 ms.
+3. في <UiLabel>Plot title</UiLabel> اترك اسم الداتاست.
+4. في <UiLabel>Plot geometry (rows,col.); [] -> near square</UiLabel> اكتب `[2 3]`.
+5. اترك خانة الخيارات الإضافية على `'electrodes', 'on'` حتى تظهر نقاط الأقطاب. اضغط <UiLabel>Ok</UiLabel>.
+6. تظهر ست خرائط بمقياس ألوان واحد وشريط ألوان واحد. اضغط على أي خريطة لتكبّرها في نافذة مستقلة.
+
+**ثالثاً: اقرأ الخريطة**
+
+| ما تراه | معناه |
+|---|---|
+| المثلث الصغير في الأعلى | الأنف. الخريطة منظورة من فوق الرأس، والأذنان على الجانبين. |
+| يسار الخريطة | نصف الرأس الأيسر. الخريطة لا تُعكس في الموقع العربي، فهي رسم علمي. |
+| النقاط السوداء | أماكن الأقطاب. ما بينها قيم مستوفاة، لا مقيسة. |
+| شريط الألوان | السعة بالميكروفولت (µV). في سلسلة الخرائط الحد الأعلى والأدنى متساويان بالقيمة ومختلفان بالإشارة، فاللون الأوسط هو الصفر. |
+| الألوان الحارة والباردة | في خريطة turbo: الأحمر موجب والأزرق سالب. |
+| بقعة صغيرة حادة حول قطب واحد | غالباً قناة سيئة، لا نشاط دماغي. |
+
+<Callout type="note" title="لماذا الخطوة الأولى؟">
+لماذا الخطوة الأولى؟ الخريطة تخلط القنوات بالاستيفاء، فيجب أن تكون كل قنواتها بنفس المرجع. قناتا EOG ليستا كذلك، وفي سلسلة الخرائط قد تحدد قيمهما مقياس الألوان المشترك للخرائط الست كلها. بحذفهما تصير الخريطة من 30 قناة رأس بمرجع متوسط.
+</Callout>
+
+## السكربت المقابل
+
+```matlab
+EEG = pop_loadset('D1_epochs_clean.set', pwd);
+
+% Scalp channels only: the EOG channels are not on the average reference
+EEG = pop_select(EEG, 'rmchannel', {'EOG1', 'EOG2'});
+EEG.setname = 'D1 epochs clean scalp';
+
+% All-channel ERP with a scalp map at the latency of maximum power
+figure; pop_timtopo(EEG, [-200 800], NaN, 'D1 epochs clean scalp');
+
+% ERP with scalp maps at chosen latencies
+figure; pop_timtopo(EEG, [-200 800], [100 200 400], 'D1 epochs clean scalp');
+
+% Map series every 100 ms, one shared color scale, 2 x 3 grid
+pop_topoplot(EEG, 1, 0:100:500, 'D1 epochs clean scalp', [2 3], 0, 'electrodes', 'on');
+
+% Mean map over a 300 to 500 ms window
+erp = mean(EEG.data, 3);
+win = EEG.times >= 300 & EEG.times <= 500;
+winMap = mean(erp(:, win), 2);
+lim = max(abs(winMap));
+figure;
+topoplot(winMap, EEG.chanlocs, 'maplimits', [-lim lim], 'electrodes', 'on');
+cb = colorbar; ylabel(cb, '\muV');
+title('300 to 500 ms');
+```
+
+## أي قيمة أختار؟
+
+| الإعداد | القيمة | لماذا |
+|---|---|---|
+| زمن واحد أم نافذة؟ | نافذة لمكوّن ممتد (مثل 300 إلى 500 ms)، وزمن واحد للاستكشاف | متوسط النافذة أثبت من نقطة واحدة، لأن الضوضاء في عيّنة واحدة أكبر. وهو نفس منطق "متوسط السعة" في درس ERPLAB. |
+| مقياس الألوان | واحد مشترك بين كل الخرائط التي تقارنها | مقياس مختلف لكل خريطة يجعل الضعيف يبدو قوياً. سلسلة <MenuPath>Plot > ERP map series > In 2-D</MenuPath> تفعل هذا تلقائياً. |
+| حدود المقياس | متماثلة حول الصفر (`[-lim lim]`) | حتى يبقى اللون الأوسط صفراً، وتقارن الموجب بالسالب بعينك. هذا الافتراضي في `topoplot` (`'absmax'`). |
+| `'electrodes'` | `'on'` حتى 64 قناة | يريك أين القياس الحقيقي. فوق 64 قناة تزدحم النقاط، و EEGLAB يقترح `'off'` تلقائياً. |
+| خريطة الألوان | الافتراضية في EEGLAB | EEGLAB 2026.1 يستخدم `turbo` على MATLAB R2023b وما بعده، و`jet` قبله (`icadefs.m`). لا تغيّرها لألوان قد تخفي الصفر. |
+| خريطة 2-D أم 3-D | 2-D (<MenuPath>Plot > ERP map series > In 2-D</MenuPath>) | <MenuPath>Plot > ERP map series > In 3-D</MenuPath> تحتاج ملف spline مصنوعاً لترتيب أقطابك، ومطابقة أقطابك مع شبكة رأس، وكل منظر يعرض جزءاً من الرأس فقط. خريطة 2-D تعرض فروة الرأس كلها مرة واحدة، وهي ما تستعمله الأوراق العلمية، لذلك يستعمل هذا المسار خرائط 2-D فقط. |
+
+## أخطاء شائعة
+
+- **مقارنة خرائط بمقاييس مختلفة.** انظر لأرقام شريط الألوان قبل الألوان. خريطتان متشابهتا اللون قد تختلفان عشر مرات في السعة.
+- **الثقة بخانة <UiLabel>Window size at latencies in ms</UiLabel>.** الرقم نصف عرض النافذة، فـ 50 عند 100 ms تعني من 50 إلى 150 ms. في EEGLAB 2026.1 تكتب الأداة هذا "50 to 150 ms" فوق الخريطة الأولى، لكنها ترسمها من عيّنة واحدة. المتوسط الحقيقي للنافذة يحدث فقط عند الضغط على الموجة. لخريطة نافذة موثوقة، استخدم السكربت أعلاه.
+- **قراءة الخريطة كأنها مكان المصدر.** البقعة الحمراء فوق Pz لا تعني أن المصدر تحت Pz. التوصيل في الجمجمة ينشر الجهد، واتجاه المصدر يغيّر مكان القمة. تحديد المصدر موضوع درس DIPFIT.
+- **خريطة بلا مواقع أقطاب صحيحة.** إذا كانت المواقع ناقصة أو خاطئة، الخريطة خاطئة كلها. تحقق منها كما في درس مواقع الأقطاب.
+- **نسيان المرجع.** الخريطة تتغيّر كلياً مع المرجع. خرائطنا بمرجع متوسط من 30 قناة رأس، فاذكر ذلك تحت كل رسمة.
+
+{/* صندوق "من التجربة": بانتظار قصة من صاحب المشروع. لا يُكتب قبل وصولها. */}
+
+## كيف تتأكد أن الخطوة نجحت؟
+
+- **الأنف للأعلى**، و Fz في المقدمة و Oz في الخلف عند تفعيل `'electrodes', 'labels'`.
+- **شريط ألوان واحد** لسلسلة الخرائط الست، وحداه متساويان بالقيمة.
+- **لا نقاط أقطاب تحت العينين**: في الخريطة 30 نقطة، و `EEG.nbchan` يساوي 30.
+- **الخريطة عند 0 ms ألوانها هادئة** قريبة من لون الصفر غالباً، لأن متوسط فترة -200 إلى 0 ms صُفّر في تصحيح baseline، والاستجابة البصرية لم تبدأ بعد.
+- **خريطة النافذة تتغيّر** إذا غيّرت النافذة من 300 إلى 500 ms إلى 100 إلى 200 ms، ولا تتغيّر حدودها إلا بتغيّر السعة.
+
+<Methods>
+Scalp topographies of the ERP at 30 average-referenced scalp channels (EOG channels excluded) were plotted at 0 to 500 ms in 100-ms steps and as the mean amplitude from 300 to 500 ms, using a symmetric color scale (pop_topoplot, topoplot, EEGLAB 2026.1).
+</Methods>

@@ -1,0 +1,156 @@
+---
+title: BIDS & OpenNeuro data
+titleEn: BIDS & OpenNeuro data
+description: How to download one participant from a BIDS dataset on OpenNeuro and import it into EEGLAB with its events and channel locations ready.
+station: 2
+order: 4
+level: recommended
+status: approved
+objectives:
+  - Recognize the folders and files of a BIDS dataset, and which file holds the events and which the electrode positions.
+  - Download one participant from OpenNeuro instead of the whole dataset.
+  - Import the participant with File > Import data, choosing the event column and keeping the BIDS electrode positions.
+prerequisites: [import-raw, events]
+references:
+  - title: EEGLAB Tutorial
+    url: https://eeglab.org/tutorials/04_Import/BIDS.html
+    section: "d. BIDS"
+  - title: EEGLAB Tutorial
+    url: https://eeglab.org/tutorials/11_Scripting/Analyzing_EEG_BIDS_data_in_EEGLAB.html
+    section: "f. BIDS pipeline"
+  - title: "BIDS data format for Neuroimaging: Export/Import BIDS EEG data from EEGLAB"
+    url: https://www.youtube.com/watch?v=EClpeP7WREw
+    section: "Full video"
+    duration: "16:14"
+  - title: Face processing EEG dataset for EEGLAB (OpenNeuro ds002718)
+    url: https://openneuro.org/datasets/ds002718
+    section: "README; dataset_description.json"
+datasets: [D4]
+startingPoint:
+  dataset: D4
+  file: sub-002_task-FaceRecognition_eeg.set
+  applied: []
+  script: |
+    [ALLEEG, EEG, CURRENTSET, ALLCOM] = eeglab;
+    % Folder for the BIDS dataset (change it)
+    bidsFolder = 'C:\Users\me\Documents\eeg-course\ds002718';
+    baseUrl = 'https://s3.amazonaws.com/openneuro.org/ds002718/';
+    files = {'dataset_description.json', 'README', 'task-FaceRecognition_events.json', ...
+        'sub-002/eeg/sub-002_task-FaceRecognition_eeg.set', ...
+        'sub-002/eeg/sub-002_task-FaceRecognition_eeg.json', ...
+        'sub-002/eeg/sub-002_task-FaceRecognition_channels.tsv', ...
+        'sub-002/eeg/sub-002_task-FaceRecognition_electrodes.tsv', ...
+        'sub-002/eeg/sub-002_task-FaceRecognition_events.tsv'};
+    for iFile = 1:numel(files)
+        target = fullfile(bidsFolder, files{iFile});
+        if ~exist(fileparts(target), 'dir'), mkdir(fileparts(target)); end
+        websave(target, [baseUrl files{iFile}]);
+    end
+eeglabVersion: "2026.1"
+updated: 2026-10-28
+---
+
+## Why this step matters
+
+Every lab names and arranges its files in its own way. BIDS (Brain Imaging Data Structure) is a shared standard: fixed folder names, fixed file names, and side files that describe the recording. A dataset in BIDS can be read by any tool that knows the standard, without asking the lab how it saved its data.
+
+OpenNeuro is a free site that hosts hundreds of public datasets in BIDS. For an EEGLAB user, BIDS saves two steps that you did by hand in this station: the events and the channel locations come ready in their own files.
+
+We use dataset `ds002718` (Wakeman and Henson): participants viewed famous, unfamiliar and scrambled faces. The whole dataset is about 4 GB, so we download one participant only, `sub-002`, about 235 MB.
+
+## Before and after
+
+<Figure src="bids-openneuro/bids-tree.svg" alt="Folder tree of ds002718: at the root dataset_description.json, README and task-FaceRecognition_events.json; then sub-002, then eeg with five files: the .set signal of about 235 MB, eeg.json with recording details, channels.tsv with 74 channel names, electrodes.tsv with electrode positions and events.tsv with 1479 events." source="original" />
+
+## Steps in the GUI
+
+### 1. Download one participant
+
+1. Open the dataset page: [ds002718 on OpenNeuro](https://openneuro.org/datasets/ds002718).
+2. In the file list, download these files, and keep the same folder structure on your computer, in a folder named `ds002718`:
+   - At the top level: `dataset_description.json`, `README` and `task-FaceRecognition_events.json`.
+   - In `sub-002/eeg/`: the five files that start with `sub-002_task-FaceRecognition_`.
+3. You do not need the `anat` folder (the MRI) for this lesson.
+
+The script in the starting point box does the same download in one go.
+
+### 2. Look at the side files
+
+Open `sub-002_task-FaceRecognition_events.tsv` in any text editor or spreadsheet. Each line is an event, with columns such as `onset` (in seconds), `trial_type` (for example `famous_new` or `right_sym`) and `value` (a number code).
+
+Open `sub-002_task-FaceRecognition_channels.tsv`. The channel names are `EEG001` to `EEG074`, not 10-10 names. This matters in the next step.
+
+### 3. Import the participant
+
+1. Open <MenuPath>File > Import data > Using EEGLAB functions and plugins > From BIDS folder structure</MenuPath>. (The same command is in <MenuPath>File > BIDS tools > Import BIDS folder to STUDY</MenuPath>.)
+2. Choose your `ds002718` folder and click <UiLabel>Select Folder</UiLabel> (on macOS: <UiLabel>Open</UiLabel>). The window <UiLabel>Import BIDS data -- pop_importbids()</UiLabel> opens.
+3. Keep <UiLabel>Use BIDS electrode.tsv files (when present) for channel locations; off: look up locations using channel labels</UiLabel> ticked. The names `EEG001` and so on are not standard, so a lookup by name would find nothing.
+4. Keep <UiLabel>Use BIDS event.tsv files for events and use the following BIDS field for event type</UiLabel> ticked, and in the list under it choose `trial_type` instead of `value`.
+5. <UiLabel>Study output folder</UiLabel> shows a path that ends with `ds002718/derivatives/eeglab`. Keep it. EEGLAB writes its own files there and does not touch the downloaded files.
+6. Click <UiLabel>OK</UiLabel>. The import takes a minute or two.
+
+In EEGLAB 2026.1, this command always creates a STUDY, even for one participant. The main window shows the STUDY, and the <UiLabel>Datasets</UiLabel> menu lists dataset 1. Choose it from the <UiLabel>Datasets</UiLabel> menu to see its details: 74 channels, 250 Hz and 1479 events. You will learn about STUDY in station 8.
+
+## The equivalent script
+
+```matlab
+% Start EEGLAB (EEG-BIDS ships with EEGLAB 2026.1)
+[ALLEEG, EEG, CURRENTSET, ALLCOM] = eeglab;
+
+% Folder where you downloaded ds002718 with sub-002 (change it)
+bidsFolder = 'C:\Users\me\Documents\eeg-course\ds002718';
+
+% Import: events from the trial_type column, positions from electrodes.tsv
+[STUDY, ALLEEG] = pop_importbids(bidsFolder, ...
+    'eventtype', 'trial_type', 'bidsevent', 'on', 'bidschanloc', 'on', ...
+    'outputdir', fullfile(bidsFolder, 'derivatives', 'eeglab'));
+
+% Make the imported dataset the current one and show it
+CURRENTSTUDY = 1; EEG = ALLEEG; CURRENTSET = 1:numel(EEG);
+eeglab redraw;
+
+% Check what arrived
+EEG(1).nbchan                % 74
+EEG(1).srate                 % 250
+numel(EEG(1).event)          % 1479
+eeg_eventtypes(EEG(1))       % right_sym 500, famous_new 150, ...
+```
+
+- `'eventtype', 'trial_type'` is the same choice as the list in the window. Without it, EEGLAB uses the `value` column, and the event types become numbers such as `13` and `4096`.
+- The imported file is written to `derivatives/eeglab/sub-002/eeg/`, and the STUDY file to `derivatives/eeglab/ds002718.study`. The file takes its name from the BIDS folder; the STUDY itself has no name (`STUDY.name` is empty) unless you give it one.
+
+## Which value should I choose?
+
+| Option | Our choice | Why |
+|---|---|---|
+| Event type column | `trial_type` | Readable names (`famous_new`, `scrambled_new`, `right_sym`). The `value` column has number codes only. |
+| Use BIDS electrode.tsv files | ticked | The channel names `EEG001`... are not standard, so positions must come from the file. Untick it only when the names are standard and there is no electrodes file. |
+| Study output folder | `derivatives/eeglab` (default) | BIDS keeps processed files in `derivatives`, away from the raw data. |
+| Import only the following participant indices | unticked | We downloaded one participant only. In a full dataset, use it to import a few participants first. |
+
+## Common mistakes
+
+- **Pointing EEGLAB at the `sub-002` or `eeg` folder.** Choose the dataset's top folder, the one that holds `dataset_description.json`.
+- **Downloading the `.set` file only.** Without `events.tsv` and `electrodes.tsv`, the side files that make BIDS useful are missing. Keep the folder structure as on OpenNeuro.
+- **Event types appear as numbers.** You kept `value` in the event column list. Import again and choose `trial_type`.
+- **Unticking the electrode.tsv option.** The lookup by name finds no position for `EEG001`, and the channels have no locations.
+- **Looking for 70 channels.** The recording has 70 EEG channels plus `HEOG`, `VEOG` and two `EKG` channels, so `EEG.nbchan` is 74.
+
+{/* "From experience" box: waiting for a story from the project owner. Do not write it before it arrives. */}
+
+## How to check it worked
+
+1. The <UiLabel>Datasets</UiLabel> menu lists dataset 1, and choosing it shows 74 channels, 250 Hz and 1479 events.
+2. `eeg_eventtypes(EEG(1))` lists names such as `right_sym`, `famous_new` and `boundary`, not numbers.
+3. The <UiLabel>Channel locations</UiLabel> line shows `Yes`, and <MenuPath>Plot > Channel locations > By name</MenuPath> shows the electrodes on the head. You also see points for the eye and heart channels, because the file gives them positions too.
+4. The folder `ds002718/derivatives/eeglab/sub-002/eeg/` has the imported `.set` file.
+
+That is all for BIDS. Close the STUDY with <MenuPath>File > Clear study / Clear all</MenuPath> before the next lesson. From the next station we work on `eeglab_data.set`, which ships with EEGLAB, because it is small and matches the documentation.
+
+<Methods>
+EEG data in BIDS format (OpenNeuro ds002718, participant sub-002) were imported with pop_importbids (EEG-BIDS plugin 10.5, EEGLAB 2026.1), using the trial_type column for event types and electrode positions from electrodes.tsv.
+</Methods>
+
+<Callout type="note" title="About the data">
+Data: Wakeman, D. G., & Henson, R. N. (2015). A multi-subject, multi-modal human neuroimaging dataset. Scientific Data, 2, 150001. https://doi.org/10.1038/sdata.2015.1. EEGLAB version on OpenNeuro: ds002718 v1.0.5, DOI 10.18112/openneuro.ds002718.v1.0.5. License: CC0.
+</Callout>

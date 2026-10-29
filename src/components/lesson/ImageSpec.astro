@@ -1,0 +1,16 @@
+---
+import { t } from '../../i18n';
+import { langOf } from '../../lib/lang';
+import { isProduction } from '../../site.config';
+import Icon from '../Icon.astro';
+interface Props { optional?: boolean }
+const { optional } = Astro.props;
+const lang = langOf(Astro.url);
+const html = await Astro.slots.render('default');
+---
+{!(optional && isProduction) && (
+  <div class="ph" role="note">
+    <p class="pt"><Icon name="img" class="ico s20" />{t(lang, optional ? 'imageSpec.optional' : isProduction ? 'imageSpec.pending' : 'imageSpec.label')}</p>
+    <div class="pd" set:html={html} />
+  </div>
+)}

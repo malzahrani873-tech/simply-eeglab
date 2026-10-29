@@ -1,0 +1,8 @@
+---
+import ComponentsGallery from '../../../components/ComponentsGallery.astro';
+import { isProduction } from '../../../site.config';
+export function getStaticPaths() {
+  return isProduction ? [] : [{ params: { page: 'components' } }];
+}
+---
+<ComponentsGallery lang="en" />

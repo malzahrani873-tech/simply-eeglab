@@ -1,0 +1,19 @@
+---
+import { t } from '../../i18n';
+import { langOf } from '../../lib/lang';
+import Icon from '../Icon.astro';
+interface Props { slug: string }
+const { slug } = Astro.props;
+const lang = langOf(Astro.url);
+---
+<div class="done-box" data-lesson-complete={slug}>
+  <noscript><p class="muted">{t(lang, 'lesson.noJsProgress')}</p></noscript>
+  <button type="button" class="btn pri done-btn" aria-pressed="false" hidden
+    data-l-mark={t(lang, 'lesson.markDone')} data-l-done={t(lang, 'lesson.isDone')}>
+    <Icon name="check" class="ico s20" /><span>{t(lang, 'lesson.markDone')}</span>
+  </button>
+  <p class="done-msg" role="status" aria-live="polite"></p>
+  <p class="done-na muted" hidden>{t(lang, 'progress.unavailable')}</p>
+  <template data-saved>{t(lang, 'lesson.saved')}</template>
+  <template data-undo>{t(lang, 'lesson.undo')}</template>
+</div>

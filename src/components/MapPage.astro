@@ -1,0 +1,97 @@
+---
+import Base from '../layouts/Base.astro';
+import { t, tn, type Lang } from '../i18n';
+import { url } from '../lib/url';
+import { roadmap, lessons, nodeTitle, pad } from '../lib/site-data';
+import T from './T.astro';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const all = await lessons();
+const title = (n: any) => (lang === 'ar' ? n.title : n.titleEn);
+const prereq = (id: string) => (all.get(`ar/${id}`)?.data.prerequisites ?? []);
+const glyph: Record<string, string> = { core: '●', recommended: '◐', optional: '○' };
+const cls: Record<string, string> = { core: 'c', recommended: 'r', optional: 'o' };
+const total = roadmap.nodes.length;
+const core = roadmap.nodes.filter((n: any) => n.level === 'core');
+const first = core[0];
+// Data the page script needs: order, level and title of every node, for "continue" and counters.
+const mapData = roadmap.nodes.map((n: any) => [n.id, n.level === 'core' ? 1 : 0, title(n), all.has(`${lang}/${n.id}`) ? 1 : 0]);
+const nodeLabel = (n: any, published: boolean) => {
+  const deps = prereq(n.id).map((p: string) => nodeTitle(lang, p));
+  return [title(n), t(lang, `level.${n.level}`), tn(lang, 'common.minutes', n.minutes)].join('، ') +
+    (published ? '' : t(lang, 'status.soon.sr')) + (deps.length ? '، ' + t(lang, 'map.node.dependsOn.sr', { list: deps.join('، ') }) : '');
+};
+---
+<Base lang={lang} title={t(lang, 'map.title')} description={t(lang, 'map.intro')} path="" current="map" isHome>
+  <section aria-labelledby="map-t">
+    <div class="mhead"><div class="wrap">
+      <div>
+        <h1 id="map-t">{lang === 'ar' ? <>خريطة طريق <span lang="en">EEGLAB</span></> : t(lang, 'map.title')}</h1>
+        <svg class="trace" viewBox="0 0 160 14" preserveAspectRatio="none" aria-hidden="true"><path d="M0 7 L20 7 L26 3 L31 11 L36 5 L41 8 L60 7 L66 2 L71 12 L76 6 L80 7 L100 7 L105 4 L110 10 L114 7 L160 7" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" /></svg>
+      </div>
+      <p class="lead">{t(lang, 'map.intro')}</p>
+      <div class="mbar" id="mbar"
+        data-l-cont={t(lang, 'progress.continue', { title: '{title}' })} data-l-count={t(lang, 'progress.count', { n: '{n}', total: '{total}' })}
+        data-l-core={t(lang, 'progress.coreCount', { n: '{n}', total: '{total}' })} data-l-progress={t(lang, 'progress.label')}
+        data-l-backup={t(lang, 'progress.backupHint')} data-l-backup-cta={t(lang, 'progress.backupHint.cta')}
+        data-l-st={t(lang, 'map.station.progress', { n: '{n}', total: '{total}' })} data-l-next={t(lang, 'status.next')} data-l-done-sr={t(lang, 'status.done.sr')}
+        data-progress-url={url('progress/', lang)} data-lesson-url={url('lesson/', lang)}>
+        <a class="btn pri" href={url(`lesson/${first.id}/`, lang)}><T s={t(lang, 'map.startHere', { title: title(first) })} lang={lang} /></a>
+        <span class="muted" style="font-size:15px">{t(lang, 'map.newVisitor', { n: total, stations: roadmap.stations.length })}</span>
+        <a href={url('progress/', lang)} class="mmanage" hidden>{t(lang, 'progress.manage')}</a>
+      </div>
+      <div class="mtools">
+        <nav class="seg" aria-label={t(lang, 'map.filter.label')} id="flt">
+          <a href={url('', lang)} data-f="all" aria-current="true">{t(lang, 'map.filter.all')}</a>
+          <a href={url('', lang) + '?level=core'} data-f="core">{t(lang, 'map.filter.core')}</a>
+          <a href={url('', lang) + '?level=core-rec'} data-f="core-rec">{t(lang, 'map.filter.coreRec')}</a>
+        </nav>
+        <span class="muted" id="flt-count" aria-live="polite" data-l={t(lang, 'map.filter.shown', { n: '{n}', total: '{total}' })}></span>
+        <ul class="legend" aria-label={t(lang, 'level.legendTitle')}>
+          <li><span class="sw2 c" aria-hidden="true"></span>{t(lang, 'level.core')}</li>
+          <li><span class="sw2 r" aria-hidden="true"></span>{t(lang, 'level.recommended')}</li>
+          <li><span class="sw2 o" aria-hidden="true"></span>{t(lang, 'level.optional')}</li>
+        </ul>
+      </div>
+      <p class="dep">{t(lang, 'map.depHint')}</p>
+      <p class="dep-touch">{t(lang, 'map.depHint.touch')}</p>
+    </div></div>
+    <div class="rmc paper"><div class="wrap">
+      <ol class="rm" id="rm" aria-label={t(lang, 'a11y.mapRegion')} data-map={JSON.stringify(mapData)} data-pre={JSON.stringify(Object.fromEntries(roadmap.nodes.map((n: any) => [n.id, prereq(n.id)]).filter(([, p]: any) => p.length)))}>
+        {roadmap.stations.map((s: any) => {
+          const nodes = roadmap.nodes.filter((n: any) => n.station === s.station);
+          const cores = nodes.filter((n: any) => n.level === 'core');
+          const ext = nodes.filter((n: any) => n.level !== 'core');
+          const extCls = ext.every((n: any) => n.level === 'optional') ? ' opt-only' : '';
+          const node = (n: any) => {
+            const published = all.has(`${lang}/${n.id}`);
+            const href = published ? url(`lesson/${n.id}/`, lang) : url(`station/${pad(s.station)}/`, lang) + `#card-${n.id}`;
+            return (
+              <li><a href={href} class={`node ${cls[n.level]}${published ? '' : ' soon'}`} id={n.id} data-id={n.id} aria-label={nodeLabel(n, published)}>
+                <span class="g" aria-hidden="true">{glyph[n.level]}</span><span class="nt"><T s={title(n)} lang={lang} /></span>
+                {!published && <span class="soonp" aria-hidden="true">{t(lang, 'status.soon')}</span>}
+                <span class="done" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5" /></svg></span>
+              </a></li>
+            );
+          };
+          return (
+            <li class={`rs${cores.length ? '' : ' ext-only'}${!cores.length && extCls ? ' opt-only' : ''}`} id={`station-${pad(s.station)}`}>
+              <div class="sbox"><span class="ch">{t(lang, 'station.channel', { nn: pad(s.station) })}</span>
+                <h2><a href={url(`station/${pad(s.station)}/`, lang)}><T s={lang === 'ar' ? s.title : s.titleEn} lang={lang} /></a></h2>
+                <span class="meta" data-st={s.station}>{tn(lang, 'map.station.lessons', nodes.length)} · {tn(lang, 'common.minutes', nodes.reduce((a: number, n: any) => a + n.minutes, 0))}</span></div>
+              {cores.length > 0 && <ol class="cl core" aria-label={t(lang, 'level.core')}>{cores.map(node)}</ol>}
+              {ext.length > 0 && <ol class={`cl ext${extCls}`} data-label={t(lang, 'map.extras')} aria-label={t(lang, 'map.extras')}>{ext.map(node)}</ol>}
+            </li>
+          );
+        })}
+      </ol>
+    </div></div>
+  </section>
+  <script>
+    import '../scripts/map.ts';
+  </script>
+  <script>
+    import '../scripts/map-links.ts';
+  </script>
+</Base>

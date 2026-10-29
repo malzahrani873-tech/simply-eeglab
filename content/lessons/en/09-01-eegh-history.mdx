@@ -1,0 +1,157 @@
+---
+title: eegh & the command history
+titleEn: eegh & the command history
+description: How to use eegh to get the line of code behind every click in the EEGLAB window, and save your history as a script that reproduces the same result.
+station: 9
+order: 1
+level: core
+status: approved
+objectives:
+  - Use eegh to display the line of code for each step run from the GUI.
+  - Save the session history and the dataset history to a .m file, and tell them apart.
+  - Clean a history script of fixed paths and extra lines, and run it to get the same result.
+prerequisites: [extract-epochs]
+references:
+  - title: EEGLAB Tutorial
+    url: https://eeglab.org/tutorials/11_Scripting/Using_EEGLAB_history.html
+    section: "11. Write scripts > a. Using EEGLAB history"
+  - title: EEGLAB Tutorial
+    url: https://eeglab.org/tutorials/ConceptsGuide/EEGLAB_functions.html
+    section: "EEGLAB functions"
+datasets: [D1]
+startingPoint:
+  dataset: D1
+  file: eeglab_data.set
+  applied: []
+  script: |
+    % Start a fresh EEGLAB session so the history begins empty
+    clear
+    [ALLEEG, EEG, CURRENTSET, ALLCOM] = eeglab;
+eeglabVersion: "2026.1"
+updated: 2026-10-28
+---
+
+## Why this step matters
+
+Every click in the EEGLAB window runs a line of MATLAB behind the scenes. EEGLAB keeps these lines, in order, in the command history, and the `eegh` command shows them to you.
+
+This history is your first script, and you did not type a single character of it. Save it to a file, and you can repeat the same analysis in one click, or apply it to another participant.
+
+The history is also an exact record of what you did. A month from now you will not remember which filter edge you chose. The history will.
+
+## Before and after
+
+<Figure src="eegh-history/S6-filter-dialog.png" alt="The Filter the data -- pop_eegfiltnew() window with 0.1 in Lower edge of the frequency pass band (Hz) and Plot frequency response checked." caption="EEGLAB 2026.1" source="eeglab-ui" />
+
+After you click <UiLabel>Ok</UiLabel> in this window, type `eegh` in the command window. The matching line is:
+
+```matlab
+EEG = pop_eegfiltnew(EEG, 'locutoff',0.1,'plotfreqz',1);
+```
+
+Each field you filled in the window is in the line: `'locutoff',0.1` is the lower edge, and `'plotfreqz',1` is the ticked <UiLabel>Plot frequency response</UiLabel> box.
+
+## Steps in the GUI
+
+Start a fresh session as in "Starting point": `clear`, then `eeglab`. Running `eeglab` starts a new, empty history, so it does not mix with commands from an earlier session.
+
+**First: run a few steps from the GUI**
+
+1. Open <MenuPath>File > Load existing dataset</MenuPath> and choose `eeglab_data.set` from the `sample_data` folder inside the EEGLAB folder.
+2. Open <MenuPath>Tools > Filter the data > Basic FIR filter (new, default)</MenuPath>. Type `0.1` in <UiLabel>Lower edge of the frequency pass band (Hz)</UiLabel> and press <UiLabel>Ok</UiLabel>. Close the filter response window and name the dataset `D1 hp0.1`.
+3. Open the same menu again to remove 60 Hz line noise. Type `58` in <UiLabel>Lower edge of the frequency pass band (Hz)</UiLabel> and `62` in <UiLabel>Higher edge of the frequency pass band (Hz)</UiLabel>, and check <UiLabel>Notch filter the data instead of pass band</UiLabel>. Press <UiLabel>Ok</UiLabel> and name the dataset `D1 hp0.1 notch60`.
+4. Open <MenuPath>Plot > Channel data (scroll)</MenuPath>, then close the window.
+
+**Second: show the history**
+
+5. In the MATLAB command window, type `eegh` and press <kbd>Enter</kbd>. EEGLAB prints every command of the session, oldest first. It will look like this (your path will differ):
+
+```matlab
+[ALLEEG EEG CURRENTSET ALLCOM] = eeglab;
+EEG = pop_loadset('filename','eeglab_data.set','filepath','C:\eeglab2026.1\sample_data\');
+[ALLEEG, EEG, CURRENTSET] = eeg_store( ALLEEG, EEG, 0 );
+EEG = pop_eegfiltnew(EEG, 'locutoff',0.1,'plotfreqz',1);
+[ALLEEG EEG CURRENTSET] = pop_newset(ALLEEG, EEG, 1,'setname','D1 hp0.1','gui','off');
+EEG = pop_eegfiltnew(EEG, 'locutoff',58,'hicutoff',62,'revfilt',1,'plotfreqz',1);
+[ALLEEG EEG CURRENTSET] = pop_newset(ALLEEG, EEG, 2,'setname','D1 hp0.1 notch60','gui','off');
+pop_eegplot( EEG, 1, 1, 1);
+```
+
+6. Match each line to its step. Notice that the <UiLabel>Notch filter the data instead of pass band</UiLabel> checkbox became `'revfilt',1`, and <UiLabel>Plot frequency response</UiLabel> became `'plotfreqz',1`. This is how you learn the script name of each option from the GUI itself.
+
+**Third: save the history to a file**
+
+7. Open <MenuPath>File > History scripts > Save session history script</MenuPath>. The suggested name is `eeglabhist.m`. Change it to `my_first_history.m` and save it in your working folder.
+8. Type `EEG.history` in the command window. This is the **dataset history**: the commands for the current dataset only, without the dataset management commands. It starts with lines you did not write, with paths like `/Users/arno/...`: this is the file's history on the computers of the people who made it, because the history is saved inside the `.set` file and travels with it. Then comes a line that records the EEGLAB version, then the two filter lines, and at the end a `pop_eegplot` line, because you opened the scroll window from the menu.
+9. To save it to a file, open <MenuPath>File > History scripts > Save dataset history script</MenuPath>.
+
+**Fourth: run the history**
+
+10. Close EEGLAB, then type `clear` and `close all`.
+11. Open `my_first_history.m` in the MATLAB editor and press <UiLabel>Run</UiLabel>. All the steps repeat on their own, and the scroll window opens at the end. You can also run it from <MenuPath>File > History scripts > Run script</MenuPath>.
+
+<Callout type="note">
+**Session history or dataset history?** The session history (`eegh`) keeps everything you did in the session, for all datasets, and it is lost when you run `eeglab` again if you did not save it. The dataset history (`EEG.history`) keeps what changed this dataset only, and it is saved inside the `.set` file, so you will still find it a year later when you open the file.
+</Callout>
+
+## The equivalent script
+
+The history script works as is, but it is written for the machine, not for you. Clean it before you rely on it. Here is the same history after cleaning:
+
+```matlab
+% Rebuilt from the EEGLAB session history (eegh)
+eeglab nogui
+eeglabRoot = fileparts(which('eeglab'));
+
+% Load the sample dataset (portable path, works on any computer)
+EEG = pop_loadset('filename', 'eeglab_data.set', 'filepath', fullfile(eeglabRoot, 'sample_data'));
+
+% High-pass: passband edge at 0.1 Hz
+[EEG, com] = pop_eegfiltnew(EEG, 'locutoff', 0.1);
+EEG = eeg_hist(EEG, com);
+
+% Line noise: notch between 58 and 62 Hz
+[EEG, com] = pop_eegfiltnew(EEG, 'locutoff', 58, 'hicutoff', 62, 'revfilt', 1);
+EEG = eeg_hist(EEG, com);
+EEG.setname = 'D1 hp0.1 notch60';
+EEG = eeg_checkset(EEG);
+
+% Save the dataset history to a file, for your records
+pop_saveh(EEG.history, 'D1_hp0.1_notch60_history.m', pwd);
+```
+
+What changed from the raw history:
+
+- **The fixed path** became `fullfile(eeglabRoot, 'sample_data')`, so the script works on any computer.
+- **`'plotfreqz',1`** was removed, so no step stops at a plot window.
+- **The `eeg_store` and `pop_newset` lines** were removed, because they manage datasets in the GUI. The script works on a single `EEG` variable, and the name goes in `EEG.setname`.
+- **`eeglab nogui`** replaces `eeglab`, so EEGLAB loads its functions without opening the main window.
+- **Comments** were added, because a line of code says what it does, and a comment says why.
+- **`[EEG, com]` and `eeg_hist`** were added. `pop_` functions return their command line as the second output `com`, and `eeg_hist` adds it to `EEG.history`. Without them the dataset history stays empty of the script's steps, because EEGLAB writes the history automatically only for commands run from the menus.
+
+<Callout type="note" title="pop_saveh from a script">
+`pop_saveh` does the same as the <UiLabel>Save dataset history script</UiLabel> menu item. To save the session history from a script, type `pop_saveh(ALLCOM, 'session_history.m', pwd)`.
+</Callout>
+
+## Which value should I choose?
+
+| You want to | Use | Why |
+|---|---|---|
+| Repeat everything you did today, across all datasets | Session history: `eegh` or <UiLabel>Save session history script</UiLabel> | It includes the load, save and dataset management commands, so it replays the whole session. |
+| Know how a specific `.set` file was made | Dataset history: `EEG.history` | It is saved inside the file itself, so it stays with the data (official EEGLAB tutorial, section EEGLAB dataset history). |
+| Build a script for other participants | The dataset history, cleaned | It is shorter and has no GUI commands, so it moves easily into a loop over participants (the batch processing lesson). |
+
+## Common mistakes
+
+- **Running `eeglab` again before saving the session history.** `eeglab` starts an empty history. Save the history first, or rely on the `EEG.history` saved with the dataset.
+- **Sharing a script with a fixed path.** A line like `'filepath','C:\Users\...'` will not work on your colleague's computer. Replace it with `fullfile` as in the script above.
+- **Expecting steps run outside the menus to be recorded.** EEGLAB writes the history for commands run from the menus only. What you type yourself in the command window does not appear in `eegh`, and running `pop_eegfiltnew` from a script does not change `EEG.history`. If you want the saved file to carry its history, add `EEG = eeg_hist(EEG, com);` after each step, as in the script above.
+- **Running the dataset history as is.** It starts with old lines from the file's creator, with paths from their computer, so it stops at the first line. Copy only the processing lines from it, and start your script with a load command that uses a path from your own computer.
+
+{/* "From experience" box: waiting for the project owner's story. Do not write it before it arrives. */}
+
+## How to check it worked
+
+1. **The script runs on its own.** Run the clean script in a fresh session. It should finish without any error and without asking you to click anything.
+2. **Same processing.** After it runs, type `EEG.history`. You should see the two filter lines with the same numbers you chose in the GUI: `0.1`, then `58` and `62` with `'revfilt',1`.
+3. **The history file exists.** In your working folder you should find `D1_hp0.1_notch60_history.m`. Open it, and you will find the same two filter lines.

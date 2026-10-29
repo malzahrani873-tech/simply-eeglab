@@ -1,0 +1,137 @@
+---
+title: ALLEEG وإدارة الداتاست
+titleEn: ALLEEG & dataset management
+description: كيف يحتفظ EEGLAB بعدة نسخ من الداتاست في الذاكرة، وكيف تخزّن نسخة جديدة بعد كل خطوة، وتتنقّل بين النسخ دون أن تخلط بينها.
+station: 1
+order: 4
+level: recommended
+status: approved
+objectives:
+  - تخزّن نتيجة خطوة كداتاست جديدة بدل الكتابة فوق الأصل.
+  - تتنقّل بين الداتاست في الذاكرة من قائمة Datasets وتعرف أيها الحالية.
+  - تحذف داتاست من الذاكرة، وتعرف أن هذا لا يحذف ملفها.
+prerequisites: [eeg-struct]
+references:
+  - title: EEGLAB Tutorial
+    url: https://eeglab.org/tutorials/03_Dataset_management/datasets.html
+    section: "3. Dataset management"
+datasets: [D1]
+startingPoint:
+  dataset: D1
+  file: eeglab_data.set
+  applied: []
+  script: |
+    [ALLEEG, EEG, CURRENTSET, ALLCOM] = eeglab;
+    sampleFolder = fullfile(fileparts(which('eeglab')), 'sample_data');
+    EEG = pop_loadset('filename', 'eeglab_data.set', 'filepath', sampleFolder);
+    [ALLEEG, EEG, CURRENTSET] = pop_newset(ALLEEG, EEG, 0, 'setname', 'Continuous EEG Data', 'gui', 'off');
+    eeglab redraw;
+eeglabVersion: "2026.1"
+updated: 2026-10-28
+---
+
+## لماذا هذه الخطوة مهمة؟
+
+كل خطوة معالجة تنتج نسخة جديدة من بياناتك. ويستطيع EEGLAB أن يحتفظ بعدة نسخ في الذاكرة في نفس الوقت، فتقارن قبل وبعد، أو تعود خطوة للخلف دون أن تفتح الملف من جديد.
+
+يستخدم EEGLAB لذلك ثلاثة متغيّرات:
+
+- `ALLEEG`: الرفّ الذي يحمل كل الداتاست (<En>dataset</En>) في الذاكرة.
+- `EEG`: الداتاست التي تعمل عليها الآن.
+- `CURRENTSET`: رقم هذه الداتاست على الرفّ.
+
+إذا لم تعرف أي داتاست هي الحالية، قد تفلتر النسخة الخطأ أو تحفظ فوق الأصل. هذا الدرس يعلّمك كيف تعرف دائماً أين أنت.
+
+## قبل وبعد
+
+<Figure src="alleeg-datasets/alleeg-shelf.svg" alt="رف اسمه ALLEEG عليه صندوقان: 1 هو Continuous EEG Data بـ 32 قناة، و 2 هو D1 no EOG بـ 30 قناة. سهم CURRENTSET = 2 يشير إلى الصندوق 2، ونسخة منه أمام الرف اسمها EEG." source="original" />
+
+## الخطوات من الواجهة
+
+### 1. غيّر شيئاً وخزّنه كداتاست جديدة
+
+حتى يكون عندنا شيء نخزّنه، نجري تغييراً بسيطاً: نحذف قناتي العين `EOG1` و `EOG2`. هذا مثال لهذا الدرس فقط.
+
+1. و `eeglab_data.set` مفتوحة، افتح <MenuPath>Edit > Select data</MenuPath>.
+2. في صف <UiLabel>Channel(s)</UiLabel> اكتب `EOG1 EOG2`.
+3. فعّل الخانة في نفس الصف، تحت <UiLabel>on->remove these</UiLabel>. بدون هذه العلامة يُبقي EEGLAB هاتين القناتين ويحذف كل القنوات (<En>channel</En>) الأخرى.
+4. اضغط <UiLabel>OK</UiLabel>.
+5. تظهر نافذة تسأل <UiLabel>What do you want to do with the new dataset?</UiLabel>. في <UiLabel>Name it:</UiLabel> استبدل `Continuous EEG Data` بـ `D1 no EOG`.
+6. اترك <UiLabel>Save it as file:</UiLabel> غير مفعّلة. الداتاست الجديدة تبقى في الذاكرة فقط.
+7. اترك <UiLabel>Overwrite it in memory (set=yes; unset=create a new dataset)</UiLabel> غير مفعّلة، حتى يبقى الأصل داتاست رقم 1.
+8. اضغط <UiLabel>OK</UiLabel>.
+
+تبدأ النافذة الرئيسية الآن بـ `#2: D1 no EOG`، و <UiLabel>Channels per frame</UiLabel> يعرض 30.
+
+### 2. تنقّل بين الداتاست
+
+1. افتح قائمة <UiLabel>Datasets</UiLabel>. فيها `Dataset 1:Continuous EEG Data` و `Dataset 2:D1 no EOG`. والحالية عليها علامة صح.
+2. اختر `Dataset 1:Continuous EEG Data`. تعرض النافذة الرئيسية `#1` و 32 قناة من جديد.
+3. أي قائمة تستخدمها الآن تعمل على الداتاست 1. قبل كل خطوة، انظر إلى السطر الأول في النافذة الرئيسية لتعرف أي داتاست هي الحالية.
+
+### 3. احذف داتاست من الذاكرة
+
+1. افتح <MenuPath>Edit > Delete dataset(s) from memory</MenuPath>.
+2. في <UiLabel>Dataset(s) to delete:</UiLabel> اكتب `2`.
+3. اضغط <UiLabel>OK</UiLabel>. قائمة <UiLabel>Datasets</UiLabel> فيها الآن الداتاست 1 فقط.
+
+الحذف من الذاكرة لا يمسّ أي ملف على القرص. والداتاست التي لم تُحفظ أبداً تضيع عند حذفها.
+
+## السكربت المقابل
+
+```matlab
+% Start EEGLAB and load the sample dataset as dataset 1
+[ALLEEG, EEG, CURRENTSET, ALLCOM] = eeglab;
+sampleFolder = fullfile(fileparts(which('eeglab')), 'sample_data');
+EEG = pop_loadset('filename', 'eeglab_data.set', 'filepath', sampleFolder);
+[ALLEEG, EEG, CURRENTSET] = eeg_store(ALLEEG, EEG, 0);
+
+% Remove the two eye channels and store the result as a new dataset
+EEG = pop_select(EEG, 'rmchannel', {'EOG1', 'EOG2'});
+[ALLEEG, EEG, CURRENTSET] = pop_newset(ALLEEG, EEG, CURRENTSET, ...
+    'setname', 'D1 no EOG', 'gui', 'off');
+
+CURRENTSET                            % 2
+[ALLEEG(1).nbchan ALLEEG(2).nbchan]   % 32 30
+
+% Go back to dataset 1
+[ALLEEG, EEG, CURRENTSET] = pop_newset(ALLEEG, EEG, CURRENTSET, 'retrieve', 1);
+EEG.nbchan                            % 32
+
+% Delete dataset 2 from memory (its file, if any, is not touched)
+ALLEEG = pop_delset(ALLEEG, 2);
+eeglab redraw;
+```
+
+- `pop_newset` مع `CURRENTSET` يخزّن `EEG` المعدّلة كداتاست جديدة بعد الحالية. ومع `'gui', 'off'` لا يفتح نافذة التسمية.
+- `'retrieve', 1` يجعل الداتاست 1 هي الحالية من جديد، كما يفعل اختيارها من قائمة <UiLabel>Datasets</UiLabel>.
+
+## أي قيمة أختار؟
+
+الاختيار في النافذة التي تظهر بعد كل خطوة:
+
+| الخيار | متى تستخدمه |
+|---|---|
+| إنشاء داتاست جديدة (الافتراضي) | تريد المقارنة مع النسخة السابقة، أو لست متأكداً من الخطوة بعد. |
+| <UiLabel>Overwrite it in memory</UiLabel> | الذاكرة محدودة، أو لم تعد تحتاج النسخة السابقة في هذه الجلسة. |
+| <UiLabel>Save it as file:</UiLabel> | تريد الاحتفاظ بهذه النسخة بعد إغلاق MATLAB. أعطها اسماً جديداً حتى لا تكتب فوق الملف الأصلي. |
+
+**عادة جيدة:** سمِّ كل نسخة باسم يقول ماذا فعلت بها، مثل `D1 no EOG` أو `D1 filtered 1Hz`. قائمة داتاست كلها `Continuous EEG Data` سهلة الخلط.
+
+## أخطاء شائعة
+
+- **العمل على الداتاست الخطأ.** بعد التنقّل من قائمة <UiLabel>Datasets</UiLabel>، كل خطوة تنطبق على الداتاست التي اخترتها. تحقّق من رقم `#` في السطر الأول من النافذة الرئيسية قبل كل خطوة.
+- **ظنّ أن التخزين في الذاكرة يحفظ الملف.** الداتاست الجديدة تعيش في الذاكرة حتى تحفظها. وتضيع عند إغلاق MATLAB.
+- **نسيان العلامة تحت <UiLabel>on->remove these</UiLabel>.** بدونها يُبقي <MenuPath>Edit > Select data</MenuPath> القناتين `EOG1` و `EOG2` فقط، فتكون في الداتاست الجديدة قناتان بدل 30.
+- **تغيير `EEG` في سكربت ونسيان `eeg_store` أو `pop_newset`.** التغيير في المتغيّر `EEG` فقط، وقائمة <UiLabel>Datasets</UiLabel> لا تعرف عنه.
+
+{/* صندوق "من التجربة": بانتظار قصة من صاحب المشروع. لا يُكتب قبل وصولها. */}
+
+## كيف تتأكد أن الخطوة نجحت؟
+
+1. بعد الخطوة 1، السطر الأول في النافذة الرئيسية `#2: D1 no EOG`، و 30 قناة.
+2. قائمة <UiLabel>Datasets</UiLabel> فيها داتاستان، وعلى الحالية علامة صح.
+3. بعد التنقّل إلى الداتاست 1، تعرض النافذة الرئيسية `#1` و 32 قناة.
+4. بعد الحذف، قائمة <UiLabel>Datasets</UiLabel> فيها الداتاست 1 فقط.
+
+لا شيء في هذا الدرس يُحفظ على القرص، وملف العيّنة يبقى كما هو.

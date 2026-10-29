@@ -1,0 +1,32 @@
+---
+import { existsSync, readFileSync } from 'node:fs';
+import { t } from '../../i18n';
+import { langOf } from '../../lib/lang';
+import { asset } from '../../lib/url';
+import { datasetByCode } from '../../lib/site-data';
+interface Props { src: string; alt: string; caption?: string; source: string; bare?: boolean }
+const { src, alt, caption, source, bare } = Astro.props;
+const lang = langOf(Astro.url);
+// Bilingual drawings come as name.ar.svg / name.en.svg; otherwise the neutral file is used.
+const stem = src.replace(/\.(svg|png|webp)$/, '');
+const ext = src.match(/\.(\w+)$/)?.[1] ?? 'svg';
+const candidates = [`${stem}.${lang}.${ext}`, src];
+const file = candidates.find((c) => existsSync(`assets-src/lessons/${c}`));
+if (!file) throw new Error(`Figure not found: assets-src/lessons/${src}`);
+const head = readFileSync(`assets-src/lessons/${file}`, 'utf8').slice(0, 600);
+const vb = head.match(/viewBox="[\d.\s-]*?([\d.]+)\s+([\d.]+)"/);
+const width = Number(head.match(/\swidth="([\d.]+)"/)?.[1] ?? vb?.[1] ?? 720);
+const height = Number(head.match(/\sheight="([\d.]+)"/)?.[1] ?? vb?.[2] ?? 400);
+const ds = datasetByCode.get(source);
+const credit = ds ? ds.credit[lang] : source === 'eeglab-ui' ? (lang === 'ar' ? 'لقطة من واجهة EEGLAB (SCCN)' : 'Screenshot of the EEGLAB interface (SCCN)') : '';
+const shareAlike = ds?.shareAlike;
+---
+<figure class:list={['fig', { bare }]} data-license={shareAlike ? 'CC-BY-SA-4.0' : undefined}>
+  <div class="fig-img"><img src={asset(`img/lessons/${file}`)} alt={alt} width={width} height={height} loading="lazy" decoding="async" /></div>
+  {(caption || credit) && (
+    <figcaption>
+      {caption && <span set:html={caption} />}
+      {credit && <span class="credit">{credit}{shareAlike && <> · <a href={ds.licenseUrl} rel="license">{lang === 'ar' ? 'رخصة الصورة' : 'Image licence'}: {ds.license}</a></>}</span>}
+    </figcaption>
+  )}
+</figure>

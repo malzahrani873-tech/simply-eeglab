@@ -1,0 +1,112 @@
+---
+import { readFileSync } from 'node:fs';
+import Base from '../layouts/Base.astro';
+import Icon from './Icon.astro';
+import ResetProgress from './ResetProgress.astro';
+import { t, type Lang } from '../i18n';
+import { url } from '../lib/url';
+import { roadmap } from '../lib/site-data';
+import { iso } from '../lib/bidi';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const slots = readFileSync('src/data/progress-slots.lock', 'utf8').split('\n').map((s) => s.trim()).filter((s) => s && !s.startsWith('#'));
+const ids = roadmap.nodes.map((n: any) => n.id);
+const cores = roadmap.nodes.filter((n: any) => n.level === 'core').map((n: any) => n.id);
+const L = (k: string, v?: Record<string, string>) => t(lang, k, v);
+---
+<Base lang={lang} title={L('progressPage.title')} path="progress/" current="progress" noindex>
+  <div class="wrap narrow simple prog" id="prog" data-slots={JSON.stringify(slots)} data-ids={JSON.stringify(ids)} data-cores={JSON.stringify(cores)}
+    data-l-count={L('progress.count', { n: '{n}', total: '{total}' })} data-l-core={L('progress.coreCount', { n: '{n}', total: '{total}' })}
+    data-l-games={L('progressPage.games', { n: '{n}' })} data-l-streak={t(lang, 'daily.streak', { n: '{n}' })} data-l-streak-two={t(lang, 'daily.streak.two', { n: '{n}' })} data-l-streak-few={t(lang, 'daily.streak.few', { n: '{n}' })}
+    data-l-code-sr={L('progressPage.code.sr', { code: '{code}' })} data-l-copied={L('progressPage.copied')}
+    data-l-bad-code={L('progressPage.badCode')} data-l-arabic={L('progressPage.arabicLetters')} data-l-bad-file={L('progressPage.badFile')}
+    data-l-newer={L('progressPage.newer')} data-l-done={L('progressPage.done', { n: '{n}', total: '{total}' })}
+    data-l-link-body={L('progressPage.link.body', { n: '{n}' })} data-l-link-none={L('progressPage.link.none')}
+    data-l-persist-on={L('progressPage.persist.on')} data-l-persist-off={L('progressPage.persist.off')}
+    data-l-file-name={L('progressPage.fileName', { date: '{date}' })} data-l-code-empty={L('progressPage.code.empty')}
+    data-l-replace-confirm={L('progressPage.dialog.replaceConfirm')} data-base-url={new URL(url('progress/', lang), Astro.site).href}>
+    <h1>{L('progressPage.title')}</h1>
+    <p class="lead">{L('progressPage.lead')}</p>
+    <p class="unavail" data-unavail hidden>{L('progress.unavailable')}</p>
+    <noscript><p>{L('progress.unavailable')}</p></noscript>
+
+    <div class="pgrid">
+      <section aria-labelledby="pp-sum" class="pcard js-only" hidden>
+        <h2 id="pp-sum">{L('progressPage.summary')}</h2>
+        <p class="big" data-sum-count></p>
+        <p data-sum-core></p>
+        <p data-sum-games hidden></p>
+        <p data-sum-streak hidden></p>
+      </section>
+
+      <section aria-labelledby="pp-where" class="pcard">
+        <h2 id="pp-where">{L('progressPage.where.title')}</h2>
+        <ul>{['1', '2', '3', '4'].map((n) => <li set:html={iso(L(`progressPage.where.${n}`), lang)} />)}</ul>
+      </section>
+
+      <section aria-labelledby="pp-move" class="pcard js-only" hidden>
+        <h2 id="pp-move">{L('progressPage.move')}</h2>
+        <p class="muted">{L('progressPage.holds')}</p>
+        <p class="lbl2">{L('progressPage.code')}</p>
+        <p class="pcode" dir="ltr" lang="en" data-code></p>
+        <p class="muted" data-code-empty hidden>{L('progressPage.code.empty')}</p>
+        <div class="acts">
+          <button type="button" class="btn sec" data-copy-code><Icon name="copy" class="ico s20" />{L('progressPage.copyCode')}</button>
+          <button type="button" class="btn sec" data-copy-link><Icon name="link" class="ico s20" />{L('progressPage.copyLink')}</button>
+          <button type="button" class="btn sec" data-download><Icon name="download" class="ico s20" />{L('progressPage.download')}</button>
+        </div>
+        <p class="muted" role="status" aria-live="polite" data-move-status></p>
+        <div data-persist-box hidden>
+          <button type="button" class="btn sec" data-persist>{L('progressPage.persist')}</button>
+          <p class="muted small">{L('progressPage.persist.help')}</p>
+          <p role="status" aria-live="polite" data-persist-status></p>
+        </div>
+      </section>
+
+      <section aria-labelledby="pp-restore" class="pcard js-only" hidden>
+        <h2 id="pp-restore">{L('progressPage.restore')}</h2>
+        <form class="restore" data-restore-form>
+          <label for="pp-code">{L('progressPage.codeInput')}</label>
+          <div class="row2">
+            <input id="pp-code" type="text" dir="ltr" lang="en" autocomplete="off" autocapitalize="characters" spellcheck="false" inputmode="text" />
+            <button type="submit" class="btn pri">{L('progressPage.restoreBtn')}</button>
+          </div>
+        </form>
+        <p>
+          <label class="btn sec file-btn"><Icon name="upload" class="ico s20" />{L('progressPage.chooseFile')}<input type="file" accept="application/json,.json" data-file class="sr" /></label>
+        </p>
+        <p role="status" aria-live="polite" data-restore-status></p>
+      </section>
+    </div>
+
+    <section aria-labelledby="pp-reset" class="js-only reset-sec" hidden>
+      <h2 id="pp-reset">{L('progressPage.reset')}</h2>
+      <ResetProgress lang={lang} />
+    </section>
+
+    <dialog data-add-dialog aria-labelledby="add-t">
+      <h2 id="add-t">{L('progressPage.add.title')}</h2>
+      <p data-add-body></p>
+      <div class="acts">
+        <button type="button" class="btn sec" data-add-cancel>{t(lang, 'common.cancel')}</button>
+        <button type="button" class="btn pri" data-add-ok>{L('progressPage.add')}</button>
+      </div>
+    </dialog>
+    <dialog data-file-dialog aria-labelledby="file-t">
+      <h2 id="file-t">{L('progressPage.dialog.title')}</h2>
+      <fieldset class="opts2">
+        <label class="opt"><input type="radio" name="fmode" value="merge" checked /><span>{L('progressPage.dialog.merge')}</span></label>
+        <label class="opt"><input type="radio" name="fmode" value="replace" /><span>{L('progressPage.dialog.replace')}</span></label>
+      </fieldset>
+      <p class="warn-line" data-replace-warn hidden>{L('progressPage.dialog.replaceConfirm')}</p>
+      <div class="acts">
+        <button type="button" class="btn sec" data-file-cancel>{t(lang, 'common.cancel')}</button>
+        <button type="button" class="btn pri" data-file-ok>{L('progressPage.dialog.confirm')}</button>
+      </div>
+    </dialog>
+  </div>
+  <script>
+    import '../scripts/progress-page.ts';
+  </script>
+</Base>

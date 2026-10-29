@@ -1,0 +1,163 @@
+---
+title: الطيف الترددي PSD
+titleEn: Power spectrum (PSD)
+description: كيف ترسم طيف القنوات في EEGLAB من Channel spectra and maps، وتقرأ فيه قمة ألفا وانحدار 1/f وقمم الضوضاء.
+station: 6
+order: 2
+level: core
+status: approved
+objectives:
+  - يرسم الطيف الترددي لكل القنوات مع خريطة رأس عند تردد محدد، من الواجهة ومن السكربت.
+  - يحدد قمة ألفا وترددها ومكانها على الرأس من الطيف وخريطته.
+  - يميّز انحدار 1/f الطبيعي عن قمة ضوضاء ضيقة مثل ضوضاء الكهرباء.
+prerequisites: [filtering]
+references:
+  - title: EEGLAB Tutorial
+    url: https://eeglab.org/tutorials/08_Plot_data/Plotting_Channel_Spectra_and_Maps.html
+    section: "8. Plot data > c. Channel spectra and maps"
+  - title: EEGLAB Tutorial
+    url: https://eeglab.org/tutorials/ConceptsGuide/Time_frequency_tutorial.html
+    section: "Concepts guide: time-frequency"
+  - title: "Time-Frequency Analysis of EEG Time Series Part 2: EEG Spectrum and ERSP"
+    url: https://www.youtube.com/watch?v=BcOuRxeZTtA
+    section: "الفيديو كاملاً"
+    duration: "9:05"
+datasets: [D1]
+startingPoint:
+  dataset: D1
+  file: eeglab_data.set
+  applied: [filtering, line-noise, bad-channels, interpolation, rereferencing, run-ica, ica-1hz-copy-weights, iclabel]
+  script: |
+    % Shortcut: if you saved D1_main_clean.set in the ICLabel lesson, keep
+    % the first line and the last three lines, and replace every line between them with:
+    % EEG = pop_loadset('D1_main_clean.set', pwd);
+    [ALLEEG, EEG, CURRENTSET, ALLCOM] = eeglab;
+    eeglabRoot = fileparts(which('eeglab'));
+    EEG = pop_loadset('eeglab_data.set', fullfile(eeglabRoot, 'sample_data'));
+    fullLocs = EEG.chanlocs;
+
+    % Main dataset: high-pass at 0.1 Hz, then 60 Hz line-noise removal
+    EEG = pop_eegfiltnew(EEG, 'locutoff', 0.1);
+    EEG = pop_eegfiltnew(EEG, 'locutoff', 58, 'hicutoff', 62, 'revfilt', 1);
+
+    % Bad channels you removed earlier, e.g. {'T7'}; leave empty if none
+    badChans = {};
+    if ~isempty(badChans)
+        EEG = pop_select(EEG, 'rmchannel', badChans);
+        EEG = pop_interp(EEG, fullLocs, 'spherical');
+    end
+
+    % Average reference, EOG channels excluded
+    eogIdx = find(ismember({EEG.chanlocs.labels}, {'EOG1', 'EOG2'}));
+    EEG = pop_reref(EEG, [], 'exclude', eogIdx);
+
+    % ICA on a 1-Hz copy, then copy the weights back
+    EEG_ica = pop_eegfiltnew(EEG, 'locutoff', 1);
+    EEG_ica = pop_runica(EEG_ica, 'icatype', 'runica', 'extended', 1);
+    EEG.icaweights  = EEG_ica.icaweights;
+    EEG.icasphere   = EEG_ica.icasphere;
+    EEG.icachansind = EEG_ica.icachansind;
+    EEG.icawinv     = [];
+    EEG.icaact      = [];
+    EEG = eeg_checkset(EEG);
+
+    % Remove components ICLabel rates above 90% Eye or Muscle
+    EEG = pop_iclabel(EEG, 'default');
+    EEG = pop_icflag(EEG, [NaN NaN; 0.9 1; 0.9 1; NaN NaN; NaN NaN; NaN NaN; NaN NaN]);
+    artifactComps = find(EEG.reject.gcompreject);
+    if ~isempty(artifactComps)
+        EEG = pop_subcomp(EEG, artifactComps, 0);
+    end
+    EEG.setname = 'D1 main clean';
+    EEG.filename = ''; EEG.filepath = ''; EEG.datfile = ''; EEG.saved = 'no';
+    [ALLEEG, EEG, CURRENTSET] = pop_newset(ALLEEG, EEG, 0, 'setname', 'D1 main clean', 'gui', 'off');
+    eeglab redraw;
+eeglabVersion: "2026.1"
+updated: 2026-10-28
+---
+
+## لماذا هذه الخطوة مهمة؟
+
+الـ ERP يجيب عن سؤال "ماذا يحدث بعد المثير؟". أما الطيف الترددي (<En>PSD</En>) فيجيب عن سؤال آخر: ما الترددات الموجودة في الإشارة، وكم قدرة (<En>power</En>) كل تردد؟
+
+الطيف أداة تحليل أساسية، في دراسات الراحة والنوم مثلاً. وهو أيضاً أسرع فحص لجودة بياناتك: قمة ألفا واضحة تعني إشارة دماغية سليمة، وقمة ضيقة عند 50 أو 60 هرتز تعني ضوضاء كهرباء.
+
+نحسبه هنا على البيانات المستمرة بعد حذف مكوّنات ICA وقبل الـ <En>low-pass</En> 30، حتى يظهر الطيف كاملاً إلى 64 هرتز.
+
+## قبل وبعد
+
+<Figure src="power-spectrum/power-spectrum-spectopo-10hz.png" alt="طيف كل القنوات من 1 إلى 64 هرتز مع خريطة عند 10 هرتز: قمة قرب 10 هرتز، وانخفاض عام مع ارتفاع التردد، وانخفاض ضيق عند 60 هرتز من فلتر الشبكة." source="D1" />
+
+## الخطوات من الواجهة
+
+ابدأ والداتاست `D1 main clean` مفتوحة، كما في "نقطة البداية". هذه داتاست مستمرة، لا epochs. سكربت نقطة البداية يعيد ICA، فقد يأخذ بضع دقائق، إلا إذا استخدمت سطر الاختصار في أوله.
+
+1. افتح <MenuPath>Plot > Channel spectra and maps</MenuPath>.
+2. تظهر نافذة <UiLabel>Channel spectra and maps -- pop_spectopo()</UiLabel>. اترك <UiLabel>Epoch time range to analyze [min_ms max_ms]:</UiLabel> على قيمته، أي كل التسجيل.
+3. اترك <UiLabel>Percent data to sample (1 to 100):</UiLabel> على `100`.
+4. في <UiLabel>Frequencies to plot as scalp maps (Hz):</UiLabel> اكتب `10` مكان الافتراضي `6 10 22`.
+5. في <UiLabel>Plotting frequency range [lo_Hz hi_Hz]:</UiLabel> اكتب `1 64` مكان الافتراضي `2 25`. الافتراضي يخفي ضوضاء الكهرباء وكل ما فوق 25 هرتز.
+6. اترك <UiLabel>Spectral and scalp map options (see topoplot):</UiLabel> كما هي، واضغط <UiLabel>Ok</UiLabel>.
+7. اقرأ الرسم بالترتيب:
+   - **قمة ألفا:** ارتفاع واضح قرب 10 هرتز. خريطة الرأس فوقها تبيّن أين هو أقوى.
+   - **انحدار 1/f:** القدرة تنخفض تدريجياً كلما زاد التردد. هذا شكل طبيعي لكل إشارة EEG.
+   - **قمم أو انخفاضات ضيقة:** قمة ضيقة عند 60 هرتز في بيانات غير منظفة تعني ضوضاء كهرباء. في بياناتنا ستجد العكس: انخفاضاً ضيقاً بين 58 و 62 هرتز، أثر فلتر الكهرباء.
+8. اضغط على أي خط لترى اسم قناته.
+
+<Callout type="note" title="عن خريطة الرأس">
+خريطة الرأس في هذه النافذة يرسمها <En>topoplot</En>. خياراته وطريقة قراءته بالتفصيل في درس خرائط الرأس في المحطة 7.
+</Callout>
+
+## السكربت المقابل
+
+```matlab
+% Spectra of all channels from 1 to 64 Hz, with a scalp map at 10 Hz
+figure;
+[spectra, freqs] = pop_spectopo(EEG, 1, [0 EEG.xmax*1000], 'EEG', ...
+    'freq', 10, 'freqrange', [1 64], 'electrodes', 'off');
+
+% spectra: channels x frequencies, in 10*log10(uV^2/Hz)
+fprintf('Frequency step: %.2f Hz\n', freqs(2) - freqs(1));
+
+% Alpha peak at Pz between 8 and 13 Hz
+pz = find(strcmp({EEG.chanlocs.labels}, 'Pz'));
+alphaBand = freqs >= 8 & freqs <= 13;
+alphaFreqs = freqs(alphaBand);
+[peakPow, iPeak] = max(spectra(pz, alphaBand));
+fprintf('Alpha peak at Pz: %.0f Hz, %.1f dB\n', alphaFreqs(iPeak), peakPow);
+
+% Channels with the strongest 10 Hz power
+[~, order] = sort(spectra(:, freqs == 10), 'descend');
+disp({EEG.chanlocs(order(1:5)).labels});
+```
+
+## أي قيمة أختار؟
+
+| الإعداد | القيمة | لماذا |
+|---|---|---|
+| نطاق الرسم | من 1 إلى 64 هرتز هنا (حتى نصف معدل العيّنات) | الافتراضي من 2 إلى 25 يخفي ضوضاء الكهرباء ونشاط العضلات. لفحص الجودة، ارسم النطاق كاملاً. |
+| ترددات خرائط الرأس | 10 هرتز لألفا | يمكن إضافة غيرها، مثل 6 لثيتا و 20 لبيتا، حسب سؤالك. |
+| نسبة البيانات | 100 | النسب الأقل أسرع، لكنها في البيانات المستمرة تأخذ أول جزء من التسجيل فقط. D1 صغيرة، فلا داعي. |
+| طول النافذة | الافتراضي (ثانية واحدة، 128 نقطة) | يعطي دقة ترددية 1 هرتز، وهي كافية لرؤية قمة ألفا. |
+| أي بيانات | مستمرة نظيفة قبل الـ low-pass | الـ low-pass 30 يمحو كل ما فوق 30 هرتز، فلا ترى الطيف كاملاً. |
+
+## أخطاء شائعة
+
+- **الحكم على البيانات من نطاق الرسم الافتراضي.** من 2 إلى 25 هرتز لا ترى 50 أو 60 هرتز أصلاً. غيّر النطاق.
+- **قراءة الانحدار كمشكلة.** القدرة تنخفض طبيعياً مع التردد (انحدار 1/f). المشكلة هي القمة الضيقة غير المتوقعة، أو قناة واحدة طيفها بعيد عن الباقي.
+- **نسيان أن المحور الرأسي لوغاريتمي.** فرق 10 dB يعني أن القدرة أكبر 10 مرات، لا 10 ميكروفولت.
+- **حساب الطيف على epochs قصيرة جداً.** كل epoch أقصر من نافذة الحساب يقلّل الدقة. للطيف العام، البيانات المستمرة أفضل.
+- **افتراض تردد الكهرباء.** 60 هرتز في السعودية وأمريكا، و 50 هرتز في أوروبا وأغلب الدول العربية الأخرى. انظر للطيف قبل أن تفترض.
+
+{/* صندوق "من التجربة": بانتظار قصة من صاحب المشروع. لا يُكتب قبل وصولها. */}
+
+## كيف تتأكد أن الخطوة نجحت؟
+
+- `freqs(2) - freqs(1)` يساوي 1 هرتز، و`size(spectra)` يعطي 32 قناة في عدد الترددات.
+- قمة ألفا عند Pz بين 9 و 11 هرتز تقريباً.
+- خريطة 10 هرتز أقوى في القنوات الخلفية، مثل <En>POz</En> و<En>Pz</En>.
+- عند 58 إلى 62 هرتز انخفاض ضيق لا قمة.
+
+<Methods>
+Power spectral density was estimated for each channel from the continuous ICA-cleaned data using Welch's method with 1-s Hamming windows and no overlap (pop_spectopo, EEGLAB 2026.1).
+</Methods>

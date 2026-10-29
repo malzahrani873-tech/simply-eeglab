@@ -1,0 +1,165 @@
+---
+title: "ERPLAB: measuring amplitude & latency"
+titleEn: "ERPLAB: measuring amplitude & latency"
+description: Measure mean amplitude, peak amplitude, and latency with the ERPLAB ERP Measurement Tool, and see why mean amplitude is more robust.
+station: 6
+order: 3
+level: recommended
+status: review
+objectives:
+  - Measure the mean amplitude in a predefined time window for many ERPsets at once, from the GUI and from a script.
+  - Measure the peak amplitude and latency of the same component, and compare the results with the mean amplitude.
+  - Explain why peak amplitude is more affected by noise than mean amplitude.
+prerequisites: [erp-average]
+references:
+  - title: ERPLAB Toolbox wiki
+    url: https://github.com/ucdavis/erplab/wiki/ERP-Measurement-Tool
+    section: "ERP Measurement Tool"
+  - title: Applied Event-Related Potential Data Analysis (Luck)
+    url: https://socialsci.libretexts.org/Bookshelves/Psychology/Biological_Psychology/Applied_Event-Related_Potential_Data_Analysis_(Luck)/10:_Scoring_and_Statistical_Analysis_of_ERP_Amplitudes_and_Latencies
+    section: "Chapter 10: Scoring and Statistical Analysis of ERP Amplitudes and Latencies"
+  - title: Applied Event-Related Potential Data Analysis (Luck)
+    url: https://socialsci.libretexts.org/Bookshelves/Psychology/Biological_Psychology/Applied_Event-Related_Potential_Data_Analysis_(Luck)
+    section: "Chapters 2 and 6: EventList, BINLISTER, and averaging"
+  - title: Applied ERP Data Analysis, data master folder
+    url: https://doi.org/10.18115/D50056
+    section: "Chapter_10 folder"
+datasets: [D3]
+startingPoint:
+  dataset: D3
+  file: Chapter_10/Data/ERPsets_CI_Diff
+  applied: []
+  script: |
+    [ALLEEG, EEG, CURRENTSET, ALLCOM] = eeglab;
+
+    % The 40 LRP difference-wave ERPsets from chapter 10 of Luck's book
+    dataDir = fullfile(pwd, 'Chapter_10', 'Data', 'ERPsets_CI_Diff');
+    files = dir(fullfile(dataDir, '*.erp'));
+    ALLERP = [];   % start from an empty ERPset list
+    [ERP, ALLERP] = pop_loaderp('filename', {files.name}, 'filepath', dataDir, ...
+        'UpdateMainGui', 'on');
+    fprintf('Loaded %d ERPsets\n', numel(ALLERP));
+    eeglab redraw
+eeglabVersion: "2026.1"
+updated: 2026-10-28
+---
+
+## Why this step matters
+
+We start this lesson from ready-made ERPsets from Luck's book (chapter 10). Building an ERPset from your own data is explained in chapters 2 and 6 of the book.
+
+An <En>ERPset</En> is an ERPLAB file that holds one participant's averaged waveforms, split into bins. ERPLAB is a separate plugin that does not ship with EEGLAB, and it has its own chain for building an ERPset: EventList, then BINLISTER, then epoching by bin, then averaging. That chain is long, so we leave it to the book and start here at the measurement step.
+
+The data come from the ERP CORE flankers experiment, 40 participants. On each trial a central arrow appears, and the participant presses with the right or left hand according to its direction, while the arrows around it point the same way (compatible) or the opposite way (incompatible).
+
+Before the hand moves, the motor area in the hemisphere opposite that hand prepares it: the right hand is moved by the left hemisphere (channel C3), and the left hand by the right hemisphere (C4). So we subtract the channel on the same side as the hand from the opposite channel, which removes the activity shared by both hemispheres and leaves only the motor preparation. The component is the lateralized readiness potential (<En>LRP</En>): a negative wave over the hemisphere opposite the hand that is about to respond. Each ERPset in the `ERPsets_CI_Diff` folder holds the difference wave (contralateral minus ipsilateral) at channel `C3/C4`, in bin 1 for compatible trials (<En>Compatible</En>) and bin 2 for incompatible trials (<En>Incompatible</En>).
+
+After averaging, you need one number per participant and condition to put into your statistics. That number is the "score". The key question: do you take the peak of the wave, or its mean in a window? Luck answers clearly: peak amplitude is a poor way to score the amplitude of an ERP component, and mean amplitude is better in most cases.
+
+## Before and after
+
+<ImageSpec>
+Grand average of the LRP difference wave at `C3/C4` across 40 participants, bin 1 (Compatible), from -200 to 800 ms, negative down. The window from 150 to 400 ms is shaded. Inside it, a dashed horizontal line at the mean amplitude, and a dot at the lowest value (the negative peak amplitude) with a vertical line down to the time axis (the latency). Source: script on the chapter 10 data from Luck's book. Data: ERP CORE, image licence CC BY-SA 4.0.
+</ImageSpec>
+
+## Steps in the GUI
+
+**First: install ERPLAB and load the data (only once)**
+
+1. Open <MenuPath>File > Manage EEGLAB extensions</MenuPath>, search for `ERPLAB`, and install it. This lesson is written for ERPLAB 13.10.
+2. Download the `Chapter_10` folder from the master folder of Luck's book (the link is under "Going further"), and put it in your working folder.
+3. From the new menu <MenuPath>ERPLAB > Load existing ERPset(s)</MenuPath>, select all forty `.erp` files in `Chapter_10/Data/ERPsets_CI_Diff`. Their names appear under the new <MenuPath>ERPsets</MenuPath> menu in the EEGLAB window.
+
+**Second: measure the mean amplitude**
+
+1. Open <MenuPath>ERPLAB > ERP Measurement Tool</MenuPath>.
+2. Choose <UiLabel>From ERPset Menu</UiLabel>, and type `1:40` in the box next to it.
+3. In <UiLabel>Type</UiLabel>, choose <UiLabel>Mean amplitude between two fixed latencies</UiLabel>.
+4. In <UiLabel>Bin</UiLabel>, type `1 2`. In <UiLabel>Channel</UiLabel>, type the index of channel `C3/C4`, or pick it with the <UiLabel>Browse</UiLabel> button next to it.
+5. In <UiLabel>Measurement window</UiLabel>, type `150 400`. In <UiLabel>Baseline period</UiLabel>, keep <UiLabel>Pre</UiLabel>.
+6. In <UiLabel>Save output file as</UiLabel>, type `mean_amp_150_400.txt`.
+7. Press the viewer button (<En>Viewer</En>). The tool closes and a window opens showing the time window over each participant's waveform. This is only a preview and saves nothing. Go back from it to the Measurement Tool (do not close it with the X, which cancels everything), then press <UiLabel>RUN</UiLabel> to save the file.
+
+**Third: measure the peak amplitude and latency**
+
+1. Open the tool again. In <UiLabel>Type</UiLabel>, choose <UiLabel>Peak amplitude</UiLabel>.
+2. In <UiLabel>Bin</UiLabel>, type `1`, and keep the window at `150 400`.
+3. In <UiLabel>Find a local peak that is</UiLabel>, choose <UiLabel>Negative</UiLabel>, with `3` points. This means: the lowest point that is also lower than the 3 points on each side.
+4. In <UiLabel>If no local peak is found, use</UiLabel>, choose <UiLabel>absolute peak</UiLabel>.
+5. Save as `negative_peak_bin1.txt`, and press <UiLabel>RUN</UiLabel>.
+6. For latency: the same steps with <UiLabel>Peak latency</UiLabel>, window `100 700`, bins `1 2`, and file name `peak_latency.txt`.
+
+<Callout type="note" title="After exporting">
+The txt files hold one value per participant and bin. Open them in Excel or any statistics program, then compare the two conditions with a paired t test. Statistics are outside this lesson.
+</Callout>
+
+## The equivalent script
+
+
+```matlab
+% Channel index of the LRP difference wave
+chan = find(strcmp({ALLERP(1).chanlocs.labels}, 'C3/C4'));
+nSets = numel(ALLERP);
+
+% 1) Mean amplitude, 150-400 ms, both bins
+[ALLERP, meanAmp] = pop_geterpvalues(ALLERP, [150 400], [1 2], chan, ...
+    'Erpsets', 1:nSets, 'Measure', 'meanbl', 'Baseline', 'pre', ...
+    'Binlabel', 'on', 'Filename', 'mean_amp_150_400.txt');
+meanAmp = squeeze(meanAmp);   % bins x ERPsets
+fprintf('Mean amplitude: compatible %.2f uV, incompatible %.2f uV\n', ...
+    mean(meanAmp(1, :)), mean(meanAmp(2, :)));
+
+% 2) Negative local peak, 150-400 ms, compatible bin
+[ALLERP, peakAmp] = pop_geterpvalues(ALLERP, [150 400], 1, chan, ...
+    'Erpsets', 1:nSets, 'Measure', 'peakampbl', 'Peakpolarity', 'negative', ...
+    'Neighborhood', 3, 'Peakreplace', 'absolute', 'Baseline', 'pre');
+fprintf('Peak amplitude, compatible: %.2f uV\n', mean(peakAmp(:)));
+
+% 3) Negative peak latency, 100-700 ms, both bins
+[ALLERP, peakLat] = pop_geterpvalues(ALLERP, [100 700], [1 2], chan, ...
+    'Erpsets', 1:nSets, 'Measure', 'peaklatbl', 'Peakpolarity', 'negative', ...
+    'Neighborhood', 3, 'Peakreplace', 'absolute', 'Baseline', 'pre');
+peakLat = squeeze(peakLat);
+fprintf('Peak latency: compatible %.0f ms, incompatible %.0f ms\n', ...
+    mean(peakLat(1, :)), mean(peakLat(2, :)));
+
+% 4) The bias of peak measures: measure a window with no signal
+[ALLERP, blMean] = pop_geterpvalues(ALLERP, [-100 0], 1, chan, ...
+    'Erpsets', 1:nSets, 'Measure', 'meanbl', 'Baseline', 'pre');
+[ALLERP, blPeak] = pop_geterpvalues(ALLERP, [-100 0], 1, chan, ...
+    'Erpsets', 1:nSets, 'Measure', 'peakampbl', 'Peakpolarity', 'negative', ...
+    'Neighborhood', 3, 'Peakreplace', 'absolute', 'Baseline', 'pre');
+fprintf('Before the stimulus: mean %.2f uV, negative peak %.2f uV\n', ...
+    mean(blMean(:)), mean(blPeak(:)));
+```
+
+## Which value should I choose?
+
+| Setting | Value | Why |
+|---|---|---|
+| Amplitude measure | Mean amplitude | Less affected by noise, does not grow as noise grows, and compares conditions fairly even when the peak timing differs between them. |
+| Measurement window | Set before you look at the data, from the literature or an earlier study | Choosing the window after looking at the grand average raises the chance of finding an "effect" caused by noise. Here we use 150 to 400 ms, the window of the peak exercise in Luck's book, so the two measures are compared on the same window. |
+| Points around the peak | 3 on each side | Stops a point at the edge of the window from being chosen just because it is the lowest, as in Luck's book. |
+| Baseline | <UiLabel>Pre</UiLabel> | The data are already corrected with the prestimulus period, so this changes nothing here, but it protects you with other data. |
+| Latency | Peak latency for recognition, fractional area latency for results | Luck prefers `Fractional Area latency` because it is more robust. Chapter 10 of his book explains it. |
+
+## Common mistakes
+
+- **Choosing the window from the grand average of the same data.** You see where the difference is largest and measure it there, so you get an effect that may be chance. Set the window before the analysis.
+- **Measuring peak amplitude and comparing two conditions with different noise.** The peak grows as noise grows. A condition with fewer trials seems to have a larger peak.
+- **Forgetting the direction of the component.** The LRP is negative, so you choose <UiLabel>Negative</UiLabel>. In the incompatible condition, the wave starts with a positive deflection before the negative one, so a positive peak in a short window measures something else.
+- **Loading ERPsets with different numbers of bins or channels.** The tool refuses: <UiLabel>ERPsets must have the same amount of bins and channels.</UiLabel>
+- **Mixing up the bin number and the channel number.** In a script, find `C3/C4` by name, as in the first line, instead of a number you remember.
+
+{/* "From experience" box: waiting for the project owner's story. Do not write it before it arrives. */}
+
+## How to check it worked
+
+- `numel(ALLERP)` is 40, and the file `mean_amp_150_400.txt` exists with 80 values (40 participants × bin).
+- The mean negative peak amplitude for compatible trials is about -3.2 µV, as in Luck's book.
+- Mean peak latency: compatible before incompatible, about 320 and 375 ms in Luck's book.
+- Before the stimulus (-100 to 0 ms): the mean amplitude is close to zero, but the negative peak is not (about -0.9 µV in Luck's book). This is the bias of peak measures.
+
+<Methods>
+Mean amplitude of the contralateral-minus-ipsilateral LRP difference wave was measured from 150 to 400 ms at C3/C4 (ERPLAB 13.10; Lopez-Calderon & Luck, 2014).
+</Methods>

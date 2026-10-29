@@ -1,0 +1,208 @@
+{
+  "v": 1,
+  "station": 2,
+  "lang": "en",
+  "passPercent": 80,
+  "questions": [
+    {
+      "id": "s02-q01",
+      "type": "single",
+      "lesson": "import-raw",
+      "objective": 1,
+      "prompt": "You have the file `S001R03.edf` from PhysioNet. Which menu do you import it with?",
+      "options": [
+        {
+          "id": "a",
+          "text": "`File > Load existing dataset`"
+        },
+        {
+          "id": "b",
+          "text": "`File > Import data > Using EEGLAB functions and plugins > From EDF/EDF+/GDF files (BIOSIG toolbox)`"
+        },
+        {
+          "id": "c",
+          "text": "`File > Import data > Using EEGLAB functions and plugins > From Brain Vis. Rec. .vhdr file`"
+        },
+        {
+          "id": "d",
+          "text": "`File > Import data > Using EEGLAB functions and plugins > From Neuroscan .CNT file`"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "EDF, EDF+ and GDF files are read by the Biosig plugin, with the function `pop_biosig`. `Load existing dataset` opens `.set` files only, and the other two menus are for BrainVision and Neuroscan formats."
+    },
+    {
+      "id": "s02-q02",
+      "type": "multiple",
+      "lesson": "import-raw",
+      "objective": 2,
+      "prompt": "Which statements about importing different formats are true? (Select all that apply)",
+      "options": [
+        {
+          "id": "a",
+          "text": "A BioSemi BDF file is read with Biosig, and you should pick a temporary reference channel at import"
+        },
+        {
+          "id": "b",
+          "text": "For a BrainVision recording you pick the `.vhdr` file, not `.eeg` or `.vmrk`"
+        },
+        {
+          "id": "c",
+          "text": "Every `.cnt` file is read with the same plugin, because the extension is the same"
+        },
+        {
+          "id": "d",
+          "text": "If you untick `Import EDF+ annotations`, the event count may drop to zero"
+        }
+      ],
+      "answer": [
+        "a",
+        "b",
+        "d"
+      ],
+      "explanation": "A Neuroscan `.cnt` and an ANT `.cnt` are two different formats with the same extension, so choose the plugin by the system, not the extension. BioSemi data are recorded reference-free and lose much of their signal quality if left without a reference."
+    },
+    {
+      "id": "s02-q03",
+      "type": "image",
+      "lesson": "import-raw",
+      "objective": 3,
+      "prompt": "You imported `S001R03.edf` and the main window looks like this. What does the `Channel locations` line mean?",
+      "image": {
+        "src": "/quiz/02/s02-q03.webp",
+        "w": 720,
+        "h": 480,
+        "status": "pending",
+        "alt": "The EEGLAB main window for dataset S001R03: Channels per frame is 64, Sampling rate (Hz) is 160, Events shows a number above zero, and Channel locations shows No (labels only).",
+        "spec": "A real EEGLAB 2026.1 screenshot (source: eeglab-ui) of the main window after importing S001R03.edf, like the \"after\" image in the import-raw lesson but **with no arrows**. One version for both languages."
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": "The import failed, so import again with another plugin"
+        },
+        {
+          "id": "b",
+          "text": "The channel names are there without positions on the head, which is expected after import"
+        },
+        {
+          "id": "c",
+          "text": "All channels are bad"
+        },
+        {
+          "id": "d",
+          "text": "The file has no channel names"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "`No (labels only)` means each channel has a name but no coordinates. This is not an import error: you add the positions in the channel locations lesson, after removing the dots from the names. The other lines (64 channels, 160 Hz, events above zero) show that the import worked."
+    },
+    {
+      "id": "s02-q04",
+      "type": "image",
+      "lesson": "channel-locations",
+      "objective": 3,
+      "prompt": "After looking up the locations you plotted `Plot > Channel locations > By name`. Some electrodes, such as T9, T10 and Iz, sit on or outside the circle. What do you conclude?",
+      "image": {
+        "src": "/quiz/02/s02-q04.webp",
+        "w": 640,
+        "h": 640,
+        "status": "pending",
+        "alt": "A head from above, nose up, with 64 named electrodes. Cz is in the center, Fpz at the front, Oz at the back, and the lower-edge electrodes such as T9, T10 and Iz are on the circle or just outside it.",
+        "spec": "A real EEGLAB 2026.1 screenshot (source: eeglab-ui) of Plot > Channel locations > By name on S001R03 after the lookup in standard_1005.elc, like the channel-locations lesson image but **with no arrows and no note**. One version for both languages."
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": "The locations are correct: these electrodes are below the head's horizontal mid-plane, so they are drawn on or outside the circle"
+        },
+        {
+          "id": "b",
+          "text": "The lookup failed, so remove the dots from the names again"
+        },
+        {
+          "id": "c",
+          "text": "Tick `Import file instead and erase all channels` and look up again"
+        },
+        {
+          "id": "d",
+          "text": "These are bad channels that should be removed"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "The circle marks the horizontal plane through the middle of the head, and electrodes around the lower edge of the cap are below it, so they are drawn on or outside the circle. Cz in the center, Fpz at the front and Oz at the back show the lookup worked. `Import file instead and erase all channels` would replace your channels with all the template's channels."
+    },
+    {
+      "id": "s02-q05",
+      "type": "single",
+      "lesson": "events",
+      "objective": 3,
+      "prompt": "An event's latency in `EEG.event` is 673, and the sampling rate is 160 Hz. How many seconds after the start of the recording did it happen?",
+      "options": [
+        {
+          "id": "a",
+          "text": "673 seconds"
+        },
+        {
+          "id": "b",
+          "text": "4.2 seconds"
+        },
+        {
+          "id": "c",
+          "text": "0.24 seconds"
+        },
+        {
+          "id": "d",
+          "text": "107680 seconds"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "Latency in `EEG.event` is in samples. Time in seconds = (sample number − 1) ÷ sampling rate = (673 − 1) ÷ 160 = 4.2 seconds. We subtract 1 because the first sample is number 1 and sits at time zero."
+    },
+    {
+      "id": "s02-q06",
+      "type": "order",
+      "lesson": "events",
+      "objective": 2,
+      "prompt": "Put the steps for working on `S001R03.edf` in the order of station 2:",
+      "options": [
+        {
+          "id": "a",
+          "text": "Look up the channel locations in the standard template"
+        },
+        {
+          "id": "b",
+          "text": "Check the event types and counts with `eeg_eventtypes`"
+        },
+        {
+          "id": "c",
+          "text": "Import the file with the Biosig plugin"
+        },
+        {
+          "id": "d",
+          "text": "Remove the dots from the channel names"
+        },
+        {
+          "id": "e",
+          "text": "Save a `.set` copy after import"
+        }
+      ],
+      "answer": [
+        "c",
+        "e",
+        "d",
+        "a",
+        "b"
+      ],
+      "explanation": "You import first, then save a `.set` so you do not repeat the import. Then you fix the names, because the location lookup matches names with the template, and `Cz..` does not match `Cz`. Then you check the events before any later epoching."
+    }
+  ]
+}

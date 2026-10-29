@@ -1,0 +1,206 @@
+---
+title: Writing an EEGLAB plugin
+titleEn: Writing an EEGLAB plugin
+description: How to write a small plugin that adds an item to the EEGLAB menu, calls your own pop_ function, and records its command in the command history.
+station: 10
+order: 4
+level: optional
+status: approved
+objectives:
+  - "Know the structure of a plugin: a folder in plugins holding an eegplugin_ file and a pop_ function."
+  - Write a pop_ function that opens a window when arguments are missing and returns the command string for the history.
+  - Add an item to the Plot menu that calls the function and records its command in eegh.
+prerequisites: [single-subject-script]
+references:
+  - title: EEGLAB Tutorial
+    url: https://eeglab.org/tutorials/contribute/design_plugin.html
+    section: "Contribute > Create an EEGLAB plugin"
+  - title: EEGLAB Tutorial
+    url: https://eeglab.org/tutorials/ConceptsGuide/EEGLAB_functions.html
+    section: "Concepts guide > EEGLAB functions"
+datasets: [D1]
+startingPoint:
+  dataset: D1
+  file: eeglab_data.set
+  applied: []
+  script: |
+    [ALLEEG, EEG, CURRENTSET, ALLCOM] = eeglab;
+    eeglabRoot = fileparts(which('eeglab'));
+    EEG = pop_loadset('eeglab_data.set', fullfile(eeglabRoot, 'sample_data'));
+
+    % Show the dataset in the main EEGLAB window
+    [ALLEEG, EEG, CURRENTSET] = pop_newset(ALLEEG, EEG, 0, 'setname', 'D1 raw', 'gui', 'off');
+    eeglab redraw;
+eeglabVersion: "2026.1"
+updated: 2026-10-28
+---
+
+## Why this step matters
+
+Almost every menu in EEGLAB comes from a <En>plugin</En>: DIPFIT, ICLabel and firfilt are all plugins. If you write a tool you use in every project, turning it into a plugin makes it a menu item like any official tool, and lets your colleagues use it the same way.
+
+A plugin is simpler than you might expect. It is a folder inside the EEGLAB `plugins` folder, holding two files:
+
+- A file whose name starts with `eegplugin_`. EEGLAB runs it at every startup, and its only job is to add the item to the menu.
+- A function whose name starts with `pop_`. This is the tool itself: it opens a window when arguments are missing, and it returns the command string that reproduces the same result, so it appears in the command history.
+
+The second rule is what makes your tool part of your script. Every click on your item appears in `eegh` as a line of code, as you learned in the command history lesson.
+
+In this lesson we write a plugin called `chanvar`: it plots the standard deviation of each channel and colors in red the channels far from the rest. A quick check tool, before or after the bad channels lesson.
+
+## Before and after
+
+<ImageSpec>
+Two screenshots side by side. Left: the `plugins` folder inside the EEGLAB folder, holding the `chanvar1.0` folder with the two files `eegplugin_chanvar.m` and `pop_chanvar.m`. Right: the EEGLAB Plot menu open, ending with the new Channel variance item below a separator line. Source: screenshot from EEGLAB 2026.1 on the project owner's computer.
+</ImageSpec>
+
+## Steps in the GUI
+
+**First: create the plugin folder**
+
+1. Type in the command window:
+
+```matlab
+pluginDir = fullfile(fileparts(which('eeglab')), 'plugins', 'chanvar1.0');
+mkdir(pluginDir); cd(pluginDir);
+```
+
+The folder name carries the version: EEGLAB reads `chanvar1.0` as a plugin named `chanvar`, version 1.0.
+
+**Second: write the pop_ function**
+
+2. Type `edit pop_chanvar.m`, paste this code, and save:
+
+```matlab
+function com = pop_chanvar(EEG, zThresh)
+% POP_CHANVAR - Plot the standard deviation of each channel and
+%               highlight channels far from the others.
+%
+% Usage:
+%   >> pop_chanvar(EEG);           % ask for the threshold in a window
+%   >> pop_chanvar(EEG, zThresh);  % plot directly
+%
+% Inputs:
+%   EEG     - EEGLAB dataset
+%   zThresh - robust z-score above which a channel is highlighted
+%             (default in the window: 3)
+%
+% Output:
+%   com     - command string for the EEGLAB history
+
+com = '';
+if nargin < 1
+    help pop_chanvar;
+    return;
+end
+
+% Missing threshold: ask for it
+if nargin < 2
+    res = inputgui('geometry', {[2 1]}, ...
+        'uilist', { {'style', 'text', 'string', 'Robust z-score threshold'}, ...
+                    {'style', 'edit', 'string', '3'} }, ...
+        'title', 'Channel variance -- pop_chanvar()');
+    if isempty(res), return; end   % user pressed Cancel
+    zThresh = str2double(res{1});
+end
+
+% Standard deviation of each channel over all samples (and epochs)
+data = double(reshape(EEG.data, EEG.nbchan, []));
+sd   = std(data, 0, 2);
+
+% Robust z-score based on the median absolute deviation
+medSd = median(sd);
+z = (sd - medSd) / (1.4826 * median(abs(sd - medSd)));
+flagged = find(z > zThresh);
+
+% Plot
+figure('Name', 'Channel variance');
+bar(sd, 'FaceColor', [0.6 0.6 0.6]); hold on;
+if ~isempty(flagged)
+    bar(flagged, sd(flagged), 'FaceColor', [0.85 0.2 0.2]);
+end
+set(gca, 'XTick', 1:EEG.nbchan, 'XTickLabel', {EEG.chanlocs.labels});
+xtickangle(90);
+ylabel('Standard deviation (\muV)');
+title(sprintf('%s: %d channel(s) above z = %g', EEG.setname, ...
+    numel(flagged), zThresh), 'Interpreter', 'none');
+if ~isempty(flagged)
+    fprintf('Channels above threshold: %s\n', ...
+        strjoin({EEG.chanlocs(flagged).labels}, ' '));
+end
+
+% Command that reproduces this call
+com = sprintf('pop_chanvar(EEG, %g);', zThresh);
+```
+
+**Third: write the eegplugin_ file**
+
+3. Type `edit eegplugin_chanvar.m`, paste this code, and save:
+
+```matlab
+function vers = eegplugin_chanvar(fig, trystrs, catchstrs)
+% EEGPLUGIN_CHANVAR - Add "Channel variance" to the EEGLAB Plot menu.
+
+vers = 'chanvar1.0';
+
+% Find the Plot menu of the main EEGLAB window
+plotmenu = findobj(fig, 'tag', 'plot');
+
+% Check the data, run the function, then add its command to the history
+cmd = [trystrs.check_data 'LASTCOM = pop_chanvar(EEG);' catchstrs.add_to_hist];
+uimenu(plotmenu, 'Label', 'Channel variance', 'CallBack', cmd, 'Separator', 'on');
+```
+
+**Fourth: try the plugin**
+
+4. Close the EEGLAB window and type `eeglab` again, because EEGLAB looks for plugins only at startup. The command window prints a line containing `adding "chanvar" v1.0`.
+5. Load D1 as in "Starting point", but from the GUI: <MenuPath>File > Load existing dataset</MenuPath>.
+6. Open <MenuPath>Plot > Channel variance</MenuPath>. Your window appears with `3` in it. Click <UiLabel>Ok</UiLabel>. The plot appears.
+7. Type `eegh`. The last line is `pop_chanvar(EEG, 3);`. Your tool is now part of the command history like any official tool.
+
+## The equivalent script
+
+The `pop_` function also works from a script, without the menu. This test checks the basic rule: the string the function returns reproduces the same result.
+
+```matlab
+eeglab nogui
+eeglabRoot = fileparts(which('eeglab'));
+EEG = pop_loadset('eeglab_data.set', fullfile(eeglabRoot, 'sample_data'));
+
+% The plugin folder is on the path even without the GUI
+assert(exist('pop_chanvar', 'file') == 2, 'pop_chanvar not found: check the plugins folder');
+
+% Call with all arguments: no window, direct plot
+com = pop_chanvar(EEG, 3);
+disp(com);   % pop_chanvar(EEG, 3);
+
+% Running the returned command must reproduce the same figure
+eval(com);
+```
+
+## Which value should I choose?
+
+| Setting | Value in this lesson | Why |
+|---|---|---|
+| Folder location | `plugins` inside the EEGLAB folder | This is where EEGLAB looks at every startup for folders holding a file that starts with `eegplugin` (`eeglab.m`). |
+| Folder name | `chanvar1.0` | Digits at the end of the name are read as a version. If it differs from the version `eegplugin_` returns, EEGLAB prints a warning. |
+| Data check | `trystrs.check_data` | Makes sure a dataset is loaded before running. For functions that need epochs use `trystrs.check_epoch`, and for ones that need ICA `trystrs.check_ica`. |
+| History | `catchstrs.add_to_hist` | Adds `LASTCOM` to the history and stores the dataset in `ALLEEG`. If the command starts with `EEG =`, EEGLAB creates a new dataset automatically. |
+| Highlight threshold | z = 3 | A common starting value for outliers. The tool is for visual checking, not for removing channels automatically. |
+
+## Common mistakes
+
+- **Putting the two files outside the `plugins` folder.** EEGLAB does not look anywhere else, so the item does not appear.
+- **A `pop_` function that returns nothing.** Without `com`, nothing is recorded in `eegh`, so your click cannot be repeated in your script.
+- **A command string that does not reproduce the result.** If the user types 2.5 in the window, the string must be `pop_chanvar(EEG, 2.5);`, not the default value. That is why `com` is built from the values actually used.
+- **Expecting the item to appear with `eeglab nogui`.** In this mode EEGLAB adds the plugin folder to the path but does not run `eegplugin_`, so there are no menus. This is normal.
+- **Testing the plugin from the menu only.** EEGLAB catches errors coming from menus. To trace an error, type `dbstop if error` and call the function from the command window (advice from the official documentation).
+
+{/* "From experience" box: waiting for the project owner's story. Do not write it before it arrives. */}
+
+## How to check it worked
+
+- When you start `eeglab`, the command window prints a line containing `adding "chanvar" v1.0`.
+- The <MenuPath>Plot > Channel variance</MenuPath> item exists and opens a window with the threshold box.
+- After clicking <UiLabel>Ok</UiLabel>, a bar plot appears with one bar per channel (32 in D1).
+- `eegh` shows `pop_chanvar(EEG, 3);`, and the script above runs without error.

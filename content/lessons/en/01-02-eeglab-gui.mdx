@@ -1,0 +1,142 @@
+---
+title: The EEGLAB window & menus
+titleEn: The EEGLAB window & menus
+description: How to open a dataset in EEGLAB, browse its signal, and read the channel count, sampling rate and recording length from the main window.
+station: 1
+order: 2
+level: core
+status: approved
+objectives:
+  - Open a dataset from the File menu and know what each of the seven menus is for.
+  - Browse the signal in the scrolling window and move through it.
+  - Read the channel count, sampling rate, recording length and event count from the main window.
+prerequisites: [install-eeglab]
+references:
+  - title: EEGLAB Tutorial
+    url: https://eeglab.org/tutorials/02_Quickstart/quickstart.html
+    section: "2. Quickstart"
+  - title: EEGLAB Tutorial data
+    url: https://eeglab.org/tutorials/tutorial_data.html
+    section: "Tutorial data"
+datasets: [D1]
+startingPoint:
+  dataset: D1
+  file: eeglab_data.set
+  applied: []
+  script: |
+    [ALLEEG, EEG, CURRENTSET, ALLCOM] = eeglab;
+eeglabVersion: "2026.1"
+updated: 2026-10-28
+---
+
+## Why this step matters
+
+The EEGLAB main window is your dashboard. From it you open data, apply every processing step, and read a summary of the current dataset.
+
+Before any processing, you need to know what you opened: how many channels, at what sampling rate, and for how many minutes. These numbers change with each step, and watching them is the fastest way to catch a mistake.
+
+In this lesson we open the official EEGLAB sample, `eeglab_data.set`. It ships with EEGLAB in the `sample_data` folder, so there is nothing to download.
+
+## Before and after
+
+<BeforeAfter>
+<Figure src="eeglab-gui/S2-eeglab-empty.png" alt="The EEGLAB main window before any dataset is opened: it shows &quot;No current dataset&quot; and a list of suggested first steps." caption="Before loading data, EEGLAB 2026.1" source="eeglab-ui" />
+<ImageSpec>
+After: the same EEGLAB main window after opening eeglab_data.set. At the top the line #1: Continuous EEG Data, then a Filename line, and below them the lines with their values: Channels per frame = 32, Frames per epoch = 30504, Epochs = 1, Events = 154, Sampling rate (Hz) = 128, Epoch start (sec) = 0.000, Epoch end (sec) = 238.305, Reference = unknown, Channel locations = Yes, ICA weights = No, Dataset size (Mb). Each line carries a small number matching a row in the "Which value should I choose?" table. Same window size and frame as the "before" image exactly. Real screenshot from EEGLAB 2026.1 (source: eeglab-ui).
+</ImageSpec>
+</BeforeAfter>
+
+## Steps in the GUI
+
+### 1. Meet the seven menus
+
+Start `eeglab`. The window bar has seven menus, roughly in the order you use them:
+
+| Menu | What it holds |
+|---|---|
+| <UiLabel>File</UiLabel> | Opening, importing and saving data, plugins, and preferences. |
+| <UiLabel>Edit</UiLabel> | Dataset info, events, channel locations, and selecting part of the data. |
+| <UiLabel>Tools</UiLabel> | Processing steps: filtering, ICA, epoching and more. |
+| <UiLabel>Plot</UiLabel> | Plots: the signal, the spectrum, and scalp maps. |
+| <UiLabel>Study</UiLabel> | Analyzing a group of participants together (station 8). |
+| <UiLabel>Datasets</UiLabel> | Switching between the datasets open in memory. |
+| <UiLabel>Help</UiLabel> | Documentation and function help. |
+
+Most menus are greyed out for now, because they need an open dataset.
+
+### 2. Open the dataset
+
+1. Open <MenuPath>File > Load existing dataset</MenuPath>.
+2. A file selection window opens. Go into the EEGLAB folder, then the `sample_data` folder.
+3. Select `eeglab_data.set` and click <UiLabel>Open</UiLabel>.
+
+The main window fills with the dataset summary, and the menus become available.
+
+### 3. Browse the signal
+
+1. Open <MenuPath>Plot > Channel data (scroll)</MenuPath>.
+2. A scrolling window opens: each horizontal line is a channel, and the horizontal axis is time in seconds.
+3. Move with the arrow buttons at the bottom: the single arrow (`>` or `<`) moves one second, and the double arrow (`>>` or `<<`) moves almost a full window.
+4. Zoom the signal in or out with the <UiLabel>+</UiLabel> and <UiLabel>-</UiLabel> buttons. The number next to them is the spacing between channels in microvolts.
+5. The colored vertical lines are the events, with each event's name above it (`square` or `rt`).
+6. To change the time window length or the number of channels shown, use <MenuPath>Settings > Time range to display</MenuPath> inside the scrolling window.
+
+<ImageSpec>
+The Channel data (scroll) window after opening eeglab_data.set: channel names on the left, vertical event lines for square and rt, the four arrow buttons for moving at the bottom, and the scale box between the + and - buttons. Arrows mark one channel, one event, the move buttons, and the scale. Real screenshot from EEGLAB 2026.1 (source: eeglab-ui).
+</ImageSpec>
+
+## The equivalent script
+
+```matlab
+% Start EEGLAB and get its main variables
+[ALLEEG, EEG, CURRENTSET, ALLCOM] = eeglab;
+
+% Load the sample dataset that ships with EEGLAB
+sampleFolder = fullfile(fileparts(which('eeglab')), 'sample_data');
+EEG = pop_loadset('filename', 'eeglab_data.set', 'filepath', sampleFolder);
+
+% Register it in EEGLAB and refresh the main window
+[ALLEEG, EEG, CURRENTSET] = pop_newset(ALLEEG, EEG, 0, 'gui', 'off');
+eeglab redraw;
+
+% Scroll through the channel data
+pop_eegplot(EEG, 1, 1, 1);
+```
+
+- `fileparts(which('eeglab'))` returns the EEGLAB folder wherever you installed it, so the script works on any computer.
+- `pop_newset` adds the dataset to EEGLAB's list of datasets (`'gui', 'off'` skips the naming window), and `eeglab redraw` refreshes the main window. EEGLAB uses the same function when you open a dataset from File > Load existing dataset.
+
+## Which value should I choose?
+
+There is no value to choose here. What matters is reading the main window correctly. This is what each line means, and its value in the tutorial dataset:
+
+| Line | Meaning | Value in `eeglab_data.set` |
+|---|---|---|
+| <UiLabel>Channels per frame</UiLabel> | Number of channels | 32 |
+| <UiLabel>Frames per epoch</UiLabel> | Number of samples per channel (for continuous data: the whole recording) | 30504 |
+| <UiLabel>Epochs</UiLabel> | Number of segments. A value of 1 means continuous data that has not been epoched | 1 |
+| <UiLabel>Events</UiLabel> | Number of events | 154 |
+| <UiLabel>Sampling rate (Hz)</UiLabel> | Sampling rate: samples per second | 128 |
+| <UiLabel>Epoch start (sec)</UiLabel> and <UiLabel>Epoch end (sec)</UiLabel> | Start and end of the data in seconds | 0.000 and 238.305 |
+| <UiLabel>Reference</UiLabel> | The reference the channels were recorded against | unknown: EEGLAB does not know this file's reference, although it was recorded with a mastoid reference. You will come back to this in the re-referencing lesson |
+| <UiLabel>Channel locations</UiLabel> | Do the channels have positions on the head? | Yes |
+| <UiLabel>ICA weights</UiLabel> | Has ICA been computed for this dataset? | No |
+
+**Recording length** = number of samples ÷ sampling rate = 30504 ÷ 128 = 238.3 seconds, about 4 minutes. This is roughly the number in <UiLabel>Epoch end (sec)</UiLabel>.
+
+## Common mistakes
+
+- **Menus are grey and do not respond.** You have not opened a dataset yet, or the open dataset does not suit that menu. Open a dataset first.
+- **Reading <UiLabel>Frames per epoch</UiLabel> as time.** It is a sample count, not seconds. Divide it by the sampling rate to get seconds.
+- **Picking the `.fdt` file in the open window.** Always open the `.set` file. The `.fdt` file holds the signal only, and EEGLAB reads it automatically with the `.set` file (details in the `.set` and `.fdt` lesson, an optional lesson).
+- **Saving over the sample file.** Do not use <MenuPath>File > Resave current dataset(s)</MenuPath> after changing `eeglab_data.set`. Save any modified copy under a new name in your own folder with <MenuPath>File > Save current dataset as</MenuPath>, so the original sample stays intact for the other lessons.
+- **Closing the main window by mistake.** The data stays in memory. Type `eeglab redraw` in the Command Window to bring the window back with the same data.
+
+{/* "From experience" box: waiting for a story from the project owner. Do not write it before it arrives. */}
+
+## How to check it worked
+
+1. **The first line** of the main window starts with `#1:` followed by the dataset name `Continuous EEG Data`.
+2. **The values** match the table above: 32 channels, 128 Hz, 30504 samples, and 154 events.
+3. **The scrolling window** shows 32 channels with their names, and the `square` and `rt` event lines appear in it.
+4. **From the Command Window:** type `EEG.setname`. It should print `'Continuous EEG Data'`.

@@ -1,0 +1,129 @@
+---
+title: فكرة ICA ببساطة
+titleEn: ICA, simply explained
+description: فكرة تحليل المكوّنات المستقلة (ICA) بمثال الحفلة والميكروفونات، وكيف يفصل مصادر EEG المختلطة بدون أن يحذف قنوات أو بيانات.
+station: 4
+order: 1
+level: core
+status: approved
+objectives:
+  - يشرح بمثال الحفلة والميكروفونات أن كل قناة EEG خليط من عدة مصادر.
+  - يشرح أن ICA يفصل المصادر بدون أن يحذف قنوات أو بيانات، وأن حذف مكوّن ICA لاحقاً قرار منفصل.
+  - يميّز بين جزأي مكوّن ICA، أي خريطة الرأس والسلسلة الزمنية، وأين يجدهما في EEGLAB.
+prerequisites: [rereferencing]
+references:
+  - title: EEGLAB Concepts guide
+    url: https://eeglab.org/tutorials/ConceptsGuide/ICA_background.html
+    section: "Independent Component Analysis of EEG data"
+  - title: EEGLAB Tutorial
+    url: https://eeglab.org/tutorials/06_RejectArtifacts/RunICA.html
+    section: "6. Reject artifacts > d. Indep. Comp. Analysis"
+  - title: Luck, Applied Event-Related Potential Data Analysis (الطبعة الأولى)
+    url: https://socialsci.libretexts.org/Bookshelves/Psychology/Biological_Psychology/Applied_Event-Related_Potential_Data_Analysis_(Luck)
+    section: "الفصل 9: Artifact Correction with ICA"
+  - title: "ICA applied to EEG: What is ICA?"
+    url: https://www.youtube.com/watch?v=kWAjhXr7pT4
+    section: "الفيديو كاملاً"
+    duration: "6:35"
+datasets: []
+interactive: []
+eeglabVersion: "2026.1"
+updated: 2026-10-28
+---
+
+## لماذا هذه الخطوة مهمة؟
+
+تخيّل حفلة فيها ثلاثة أشخاص يتكلّمون في نفس الوقت، وثلاثة ميكروفونات في أماكن مختلفة من القاعة. كل ميكروفون يسجّل خليطاً من الأصوات الثلاثة. الميكروفون القريب من شخص يسمعه أعلى، لكنه يسمع الآخرين أيضاً.
+
+السؤال: هل تستطيع من التسجيلات الثلاثة وحدها أن تستخرج صوت كل شخص منفرداً؟ هذا ما يفعله تحليل المكوّنات المستقلة (<En>ICA</En>).
+
+في EEG نفس المشكلة تماماً:
+
+- **الأشخاص** هم المصادر: نشاط مناطق في الدماغ، ورمش العين، والعضلات، والقلب، وضوضاء الكهرباء.
+- **الميكروفونات** هي القنوات (<En>channels</En>) على الرأس.
+- **الخلط** يحدث لأن التيار ينتشر في الرأس قبل أن يصل إلى الأقطاب. التوثيق الرسمي يصف هذا الخلط بأنه سلبي وخطّي، ولا يضيف معلومة جديدة.
+
+لذلك كل قناة خليط. قناة `FPz` في مقدمة الرأس مثلاً تسجّل نشاط الدماغ ومعه رمش العين بقوة.
+
+ICA يبحث عن طريقة لإعادة جمع القنوات تعطي إشارات مستقلة عن بعضها في الزمن قدر الإمكان. كل إشارة منها اسمها مكوّن ICA (<En>independent component</En>).
+
+## قبل وبعد
+
+<Figure src="ica-concept/ica-concept-stages.svg" alt="ثلاث مراحل. المصادر: دماغ بموجة 10 هرتز منتظمة، ورمش بقمم كبيرة بطيئة، وعضلة بنشاط سريع. ما تسجّله القنوات: ثلاثة أقطاب أمامي ومركزي وصدغي، كل منها خليط من الثلاثة، والأمامي فيه الرمش بقوة. بعد ICA: ثلاثة مكوّنات تشبه المصادر بترتيب مختلف، والرمش مقلوب الإشارة." source="original" />
+
+لاحظ في المرحلة الأخيرة أمرين. أولاً، ترتيب المكوّنات لا يطابق ترتيب المصادر. ثانياً، قد يكون المكوّن مقلوباً أو بحجم مختلف. ICA يجد شكل كل مصدر في الزمن، لكنه لا يعرف اسمه ولا حجمه الحقيقي ولا ترتيبه. تسمية المكوّنات عملك أنت، أو عمل ICLabel لاحقاً.
+
+## الخطوات من الواجهة
+
+لا توجد خطوات في EEGLAB لهذا الدرس، لأنه يشرح الفكرة قبل أن تشغّل ICA.
+
+ستقابل الفكرة في الواجهة في الدروس التالية:
+
+- **تشغيل ICA:** من <MenuPath>Tools > Decompose data by ICA</MenuPath>. بعده تظهر <UiLabel>ICA weights</UiLabel> بقيمة <UiLabel>Yes</UiLabel> في النافذة الرئيسية.
+- **خرائط الرأس:** من <MenuPath>Plot > Component maps > In 2-D</MenuPath>. كل خريطة تبيّن أين يظهر المكوّن على الرأس.
+- **حذف مكوّن:** من <MenuPath>Tools > Remove components from data</MenuPath>. هذه خطوة منفصلة تقرّرها أنت بعد المراجعة.
+
+## السكربت المقابل
+
+هذا السكربت اختياري. شغّله بعد تثبيت EEGLAB إذا أردت أن ترى الحفلة بنفسك. يصنع ثلاثة مصادر مصطنعة، ويخلطها في ثلاث "قنوات"، ثم يفصلها بالدالة `runica` من EEGLAB.
+
+```matlab
+eeglab nogui;   % puts runica on the MATLAB path
+
+% Three made-up sources, 10 seconds at 128 Hz
+srate = 128;
+t = (0:10*srate-1) / srate;
+brain = sin(2*pi*10*t);                        % steady 10 Hz rhythm
+n = round(0.3*srate);
+win = 0.5 - 0.5*cos(2*pi*(0:n-1)/(n-1));       % smooth bump for one blink
+blink = zeros(size(t));
+blink(round([1.5 4 6.5 9]*srate)) = 1;
+blink = 5 * conv(blink, win, 'same');          % four large, slow blinks
+muscle = 0.5 * randn(size(t));                 % fast, irregular activity
+S = [brain; blink; muscle];
+
+% Each channel records a different mix of the three sources
+A = [1.0 0.8 0.3;     % frontal channel: strong blink
+     0.9 0.2 0.4;     % central channel
+     0.7 0.1 1.0];    % temporal channel: strong muscle
+X = A * S;
+
+% ICA unmixes the channels without knowing A
+[weights, sphere] = runica(X, 'extended', 1);
+act = weights * sphere * X;
+
+figure;
+for k = 1:3
+    subplot(3, 2, 2*k-1); plot(t, X(k, :));   title(sprintf('Channel %d (mixture)', k));
+    subplot(3, 2, 2*k);   plot(t, act(k, :)); title(sprintf('ICA component %d', k));
+end
+```
+
+في العمود الأيسر ترى القنوات الثلاث، وكلها مختلطة. في العمود الأيمن ترى المكوّنات: إيقاع منتظم، وقمم رمش، ونشاط عشوائي، كل واحد في سطر وحده.
+
+## أي قيمة أختار؟
+
+لا قيم تختارها في هذا الدرس. الجدول يربط الفكرة بما ستراه في EEGLAB.
+
+| في الفكرة | في EEGLAB | ماذا يعني |
+|---|---|---|
+| طريقة إعادة جمع القنوات | `EEG.icaweights` و `EEG.icasphere` | ما يتعلّمه ICA. ضربهما في البيانات يعطي المكوّنات. |
+| شكل المكوّن في الزمن | `EEG.icaact` | السلسلة الزمنية لكل مكوّن ICA. |
+| مكان المكوّن على الرأس | `EEG.icawinv` | كل عمود فيه خريطة رأس لمكوّن ICA: كم يساهم في كل قناة. |
+| عدد المكوّنات | يساوي رتبة البيانات، وهو لا يزيد على عدد القنوات | في D1 بعد المرجع المتوسط وبلا قنوات مستوفاة: 31 مكوّناً من 32 قناة. كل قناة مستوفاة تنقص واحداً (درس تشغيل ICA). |
+
+## أخطاء شائعة
+
+- **الظن أن ICA يحذف شيئاً.** ICA وحده لا يغيّر بياناتك. يعطيك طريقة أخرى لرؤية نفس البيانات. الحذف قرار منفصل في درس ICLabel.
+- **الخلط بين القناة ومكوّن ICA.** القناة ما يسجّله قطب واحد. مكوّن ICA مصدر محسوب من كل القنوات معاً، وله خريطة على الرأس كله.
+- **الخلط بين مكوّن ICA ومكوّن ERP.** مكوّن ERP مثل P3 قمة في متوسط الـ epochs. مكوّن ICA مصدر مستقل يُحسب من كل نقاط التسجيل، لا من المتوسط. قل دائماً "مكوّن ICA" أو "مكوّن ERP".
+- **انتظار نفس الترتيب في كل مرة.** ترتيب المكوّنات وإشارتها وحجمها قد تختلف بين تشغيل وآخر. ابحث عن المكوّن بشكله، لا برقمه.
+- **توقّع مصادر أكثر من القنوات.** ICA لا يستطيع إيجاد مكوّنات أكثر من رتبة البيانات. مع 32 قناة لا تحصل على 50 مصدراً.
+
+{/* صندوق "من التجربة": بانتظار قصة من صاحب المشروع. لا يُكتب قبل وصولها. */}
+
+## كيف تتأكد أن الخطوة نجحت؟
+
+1. **تستطيع شرح الحفلة** بجملتين: القنوات ميكروفونات تسمع خليطاً، و ICA يستخرج كل صوت وحده.
+2. **تعرف جزأي مكوّن ICA:** خريطة رأس (`EEG.icawinv`) وسلسلة زمنية (`EEG.icaact`).
+3. **إذا شغّلت السكربت**، ترى في العمود الأيمن ثلاثة مكوّنات منفصلة، كل واحد يشبه أحد المصادر الثلاثة، بترتيب أو إشارة قد تختلف.

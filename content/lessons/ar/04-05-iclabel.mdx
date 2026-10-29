@@ -1,0 +1,211 @@
+---
+title: ICLabel وحذف المكوّنات
+titleEn: ICLabel & removing components
+description: كيف تصنّف مكوّنات ICA بـ ICLabel، وتراجع قراره بعينك، ثم تحذف مكوّنات الرمش والعضلات من بيانات EEG في EEGLAB.
+station: 4
+order: 5
+level: core
+status: approved
+objectives:
+  - يصنّف مكوّنات ICA بـ ICLabel ويقرأ احتمالات كل فئة.
+  - يراجع تصنيف مكوّن ICA بالنظر لخريطة الرأس والطيف والسلسلة الزمنية.
+  - يحذف مكوّنات الآرتفاكت ويقارن الإشارة قبل الحذف وبعده.
+prerequisites: [ica-1hz-copy-weights]
+references:
+  - title: EEGLAB Tutorial
+    url: https://eeglab.org/tutorials/06_RejectArtifacts/RunICA.html
+    section: "6. Reject artifacts > d. Indep. Comp. Analysis: Automated detection of artifactual ICA components"
+  - title: EEGLAB Tutorial
+    url: https://eeglab.org/tutorials/06_RejectArtifacts/RunICA.html
+    section: "Subtracting ICA components from data"
+  - title: ICLabel Tutorial
+    url: https://labeling.ucsd.edu/tutorial/about
+    section: "ICLabel Tutorial"
+  - title: "ICA applied to EEG part 9: Automatically detecting ICA component classes"
+    url: https://www.youtube.com/watch?v=Gi-0KiV_Az8
+    section: "الفيديو كاملاً"
+    duration: "5:24"
+datasets: [D1]
+startingPoint:
+  dataset: D1
+  file: eeglab_data.set
+  applied: [filtering, line-noise, bad-channels, interpolation, rereferencing, run-ica, ica-1hz-copy-weights]
+  script: |
+    % Shortcut: if you saved D1_main_ica.set in the 1-Hz filtering lesson, keep
+    % the first line and the last two lines, and replace every line between them with:
+    % EEG = pop_loadset('D1_main_ica.set', pwd);
+    [ALLEEG, EEG, CURRENTSET, ALLCOM] = eeglab;
+    eeglabRoot = fileparts(which('eeglab'));
+    EEG = pop_loadset('eeglab_data.set', fullfile(eeglabRoot, 'sample_data'));
+    fullLocs = EEG.chanlocs;
+
+    % Main dataset: high-pass at 0.1 Hz, then 60 Hz line-noise removal
+    EEG = pop_eegfiltnew(EEG, 'locutoff', 0.1);
+    EEG = pop_eegfiltnew(EEG, 'locutoff', 58, 'hicutoff', 62, 'revfilt', 1);
+
+    % Bad channels you removed earlier, e.g. {'T7'}; leave empty if none
+    badChans = {};
+    if ~isempty(badChans)
+        EEG = pop_select(EEG, 'rmchannel', badChans);
+        EEG = pop_interp(EEG, fullLocs, 'spherical');
+    end
+
+    % Average reference, EOG channels excluded
+    eogIdx = find(ismember({EEG.chanlocs.labels}, {'EOG1', 'EOG2'}));
+    EEG = pop_reref(EEG, [], 'exclude', eogIdx);
+
+    % ICA on a 1-Hz copy, then copy the weights back
+    EEG_ica = pop_eegfiltnew(EEG, 'locutoff', 1);
+    EEG_ica = pop_runica(EEG_ica, 'icatype', 'runica', 'extended', 1);
+    EEG.icaweights  = EEG_ica.icaweights;
+    EEG.icasphere   = EEG_ica.icasphere;
+    EEG.icachansind = EEG_ica.icachansind;
+    EEG.icawinv     = [];
+    EEG.icaact      = [];
+    EEG = eeg_checkset(EEG);
+    EEG.filename = ''; EEG.filepath = ''; EEG.datfile = ''; EEG.saved = 'no';
+    [ALLEEG, EEG, CURRENTSET] = pop_newset(ALLEEG, EEG, 0, 'setname', 'D1 main', 'gui', 'off');
+    eeglab redraw;
+interactive: [IcaGameTeaser]
+eeglabVersion: "2026.1"
+updated: 2026-10-28
+---
+
+## لماذا هذه الخطوة مهمة؟
+
+بعد تشغيل ICA عدد مكوّنات ICA عندك حوالي 31. بعضها نشاط دماغي، وبعضها آرتفاكت، أي إشارة غير دماغية تختلط بالتسجيل، مثل الرمش والعضلات.
+
+الحكم على كل مكوّن بعينك يحتاج وقتاً وخبرة. ICLabel إضافة (<En>plugin</En>) تأتي مع EEGLAB، دُرّبت على آلاف المكوّنات التي صنّفها أشخاص يدوياً. تعطي كل مكوّن احتمالاً في سبع فئات.
+
+ICLabel مساعد لا حَكَم. أنت تراجع اقتراحه، ثم تحذف مكوّنات الآرتفاكت من النسخة الرئيسية.
+
+## قبل وبعد
+
+قبل أن تثق بأي تصنيف آلي، درّب عينك على قراءة المكوّن بنفسك.
+
+<IcaGameTeaser />
+
+<Figure src="iclabel/iclabel-before-after.png" alt="خمس ثوانٍ من القنوات الأمامية FPz و EOG1 و EOG2 و F3 و Fz و F4: قبل حذف مكوّن الرمش بالأسود وبعده بالأحمر. قمم الرمش الكبيرة تختفي، وباقي الإشارة يبقى تقريباً كما هو." source="D1" />
+
+## الخطوات من الواجهة
+
+ابدأ والنسخة الرئيسية مفتوحة وفيها أوزان ICA، كما في "نقطة البداية".
+
+**أولاً: صنّف المكوّنات**
+
+1. افتح <MenuPath>Tools > Classify components using ICLabel > Label components</MenuPath>.
+2. في <UiLabel>Select which icversion of ICLabel to use:</UiLabel> اترك <UiLabel>Default (recommended)</UiLabel> واضغط <UiLabel>OK</UiLabel>.
+3. تظهر خرائط رأس المكوّنات، وفوق كل خريطة الفئة الأرجح واحتمالها.
+4. اضغط على أي مكوّن لتفتح لوحاته: خريطة الرأس، والطيف، والسلسلة الزمنية، واحتمال كل فئة.
+
+**ثانياً: راجع بعينك**
+
+لكل مكوّن تنوي حذفه، تأكد من العلامات الثلاث:
+
+| الفئة | خريطة الرأس | الطيف | السلسلة الزمنية |
+|---|---|---|---|
+| العين (<En>Eye</En>)، والرمش مثالها هنا | قوية في مقدمة الرأس ومتماثلة بين اليمين واليسار | أعلى ما يكون في الترددات المنخفضة، ثم ينخفض بسلاسة | قمم كبيرة متفرقة، كل قمة رمشة |
+| عضلة (<En>Muscle</En>) | بقعة صغيرة مركّزة على الحافة، قرب الصدغ أو الرقبة | يرتفع أو يبقى عالياً فوق 20 هرتز | نشاط سريع خشن، غالباً في دفعات |
+| دماغ (<En>Brain</En>) | عريضة وناعمة | قمة قرب 10 هرتز، أو انخفاض تدريجي مع زيادة التردد | تذبذب مستمر بلا قمم حادة |
+
+<Callout type="note" title="باقي الفئات">
+قراءة باقي الفئات (القلب، وضوضاء الكهرباء، وضوضاء القناة) في الدرس التالي: قراءة مكوّنات الآرتفاكت.
+</Callout>
+
+لوحات المكوّن التي تفتحها بالضغط عليه تأتي من إضافة Viewprops، وهي مرفقة داخل ICLabel. تفتحها لكل المكوّنات معاً من <MenuPath>Tools > Classify components using ICLabel > View extended component properties</MenuPath>، وعنوان نافذتها يبدأ بـ <UiLabel>View components properties - pop_viewprops()</UiLabel>. ملفات Viewprops موجودة في المجلد `<EEGLAB>/plugins/ICLabel/viewprops`. القائمة تضيفه إلى مسار MATLAB بنفسها، أما السكربت فيضيفه بسطر `addpath` قبل `pop_viewprops`، كما في سكربت هذا الدرس.
+
+**ثالثاً: ضع وسم الحذف على مكوّنات الآرتفاكت**
+
+وسم الحذف (<En>flag</En>) علامة على المكوّن، لا حذف فعلي. الحذف في الخطوة التالية.
+
+1. افتح <MenuPath>Tools > Classify components using ICLabel > Flag components as artifacts</MenuPath>.
+2. تظهر نافذة <UiLabel>Select range for flagging component for rejection</UiLabel>، فيها حد أدنى <UiLabel>Min</UiLabel> وحد أعلى <UiLabel>Max</UiLabel> لكل فئة. الافتراضي: <UiLabel>Muscle</UiLabel> من 0.9 إلى 1، و<UiLabel>Eye</UiLabel> من 0.9 إلى 1، والباقي فارغ.
+3. اضغط <UiLabel>OK</UiLabel>. ستطبع نافذة الأوامر عدد المكوّنات التي عُلّمت.
+
+**رابعاً: احذف المكوّنات وقارن**
+
+1. افتح <MenuPath>Tools > Remove components from data</MenuPath>.
+2. تظهر نافذة تذكر أرقام المكوّنات الموسومة وتسأل هل تحذفها. اضغط <UiLabel>Manual rej.</UiLabel> لترى القائمة وتعدّلها، لا <UiLabel>Yes</UiLabel>، لأن <UiLabel>Yes</UiLabel> يحذفها بدون مراجعة. تجاهل ملاحظة STUDY في النافذة الآن، فهي لتحليل عدة مشاركين وتأتي في المحطة 8.
+3. خانة <UiLabel>List of component(s) to remove from data</UiLabel> فيها المكوّنات الموسومة. عدّلها حسب مراجعتك: أضف مكوّناً متأكداً أنه آرتفاكت، أو احذف رقماً تشك فيه. ثم اضغط <UiLabel>OK</UiLabel>.
+4. تظهر نافذة تأكيد. اضغط <UiLabel>Plot single trials</UiLabel>: الأسود قبل الحذف والأحمر بعده.
+5. إذا اختفى الرمش وبقيت الإشارة الباقية كما هي، اضغط <UiLabel>Accept</UiLabel>.
+6. سمِّ الداتاست الجديدة `D1 main clean`، واترك <UiLabel>Overwrite it in memory (set=yes; unset=create a new dataset)</UiLabel> غير مفعّل. احفظها من <MenuPath>File > Save current dataset as</MenuPath> باسم `D1_main_clean.set`، ويمكن أن يبدأ منها درس طيف القدرة.
+
+**خامساً: طبّق الـ low-pass المؤجَّل**
+
+الآن بعد تنظيف البيانات، طبّق <En>low-pass</En> عند 30 هرتز كما في درس الفلترة: <MenuPath>Tools > Filter the data > Basic FIR filter (new, default)</MenuPath>، واكتب `30` في <UiLabel>Higher edge of the frequency pass band (Hz)</UiLabel>. سمِّ الداتاست الناتجة `D1 main clean lp30`، ثم احفظها من <MenuPath>File > Save current dataset as</MenuPath>. درس التقطيع يبدأ منها.
+
+## السكربت المقابل
+
+```matlab
+% Classify all components with the default ICLabel classifier
+EEG = pop_iclabel(EEG, 'default');
+
+% One row per component, one column per class
+classes = EEG.etc.ic_classification.ICLabel.classes;
+probs   = EEG.etc.ic_classification.ICLabel.classifications;
+disp(classes);
+disp(round(probs(1:10, :) * 100));
+
+% Flag components above 90% Muscle or Eye
+% Row order: Brain, Muscle, Eye, Heart, Line Noise, Channel Noise, Other
+thresh = [NaN NaN; 0.9 1; 0.9 1; NaN NaN; NaN NaN; NaN NaN; NaN NaN];
+EEG = pop_icflag(EEG, thresh);
+artifactComps = find(EEG.reject.gcompreject);
+
+% Review the flagged components
+% pop_viewprops is in the ICLabel plugin folder; the menu adds it to the path, a script must add it
+addpath(fullfile(fileparts(which('iclabel')), 'viewprops'));
+if ~isempty(artifactComps)
+    pop_viewprops(EEG, 0, artifactComps);
+end
+
+% Remove them from the main dataset
+if ~isempty(artifactComps)
+    EEG = pop_subcomp(EEG, artifactComps, 0);
+end
+EEG.setname = 'D1 main clean';
+EEG = pop_saveset(EEG, 'filename', 'D1_main_clean.set', 'filepath', pwd);
+
+% Low-pass at 30 Hz, postponed until after ICA cleaning
+EEG = pop_eegfiltnew(EEG, 'hicutoff', 30);
+EEG.setname = 'D1 main clean lp30';
+EEG = pop_saveset(EEG, 'filename', 'D1_main_clean_lp30.set', 'filepath', pwd);
+```
+
+إذا لم يُوسم أي مكوّن، يتخطّى السكربت المراجعة والحذف. وإذا غيّرت مراجعتك القائمة، عدّل `artifactComps` يدوياً قبل كتلة الحذف.
+
+## أي قيمة أختار؟
+
+| الإعداد | القيمة | لماذا |
+|---|---|---|
+| نسخة المصنّف | `Default` | الخيار الموصى به في نافذة ICLabel نفسها، وقد اختُبر في ورقة ICLabel المنشورة. |
+| حد وسم الحذف | Eye و Muscle فوق 90% | الافتراضي في EEGLAB 2026.1 والتوثيق الرسمي. حد عالٍ يعني أن ICLabel لا يعلّم إلا ما هو متأكد منه، والباقي يبقى لمراجعتك. |
+| مكوّنات أخرى (Heart، Line Noise، Channel Noise) | لا تُعلّم تلقائياً | احذفها فقط بعد مراجعتها بنفسك. تعلّم قراءتها في الدرس التالي. |
+| إصدار ICLabel | 1.6 أو أحدث | ICLabel 1.5 المرفق مع EEGLAB 2024.0 فيه خلل معروف، والتوصية الترقية. |
+
+<Callout type="note" title="ICLabel والمرجع">
+ICLabel يحسب علاماته على بيانات بمرجع متوسط. إذا لم تكن بياناتك كذلك، يحوّل نسخة مؤقتة داخلياً قبل الحساب. في مسارنا قنوات EEG بمرجع متوسط أصلاً من درس إعادة المرجع.
+</Callout>
+
+في الأوراق العلمية الأقدم سترى أدوات أخرى لتصنيف المكوّنات، مثل MARA و ADJUST و SASICA. هذه أدوات أقدم، و ICLabel هو الأداة الافتراضية اليوم.
+
+## أخطاء شائعة
+
+- **الثقة العمياء بـ ICLabel.** هو مصنّف آلي يخطئ أحياناً. راجع كل مكوّن قبل حذفه بالعلامات الثلاث.
+- **حذف كل ما ليس دماغاً.** المكوّن الذي أعلى فئاته <En>Other</En> قد يحمل جزءاً من نشاط الدماغ. إذا لم تتأكد أنه آرتفاكت، أبقِه.
+- **الحذف من نسخة ICA بدل النسخة الرئيسية.** نسخة 1 هرتز لحساب ICA فقط. احذف المكوّنات من النسخة الرئيسية المفلترة عند 0.1 هرتز.
+- **نقل أرقام المكوّنات.** ترتيب المكوّنات يختلف بين تشغيل وآخر. المكوّن رقم 3 في التوتوريال الرسمي أو في صورة هذا الدرس قد لا يكون الرمش عندك.
+- **إصدار ICLabel قديم.** تحقّق من إصداره في <MenuPath>File > Manage EEGLAB extensions</MenuPath>، وحدّثه إذا كان أقدم من 1.6. EEGLAB 2026.1 يأتي بالإصدار 1.7.
+
+{/* صندوق "من التجربة": بانتظار قصة من صاحب المشروع. لا يُكتب قبل وصولها. */}
+
+## كيف تتأكد أن الخطوة نجحت؟
+
+1. **قارن الإشارة.** افتح <MenuPath>Plot > Channel data (scroll)</MenuPath> على `D1 main` ثم على `D1 main clean`. يجب أن تختفي قمم الرمش من القنوات الأمامية، وأن تبقى باقي الإشارة شبه مطابقة.
+2. **عُدّ المكوّنات.** في نافذة الأوامر اكتب `size(EEG.icawinv, 2)`. يجب أن يكون العدد السابق ناقص عدد المكوّنات التي حذفتها.
+3. **افتح خرائط المكوّنات** من <MenuPath>Plot > Component maps > In 2-D</MenuPath> على `D1 main clean`. يجب ألا يظهر مكوّن الرمش بينها.
+
+<Methods>
+Components were classified with ICLabel (version 1.7; Pion-Tonachini et al., 2019), and components with a probability above 0.9 for the Eye or Muscle class were reviewed visually and removed ([N] components). Data were then low-pass filtered (passband edge 30 Hz, cutoff frequency [33.64] Hz at −6 dB, filter length [59] points; pop_eegfiltnew, firfilt plugin 2.8).
+</Methods>

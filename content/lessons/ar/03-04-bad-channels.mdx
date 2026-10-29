@@ -1,0 +1,164 @@
+---
+title: القنوات السيئة
+titleEn: Bad channels
+description: كيف تكتشف القنوات السيئة في EEGLAB بالنظر والطيف ومعايير clean_rawdata، وتحذفها بأسمائها، ولماذا قد تكون النتيجة "لا شيء".
+station: 3
+order: 4
+level: core
+status: approved
+objectives:
+  - يكتشف القنوات السيئة بالنظر إلى الإشارة وإلى طيف كل قناة.
+  - يشغّل معايير القنوات في clean_rawdata وحدها، مع استبعاد قنوات العين من الفحص.
+  - يحذف القنوات السيئة بأسمائها ويسجّلها للاستيفاء.
+prerequisites: [line-noise, channel-locations]
+references:
+  - title: EEGLAB Tutorial
+    url: https://eeglab.org/tutorials/06_RejectArtifacts/Channel_rejection.html
+    section: "6. Reject artifacts > a. Remove bad channels by visual inspection"
+  - title: EEGLAB Tutorial
+    url: https://eeglab.org/tutorials/06_RejectArtifacts/cleanrawdata.html
+    section: "6. Reject artifacts > Automated rejection using clean_rawdata"
+  - title: Luck, Applied Event-Related Potential Data Analysis (الطبعة الأولى)
+    url: https://socialsci.libretexts.org/Bookshelves/Psychology/Biological_Psychology/Applied_Event-Related_Potential_Data_Analysis_(Luck)
+    section: "الفصل 7: Inspecting the EEG and Interpolating Bad Channels"
+  - title: "EEGLAB preprocessing #6: Removing bad channels"
+    url: https://www.youtube.com/watch?v=5BTT-L2Ab04
+    section: "الفيديو كاملاً"
+    duration: "13:02"
+datasets: [D1, D3]
+startingPoint:
+  dataset: D1
+  file: eeglab_data.set
+  applied: [filtering, line-noise]
+  script: |
+    [ALLEEG, EEG, CURRENTSET, ALLCOM] = eeglab;
+    eeglabRoot = fileparts(which('eeglab'));
+    EEG = pop_loadset('eeglab_data.set', fullfile(eeglabRoot, 'sample_data'));
+
+    % Main dataset: high-pass at 0.1 Hz, then 60 Hz line-noise removal
+    EEG = pop_eegfiltnew(EEG, 'locutoff', 0.1);
+    EEG = pop_eegfiltnew(EEG, 'locutoff', 58, 'hicutoff', 62, 'revfilt', 1);
+    EEG.filename = ''; EEG.filepath = ''; EEG.datfile = ''; EEG.saved = 'no';
+    [ALLEEG, EEG, CURRENTSET] = pop_newset(ALLEEG, EEG, 0, 'setname', 'D1 hp0.1 notch60', 'gui', 'off');
+    eeglab redraw;
+interactive: []
+eeglabVersion: "2026.1"
+updated: 2026-10-27
+---
+
+## لماذا هذه الخطوة مهمة؟
+
+القناة السيئة قناة لا تسجّل نشاط الدماغ كما يجب. السبب غالباً قطب لم يلامس الجلد جيداً، أو سلك تالف، أو قطبان تلامسا بالجِل.
+
+تظهر بثلاثة أشكال: خط مسطّح، أو ضوضاء أعلى بكثير من جاراتها، أو إشارة لا تشبه القنوات المجاورة لها.
+
+قناة سيئة واحدة تضرّ كل البيانات. في المرجع المتوسط تدخل ضوضاؤها في كل القنوات. وفي ICA تأخذ مكوّنات لنفسها بدل المصادر الحقيقية.
+
+لذلك تكتشفها الآن، وتسجّل أسماءها، وتحذفها. وفي الدرس التالي تعيد بناءها بالاستيفاء.
+
+<Callout type="note">
+**عن D1:** التوثيق الرسمي يقول إن بيانات التوتوريال نظيفة نسبياً، ولا فيها قنوات تُحذف عادة. وفحص clean_rawdata بالإعدادات في هذا الدرس لا يحذف أي قناة. هذه نتيجة صحيحة: ليست كل البيانات فيها قنوات سيئة. لن نخترع خللاً. ستتعلّم الطريقة على D1، وترى شكل القناة السيئة في صورة من بيانات أخرى.
+</Callout>
+
+## قبل وبعد
+
+<Figure src="bad-channels/bad-channels-d3-scroll.png" alt="عشر ثوانٍ من بيانات مشارك في تجربة N400 من ERP CORE في نافذة التمرير: بعض القنوات مثل FP1 فيها انحراف كبير وضوضاء أعلى من جيرانها." caption="البيانات: ERP CORE، الترخيص CC BY-SA 4.0" source="D3" />
+
+## الخطوات من الواجهة
+
+ابدأ والنسخة الرئيسية `D1 hp0.1 notch60` مفتوحة كما في "نقطة البداية".
+
+**أولاً: انظر إلى الإشارة**
+
+1. افتح <MenuPath>Plot > Channel data (scroll)</MenuPath>.
+2. مرّ على التسجيل كله، لا على أول بضع ثوانٍ فقط. بعض القنوات تفسد لفترة قصيرة ثم تعود.
+3. ابحث عن ثلاث علامات: خط مسطّح، أو سعة أكبر بكثير من القنوات المجاورة، أو قفزات متكررة في قناة واحدة.
+4. في D1 سترى قمماً كبيرة في `EOG1` و `EOG2` والقنوات الأمامية. هذا رمش العين، وهو آرتفاكت طبيعي يزيله ICA لاحقاً. القناة ليست سيئة لأنها تسجّل الرمش.
+
+**ثانياً: انظر إلى الطيف**
+
+1. افتح <MenuPath>Plot > Channel spectra and maps</MenuPath>.
+2. غيّر <UiLabel>Plotting frequency range [lo_Hz hi_Hz]:</UiLabel> إلى `1 64`، ثم اضغط <UiLabel>OK</UiLabel>.
+3. القناة السيئة تظهر خطاً بعيداً عن مجموعة الخطوط: أعلى بكثير، أو أدنى بكثير إذا كانت مسطّحة.
+4. اضغط على أي خط في الرسم، فيظهر رقم قناته في نافذة الأوامر.
+5. في D1 تبقى الخطوط متقاربة، ولا يبتعد خط بوضوح عن الباقي.
+6. لتنظر عن قرب إلى قناة مشكوك فيها، افتح <MenuPath>Plot > Channel properties</MenuPath> واكتب رقمها. تعرض النافذة موقع القناة على الرأس، ونشاطها عبر الزمن، وطيفها معاً.
+
+**ثالثاً: افحص بمعايير clean_rawdata للقنوات فقط**
+
+1. افتح <MenuPath>Tools > Reject data using Clean Rawdata and ASR</MenuPath>.
+2. اترك <UiLabel>Remove channel drift (data not already high-pass filtered)</UiLabel> غير مفعّل، لأن البيانات مفلترة أصلاً.
+3. أبقِ <UiLabel>Process/remove channels</UiLabel> مفعّلاً.
+4. فعّل <UiLabel>Ignore these channels (ECG, EMG, ...)</UiLabel>، واكتب في الخانة بجانبه `EOG1 EOG2`.
+5. اترك المعايير الثلاثة بقيمها الافتراضية: <UiLabel>Remove channel if it is flat for more than (seconds)</UiLabel> بقيمة 5، و <UiLabel>Max acceptable high-frequency noise std dev</UiLabel> بقيمة 4، و <UiLabel>Min acceptable correlation with nearby chans [0-1]</UiLabel> بقيمة 0.8.
+6. ألغِ تفعيل <UiLabel>Perform Artifact Subspace Reconstruction bad burst correction/rejection</UiLabel>، وألغِ تفعيل <UiLabel>Additional removal of bad data periods</UiLabel>. هذان يحذفان مقاطع زمنية، وهذا موضوع درس آخر.
+7. اضغط <UiLabel>OK</UiLabel>. تطبع نافذة الأوامر `Scanning for bad channels...` ثم تقدّم الفحص على أجزاء من 5 ثوانٍ.
+8. تظهر نافذة تقارن البيانات قبل وبعد. القناة المحذوفة تظهر بالأحمر. في D1 لا تظهر قناة حمراء.
+9. سمِّ الداتاست الناتجة `D1 badch`، واترك <UiLabel>Overwrite it in memory (set=yes; unset=create a new dataset)</UiLabel> غير مفعّل.
+
+**رابعاً: سجّل الأسماء واحذف ما وجدته بالنظر**
+
+1. اكتب أسماء كل القنوات السيئة التي وجدتها، من الطرق الثلاث. ستحتاجها في الاستيفاء وفي قسم Methods لورقتك.
+2. clean_rawdata يحذف ما يكتشفه بنفسه. أما القناة التي وجدتها بالنظر فقط، فاحذفها من <MenuPath>Edit > Select data</MenuPath>: اكتب اسمها في خانة <UiLabel>Channel(s)</UiLabel>، وفعّل المربع تحت <UiLabel>on->remove these</UiLabel> في نفس السطر، ثم اضغط <UiLabel>OK</UiLabel>.
+3. في D1 القائمة فارغة، فلا تحذف شيئاً. احفظ `D1 badch` من <MenuPath>File > Save current dataset as</MenuPath>. درس الاستيفاء يبدأ منها.
+
+## السكربت المقابل
+
+```matlab
+% Detection with clean_rawdata channel criteria only:
+% no drift removal, no ASR, no window rejection, EOG channels ignored
+EEG_test = pop_clean_rawdata(EEG, 'FlatlineCriterion', 5, 'ChannelCriterion', 0.8, ...
+    'LineNoiseCriterion', 4, 'Highpass', 'off', 'BurstCriterion', 'off', ...
+    'WindowCriterion', 'off', 'BurstRejection', 'off', 'Distance', 'Euclidian', ...
+    'channels_ignore', {'EOG1', 'EOG2'});
+
+% Names of the channels it removed
+badChans = setdiff({EEG.chanlocs.labels}, {EEG_test.chanlocs.labels}, 'stable');
+
+% Add channels you found by eye, e.g. badChans = [badChans {'T7'}];
+fprintf('Bad channels: %s\n', strjoin(badChans, ', '));
+
+% Remove them by name from the main dataset
+if ~isempty(badChans)
+    EEG = pop_select(EEG, 'rmchannel', badChans);
+end
+EEG.setname = 'D1 badch';
+EEG = pop_saveset(EEG, 'filename', 'D1_badch.set', 'filepath', pwd);
+```
+
+في D1 يطبع السكربت `Bad channels: ` بقائمة فارغة، ويبقى عدد القنوات 32. انسخ `badChans` إلى سكربت نقطة البداية في الدروس التالية، فهي تبدأ بنفس المتغيّر.
+
+## أي قيمة أختار؟
+
+| الإعداد | القيمة | لماذا |
+|---|---|---|
+| خط مسطّح | 5 ثوانٍ | الافتراضي في clean_rawdata. قناة مسطّحة أطول من ذلك لا تسجّل شيئاً. |
+| ضوضاء الترددات العالية | 4 انحرافات معيارية | الافتراضي. يقارن كل قناة بباقي القنوات، فيكتشف القناة الأعلى ضوضاء بوضوح. |
+| الارتباط بالقنوات المجاورة | 0.8 | الافتراضي، ويذكره التوثيق الرسمي. القناة تُحذف إذا قلّ ارتباطها عن 0.8 في أكثر من نصف التسجيل. يعتمد على مواقع الأقطاب، فتأكد أنها صحيحة. |
+| قنوات العين والقلب | تُستبعد من الفحص | clean_rawdata مصمّم لقنوات EEG. قناة العين لا تشبه جاراتها بطبيعتها، فقد تُحذف وهي سليمة. |
+| ASR وحذف المقاطع | غير مفعّلين في هذا الدرس | هدفنا القنوات فقط. حذف المقاطع في درس clean_rawdata و ASR. |
+
+<Callout type="note">
+**بديل آلي:** إضافة PREP (PrepPipeline) تكتشف القنوات السيئة وتحسب مرجعاً متوسطاً مقاوماً للقنوات السيئة، كلها تلقائياً. تُثبّت من <MenuPath>File > Manage EEGLAB extensions</MenuPath>. نبدأ هنا بالطريقة اليدوية لتفهم كل خطوة.
+</Callout>
+
+## أخطاء شائعة
+
+- **عدم استبعاد قنوات العين.** بدون استبعاد `EOG1` و `EOG2`، قد يحذف clean_rawdata قناة `EOG1` في D1، لأن إشارتها لا تشبه القنوات المجاورة. هي ليست سيئة: هي قناة غير دماغية بطبيعتها. توثيق clean_rawdata نفسه يقول إن قنوات الإشارات غير الدماغية تُحذف عادة بهذه الطريقة. لهذا قد ترى في صفحة clean_rawdata الرسمية قنوات حمراء على نفس البيانات.
+- **اعتبار قناة الرمش سيئة.** القمم الكبيرة في القنوات الأمامية رمش عين. يزيله ICA لاحقاً، ولا تُحذف القناة بسببه.
+- **النظر إلى أول بضع ثوانٍ فقط.** بعض القنوات تفسد في منتصف التسجيل. مرّ على التسجيل كله.
+- **حذف قناة بدون تسجيل اسمها.** ستحتاج الأسماء في الاستيفاء، وفي قسم Methods، وعند معالجة باقي المشاركين بنفس الطريقة.
+- **حذف عدد كبير من القنوات دون سؤال.** إذا ظهرت قنوات كثيرة سيئة، فتحقّق أولاً من مواقع الأقطاب ومن التسجيل كله. clean_rawdata نفسه يتوقف بخطأ إذا أراد حذف أكثر من 75% من القنوات، ويقول إن السبب غالباً مواقع أقطاب خاطئة.
+
+{/* صندوق "من التجربة": بانتظار قصة من صاحب المشروع. لا يُكتب قبل وصولها. */}
+
+## كيف تتأكد أن الخطوة نجحت؟
+
+1. **عدد القنوات:** في النافذة الرئيسية، <UiLabel>Channels per frame</UiLabel> يساوي العدد الأصلي ناقص القنوات المحذوفة. في D1 يبقى 32.
+2. **قائمتك مكتوبة:** عندك أسماء القنوات المحذوفة، أو "لا شيء" كما في D1.
+3. **الطيف بعد الحذف:** افتح <MenuPath>Plot > Channel spectra and maps</MenuPath> بنطاق `1 64`. لا يبتعد خط بوضوح عن الباقي.
+4. **قنوات العين باقية:** `EOG1` و `EOG2` ما زالتا في قائمة القنوات.
+
+<Methods>
+Bad channels were identified by visual inspection of the continuous data and channel spectra and with clean_rawdata (flatline criterion 5 s, channel correlation criterion 0.8, line noise criterion 4 SD; EOG channels excluded; clean_rawdata plugin 2.11, EEGLAB 2026.1) and removed ([0] channels).
+</Methods>

@@ -1,0 +1,148 @@
+---
+title: Signals & frequencies
+titleEn: Signals & frequencies
+description: What frequency, sampling rate and the Nyquist frequency are, and how to read a simple spectrum and find the alpha peak near 10 Hz.
+station: 0
+order: 4
+level: core
+status: approved
+objectives:
+  - Identify the alpha peak (about 8 to 12 Hz) in a spectrum plot and tell it apart from the power-line peak.
+  - Compute the Nyquist frequency from the sampling rate, and explain why no higher frequencies appear.
+  - "Interpret the two axes of a spectrum plot: frequency in hertz, and power or amplitude."
+prerequisites: []
+references:
+  - title: EEGLAB Tutorial
+    url: https://eeglab.org/tutorials/05_Preprocess/resampling.html
+    section: "5. Preprocess data > Resampling"
+  - title: Luck, Applied Event-Related Potential Data Analysis (1st edition)
+    url: https://socialsci.libretexts.org/Bookshelves/Psychology/Biological_Psychology/Applied_Event-Related_Potential_Data_Analysis_(Luck)
+    section: "Chapter 4: Filtering the EEG and ERPs (first sections)"
+  - title: "Cohen (2014), Analyzing Neural Time Series Data. MIT Press"
+    url: https://mitpressbookstore.mit.edu/book/9780262019873
+    section: "Chapter The Discrete Time Fourier Transform, the FFT, and the Convolution Theorem"
+  - title: "Time-Frequency Analysis of EEG Time Series Part 1: Fourier Analysis of EEG Signal"
+    url: https://www.youtube.com/watch?v=d3haHpOPCc8
+    section: "Full video"
+    duration: "9:04"
+interactive: [FilterDemo]
+eeglabVersion: "2026.1"
+updated: 2026-10-27
+---
+
+## Why this step matters
+
+An EEG signal is a mix of waves at different speeds. Some are slow, some are fast. Almost every processing step deals with these speeds.
+
+Filtering removes the frequencies you do not want. Resampling changes the highest frequency that can be represented. The power spectrum measures how strong each frequency is in the signal.
+
+In these lessons you need three ideas: **frequency**, **sampling rate** and the **spectrum**. This lesson explains them with one example.
+
+## Before and after
+
+<FilterDemo filters="off" />
+
+The simulation starts with both filters off, so it shows the signal as it is. Switch the view from **Time** to **Spectrum** and look at what changes.
+
+In the time view you see one jagged line that is hard to read. In the spectrum view you see the same signal broken down into its frequencies: a peak at 10 Hz (alpha), a smaller peak at 6 Hz (theta), and a narrow peak at 60 Hz (power line).
+
+**Simplifications in the simulation:** one channel with an artificial signal, not real EEG, at a fixed sampling rate of 250 Hz. You do not need the two filters in this lesson; you will come back to them in the filtering lesson.
+
+## Steps in the GUI
+
+There are no EEGLAB steps in this lesson. Use the simulation above:
+
+1. Choose the **Spectrum** view.
+2. Find the highest peak between 8 and 12 Hz. This is the alpha peak.
+3. Find the very narrow peak at 60 Hz. This is power-line noise, not brain activity.
+4. Switch the line frequency to **50 Hz**. Notice that the peak moved, and the alpha peak did not.
+5. Go back to the **Time** view and press **New signal** a few times. The time shape changes, while the peaks in the spectrum stay in place.
+
+You will open the spectrum in EEGLAB itself later, from <MenuPath>Plot > Channel spectra and maps</MenuPath>, in the filtering and power spectrum lessons.
+
+## The equivalent script
+
+This script does not need EEGLAB. It builds a 10-second signal at 128 samples per second (the same rate as `eeglab_data.set`) from parts you already know, then computes its spectrum and looks for alpha in it.
+
+```matlab
+% Build a 10-second signal at 128 Hz from known parts, then look at its spectrum
+srate = 128;                          % samples per second
+t     = (0:10*srate-1) / srate;       % 10 s of time, first sample at 0
+rng(0);                               % same random noise on every run
+alpha = 20 * sin(2*pi*10*t);          % 10 Hz, 20 microvolts
+theta =  8 * sin(2*pi*6*t);           % 6 Hz, 8 microvolts
+noise =  5 * randn(size(t));          % broadband noise
+sig   = alpha + theta + noise;
+
+% Amplitude spectrum with the FFT
+n     = numel(sig);
+amp   = abs(fft(sig)) / n * 2;        % amplitude at each frequency
+freqs = (0:n-1) * srate / n;          % frequency of each FFT bin in Hz
+keep  = freqs <= srate/2;             % keep frequencies up to Nyquist
+
+figure;
+subplot(2,1,1); plot(t, sig); xlim([0 2]);
+xlabel('Time (s)'); ylabel('Amplitude (\muV)');
+subplot(2,1,2); plot(freqs(keep), amp(keep));
+xlabel('Frequency (Hz)'); ylabel('Amplitude (\muV)');
+
+% Strongest frequency between 8 and 12 Hz
+band = freqs >= 8 & freqs <= 12;
+[~, iPeak] = max(amp .* band);
+fprintf('Alpha peak at %.1f Hz, amplitude %.1f\n', freqs(iPeak), amp(iPeak));
+fprintf('Nyquist frequency: %d Hz\n', srate/2);
+
+% Aliasing: a 70 Hz wave sampled at 128 Hz shows up at 58 Hz
+fast = sin(2*pi*70*t);
+[~, iAlias] = max(abs(fft(fast)) .* keep);
+fprintf('A 70 Hz wave appears at %.1f Hz\n', freqs(iAlias));
+```
+
+**What each part does:**
+
+- **Frequency:** `sin(2*pi*10*t)` is a wave that repeats 10 times per second, that is 10 Hz. The number in front of it is its amplitude in microvolts.
+- **Sampling rate:** the system does not record a continuous line. It records one point every fraction of a second. At 128 Hz it records 128 samples per second, one sample about every 7.8 milliseconds.
+- **Spectrum:** `fft` breaks the signal into a sum of waves and gives the amplitude of each frequency. The lower plot has a peak at 6 Hz and a higher one at 10 Hz.
+- **Nyquist frequency:** the highest frequency that can be represented is half the sampling rate, 64 Hz here. That is why the plot stops at 64.
+- **Aliasing:** a 70 Hz wave is faster than the Nyquist limit, so it does not disappear. Instead it shows up disguised at 58 Hz (128 minus 70). This is why EEGLAB applies a low-pass filter before lowering the sampling rate (EEGLAB tutorial, Resampling page).
+
+## Which value should I choose?
+
+There is no value to choose here, but you will meet these numbers throughout the path.
+
+**Common frequency bands (approximate):**
+
+| Band | Approximate frequency | Where it usually appears |
+|---|---|---|
+| Delta | Below 4 Hz | Deep sleep |
+| Theta | 4 to 8 Hz | Memory and attention tasks, at frontal midline electrodes |
+| Alpha | 8 to 12 Hz | Relaxed with eyes closed, at posterior electrodes |
+| Beta | 13 to 30 Hz | Over the motor area |
+| Gamma | Above 30 Hz | Hard to measure from the scalp because muscle activity covers it |
+
+The band boundaries are a convention among researchers, not a law, and they differ slightly between sources. The alpha peak itself varies from person to person within this range.
+
+**Sampling rate and Nyquist limit in the path datasets:**
+
+| Dataset | Sampling rate | Nyquist frequency |
+|---|---|---|
+| `eeglab_data.set` (main path) | 128 Hz | 64 Hz |
+| PhysioNet file in station 2 | 160 Hz | 80 Hz |
+| A recording at 1000 Hz | 1000 Hz | 500 Hz |
+
+## Common mistakes
+
+- **Thinking the sampling rate is the highest frequency in the data.** The highest frequency is only half of it. Data at 128 Hz contain no information above 64 Hz.
+- **Thinking every peak in the spectrum is brain activity.** The narrow peak at 60 Hz (in Saudi Arabia and the US) or 50 Hz (in Europe and most other Arab countries) comes from the power grid. Check the spectrum before you assume the line frequency of the recording country.
+- **Reading the spectrum axis as linear.** EEGLAB plots spectral power in decibels (dB), a logarithmic scale (`spectopo.m`). A 10 dB difference means 10 times more power, not 10 units more.
+- **Treating band boundaries as exact numbers.** "Alpha is 8 to 12" is a rough rule. If a participant's peak is at 7.5 Hz, it may still be their alpha.
+- **Lowering the sampling rate by hand, keeping every other sample.** This causes aliasing. Use the EEGLAB function that filters first; you will learn it in the resampling lesson.
+
+{/* "From experience" box: waiting for a story from the project owner. Not written before it arrives. */}
+
+## How to check it worked
+
+- In the simulation you found the alpha peak near 10 Hz and the power-line peak at 60 Hz, and only the power-line peak moved when you switched to 50.
+- The script prints `Alpha peak at 10.0 Hz` with an amplitude close to 20.
+- The script prints `Nyquist frequency: 64 Hz`, and the lower plot stops at 64 Hz.
+- The script prints `A 70 Hz wave appears at 58.0 Hz`, and you can explain why in one sentence.

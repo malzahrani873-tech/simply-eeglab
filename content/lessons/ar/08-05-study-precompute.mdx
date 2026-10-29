@@ -1,0 +1,218 @@
+---
+title: حساب المقاييس مسبقاً (precompute)
+titleEn: Precomputing measures
+description: كيف تحسب ERP والطيف و ERSP لقنوات كل المشاركين مرة واحدة في EEGLAB قبل الرسم والإحصاء، وما معنى خيارات الاستيفاء وحذف مكوّنات ICA، وكم تأخذ الملفات من القرص.
+station: 8
+order: 5
+level: core
+status: approved
+objectives:
+  - يحسب ERP والطيف للقنوات لكل المشاركين من Study > Precompute channel measures.
+  - يحسب ERSP و ITC لكل القنوات بشبكة زمن وتردد خفيفة بالسكربت، ويبرّر هذه الشبكة بحجم الملفات.
+  - يختار متى يستوفي القنوات الناقصة ومتى يحذف مكوّنات ICA المعلّمة، ويحدد مكان الملفات وحجمها.
+prerequisites: [study-design]
+references:
+  - title: EEGLAB Tutorial
+    url: https://eeglab.org/tutorials/10_Group_analysis/study_data_visualization_tools.html
+    section: "10. Group analysis > Precomputing ERPs"
+  - title: EEGLAB Tutorial
+    url: https://eeglab.org/tutorials/11_Scripting/command_line_study_functions.html
+    section: "11. Scripting > Computing measures"
+  - title: Go-nogo categorization and detection task (OpenNeuro ds002680)
+    url: https://openneuro.org/datasets/ds002680
+    section: "README"
+datasets: [D6]
+startingPoint:
+  dataset: D6
+  file: animal_mine.study
+  applied: [create-study, study-design]
+  script: |
+    [ALLEEG, EEG, CURRENTSET, ALLCOM] = eeglab;
+    % Folder for the course data (change it)
+    dataFolder = 'C:\Users\me\Documents\eeg-course';
+
+    % Download the ready Go-nogo STUDY once and unzip it in its own folder
+    zipDir = fullfile(dataFolder, 'animal_study');
+    studyFile = dir(fullfile(zipDir, '**', 'animal.study'));
+    if isempty(studyFile)
+        zipFile = fullfile(dataFolder, 'animal_study.zip');
+        websave(zipFile, 'https://sccn.ucsd.edu/eeglab/download/animal_study.zip');
+        unzip(zipFile, zipDir);
+        studyFile = dir(fullfile(zipDir, '**', 'animal.study'));
+    end
+    studyDir = studyFile(1).folder;
+
+    % Convert the old .dat data files to .fdt once: resaving them in their old format damages the data in EEGLAB 2026.1
+    setFiles = dir(fullfile(studyDir, '*', '*.set'));
+    for k = 1:numel(setFiles)
+        [~, base] = fileparts(setFiles(k).name);
+        folder = setFiles(k).folder;
+        if ~exist(fullfile(folder, [base '.fdt']), 'file')
+            TMP = pop_loadset('filename', setFiles(k).name, 'filepath', folder);
+            pop_saveset(TMP, 'filename', setFiles(k).name, 'filepath', folder, 'savemode', 'twofiles');
+            if exist(fullfile(folder, [base '.fdt']), 'file') && exist(fullfile(folder, [base '.dat']), 'file')
+                delete(fullfile(folder, [base '.dat']));
+            end
+        end
+    end
+
+    % Rebuild animal_mine.study (create-study lesson) if it is missing
+    if ~exist(fullfile(studyDir, 'animal_mine.study'), 'file')
+        gender = containers.Map( ...
+            {'cba','clm','ega','fsa','gro','hth','lmi','mba','mma','mta','pla','sce','sph','wpa'}, ...
+            {'F',  'F',  'F',  'M',  'M',  'M',  'F',  'F',  'M',  'F',  'M',  'F',  'M',  'M'});
+        files = dir(fullfile(studyDir, '*', '*.set'));
+        commands = {};
+        for k = 1:numel(files)
+            hdr = pop_loadset('filename', files(k).name, 'filepath', files(k).folder, 'loadmode', 'info');
+            subj = hdr.subject;
+            if isempty(subj), [~, subj] = fileparts(files(k).folder); end
+            cond = hdr.condition;
+            if isempty(cond)
+                if contains(files(k).name, 'distractor'), cond = 'distractor'; else, cond = 'animal'; end
+            end
+            if ~isKey(gender, lower(subj))
+                error('No gender entry for subject %s (%s)', subj, files(k).name);
+            end
+            commands{end+1} = {'index', k, 'load', fullfile(files(k).folder, files(k).name), ...
+                'subject', subj, 'condition', cond, 'group', gender(lower(subj))};
+        end
+        [STUDY, ALLEEG] = std_editset([], [], 'name', 'Go-nogo animal (mine)', ...
+            'task', 'Go-nogo categorization', 'commands', commands, 'updatedat', 'on');
+        STUDY = pop_savestudy(STUDY, ALLEEG, 'filename', 'animal_mine.study', ...
+            'filepath', studyDir, 'resavedatasets', 'on');
+    end
+    [STUDY, ALLEEG] = pop_loadstudy('filename', 'animal_mine.study', 'filepath', studyDir);
+
+    % Designs 2 and 3 (study-design lesson); design 2 is the current one
+    STUDY = std_makedesign(STUDY, ALLEEG, 2, 'name', 'image x gender', ...
+        'variable1', 'condition', 'values1', {'animal', 'distractor'}, 'vartype1', 'categorical', ...
+        'variable2', 'group', 'values2', {'F', 'M'}, 'vartype2', 'categorical');
+    STUDY = std_makedesign(STUDY, ALLEEG, 3, 'name', 'image only', ...
+        'variable1', 'condition', 'values1', {'animal', 'distractor'}, 'vartype1', 'categorical', ...
+        'variable2', 'none');
+    STUDY = std_selectdesign(STUDY, ALLEEG, 2);
+    STUDY = pop_savestudy(STUDY, ALLEEG, 'savemode', 'resave');
+
+    CURRENTSTUDY = 1; EEG = ALLEEG; CURRENTSET = 1:length(EEG);
+    eeglab redraw;
+eeglabVersion: "2026.1"
+updated: 2026-10-28
+---
+
+## لماذا هذه الخطوة مهمة؟
+
+لرسم ERP المجموعة يحتاج EEGLAB متوسط كل مشارك في كل شرط. حسابه من البيانات الخام في كل مرة ترسم فيها بطيء، خاصة للطيف و ERSP.
+
+لذلك تحسب الـ STUDY كل مقياس مرة واحدة، وتحفظه في ملف بجانب ملفات كل مشارك. بعدها يقرأ الرسم والإحصاء من هذه الملفات مباشرة.
+
+نقطتان تجعلان هذه الخطوة أهم مما تبدو:
+
+- **ما تختاره هنا يدخل في كل النتائج.** خط الأساس، والاستيفاء، وحذف مكوّنات ICA تُطبَّق وقت الحساب. إذا غيّرت رأيك تعيد الحساب.
+- **EEGLAB يحفظ كل محاولة (trial) وحدها، لا المتوسط فقط.** هذا يسمح باختيار المحاولات لاحقاً في التصميم، لكنه يأخذ مساحة كبيرة مع ERSP.
+
+## قبل وبعد
+
+<Figure src="study-precompute/study-precompute-files.svg" alt="قبل الحساب: مجلد المشارك sph فيه sphanimal.set و sphdistractor.set مع ملفي بياناتهما .dat، وتحتها باهتة ملفات EEGLAB 6 القديمة مثل sphanimal.daterp و sphanimal.icaerp بوسم قديمة، لا تُستعمل. بعد الحساب: نفس المجلد وفيه أيضاً ثلاثة ملفات جديدة مظلّلة: sph.daterp و sph.datspec و sph.dattimef، وبجانب كل ملف شريط بطول حجمه." caption="رسم توضيحي، والأحجام تقدير حتى تُقاس" source="original" />
+
+## الخطوات من الواجهة
+
+**عن البيانات (D6):** نفس `animal_mine.study` من درس الإنشاء، مع التصميم 2 `image x gender` من درس التصميم. سكربت "نقطة البداية" يعيد بناءهما إذا لم يجدهما.
+
+**أولاً: افتح نافذة الحساب**
+
+1. شغّل سكربت "نقطة البداية". تظهر الـ STUDY في النافذة الرئيسية.
+2. افتح <MenuPath>Study > Precompute channel measures</MenuPath>. في أعلى النافذة: <UiLabel>Pre-compute channel measures for STUDY 'Go-nogo animal (mine)'</UiLabel>.
+
+**ثانياً: خيارات البيانات (الجزء العلوي)**
+
+1. <UiLabel>Spherical interpolation of missing channels (performed after optional ICA removal below)</UiLabel>: أبقه مفعّلاً، فهو مفعّل افتراضياً في النافذة. إذا كانت كل الملفات بنفس القنوات، كما فحصت في الدرس الأول، فلا يغيّر شيئاً.
+2. <UiLabel>Remove ICA artifactual components pre-tagged in each dataset</UiLabel>: اتركه غير مفعّل الآن. انظر الفقرة "متى أحذف مكوّنات ICA؟" أدناه.
+3. <UiLabel>Remove artifactual ICA cluster or clusters (hold shift key)</UiLabel>: اتركه غير مفعّل. يحتاج clusters من درس تجميع المكوّنات.
+
+**ثالثاً: المقاييس (الجزء السفلي)**
+
+1. فعّل <UiLabel>ERPs</UiLabel>، ثم اضغط زر <UiLabel>...</UiLabel> بجانبه. تفتح نافذة <UiLabel>Select parameters for ERP</UiLabel>.
+2. في <UiLabel>Baseline (min max) ("rmbase")</UiLabel> اكتب بداية الإيبوك بالـ ms ثم 0. خذ البداية من <UiLabel>Epoch start (sec)</UiLabel> التي سجّلتها في الدرس الأول واضربها في 1000. في هذه النسخة البداية -1 sec، فاكتب `-1000 0`. اضغط <UiLabel>Ok</UiLabel>.
+3. فعّل <UiLabel>Power spectrum</UiLabel> واترك قيمته الافتراضية `'specmode', 'fft', 'logtrials', 'off'`.
+4. **لا تفعّل** <UiLabel>ERSPs</UiLabel> و <UiLabel>ITCs</UiLabel> هنا. النافذة تحسبها لكل القنوات، وهذا يأخذ وقتاً طويلاً ومساحة كبيرة جداً. بالشبكة الافتراضية (100 تردد و 200 نقطة زمنية) تأخذ حوالي 1.5 GB لكل مشارك. نحسبها بالسكربت بشبكة أخف.
+5. أبقِ <UiLabel>Overwrite files on disk</UiLabel> مفعّلاً، حتى لا يُستخدم ملف قديم بإعدادات مختلفة. إذا وُجدت ملفات من قبل، تسأل النافذة `WARNING: SOME DATAFILES ALREADY EXIST, OVERWRITE THEM?`، وتنبّه أن STUDY أخرى على نفس الملفات قد تتأثر. اضغط <UiLabel>Yes</UiLabel>: `animal.study` الجاهزة و `animal_mine.study` تشتركان في المجلدات، ونحن نعمل على نسختنا.
+6. اضغط <UiLabel>Ok</UiLabel>. الحساب يأخذ دقيقة إلى دقيقتين للـ 14 مشاركاً، وتظهر أسطر التقدم في نافذة الأوامر.
+
+**رابعاً: ERSP و ITC بالسكربت**
+
+شغّل السكربت أدناه. في استدعاء واحد يعيد حساب ERP والطيف بنفس اختيارات النافذة، ويضيف ERSP و ITC لكل القنوات بـ 20 تردداً من 3 إلى 30 Hz و 50 نقطة زمنية، بدل 100 تردد و 200 نقطة الافتراضية. لماذا كل القنوات لا القناتين اللتين تحتاجهما فقط؟ في EEGLAB 2026.1 لا يمكن قراءة ملف ERSP حُسب لبعض القنوات: يتوقف الرسم بالرسالة `Unrecognized field name "chan1"`، لأن الملف يسمّي كل قناة برقمها في القائمة الكاملة، والقارئ يستعمل مكانها في القائمة القصيرة. الشبكة الأخف لكل القنوات تتجنب هذا وتُبقي الملفات صغيرة.
+
+**خامساً: انظر إلى الملفات**
+
+1. افتح مجلد أول مشارك (`cba`). فيه ثلاثة ملفات جديدة باسم رمز المشارك فقط، مثل `cba.daterp`: `.daterp` (ERP) و `.datspec` (الطيف) و `.dattimef` (التحليل الزمني الترددي لكل محاولة). ERSP و ITC يُحسبان كلاهما من `.dattimef` وقت الرسم، فلا ملف منفصل لهما.
+2. الملفات الأقدم التي في اسمها الشرط، مثل `cbaanimal.daterp`، هي ملفات EEGLAB 6 من سنة 2007. أسماؤها تختلف عن الجديدة، فلا يقرؤها EEGLAB ولا يكتب فوقها: تبقى بلا استعمال. يمكنك تركها أو حذفها.
+3. لاحظ أن الملف الجديد واحد لكل مشارك، لا لكل ملف .set. EEGLAB يجمع محاولات الشرطين في ملف واحد، ويفرّقها عند الرسم حسب التصميم.
+
+<Callout type="note">
+**متى أحذف مكوّنات ICA؟** خيار <UiLabel>Remove ICA artifactual components pre-tagged in each dataset</UiLabel> يحذف المكوّنات المعلّمة كتشويش في كل ملف وقت الحساب، ولا يغيّر الملفات نفسها. يعمل فقط إذا كان في الملفات أوزان ICA وعلامات، وهذا ما فحصته في الدرس الأول. إذا كانت أوزان ICA موجودة بلا علامات: مع الـ STUDY مفتوحة افتح <MenuPath>Tools > Classify components using ICLabel > Label components</MenuPath> ثم <MenuPath>Tools > Classify components using ICLabel > Flag components as artifacts</MenuPath>. تُطبَّق على كل الملفات المحددة. بعدها فعّل الخيار وأعد الحساب. لا تفعّله إذا كانت المكوّنات حُذفت من البيانات أصلاً قبل الـ STUDY.
+</Callout>
+
+## السكربت المقابل
+
+```matlab
+% STUDY and ALLEEG come from the starting point script
+% ERPs and spectra as in the GUI, plus ERSP and ITC at every channel on a light grid
+% (20 frequencies from 3 to 30 Hz, 50 time points) to keep the files small
+baseline = [round(ALLEEG(1).xmin*1000) 0];   % from the epoch start to 0 ms
+[STUDY, ALLEEG] = std_precomp(STUDY, ALLEEG, {}, 'savetrials', 'on', 'interp', 'on', 'recompute', 'on', ...
+    'erp', 'on', 'erpparams', {'rmbase', baseline}, ...
+    'spec', 'on', 'specparams', {'specmode', 'fft', 'logtrials', 'off'}, ...
+    'ersp', 'on', 'itc', 'on', 'erspparams', {'cycles', [3 0.8], 'freqs', [3 30], 'nfreqs', 20, 'ntimesout', 50});
+STUDY = pop_savestudy(STUDY, ALLEEG, 'savemode', 'resave');
+
+% Files written for the first participant, with their size on disk
+first = STUDY.datasetinfo(1);
+measureFiles = dir(fullfile(first.filepath, [first.subject '.dat*']));
+for k = 1:numel(measureFiles)
+    fprintf('%-24s %8.1f MB\n', measureFiles(k).name, measureFiles(k).bytes/1e6);
+end
+fprintf('Channel groups in the STUDY: %d\n', numel(STUDY.changrp));
+```
+
+## أي قيمة أختار؟
+
+| الخيار | في هذا الدرس | القاعدة العامة |
+|---|---|---|
+| خط الأساس (`rmbase`) | من بداية الإيبوك إلى 0 ms | نفس خط الأساس الذي استخدمته لكل مشارك. إذا كانت البيانات مصحّحة مسبقاً فالتصحيح الثاني لا يضر. |
+| الاستيفاء (`interp`) | on، كما في النافذة | في السكربت قيمته الافتراضية off، فاكتبه صراحة. الأفضل أن تستوفي القنوات الناقصة في ملف كل مشارك قبل الـ STUDY، حيث تراها بعينك. |
+| حذف مكوّنات ICA (`rmicacomps`) | off | on فقط إذا كانت المكوّنات معلّمة في كل الملفات، ولم تُحذف من البيانات قبل ذلك. |
+| الطيف (`specparams`) | `'specmode', 'fft', 'logtrials', 'off'` | الافتراضي مناسب للبداية. غيّره فقط إذا كان عندك سبب منهجي. |
+| ERSP (`erspparams`) | كل القنوات، 20 تردداً من 3 إلى 30 Hz، 50 نقطة زمنية | شبكة أدق فقط للترددات والأزمنة التي في سؤال بحثك. أبقِ كل القنوات في EEGLAB 2026.1. |
+| حفظ المحاولات (`savetrials`) | on | ثابت: في EEGLAB الحالي لا خيار غيره، والنافذة تضيفه دائماً. |
+| إعادة الحساب (`recompute`) | on | on كلما غيّرت أي خيار، وإلا يقرأ EEGLAB الملفات القديمة. |
+
+<Callout type="warning">
+**المساحة على القرص.** لأن EEGLAB يحفظ كل محاولة، ملف `.dattimef` كبير: ترددات × نقاط زمنية × محاولات × قنوات. بالإعدادات الافتراضية (100 تردد و 200 نقطة زمنية) ولكل القنوات يصل إلى حوالي 1.5 GB لكل مشارك، أي حوالي 21 GB للمشاركين الـ 14 (تقدير من حجم الملفات، يُقاس يوم التشغيل). لهذا نستعمل شبكة أخف: حوالي 75 MB لكل مشارك، وحوالي 1 GB للكل (تقدير يُقاس يوم التشغيل). درس تنظيم الملفات في المحطة 9 يشرح أين تضع هذه الملفات وكيف تحذفها بأمان.
+</Callout>
+
+## أخطاء شائعة
+
+- **تغيير خيار بلا إعادة حساب.** إذا ألغيت <UiLabel>Overwrite files on disk</UiLabel>، يستخدم EEGLAB الملفات الموجودة حتى لو حسبتها بخط أساس آخر.
+- **حساب ERSP لكل القنوات من النافذة.** يمتلئ القرص ويأخذ الحساب وقتاً طويلاً.
+- **حساب ERSP لبعض القنوات فقط.** تُكتب الملفات، لكن رسمها يتوقف بالرسالة `Unrecognized field name "chan1"` في EEGLAB 2026.1. احسب لكل القنوات بشبكة أخف.
+- **حذف مكوّنات ICA مرتين.** إذا حذفت المكوّنات من كل ملف قبل الـ STUDY، لا تفعّل الخيار هنا. ما بقي معلّماً قد يكون مكوّناً سليماً.
+- **أخذ ملفات 2007 لنتائجك.** حُسبت بإعدادات لا تعرفها، و EEGLAB لا يقرؤها. استعمل فقط الملفات التي باسم رمز المشارك وحسبتها بنفسك.
+- **نقل ملفات المقاييس (`.daterp` وأمثالها) وحدها.** هي تابعة لملفات المشارك. انقل المجلد كاملاً.
+
+{/* صندوق "من التجربة": بانتظار قصة من صاحب المشروع. لا يُكتب قبل وصولها. */}
+
+## كيف تتأكد أن الخطوة نجحت؟
+
+- **في مجلد أول مشارك** ثلاثة ملفات جديدة باسم الرمز فقط، `cba.daterp` و `cba.datspec` و `cba.dattimef`، ولا يوجد `.datersp` ولا `.datitc` جديد. ملفات `cbaanimal.*` و `cbadistractor.*` هي القديمة.
+- **السكربت يطبع حجم كل ملف.** الثلاثة متقاربة، عشرات MB تقريباً (`.dattimef` حوالي 75 MB تقديراً) {/* حجما daterp و datspec: يُقاسان في التشغيل المجمّع */}، لأننا استعملنا شبكة خفيفة لـ ERSP. بالشبكة الافتراضية كان `.dattimef` سيصير حوالي 1.5 GB.
+- **السكربت يطبع** عدد مجموعات القنوات `Channel groups in the STUDY`، وهو يساوي عدد القنوات في الملفات.
+- **نافذة الأوامر** لا تعرض أخطاء حمراء، ولا تحذير `IMPORTANT WARNING`.
+
+<Methods>
+Channel ERPs and spectra were precomputed for each participant and condition (std_precomp), with baseline correction from [−1000] to 0 ms; with spherical interpolation of any missing channels enabled; event-related spectral perturbations were computed at every channel for [20] frequencies from [3] to [30] Hz.
+</Methods>
+
+<Callout type="note" title="مصدر البيانات">
+البيانات: نسخة STUDY من SCCN/Delorme. البيانات الأصلية: OpenNeuro ds002680 (CC0).
+</Callout>

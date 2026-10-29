@@ -1,0 +1,38 @@
+# Reference table on /references/. Source: project brief §6.
+# The links marked "unverified" could not be opened from the build machine; the weekly link check covers them.
+- title: EEGLAB Tutorial
+  url: https://eeglab.org/tutorials/
+  free: true
+  lang: en
+  stations: [1, 2, 3, 4, 5, 7, 8, 9]
+  license: { ar: 'توثيق رسمي', en: 'Official documentation' }
+- title: "Makoto's preprocessing pipeline"
+  url: https://eeglab.ucsd.edu/wiki/Makoto%27s_preprocessing_pipeline
+  free: true
+  lang: en
+  stations: [3, 4, 9]
+  license: { ar: 'ويكي SCCN', en: 'SCCN wiki' }
+- title: Luck, Applied Event-Related Potential Data Analysis
+  url: https://socialsci.libretexts.org/Bookshelves/Psychology/Biological_Psychology/Applied_Event-Related_Potential_Data_Analysis_(Luck)
+  free: true
+  lang: en
+  stations: [5, 6, 8]
+  license: { ar: 'CC BY-NC 4.0', en: 'CC BY-NC 4.0' }
+- title: Luck, An Introduction to the Event-Related Potential Technique (2nd ed., MIT Press 2014)
+  url: https://mitpressbookstore.mit.edu/book/9780262525855
+  free: false
+  lang: en
+  stations: [0, 6]
+  license: { ar: 'كتاب', en: 'Book' }
+- title: Cohen, Analyzing Neural Time Series Data (MIT Press 2014)
+  url: https://mitpressbookstore.mit.edu/book/9780262019873
+  free: false
+  lang: en
+  stations: [0, 6]
+  license: { ar: 'كتاب', en: 'Book' }
+- title: Online EEGLAB Workshop (SCCN)
+  url: https://eeglab.org/workshops/
+  free: true
+  lang: en
+  stations: [4, 8, 10]
+  license: { ar: 'فيديوهات وشرائح', en: 'Videos and slides' }

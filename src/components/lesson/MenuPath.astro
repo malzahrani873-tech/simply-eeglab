@@ -1,0 +1,10 @@
+---
+import { t } from '../../i18n';
+import { langOf } from '../../lib/lang';
+const lang = langOf(Astro.url);
+const raw = (await Astro.slots.render('default')).replace(/&gt;/g, '>').replace(/<[^>]*>/g, '');
+const items = raw.split('>').map((s) => s.trim()).filter(Boolean);
+---
+<span class="mp" lang="en" dir="ltr">{items.map((it, i) => (
+  <>{i > 0 && <> <span class="cr" aria-hidden="true">›</span> </>}{i > 0 && <span class="sr" lang={lang}> {t(lang, 'menuPath.sep.sr')} </span>}<span class="it" set:html={it} /></>
+))}</span>

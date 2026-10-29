@@ -1,0 +1,183 @@
+---
+title: "البايبلاينات الجاهزة: متى تستخدمها"
+titleEn: "Automated pipelines: when to use them"
+description: ماذا تفعل البايبلاينات الجاهزة (HAPPE و MADE و RELAX و PREP و BeMoBIL و Automagic)، ولمن صُمّمت، وكيف تتحقق من مخرجاتها، مع مثال PREP على D1.
+station: 9
+order: 4
+level: optional
+status: approved
+objectives:
+  - يميّز البايبلاينات الآلية الستة الشائعة حسب البيانات التي صُمّمت لها والخطوات التي تشغّلها.
+  - يشغّل بايبلاين PREP على D1 من الواجهة ومن سكربت.
+  - "يتحقق من مخرجات أي بايبلاين بثلاثة أسئلة: أي القنوات تغيّرت، وماذا حدث للطيف، وماذا يقول التقرير."
+  - يقرّر متى يناسب البايبلاين الجاهز دراسته، ومتى يكون سكربته الخاص أفضل.
+prerequisites: [batch-processing]
+references:
+  - title: EEGLAB Tutorial
+    url: https://eeglab.org/tutorials/11_Scripting/automated_pipeline.html
+    section: "11. Scripting > e. Automated pipeline"
+  - title: PREP pipeline (EEG-Clean-Tools)
+    url: https://github.com/VisLab/EEG-Clean-Tools
+    section: "README, Releases (0.57.0)"
+  - title: RELAX
+    url: https://github.com/NeilwBailey/RELAX
+    section: "README"
+  - title: "What is the optimal automated EEG pipeline?"
+    url: https://www.youtube.com/watch?v=mW7u2YEK3ZY
+    section: "الفيديو كاملاً"
+    duration: "21:04"
+datasets: [D1]
+startingPoint:
+  dataset: D1
+  file: eeglab_data.set
+  applied: []
+  script: |
+    [ALLEEG, EEG, CURRENTSET, ALLCOM] = eeglab;
+    eeglabRoot = fileparts(which('eeglab'));
+    EEG = pop_loadset('eeglab_data.set', fullfile(eeglabRoot, 'sample_data'));
+
+    % Show the dataset in the main EEGLAB window
+    [ALLEEG, EEG, CURRENTSET] = pop_newset(ALLEEG, EEG, 0, 'setname', 'D1 raw', 'gui', 'off');
+    eeglab redraw;
+eeglabVersion: "2026.1"
+updated: 2026-10-28
+---
+
+## لماذا هذه الخطوة مهمة؟
+
+في المحطات 3 إلى 5 بنيت بيدك بايبلاين المعالجة المسبقة: الفلترة، وضوضاء الكهرباء، والقنوات السيئة، والمرجع، و ICA، ثم التقطيع. كل مختبر يكرّر هذه الخطوات، لذلك جمعتها عدة مجموعات بحثية في بايبلاينات جاهزة تعمل على كل المشاركين بلا تدخّل منك.
+
+هذه البايبلاينات توفّر وقتاً كبيراً، خصوصاً مع البيانات الكبيرة. لكن كل واحد منها يتّخذ عشرات القرارات بدلاً منك: أي قناة سيئة، وأي مكوّن عين، وأي مقطع يُحذف. إذا لم تعرف هذه القرارات، فلن تستطيع الدفاع عنها في ورقتك، ولن تنتبه إذا أخطأت.
+
+**البايبلاين الجاهز يختصر الوقت، لكنه لا يعفيك من فهم كل خطوة فيه.**
+
+لهذا يأتي هذا الدرس بعد أن بنيت البايبلاين بنفسك. فيه تقارن البايبلاينات الستة الشائعة، ثم تشغّل واحداً منها (PREP) على D1 وتتحقق من مخرجاته كما تتحقق من أي بايبلاين.
+
+### ستة بايبلاينات في جدول واحد
+
+كلها أدوات منفصلة، غير مرفقة مع EEGLAB. الإصدارات كما كانت عند كتابة الدرس.
+
+| البايبلاين | صُمّم لـ | ماذا يفعل باختصار | كيف تشغّله |
+|---|---|---|---|
+| PREP (PrepPipeline 0.57.0) | أي EEG، خصوصاً البيانات الكبيرة | المرحلة الأولى فقط: تخفيف ضوضاء الكهرباء، ومرجع متوسط متين (robust)، وكشف القنوات السيئة واستيفاؤها. لا يشغّل ICA. | إضافة EEGLAB: <MenuPath>Tools > Run PREP pipeline</MenuPath> |
+| HAPPE (v4) | بيانات الرضّع والأطفال، والتسجيلات بقنوات قليلة | بايبلاين كامل حتى epochs نظيفة، مع جدول جودة لكل ملف | سكربتات MATLAB تستخدم EEGLAB، تشغّلها من مجلد HAPPE |
+| MADE (v1.0) | بيانات الرضّع والأطفال | بايبلاين كامل مع كشف آلي للقنوات السيئة ومكوّنات التشويش | سكربت MATLAB واحد تعدّله وتشغّله |
+| RELAX (2.0.1) | بيانات البالغين، للـ ERP والذبذبات | ينظّف تشويش العين والعضلات بعدة طرق معاً (MWF و wICA و ICLabel) | إضافة EEGLAB، تحتاج إضافات أخرى يذكرها دليلها |
+| BeMoBIL (2.0.0) | EEG أثناء الحركة (mobile EEG) مع بيانات الحركة | الاستيراد والتنظيف و AMICA والتحليل، وكل الإعدادات في ملف واحد | إضافة EEGLAB وسكربتات |
+| Automagic | البيانات الكبيرة لمن لا يريد البرمجة | يشغّل عدة خطوات (منها PREP)، ثم يقيّم جودة كل ملف | واجهته الخاصة من قائمة <MenuPath>Automagic</MenuPath> في EEGLAB |
+
+أياً كان البايبلاين الذي تختاره، تحقق من ثلاثة أشياء في مخرجاته قبل أن تكمل:
+
+1. **القنوات:** كم قناة حُذفت أو استُوفيت، وأيها؟ قارنها بما تراه في <MenuPath>Plot > Channel data (scroll)</MenuPath>.
+2. **الطيف:** قارن الطيف قبل وبعد. يجب أن تصغر قمة الكهرباء بوضوح، وألّا ينهار باقي الطيف.
+3. **التقرير:** اقرأ تقرير البايبلاين لكل مشارك. المشارك الذي حُذف منه عدد كبير من القنوات أو المكوّنات يحتاج نظرة، أو استبعاداً.
+
+## قبل وبعد
+
+<Figure src="automated-pipelines/prep-spectra.png" alt="طيفان متجاوران من 1 إلى 64 هرتز. اليسار البيانات الخام: قمة ألفا عند 10 هرتز وقمة حادة عند 60 هرتز. اليمين بعد PREP: قمة 60 هرتز ما زالت موجودة لكنها أصغر، وقمة ألفا بقي شكلها." caption="يسار: الخام. يمين: بعد PREP (PrepPipeline 0.57.0)" source="D1" />
+
+## الخطوات من الواجهة
+
+**أولاً: ثبّت PREP**
+
+1. افتح <MenuPath>File > Manage EEGLAB extensions</MenuPath>، وابحث عن PrepPipeline، وثبّته (آخر إصدار عند كتابة الدرس 0.57.0). أعد تشغيل `eeglab`، فيظهر البند <UiLabel>Run PREP pipeline</UiLabel> في قائمة <MenuPath>Tools</MenuPath>.
+
+**ثانياً: انظر إلى البيانات قبل**
+
+2. ابدأ من `D1 raw` كما في "نقطة البداية". هذه البيانات كما نزّلتها، بلا فلترة.
+3. افتح <MenuPath>Plot > Channel spectra and maps</MenuPath> واترك القيم الافتراضية. لاحظ القمة الحادة عند 60 هرتز، كما في درس ضوضاء الكهرباء.
+
+**ثالثاً: شغّل PREP**
+
+4. افتح <MenuPath>Tools > Run PREP pipeline</MenuPath>. تفتح نافذة <UiLabel>PREP pipeline control panel</UiLabel> وفيها ستة أزرار، زر لكل مرحلة.
+5. اضغط <UiLabel>Reference</UiLabel>. في <UiLabel>Reference channels</UiLabel> و <UiLabel>Evaluation channels</UiLabel> و <UiLabel>Re-referenced channels</UiLabel> اكتب `[1 3:5 7:32]`، أي كل القنوات ما عدا `EOG1` (القناة 2) و `EOG2` (القناة 6). اضغط <UiLabel>Ok</UiLabel>.
+6. اضغط <UiLabel>Line noise</UiLabel> وتأكد أن <UiLabel>Line frequencies removed</UiLabel> فيها `60`. يحسبها PREP من معدل العيّنات: مضاعفات 60 تحت Nyquist، وهو 64 هرتز في D1. اضغط <UiLabel>Ok</UiLabel>.
+7. اضغط <UiLabel>Ok</UiLabel> في لوحة التحكم. يطبع PREP كل مرحلة في نافذة الأوامر، ويأخذ حوالي دقيقة على D1. عندما ينتهي يكتب ملف ملخّص (`.html`) وتقريراً مفصّلاً (`.pdf`) في مجلد العمل، ويطلب منك اسماً للداتاست الجديدة. سمِّها `D1 prep`.
+
+**رابعاً: تحقق من المخرجات**
+
+8. افتح ملف الملخّص `.html` في المتصفح. ابحث عن قائمة القنوات المستوفاة، وقائمة القنوات التي بقيت مشوّشة بعد المرجع.
+9. افتح <MenuPath>Plot > Channel spectra and maps</MenuPath> مرة أخرى على `D1 prep`. قمة 60 هرتز أصغر لكنها ما زالت موجودة، وتظهر بوضوح في قنوات قليلة. خطوة ضوضاء الكهرباء في PREP تخفّف القمة ولا تزيلها تماماً. إذا كانت القمة الباقية تؤثّر في تحليلك، أضف فلتر band-stop من درس ضوضاء الكهرباء بعد PREP.
+10. قارن بنتيجتك في درس القنوات السيئة: هناك لم يحذف clean_rawdata أي قناة من D1. إذا استوفى PREP قناة، فافتح <MenuPath>Plot > Channel data (scroll)</MenuPath> وانظر إليها بنفسك قبل أن تقبل القرار.
+
+## السكربت المقابل
+
+يكمل من "نقطة البداية". دالة PREP نفسها `prepPipeline` هي أوضح طريقة لاستدعائه من سكربت، كما في المثال المرفق مع الإضافة. السكربت لا يكتب التقرير، بل يطبع النتائج مباشرة.
+
+```matlab
+% PREP is not bundled with EEGLAB: install it from the extension manager
+plugin_askinstall('PrepPipeline', 'prepPipeline', true);
+
+% Keep a copy of the raw data to compare spectra
+EEG_raw = EEG;
+
+% Scalp channels only; EOG is cleaned of line noise but not referenced
+eegChans = find(~ismember({EEG.chanlocs.labels}, {'EOG1', 'EOG2'}));
+
+params = struct();
+params.name = 'D1';
+params.lineFrequencies = 60;
+params.detrendChannels = 1:EEG.nbchan;
+params.lineNoiseChannels = 1:EEG.nbchan;
+params.referenceChannels = eegChans;
+params.evaluationChannels = eegChans;
+params.rereferencedChannels = eegChans;
+
+% Line noise reduction, robust reference, bad channel interpolation
+[EEG, params] = prepPipeline(EEG, params);
+EEG.setname = 'D1 prep';
+
+% What did PREP decide?
+nd = EEG.etc.noiseDetection;
+if ~strcmp(nd.errors.status, 'good')
+    error('PREP stopped with status: %s', nd.errors.status);
+end
+fprintf('PREP version: %s\n', nd.version);
+fprintf('Interpolated channels: %s\n', ...
+    strjoin({EEG.chanlocs(nd.interpolatedChannelNumbers).labels}, ', '));
+fprintf('Still noisy after reference: %s\n', ...
+    strjoin({EEG.chanlocs(nd.stillNoisyChannelNumbers).labels}, ', '));
+
+% Spectrum before and after
+figure; pop_spectopo(EEG_raw, 1, [], 'EEG', 'freqrange', [1 64], 'freq', [10 60]);
+figure; pop_spectopo(EEG, 1, [], 'EEG', 'freqrange', [1 64], 'freq', [10 60]);
+
+% PREP leaves the data unfiltered: high-pass before ICA or epochs
+EEG = pop_eegfiltnew(EEG, 'locutoff', 0.1);
+
+EEG.filename = ''; EEG.filepath = ''; EEG.datfile = ''; EEG.saved = 'no';
+[ALLEEG, EEG, CURRENTSET] = pop_newset(ALLEEG, EEG, 0, 'setname', 'D1 prep', 'gui', 'off');
+eeglab redraw;
+```
+
+## أي قيمة أختار؟
+
+| الإعداد | القيمة في الدرس | لماذا |
+|---|---|---|
+| قنوات المرجع والتقييم | قنوات الرأس فقط | قنوات EOG فيها رمش كبير. إذا دخلت في المرجع أو في اختبارات القنوات السيئة، أفسدتهما. |
+| ترددات الكهرباء | 60 | سُجّلت D1 بكهرباء 60 هرتز. للبيانات المسجّلة بكهرباء 50 هرتز، القيمة الافتراضية في PREP خاطئة: اكتب `[50 100 150 200]` حتى ما تحت Nyquist. |
+| نوع المرجع | robust (الافتراضي) | يجد PREP القنوات السيئة، ويحسب المرجع المتوسط بدونها، ويكرّر حتى تستقر النتيجة. |
+| الاستيفاء | post-reference (الافتراضي) | القنوات السيئة تُستوفى بعد حساب المرجع وتبقى في البيانات، فلا يتغيّر عدد القنوات. |
+| إبقاء الفلترة (Keep filtered) | لا (الافتراضي) | يفلتر PREP نسخة بـ high-pass عند 1 هرتز لاختباراته فقط. المخرجات تبقى بلا فلترة، فيبقى اختيار الفلتر لك. |
+
+## أخطاء شائعة
+
+- **الثقة بالبايبلاين بلا فتح تقريره.** كل بايبلاين يخطئ مع بعض المشاركين. اقرأ التقرير لكل مشارك، وانظر إلى بيانات أي مشارك حُذفت منه قنوات كثيرة.
+- **ترك تردد الكهرباء على الافتراضي في بيانات 50 هرتز.** يحسب PREP مضاعفات 60 افتراضياً. في بيانات مسجّلة بكهرباء 50 هرتز، يعمل على التردد الخطأ ويترك القمة الحقيقية.
+- **توقّع أن يزيل PREP قمة الكهرباء تماماً.** في D1 تنخفض قمة 60 هرتز إلى نصفها تقريباً بالـ dB وتبقى ظاهرة. انظر إلى الطيف بعد PREP، وأضف فلتر band-stop إذا احتجت أن تختفي القمة.
+- **افتراض أن PREP فلتر البيانات.** مخرجات PREP بلا high-pass. إذا ذهبت مباشرة إلى ICA أو التقطيع، فالانجراف البطيء ما زال موجوداً.
+- **تغيير البايبلاين بين المشاركين.** كل مشارك في الدراسة الواحدة يمرّ بنفس البايبلاين وبنفس الإعدادات. إذا غيّرت إعداداً، أعد تشغيل الجميع.
+- **تطبيق بايبلاين خارج الفئة التي صُمّم لها.** HAPPE و MADE صُمّما للأطفال، و BeMoBIL للحركة. قد لا تناسب إعداداتها بيانات بالغين مسجّلة في الراحة، والعكس.
+
+{/* صندوق "من التجربة": بانتظار قصة من صاحب المشروع. لا يُكتب قبل وصولها. */}
+
+## كيف تتأكد أن الخطوة نجحت؟
+
+- نافذة الأوامر تطبع `PREP version: PrepPipeline0.57.0`.
+- قائمة القنوات المستوفاة تُطبع، حتى لو كانت فارغة. قارنها بما وجدته في درس القنوات السيئة.
+- قمة 60 هرتز في `D1 prep` أصغر بوضوح منها في الطيف الخام (أعلى من جيرانها بحوالي 11 dB بدل حوالي 23 dB)، وقمة ألفا عند 10 هرتز بقي شكلها.
+- عدد قنوات `D1 prep` ما زال 32.
+
+<Methods>
+Line noise at 60 Hz was attenuated, and robust average referencing with bad channel detection and interpolation was performed, with the PREP pipeline (prepPipeline, PrepPipeline plugin [0.57.0], EEGLAB 2026.1), using the scalp channels as reference and evaluation channels; [n] channels were interpolated.
+</Methods>

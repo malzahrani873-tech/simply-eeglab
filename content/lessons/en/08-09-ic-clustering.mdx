@@ -1,0 +1,331 @@
+---
+title: IC clustering
+titleEn: IC clustering
+description: "How to cluster independent components from many participants in an EEGLAB STUDY, and judge whether a cluster is consistent from its maps and dipoles."
+station: 8
+order: 9
+level: recommended
+status: review
+objectives:
+  - Select the components to cluster by dipole residual variance with Study > Edit study info.
+  - Precompute component measures and build a preclustering array from dipole locations and scalp maps.
+  - Cluster the components with k-means and set aside outliers.
+  - Judge a cluster from its member maps, its dipoles, the number of participants it holds and its ICLabel brain probability.
+prerequisites: [study-precompute, ic-artifacts]
+references:
+  - title: EEGLAB Tutorial
+    url: https://eeglab.org/tutorials/10_Group_analysis/component_clustering_tools.html
+    section: "10. Group analysis > f. STUDY ICA clusters"
+  - title: EEGLAB Tutorial
+    url: https://eeglab.org/tutorials/11_Scripting/command_line_study_functions.html
+    section: "11. Scripting > Component pre-clustering and clustering"
+  - title: Go-nogo categorization and detection task (OpenNeuro ds002680)
+    url: https://openneuro.org/datasets/ds002680
+    section: "README"
+datasets: [D6]
+startingPoint:
+  dataset: D6
+  file: animal_mine.study
+  applied: [create-study, study-design, study-precompute, iclabel, dipfit]
+  script: |
+    [ALLEEG, EEG, CURRENTSET, ALLCOM] = eeglab;
+    % Folder for the course data (change it)
+    dataFolder = 'C:\Users\me\Documents\eeg-course';
+
+    % Download the ready Go-nogo STUDY once and unzip it in its own folder
+    zipDir = fullfile(dataFolder, 'animal_study');
+    studyFile = dir(fullfile(zipDir, '**', 'animal.study'));
+    if isempty(studyFile)
+        zipFile = fullfile(dataFolder, 'animal_study.zip');
+        websave(zipFile, 'https://sccn.ucsd.edu/eeglab/download/animal_study.zip');
+        unzip(zipFile, zipDir);
+        studyFile = dir(fullfile(zipDir, '**', 'animal.study'));
+    end
+    studyDir = studyFile(1).folder;
+
+    % Convert the old .dat data files to .fdt once: resaving them in their old format damages the data in EEGLAB 2026.1
+    setFiles = dir(fullfile(studyDir, '*', '*.set'));
+    for k = 1:numel(setFiles)
+        [~, base] = fileparts(setFiles(k).name);
+        folder = setFiles(k).folder;
+        if ~exist(fullfile(folder, [base '.fdt']), 'file')
+            TMP = pop_loadset('filename', setFiles(k).name, 'filepath', folder);
+            pop_saveset(TMP, 'filename', setFiles(k).name, 'filepath', folder, 'savemode', 'twofiles');
+            if exist(fullfile(folder, [base '.fdt']), 'file') && exist(fullfile(folder, [base '.dat']), 'file')
+                delete(fullfile(folder, [base '.dat']));
+            end
+        end
+    end
+
+    % Rebuild animal_mine.study (create-study lesson) if it is missing
+    if ~exist(fullfile(studyDir, 'animal_mine.study'), 'file')
+        gender = containers.Map( ...
+            {'cba','clm','ega','fsa','gro','hth','lmi','mba','mma','mta','pla','sce','sph','wpa'}, ...
+            {'F',  'F',  'F',  'M',  'M',  'M',  'F',  'F',  'M',  'F',  'M',  'F',  'M',  'M'});
+        files = dir(fullfile(studyDir, '*', '*.set'));
+        commands = {};
+        for k = 1:numel(files)
+            hdr = pop_loadset('filename', files(k).name, 'filepath', files(k).folder, 'loadmode', 'info');
+            subj = hdr.subject;
+            if isempty(subj), [~, subj] = fileparts(files(k).folder); end
+            cond = hdr.condition;
+            if isempty(cond)
+                if contains(files(k).name, 'distractor'), cond = 'distractor'; else, cond = 'animal'; end
+            end
+            if ~isKey(gender, lower(subj))
+                error('No gender entry for subject %s (%s)', subj, files(k).name);
+            end
+            commands{end+1} = {'index', k, 'load', fullfile(files(k).folder, files(k).name), ...
+                'subject', subj, 'condition', cond, 'group', gender(lower(subj))};
+        end
+        [STUDY, ALLEEG] = std_editset([], [], 'name', 'Go-nogo animal (mine)', ...
+            'task', 'Go-nogo categorization', 'commands', commands, 'updatedat', 'on');
+        STUDY = pop_savestudy(STUDY, ALLEEG, 'filename', 'animal_mine.study', ...
+            'filepath', studyDir, 'resavedatasets', 'on');
+    end
+    [STUDY, ALLEEG] = pop_loadstudy('filename', 'animal_mine.study', 'filepath', studyDir);
+
+    % Designs 2 and 3 (study-design lesson); design 2 is the current one
+    STUDY = std_makedesign(STUDY, ALLEEG, 2, 'name', 'image x gender', ...
+        'variable1', 'condition', 'values1', {'animal', 'distractor'}, 'vartype1', 'categorical', ...
+        'variable2', 'group', 'values2', {'F', 'M'}, 'vartype2', 'categorical');
+    STUDY = std_makedesign(STUDY, ALLEEG, 3, 'name', 'image only', ...
+        'variable1', 'condition', 'values1', {'animal', 'distractor'}, 'vartype1', 'categorical', ...
+        'variable2', 'none');
+    STUDY = std_selectdesign(STUDY, ALLEEG, 2);
+    STUDY = pop_savestudy(STUDY, ALLEEG, 'savemode', 'resave');
+
+    % Precomputed measures (study-precompute lesson), only if they are missing
+    first = STUDY.datasetinfo(1);
+    timefFile = fullfile(first.filepath, [first.subject '.dattimef']);
+    needMeasures = ~exist(fullfile(first.filepath, [first.subject '.daterp']), 'file') || ~exist(timefFile, 'file');
+    if ~needMeasures
+        tf = load('-mat', timefFile, 'labels');
+        needMeasures = numel(tf.labels) < ALLEEG(1).nbchan;   % ERSP from an older two-channel run
+    end
+    if needMeasures
+        baseline = [round(ALLEEG(1).xmin*1000) 0];
+        [STUDY, ALLEEG] = std_precomp(STUDY, ALLEEG, {}, 'savetrials', 'on', 'interp', 'on', 'recompute', 'on', ...
+            'erp', 'on', 'erpparams', {'rmbase', baseline}, ...
+            'spec', 'on', 'specparams', {'specmode', 'fft', 'logtrials', 'off'}, ...
+            'ersp', 'on', 'itc', 'on', 'erspparams', {'cycles', [3 0.8], 'freqs', [3 30], 'nfreqs', 20, 'ntimesout', 50});
+        STUDY = pop_savestudy(STUDY, ALLEEG, 'savemode', 'resave');
+    end
+
+    % Dipoles and ICLabel for each participant (ic-clustering lesson), only if missing
+    % The ready files hold the authors' ICA and dipoles (spherical BESA head model, part of dipfit)
+    if any(arrayfun(@(x) isempty(x.icaweights), ALLEEG))
+        error('Use the ready STUDY files (animal_study.zip): ICA weights are missing');
+    end
+    needDip = ~isfield(ALLEEG(1).dipfit, 'model') || isempty(ALLEEG(1).dipfit.model) || ...
+        ~isfield(ALLEEG(1).dipfit, 'hdmfile') || ~exist(ALLEEG(1).dipfit.hdmfile, 'file');
+    needLab = ~isfield(ALLEEG(1).etc, 'ic_classification');
+    if needDip || needLab
+        if needDip && ~exist('ft_dipolefitting', 'file')
+            error('Install Fieldtrip-lite first: File > Manage EEGLAB extensions');
+        end
+        tStart = tic;
+        if needDip
+            fprintf('Fitting dipoles and running ICLabel: about 25 minutes for 14 participants (runs once)\n');
+        else
+            fprintf('Running ICLabel for 14 participants (runs once)\n');
+        end
+        dipfitdefs;   % template head model and electrode file
+        subjects = unique({ALLEEG.subject});
+        nShared = 0;
+        for s = 1:numel(subjects)
+            idx = find(strcmp({ALLEEG.subject}, subjects{s}));
+            shared = isequal(ALLEEG(idx(1)).icaweights, ALLEEG(idx(end)).icaweights);
+            nShared = nShared + shared;
+            for k = idx
+                TMP = eeg_checkset(ALLEEG(k), 'loaddata');
+                if needDip
+                    if k == idx(1) || ~shared
+                        % Fit once per ICA decomposition
+                        [~, coreg] = coregister(TMP.chanlocs, template_models(2).chanfile, 'warp', 'auto', 'manual', 'off');
+                        TMP = pop_dipfit_settings(TMP, 'model', 'standardBEM', 'coord_transform', coreg);
+                        TMP = pop_multifit(TMP, [], 'threshold', 100);
+                        fitted = TMP.dipfit;
+                    else
+                        TMP.dipfit = fitted;   % same ICA in both files, so the same dipoles
+                    end
+                end
+                TMP = pop_iclabel(TMP, 'default');
+                pop_saveset(TMP, 'savemode', 'resave');
+            end
+            fprintf('Participant %s done (%d of %d)\n', subjects{s}, s, numel(subjects));
+        end
+        fprintf('Participants with the same ICA in both files: %d of %d\n', nShared, numel(subjects));
+        fprintf('Dipoles and ICLabel took %.0f minutes\n', toc(tStart)/60);
+        [STUDY, ALLEEG] = pop_loadstudy('filename', 'animal_mine.study', 'filepath', studyDir);
+        STUDY = std_selectdesign(STUDY, ALLEEG, 2);
+    end
+
+    CURRENTSTUDY = 1; EEG = ALLEEG; CURRENTSET = 1:length(EEG);
+    eeglab redraw;
+eeglabVersion: "2026.1"
+updated: 2026-10-28
+---
+
+## Why this step matters
+
+Channel Pz in one person and Pz in another do not record the same brain sources. The skull, the folding of the cortex and the reference all differ. ICA offers another route: each component is one source estimated from the data of one participant. But components have no shared names across people. Component 5 in one participant has nothing to do with component 5 in another.
+
+Clustering solves this. It groups components from different participants that look like the same source: similar scalp maps and nearby dipoles. Each cluster can then be treated like a "virtual channel" in the group plots and statistics.
+
+Clustering has no single correct answer. Change the measures or the number of clusters, and the clusters change. So this lesson teaches you to build clusters, and also to judge them before you trust them.
+
+## Before and after
+
+<ImageSpec>
+An image from the lesson script on the run day, not a hand drawing. Left: the scalp maps of the components in the cluster with the most participants, each titled with its participant and component (for example `cba IC6`), with the cluster mean map first. Right: the dipoles of the same cluster in the template head, blue for members and red for the cluster mean. Map and dipole text come from EEGLAB in English, so one version serves both languages.
+</ImageSpec>
+
+## Steps in the GUI
+
+**About the data (D6):** `animal_mine.study` with its designs and channel measures. Clustering needs ICA, ICLabel and a dipole for each component in every file. The ready files already hold the authors' ICA (31 components per participant, 29 for `cba`), so we do not compute it again. They also hold a dipole for each component, fitted by the authors with the spherical BESA head model (`standard_BESA.mat`, which comes with the dipfit plugin), so we keep them too. There are no ICLabel results, so the "Starting point" script runs ICLabel. It fits dipoles only if they are missing or their head model file cannot be found.
+
+<Callout type="warning">
+**Before you start: what the starting point does, and one requirement.**
+
+- **Fieldtrip-lite must be installed**, because keeping only in-brain dipoles uses it, and so would dipole fitting (see the statistics lesson for how to check and install it). If dipoles must be fitted, the script stops with `Install Fieldtrip-lite first` when it is missing.
+- **The starting point runs ICLabel for every participant**: a few minutes for the 14 participants. {/* ICLabel time: measured in the combined run */} If the dipoles were missing, it would also fit them, which takes about 25 minutes. The script prints each participant as it finishes, and the total time at the end. Run it once: the results are saved in the dataset files, and the next run skips this step.
+- **The ICA is not computed again.** It comes with the data, so your components are the same as in the lesson images. In your own data, run ICA on the continuous data with a 1 Hz high-pass copy, as in station 4.
+</Callout>
+
+**1. Run the starting point and check the result**
+
+1. Run the "Starting point" script, and wait for it to finish.
+2. Both files of a participant should hold **the same ICA**. EEGLAB recognizes them as one decomposition only if their weights are identical. The script checks this: when the weights match, it fits the dipoles once and copies them to the second file, and otherwise it fits each file.
+
+**2. Choose the components to cluster**
+
+1. Open <MenuPath>Study > Edit study info</MenuPath>. The <UiLabel>Create a new STUDY set -- pop_study()</UiLabel> window opens (it has this title for editing too).
+2. Press <UiLabel>Select by r.v.</UiLabel>. In the small window keep `15` as the maximum residual variance, and keep <UiLabel>Keep only in-brain dipoles (requires Fieldtrip extension).</UiLabel> ticked. Press <UiLabel>Ok</UiLabel>.
+3. The component column for each dataset now lists fewer components: only those whose dipole explains their scalp map with less than 15% residual variance. Press <UiLabel>Ok</UiLabel>. Changing the component selection also deletes any earlier clusters, so you start clean. The script does the same with `STUDY.cluster = []`.
+
+**3. Precompute component measures**
+
+1. Open <MenuPath>Study > Precompute component measures</MenuPath>.
+2. Keep <UiLabel>Compute ERP/spectrum/ERSP only for components selected by RV (set) or for all components (unset)</UiLabel> ticked.
+3. Tick <UiLabel>Scalp maps</UiLabel>, <UiLabel>Power spectrum</UiLabel> and <UiLabel>ERPs</UiLabel>. Press <UiLabel>Ok</UiLabel>. EEGLAB writes component files next to each dataset.
+
+**4. Build the preclustering array**
+
+1. In <MenuPath>Study > Select/Edit study design(s)</MenuPath> make `image only` the current design. EEGLAB clusters only with a design that holds every dataset. Designs 2 and 3 both do; we use `image only` because clustering ignores the groups.
+2. Open <MenuPath>Study > PCA clustering (original) > Build preclustering array</MenuPath>. The <UiLabel>Select and compute component measures for later clustering -- pop_preclust()</UiLabel> window opens.
+3. In the location-based part of the window, tick `dipole locations` and type `10` in its weight box.
+4. Tick `scalp maps`, keep `3` in its PCA box and `1` as its weight, keep <UiLabel>Use channel values</UiLabel>, and keep <UiLabel>Absolute values</UiLabel> ticked.
+5. Leave every line of the time-based part (`spectra`, `ERPs`, `ERSPs`, `ITCs`) unticked. Press <UiLabel>Ok</UiLabel>.
+
+The window itself warns: <UiLabel>Mixing time-based and location-based measures might result in statistical double-dipping</UiLabel>. If you cluster on ERPs and then test the ERPs of the clusters, the clusters were partly built from the effect you test. Clustering on location only avoids this.
+
+**5. Cluster**
+
+1. Open <MenuPath>Study > PCA clustering (original) > Cluster components</MenuPath>. The <UiLabel>Set clustering algorithm -- pop_clust()</UiLabel> window opens.
+2. In <UiLabel>Clustering algorithm:</UiLabel> choose <UiLabel>Kmeans (stat. toolbox)</UiLabel>. Without the Statistics and Machine Learning Toolbox, choose <UiLabel>Kmeanscluster (no toolbox)</UiLabel>.
+3. Keep the value EEGLAB proposes in <UiLabel>Number of clusters to compute:</UiLabel>. It equals the average number of selected components per dataset, so each cluster holds about one component per participant on average.
+4. Tick <UiLabel>Separate outliers (enter std.)</UiLabel> and keep `3`. Press <UiLabel>Ok</UiLabel>.
+
+**6. Look at the clusters and judge them**
+
+1. Open <MenuPath>Study > Edit/plot component clusters</MenuPath>. The <UiLabel>View and edit current component clusters -- pop_clustedit()</UiLabel> window opens. The left list shows each cluster with its number of components, for example `Cls 3 (12 ICs)`.
+2. Choose a cluster, then press <UiLabel>Plot scalp maps</UiLabel> on the left: the mean map of the cluster. In the right list choose all its components, then <UiLabel>Plot scalp map(s)</UiLabel>: one map per member.
+3. Press <UiLabel>Plot dipoles</UiLabel>: the member dipoles in blue and their mean in red.
+4. Judge the cluster with four questions:
+   - Do the member maps look alike, or is one clearly different?
+   - Are the dipoles close together, or spread across the head?
+   - How many **different participants** does it hold? A cluster from 4 of 14 people says little about the group.
+   - Does ICLabel mostly call its members "Brain"? The script prints the median brain probability for each cluster.
+5. If one member is clearly different, choose it and press <UiLabel>Remove selected outlier comps.</UiLabel>. Press <UiLabel>Ok</UiLabel> to keep your changes, then save with <MenuPath>File > Save current study</MenuPath>.
+
+## The matching script
+
+```matlab
+% STUDY and ALLEEG come from the starting point script (ICA, dipoles and ICLabel present)
+STUDY = std_selectdesign(STUDY, ALLEEG, 3);   % a design that holds every dataset
+
+% 0. Remove earlier clusters, so new clusters do not mix with old ones
+STUDY.cluster = [];
+STUDY = std_checkset(STUDY, ALLEEG);   % recreates the parent cluster only
+
+% 1. Keep components whose dipole explains the map well (residual variance below 15%)
+[STUDY, ALLEEG] = std_editset(STUDY, ALLEEG, 'commands', {'inbrain', 'on', 'dipselect', 0.15});
+nComps = cellfun(@numel, {STUDY.datasetinfo.comps});
+fprintf('Components kept per dataset: median %g, range %d to %d\n', median(nComps), min(nComps), max(nComps));
+
+% 2. Component measures: scalp maps for clustering, spectra and ERPs for reading the clusters
+baseline = [round(ALLEEG(1).xmin*1000) 0];
+[STUDY, ALLEEG] = std_precomp(STUDY, ALLEEG, 'components', 'savetrials', 'on', 'recompute', 'on', ...
+    'scalp', 'on', 'spec', 'on', 'specparams', {'specmode', 'fft', 'logtrials', 'off'}, ...
+    'erp', 'on', 'erpparams', {'rmbase', baseline});
+
+% 3. Preclustering on location only: dipole positions (weight 10) and scalp maps (3 PCA dimensions)
+[STUDY, ALLEEG] = std_preclust(STUDY, ALLEEG, 1, {'dipoles', 'weight', 10}, ...
+    {'scalp', 'npca', 3, 'weight', 1, 'abso', 1});
+
+% 4. k-means with outliers; fixed seed so the clusters are the same on every run
+rng(1);
+if exist('kmeans', 'file'), alg = 'kmeans'; else, alg = 'kmeanscluster'; end
+nClust = ceil(mean(nComps));
+STUDY = pop_clust(STUDY, ALLEEG, 'algorithm', alg, 'clus_num', nClust, 'outliers', 3);
+
+% 5. Size, participants and ICLabel brain probability of each cluster
+best = 0; bestN = 0;
+for c = 2:numel(STUDY.cluster)
+    cl = STUDY.cluster(c);
+    if strncmpi(cl.name, 'outlier', 7) || isempty(cl.comps), continue; end
+    sets = cl.sets(1, :);
+    brain = zeros(1, numel(sets));
+    for m = 1:numel(sets)
+        brain(m) = ALLEEG(sets(m)).etc.ic_classification.ICLabel.classifications(cl.comps(m), 1);
+    end
+    nSubj = numel(unique({STUDY.datasetinfo(sets).subject}));
+    fprintf('%-10s %3d ICs from %2d participants, median brain probability %.2f\n', ...
+        cl.name, numel(cl.comps), nSubj, median(brain));
+    if nSubj > bestN, best = c; bestN = nSubj; end
+end
+
+% 6. Maps and dipoles of the cluster with the most participants, then save
+STUDY = std_topoplot(STUDY, ALLEEG, 'clusters', best, 'mode', 'apart');
+STUDY = std_dipplot(STUDY, ALLEEG, 'clusters', best);
+STUDY = pop_savestudy(STUDY, ALLEEG, 'savemode', 'resave');
+```
+
+## Which value should I choose?
+
+| Option | In this lesson | When to change it |
+|---|---|---|
+| Residual variance limit | 15% | The EEGLAB default. Lower (for example 10%) keeps fewer but cleaner components. |
+| Measures for clustering | Dipole locations (weight 10) and scalp maps | Add spectra when you want clusters by rhythm (for example alpha), and accept the double-dipping risk for tests on spectra. |
+| Number of clusters | Average number of selected components per dataset | More clusters give smaller, tighter groups with fewer participants each. |
+| Algorithm | k-means with outliers at 3 standard deviations | <UiLabel>Affinity Propagation</UiLabel> chooses the number by itself, but in this version it needs the LIMO plugin. |
+| Seed | `rng(1)` in the script | k-means starts at random, so without a fixed seed the clusters change a little each run. |
+| ICA seed | `'rndreset', 'no'` when you run ICA yourself | Here ICA comes with the data. In your own data, without it runica starts from a random point set by the clock. Keep it `'no'` whenever you want a repeatable result. |
+
+## Common mistakes
+
+- **One ICA per file instead of per participant.** EEGLAB then sees two unrelated decompositions for the same person, and the two conditions of a cluster no longer contain the same components.
+- **Trusting the cluster number.** `Cls 3` in your run is not `Cls 3` in another run or another person's analysis. Name a cluster by its location and map, for example "medial parietal".
+- **A cluster from few participants.** The tutorial warns that several components from the same participant in one cluster change the question from people to components. Look at the number of participants, not only the number of ICs.
+- **Clustering on the measure you then test.** This is double-dipping: the clusters were partly built from the effect.
+- **ICA without `'rndreset', 'no'`** in your own data. runica then starts from a different random point, so the components, and then the clusters, change on every run, even with `rng(1)` before k-means.
+- **Clustering on top of old clusters.** The ready `animal.study` holds nine clusters from the authors (`Cls 2` to `Cls 9` under the parent cluster), and every new run of `pop_clust` adds clusters to the list. Delete the earlier clusters first, as the script does, and work on `animal_mine.study`.
+- **Forgetting to save.** Clusters live in the STUDY. Without saving, they are lost when you close EEGLAB.
+
+{/* "From experience" box: waiting for a story from the project owner. Not written before it arrives. */}
+
+## How do you know it worked?
+
+- **The script prints** `Components kept per dataset:` with a median and a range, and each dataset keeps at least a few components.
+- **The script prints** one line per cluster with its number of ICs, its number of participants and its median brain probability.
+- **The cluster editor** lists the clusters with their number of ICs, and an `outlier` cluster if outliers were found.
+- **For the cluster with the most participants,** the member maps look alike and the dipoles are grouped in one area of the head.
+
+<Methods>
+Independent components whose equivalent dipole had a residual variance below [15]% and lay inside the brain were clustered across participants (EEGLAB 2026.1, std_preclust and pop_clust) using k-means on dipole locations (weight [10]) and scalp maps reduced to [3] principal dimensions; components further than [3] standard deviations from any centroid were assigned to an outlier cluster. The ICA decompositions (one per participant) and equivalent dipoles (spherical four-shell BESA head model, dipfit) distributed with the EEGLAB STUDY version of the dataset were used.
+</Methods>
+
+<Callout type="note" title="About the data">
+Data: STUDY version: SCCN/Delorme. Original data: OpenNeuro ds002680 (CC0).
+</Callout>

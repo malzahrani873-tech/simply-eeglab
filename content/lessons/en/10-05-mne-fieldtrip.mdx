@@ -1,0 +1,179 @@
+---
+title: MNE-Python & FieldTrip compared
+titleEn: MNE-Python & FieldTrip compared
+description: How EEGLAB, MNE-Python and FieldTrip compare, a table mapping each step you learned to its function in both tools, and when to switch.
+station: 10
+order: 5
+level: optional
+status: review
+objectives:
+  - Compare EEGLAB with MNE-Python and FieldTrip in language, workflow and strengths.
+  - Find, for every step learned on this site, the matching function in both tools.
+  - Move an EEGLAB dataset to FieldTrip and to MNE-Python and check it arrived complete.
+  - Decide when moving is worth it, and to which tool.
+prerequisites: [single-subject-script]
+references:
+  - title: EEGLAB Tutorial
+    url: https://eeglab.org/tutorials/misc/Exporting_Data.html
+    section: "Reference Topics > Exporting Data"
+  - title: MNE-Python documentation
+    url: https://mne.tools/stable/
+    section: "Tutorials > Introductory tutorials; API: mne.io.read_raw_eeglab"
+  - title: FieldTrip documentation
+    url: https://www.fieldtriptoolbox.org/
+    section: "Getting started; Tutorials > Preprocessing"
+datasets: [D1]
+startingPoint:
+  dataset: D1
+  file: eeglab_data.set
+  applied: []
+  script: |
+    [ALLEEG, EEG, CURRENTSET, ALLCOM] = eeglab;
+    eeglabRoot = fileparts(which('eeglab'));
+    EEG = pop_loadset('eeglab_data.set', fullfile(eeglabRoot, 'sample_data'));
+
+    % Show the dataset in the main EEGLAB window
+    [ALLEEG, EEG, CURRENTSET] = pop_newset(ALLEEG, EEG, 0, 'setname', 'D1 raw', 'gui', 'off');
+    eeglab redraw;
+eeglabVersion: "2026.1"
+updated: 2026-10-28
+---
+
+## Why this step matters
+
+EEGLAB is not the only tool. Two other free tools are widespread in research: **MNE-Python** and **FieldTrip**. You will read papers that use them, a colleague may work with one of them, and you may need an analysis that EEGLAB does not offer easily.
+
+The good news: the concepts you learned here are the same in all three tools. A filter is a filter, ICA is ICA, and an epoch is an epoch. What changes is the language and the way steps are written. This lesson gives you a map: every step you know, and what matches it there.
+
+| | EEGLAB | MNE-Python | FieldTrip |
+|---|---|---|---|
+| Language | MATLAB | Python | MATLAB |
+| Graphical interface | Yes, complete | No, scripts (with interactive plot windows) | No, scripts (with interactive plot windows) |
+| How a step is written | `EEG = pop_xxx(EEG, ...)` | Methods on an object: `raw.filter(...)` | `cfg`, then `data = ft_xxx(cfg, data)` |
+| Main strengths | ICA and ICLabel, learning through the GUI, many plugins | Full source analysis with MRI, MEG, decoding, the scientific Python ecosystem | Cluster-based statistics, source analysis, time-frequency analysis, MEG |
+| Free? | Yes (MATLAB is paid) | Yes, fully | Yes (MATLAB is paid) |
+| Version when this lesson was written | 2026.1 | 1.13.2 | FieldTrip has no fixed version numbers. With full FieldTrip, type `ft_version`. With Fieldtrip-lite, `ft_version` shows no version number, so read it in <MenuPath>File > Manage EEGLAB extensions</MenuPath> |
+
+## Before and after
+
+<Figure src="mne-fieldtrip/mne-fieldtrip-cz.png" alt="The Cz ERP from -1 to 2 s: the FieldTrip curve as a solid line and the EEGLAB curve as a dashed line, lying exactly on top of each other." source="D1" />
+
+## Steps in the GUI
+
+There are no menus for moving between tools. The path is always: save a `.set` file from EEGLAB, then read it in the other tool.
+
+**First: the mapping table**
+
+Each row is a step you learned on this site. Names come from each tool's documentation (MNE-Python 1.13.2 and a recent FieldTrip release; see the table above to find yours).
+
+| Step | EEGLAB | MNE-Python | FieldTrip |
+|---|---|---|---|
+| Read an EEGLAB file | `pop_loadset` | `mne.io.read_raw_eeglab` (continuous) or `mne.read_epochs_eeglab` (epoched) | `ft_preprocessing` with `cfg.dataset = 'file.set'`, or `eeglab2fieldtrip` from MATLAB |
+| Import EDF | `pop_biosig` | `mne.io.read_raw_edf` | `ft_preprocessing` with `cfg.dataset` |
+| Change the sampling rate | `pop_resample` | `raw.resample` | `ft_resampledata` |
+| High-pass and low-pass filter | `pop_eegfiltnew` | `raw.filter(l_freq, h_freq)` | `cfg.hpfilter` and `cfg.lpfilter` in `ft_preprocessing` |
+| Line noise | `pop_eegfiltnew` with `'revfilt', 1` | `raw.notch_filter(60)` | `cfg.bsfilter = 'yes'` and `cfg.bsfreq = [58 62]` |
+| Channel locations | `pop_chanedit` | `raw.set_montage('standard_1005')` | `ft_read_sens` or an `elec` file |
+| Bad channels and interpolation | `pop_select` then `pop_interp` | `raw.info['bads']` then `raw.interpolate_bads()` | `ft_channelrepair` with `ft_prepare_neighbours` |
+| Average reference | `pop_reref(EEG, [])` | `raw.set_eeg_reference('average')` | `cfg.reref = 'yes'` and `cfg.refchannel = 'all'` |
+| ICA | `pop_runica` (extended Infomax) | `mne.preprocessing.ICA(method='infomax', fit_params=dict(extended=True))` | `ft_componentanalysis` with `cfg.method = 'runica'` |
+| Component classification | `pop_iclabel` | `label_components` from the mne-icalabel plugin | No direct equivalent |
+| Remove components | `pop_subcomp` | `ica.apply(raw)` | `ft_rejectcomponent` |
+| Events and epoching | `pop_epoch` | `mne.events_from_annotations` then `mne.Epochs` | `ft_definetrial` then `ft_redefinetrial` |
+| Baseline | `pop_rmbase` | `baseline=(-0.2, 0)` in `mne.Epochs` | `cfg.demean` and `cfg.baselinewindow`, or `ft_timelockbaseline` |
+| Threshold trial rejection | `pop_eegthresh` (absolute value) | `reject=dict(eeg=100e-6)` in `mne.Epochs` (**peak-to-peak**) | `ft_artifact_threshold` then `ft_rejectartifact` |
+| Average (ERP) | `mean(EEG.data, 3)` (averaging lesson) | `epochs.average()` | `ft_timelockanalysis` |
+| Topographic map | `pop_topoplot` | `evoked.plot_topomap` | `ft_topoplotER` |
+| Time-frequency | `pop_newtimef` | `epochs.compute_tfr` | `ft_freqanalysis` |
+| Cluster statistics | `std_stat` in STUDY, or LIMO | `mne.stats.permutation_cluster_test` | `ft_timelockstatistics` with `cfg.method = 'montecarlo'` |
+| Dipole fitting | DIPFIT (`pop_multifit`) | `mne.fit_dipole` | `ft_dipolefitting` |
+| Decoding (MVPA) | ERPLAB (`pop_decoding`) | `mne.decoding.SlidingEstimator` with `cross_val_multiscore` | `ft_timelockstatistics` with `cfg.method = 'crossvalidate'` |
+| Connectivity | SIFT | the mne-connectivity plugin | `ft_connectivityanalysis` |
+| Command history | `eegh` | None: the script is the history | `data.cfg` keeps all previous settings |
+
+**Second: move a dataset to MNE-Python**
+
+1. Save the dataset with <MenuPath>File > Save current dataset as</MenuPath>.
+2. In Python (after `pip install mne`):
+
+```python
+import mne
+
+# Continuous EEGLAB dataset; use mne.read_epochs_eeglab for epoched files
+raw = mne.io.read_raw_eeglab("eeglab_data.set", preload=True)
+print(raw.info["sfreq"], len(raw.ch_names))   # 128.0 32
+print(raw.annotations)                        # EEGLAB events become annotations
+```
+
+**Third: move a dataset to FieldTrip**
+
+3. Download FieldTrip from its official website, add only its main folder to the path with `addpath`, then type `ft_defaults`.
+
+<Callout type="warning">
+Do not put Fieldtrip-lite (the EEGLAB plugin that DIPFIT uses) and full FieldTrip on the path at the same time. They hold functions with the same names, and MATLAB uses whichever comes first. To see which one is loaded, type `which ft_defaults`. A path inside the EEGLAB `plugins` folder (`Fieldtrip-lite...`) means the plugin; your download folder means full FieldTrip. Keep only one: remove the other folder from the path with `rmpath`, or remove the plugin from <MenuPath>File > Manage EEGLAB extensions</MenuPath> if you work with full FieldTrip only.
+</Callout>
+
+4. Run the script in the next section. It converts the dataset from EEGLAB directly, then computes the ERP in FieldTrip.
+
+## The equivalent script
+
+```matlab
+% FieldTrip is a separate toolbox: add its main folder only, then ft_defaults
+% addpath('/path/to/fieldtrip'); ft_defaults;
+
+eeglab nogui
+eeglabRoot = fileparts(which('eeglab'));
+EEG = pop_loadset('eeglab_data.set', fullfile(eeglabRoot, 'sample_data'));
+
+% Same epochs as station 5, so both tools see the same trials
+EEG = pop_epoch(EEG, {'square'}, [-1 2], 'epochinfo', 'yes');
+EEG = pop_rmbase(EEG, [-200 0]);
+
+% Convert to a FieldTrip raw data structure (eeglab2fieldtrip ships with DIPFIT)
+data = eeglab2fieldtrip(EEG, 'raw', 'none');
+fprintf('%d trials, %d channels, %g Hz\n', numel(data.trial), numel(data.label), data.fsample);
+
+% Average across trials: the FieldTrip ERP
+cfg = [];
+erp = ft_timelockanalysis(cfg, data);
+
+% Same ERP computed in EEGLAB, for comparison
+erpEeglab = mean(EEG.data, 3);
+fprintf('Max difference EEGLAB vs FieldTrip: %g uV\n', max(abs(erpEeglab(:) - erp.avg(:))));
+
+% Plot channel Cz from FieldTrip, with the EEGLAB curve on top
+cfg = [];
+cfg.channel = 'Cz';
+ft_singleplotER(cfg, erp);
+hold on;
+iCz = find(strcmp({EEG.chanlocs.labels}, 'Cz'));
+plot(EEG.times / 1000, erpEeglab(iCz, :), 'k--');
+legend({'FieldTrip', 'EEGLAB'});
+```
+
+## Which value should I choose?
+
+| If you need | Move to | Why |
+|---|---|---|
+| Full source analysis with an MRI scan for each participant, or MEG data | MNE-Python or FieldTrip | Both were built for MEG and individual head models from the start. |
+| Group-level cluster statistics with detailed documentation | FieldTrip | Its statistics functions and tutorials are among the most used methods in research. |
+| Decoding and machine learning, or you want to work in Python | MNE-Python | It connects directly to scientific Python libraries such as scikit-learn. |
+| Cleaning data with ICA and learning through the GUI | Stay in EEGLAB | This is what EEGLAB does best, so there is no need to move. |
+| Sharing data between tools | The BIDS format | All three tools read BIDS, so you move data without manual conversion. |
+
+## Common mistakes
+
+- **Copying numbers as they are between tools.** A rejection threshold of 100 in EEGLAB is an absolute value in microvolts; in MNE-Python it is `100e-6` in volts, and peak-to-peak. The same number does not mean the same rejection.
+- **Assuming the filter is the same.** Each tool has a different default filter design. Read what the tool prints, and write it in your Methods.
+- **Adding FieldTrip with all its subfolders.** `addpath(genpath(...))` adds conflicting copies of functions. Add the main folder only and type `ft_defaults`.
+- **Mixing voltage units.** EEGLAB stores microvolts, and MNE-Python works in volts. `read_raw_eeglab` converts the unit, but any number you type by hand must be in the tool's unit.
+- **Switching tools in the middle of a project.** If you started cleaning in one tool, finish it there, or redo the whole project in the new tool. Mixing steps makes the Methods hard to describe and to reproduce.
+
+{/* "From experience" box: waiting for the project owner's story. Do not write it before it arrives. */}
+
+## How to check it worked
+
+- The script prints `80 trials, 32 channels, 128 Hz`.
+- The maximum difference between the EEGLAB and FieldTrip ERPs is close to zero.
+- In Python: `raw.info["sfreq"]` equals 128, there are 32 channels, and the events appear in `raw.annotations`.
+- The Cz curve from FieldTrip looks like the Cz curve you plotted in the channel ERP lesson.

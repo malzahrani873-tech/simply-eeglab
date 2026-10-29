@@ -1,0 +1,206 @@
+---
+title: كتابة plugin
+titleEn: Writing an EEGLAB plugin
+description: كيف تكتب إضافة صغيرة تضيف بنداً لقائمة EEGLAB، وتستدعي دالة pop_ خاصة بك، وتسجّل أمرها في سجل الأوامر.
+station: 10
+order: 4
+level: optional
+status: approved
+objectives:
+  - "يعرف بنية الإضافة: مجلد في plugins، وفيه ملف eegplugin_ ودالة pop_."
+  - يكتب دالة pop_ تفتح نافذة عند نقص المعاملات، وتُرجع نص الأمر للسجل.
+  - يضيف بنداً لقائمة Plot يستدعي الدالة ويسجّل أمرها في eegh.
+prerequisites: [single-subject-script]
+references:
+  - title: EEGLAB Tutorial
+    url: https://eeglab.org/tutorials/contribute/design_plugin.html
+    section: "Contribute > Create an EEGLAB plugin"
+  - title: EEGLAB Tutorial
+    url: https://eeglab.org/tutorials/ConceptsGuide/EEGLAB_functions.html
+    section: "Concepts guide > EEGLAB functions"
+datasets: [D1]
+startingPoint:
+  dataset: D1
+  file: eeglab_data.set
+  applied: []
+  script: |
+    [ALLEEG, EEG, CURRENTSET, ALLCOM] = eeglab;
+    eeglabRoot = fileparts(which('eeglab'));
+    EEG = pop_loadset('eeglab_data.set', fullfile(eeglabRoot, 'sample_data'));
+
+    % Show the dataset in the main EEGLAB window
+    [ALLEEG, EEG, CURRENTSET] = pop_newset(ALLEEG, EEG, 0, 'setname', 'D1 raw', 'gui', 'off');
+    eeglab redraw;
+eeglabVersion: "2026.1"
+updated: 2026-10-28
+---
+
+## لماذا هذه الخطوة مهمة؟
+
+كل قائمة في EEGLAB تقريباً تأتي من إضافة (<En>plugin</En>): DIPFIT و ICLabel و firfilt كلها إضافات. وإذا كتبت أداة تستخدمها في كل مشروع، فتحويلها لإضافة يجعلها بنداً في القائمة مثل أي أداة رسمية، ويجعل زملاءك يستخدمونها بنفس الطريقة.
+
+الإضافة أبسط مما تتوقع. هي مجلد داخل مجلد `plugins` في EEGLAB، وفيه ملفان:
+
+- ملف يبدأ اسمه بـ `eegplugin_`. يشغّله EEGLAB عند كل بداية، ووظيفته الوحيدة أن يضيف البند للقائمة.
+- دالة تبدأ بـ `pop_`. هي الأداة نفسها: تفتح نافذة إذا نقصت المعاملات، وتُرجع نص الأمر الذي يعيد نفس النتيجة، فيظهر في سجل الأوامر.
+
+القاعدة الثانية هي ما يجعل أداتك جزءاً من سكربتك. كل ضغطة على بندك تظهر في `eegh` كسطر كود، كما تعلّمت في درس سجل الأوامر.
+
+في هذا الدرس نكتب إضافة اسمها `chanvar`: ترسم الانحراف المعياري لكل قناة، وتلوّن بالأحمر القنوات البعيدة عن البقية. أداة فحص سريعة قبل درس القنوات السيئة أو بعده.
+
+## قبل وبعد
+
+<ImageSpec>
+لقطتان جنباً إلى جنب. اليسرى: مجلد `plugins` داخل مجلد EEGLAB، وفيه المجلد `chanvar1.0` وبداخله الملفان `eegplugin_chanvar.m` و `pop_chanvar.m`. اليمنى: قائمة Plot في EEGLAB مفتوحة، وآخرها البند الجديد Channel variance تحت خط فاصل. المصدر: لقطة من EEGLAB 2026.1 على جهاز صاحب المشروع.
+</ImageSpec>
+
+## الخطوات من الواجهة
+
+**أولاً: أنشئ مجلد الإضافة**
+
+1. اكتب في نافذة الأوامر:
+
+```matlab
+pluginDir = fullfile(fileparts(which('eeglab')), 'plugins', 'chanvar1.0');
+mkdir(pluginDir); cd(pluginDir);
+```
+
+اسم المجلد يحمل الإصدار: EEGLAB يقرأ `chanvar1.0` كإضافة اسمها `chanvar` وإصدارها 1.0.
+
+**ثانياً: اكتب دالة pop_**
+
+2. اكتب `edit pop_chanvar.m`، والصق هذا الكود، واحفظ:
+
+```matlab
+function com = pop_chanvar(EEG, zThresh)
+% POP_CHANVAR - Plot the standard deviation of each channel and
+%               highlight channels far from the others.
+%
+% Usage:
+%   >> pop_chanvar(EEG);           % ask for the threshold in a window
+%   >> pop_chanvar(EEG, zThresh);  % plot directly
+%
+% Inputs:
+%   EEG     - EEGLAB dataset
+%   zThresh - robust z-score above which a channel is highlighted
+%             (default in the window: 3)
+%
+% Output:
+%   com     - command string for the EEGLAB history
+
+com = '';
+if nargin < 1
+    help pop_chanvar;
+    return;
+end
+
+% Missing threshold: ask for it
+if nargin < 2
+    res = inputgui('geometry', {[2 1]}, ...
+        'uilist', { {'style', 'text', 'string', 'Robust z-score threshold'}, ...
+                    {'style', 'edit', 'string', '3'} }, ...
+        'title', 'Channel variance -- pop_chanvar()');
+    if isempty(res), return; end   % user pressed Cancel
+    zThresh = str2double(res{1});
+end
+
+% Standard deviation of each channel over all samples (and epochs)
+data = double(reshape(EEG.data, EEG.nbchan, []));
+sd   = std(data, 0, 2);
+
+% Robust z-score based on the median absolute deviation
+medSd = median(sd);
+z = (sd - medSd) / (1.4826 * median(abs(sd - medSd)));
+flagged = find(z > zThresh);
+
+% Plot
+figure('Name', 'Channel variance');
+bar(sd, 'FaceColor', [0.6 0.6 0.6]); hold on;
+if ~isempty(flagged)
+    bar(flagged, sd(flagged), 'FaceColor', [0.85 0.2 0.2]);
+end
+set(gca, 'XTick', 1:EEG.nbchan, 'XTickLabel', {EEG.chanlocs.labels});
+xtickangle(90);
+ylabel('Standard deviation (\muV)');
+title(sprintf('%s: %d channel(s) above z = %g', EEG.setname, ...
+    numel(flagged), zThresh), 'Interpreter', 'none');
+if ~isempty(flagged)
+    fprintf('Channels above threshold: %s\n', ...
+        strjoin({EEG.chanlocs(flagged).labels}, ' '));
+end
+
+% Command that reproduces this call
+com = sprintf('pop_chanvar(EEG, %g);', zThresh);
+```
+
+**ثالثاً: اكتب ملف eegplugin_**
+
+3. اكتب `edit eegplugin_chanvar.m`، والصق هذا الكود، واحفظ:
+
+```matlab
+function vers = eegplugin_chanvar(fig, trystrs, catchstrs)
+% EEGPLUGIN_CHANVAR - Add "Channel variance" to the EEGLAB Plot menu.
+
+vers = 'chanvar1.0';
+
+% Find the Plot menu of the main EEGLAB window
+plotmenu = findobj(fig, 'tag', 'plot');
+
+% Check the data, run the function, then add its command to the history
+cmd = [trystrs.check_data 'LASTCOM = pop_chanvar(EEG);' catchstrs.add_to_hist];
+uimenu(plotmenu, 'Label', 'Channel variance', 'CallBack', cmd, 'Separator', 'on');
+```
+
+**رابعاً: جرّب الإضافة**
+
+4. أغلق نافذة EEGLAB واكتب `eeglab` من جديد، لأن EEGLAB يبحث عن الإضافات عند البداية فقط. تطبع نافذة الأوامر سطراً فيه `adding "chanvar" v1.0`.
+5. حمّل D1 كما في "نقطة البداية"، لكن من الواجهة: <MenuPath>File > Load existing dataset</MenuPath>.
+6. افتح <MenuPath>Plot > Channel variance</MenuPath>. تظهر نافذتك وفيها `3`. اضغط <UiLabel>Ok</UiLabel>. يظهر الرسم.
+7. اكتب `eegh`. آخر سطر: `pop_chanvar(EEG, 3);`. أداتك الآن جزء من سجل الأوامر مثل أي أداة رسمية.
+
+## السكربت المقابل
+
+الدالة `pop_` تعمل أيضاً من السكربت بلا قائمة. هذا الاختبار يتأكد من القاعدة الأساسية: النص الذي تُرجعه الدالة يعيد نفس النتيجة.
+
+```matlab
+eeglab nogui
+eeglabRoot = fileparts(which('eeglab'));
+EEG = pop_loadset('eeglab_data.set', fullfile(eeglabRoot, 'sample_data'));
+
+% The plugin folder is on the path even without the GUI
+assert(exist('pop_chanvar', 'file') == 2, 'pop_chanvar not found: check the plugins folder');
+
+% Call with all arguments: no window, direct plot
+com = pop_chanvar(EEG, 3);
+disp(com);   % pop_chanvar(EEG, 3);
+
+% Running the returned command must reproduce the same figure
+eval(com);
+```
+
+## أي قيمة أختار؟
+
+| الإعداد | القيمة في الدرس | لماذا |
+|---|---|---|
+| مكان المجلد | `plugins` داخل مجلد EEGLAB | هنا يبحث EEGLAB عند كل بداية عن مجلدات فيها ملف يبدأ بـ `eegplugin` (`eeglab.m`). |
+| اسم المجلد | `chanvar1.0` | الأرقام في آخر الاسم تُقرأ كإصدار. إذا اختلف عن الإصدار الذي يُرجعه `eegplugin_` يطبع EEGLAB تحذيراً. |
+| فحص البيانات | `trystrs.check_data` | يتأكد أن داتاست محمّلة قبل التشغيل. للدوال التي تحتاج epochs استخدم `trystrs.check_epoch`، وللتي تحتاج ICA `trystrs.check_ica`. |
+| التسجيل | `catchstrs.add_to_hist` | يضيف `LASTCOM` إلى السجل ويحفظ الداتاست في `ALLEEG`. إذا كان الأمر يبدأ بـ `EEG =` ينشئ EEGLAB داتاست جديدة تلقائياً. |
+| عتبة الإبراز | z = 3 | قيمة بداية شائعة للقيم الشاذة. الأداة للفحص بالعين، لا لحذف القنوات آلياً. |
+
+## أخطاء شائعة
+
+- **وضع الملفين خارج مجلد `plugins`.** EEGLAB لا يبحث في أي مكان آخر، فلا يظهر البند.
+- **دالة `pop_` لا تُرجع شيئاً.** بدون `com` لا يُسجَّل شيء في `eegh`، فلا تعيد الضغطة نفسها في سكربتك.
+- **نص أمر لا يعيد نفس النتيجة.** إذا كتب المستخدم 2.5 في النافذة، يجب أن يكون النص `pop_chanvar(EEG, 2.5);`، لا القيمة الافتراضية. لهذا يُبنى `com` من القيم التي استُخدمت فعلاً.
+- **انتظار ظهور البند مع `eeglab nogui`.** في هذا الوضع يضيف EEGLAB مجلد الإضافة للمسار، لكنه لا يشغّل `eegplugin_`، فلا توجد قوائم. هذا طبيعي.
+- **اختبار الإضافة من القائمة فقط.** EEGLAB يلتقط الأخطاء القادمة من القوائم. لتتبّع خطأ، اكتب `dbstop if error` ثم استدعِ الدالة من نافذة الأوامر (نصيحة التوثيق الرسمي).
+
+{/* صندوق "من التجربة": بانتظار قصة من صاحب المشروع. لا يُكتب قبل وصولها. */}
+
+## كيف تتأكد أن الخطوة نجحت؟
+
+- عند تشغيل `eeglab` تطبع نافذة الأوامر سطراً فيه `adding "chanvar" v1.0`.
+- البند <MenuPath>Plot > Channel variance</MenuPath> موجود، ويفتح نافذة فيها خانة العتبة.
+- بعد الضغط على <UiLabel>Ok</UiLabel> يظهر رسم أعمدة بعدد القنوات (32 في D1).
+- `eegh` يعرض `pop_chanvar(EEG, 3);`، والسكربت أعلاه يعمل بلا خطأ.

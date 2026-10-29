@@ -1,0 +1,169 @@
+---
+title: Reading artifact components
+titleEn: Reading artifact components
+description: How to tell the seven ICLabel classes apart in EEGLAB from the scalp map, the spectrum, and the time course, and which components to remove.
+station: 4
+order: 6
+level: core
+status: approved
+objectives:
+  - Tell eye, muscle, heart, line noise, and channel noise components apart from brain components, using the scalp map, spectrum, and time course.
+  - Name the distinguishing sign of each of the seven ICLabel classes.
+  - Decide which components to remove and which to keep, with a reason for each.
+prerequisites: [iclabel]
+references:
+  - title: EEGLAB Tutorial
+    url: https://eeglab.org/tutorials/06_RejectArtifacts/RunICA.html
+    section: "Studying and flagging artifactual ICA components"
+  - title: EEGLAB plugin
+    url: https://eeglab.org/plugins/ICLabel/
+    section: "ICLabel"
+  - title: Luck, Applied Event-Related Potential Data Analysis (1st edition)
+    url: https://socialsci.libretexts.org/Bookshelves/Psychology/Biological_Psychology/Applied_Event-Related_Potential_Data_Analysis_(Luck)
+    section: "Chapter 9: Artifact Correction with ICA"
+  - title: "Learning to recognize ICA components of EEG and mobile EEG"
+    url: https://www.youtube.com/watch?v=AXCxrDikpaM
+    section: "Full video"
+    duration: "26:13"
+datasets: [D1]
+startingPoint:
+  dataset: D1
+  file: eeglab_data.set
+  applied: [filtering, line-noise, bad-channels, interpolation, rereferencing, run-ica, ica-1hz-copy-weights]
+  script: |
+    % Shortcut: if you saved D1_main_ica.set in the 1-Hz filtering lesson, keep
+    % the first line and the last two lines, and replace every line between them with:
+    % EEG = pop_loadset('D1_main_ica.set', pwd);
+    [ALLEEG, EEG, CURRENTSET, ALLCOM] = eeglab;
+    eeglabRoot = fileparts(which('eeglab'));
+    EEG = pop_loadset('eeglab_data.set', fullfile(eeglabRoot, 'sample_data'));
+    fullLocs = EEG.chanlocs;
+
+    % Main dataset: high-pass at 0.1 Hz, then 60 Hz line-noise removal
+    EEG = pop_eegfiltnew(EEG, 'locutoff', 0.1);
+    EEG = pop_eegfiltnew(EEG, 'locutoff', 58, 'hicutoff', 62, 'revfilt', 1);
+
+    % Bad channels you removed earlier, e.g. {'T7'}; leave empty if none
+    badChans = {};
+    if ~isempty(badChans)
+        EEG = pop_select(EEG, 'rmchannel', badChans);
+        EEG = pop_interp(EEG, fullLocs, 'spherical');
+    end
+
+    % Average reference, EOG channels excluded
+    eogIdx = find(ismember({EEG.chanlocs.labels}, {'EOG1', 'EOG2'}));
+    EEG = pop_reref(EEG, [], 'exclude', eogIdx);
+
+    % ICA on a 1-Hz copy, then copy the weights back
+    EEG_ica = pop_eegfiltnew(EEG, 'locutoff', 1);
+    EEG_ica = pop_runica(EEG_ica, 'icatype', 'runica', 'extended', 1);
+    EEG.icaweights  = EEG_ica.icaweights;
+    EEG.icasphere   = EEG_ica.icasphere;
+    EEG.icachansind = EEG_ica.icachansind;
+    EEG.icawinv     = [];
+    EEG.icaact      = [];
+    EEG = eeg_checkset(EEG);
+    EEG.filename = ''; EEG.filepath = ''; EEG.datfile = ''; EEG.saved = 'no';
+    [ALLEEG, EEG, CURRENTSET] = pop_newset(ALLEEG, EEG, 0, 'setname', 'D1 main', 'gui', 'off');
+    eeglab redraw;
+interactive: [IcaGameTeaser]
+eeglabVersion: "2026.1"
+updated: 2026-10-28
+---
+
+## Why this step matters
+
+ICLabel gives each ICA component a probability for seven classes. But it can be wrong, and the decision to remove a component is yours. In the ICLabel lesson you read three classes: eye, muscle, and brain. This lesson covers all seven, with the sign that tells each one apart.
+
+The official tutorial gives the order in which to look at a component:
+
+1. The scalp map.
+2. The time course of the component.
+3. The power spectrum of the component's activity.
+4. For epoched data, the ERP image.
+
+No single panel is enough. A component is an artifact when the panels agree.
+
+<Callout type="note">
+**Colour and sign do not matter.** In ICA the sign of a component is arbitrary: red and blue on the map can swap, and the time course can flip, without any change in meaning. Look at the shape, not the colour.
+</Callout>
+
+## Before and after
+
+This lesson reads components without changing the data. The example below is solved, and its link opens the full ICA game: each example there shows the three panels, and after you answer it shows ICLabel's probabilities and why.
+
+<IcaGameTeaser />
+
+## Steps in the GUI
+
+Start with the main dataset loaded and holding ICA weights, as in the Starting point. If you continue from the ICLabel lesson, select `D1 main` from the <MenuPath>Datasets</MenuPath> menu, not `D1 main clean`, because the artifact components are still in it.
+
+1. Open <MenuPath>Tools > Classify components using ICLabel > Label components</MenuPath>, keep <UiLabel>Default (recommended)</UiLabel>, and press <UiLabel>OK</UiLabel>. The maps appear with the most likely class above each one.
+2. Open <MenuPath>Tools > Classify components using ICLabel > View extended component properties</MenuPath> and choose a component. Its window shows the scalp map, the activity spectrum, the time course, and the probability of each class.
+3. To see time courses side by side, open <MenuPath>Plot > Component activations (scroll)</MenuPath>. Blinks and heartbeats are easiest to spot here.
+4. For each component, read the panels in the order above and compare them with the table in the next section.
+5. Write down the components you would remove and why. Do not remove anything in this lesson; removal is in the ICLabel lesson.
+
+## The equivalent script
+
+```matlab
+% Classify the components, then find the clearest example of each class
+EEG = pop_iclabel(EEG, 'default');
+classes = EEG.etc.ic_classification.ICLabel.classes;
+probs   = EEG.etc.ic_classification.ICLabel.classifications;
+[~, bestClass] = max(probs, [], 2);   % most likely class of each component
+
+for c = 1:numel(classes)
+    [p, comp] = max(probs(:, c));
+    fprintf('%-14s components: %2d | clearest: %2d (%.0f%%)\n', ...
+        classes{c}, sum(bestClass == c), comp, 100 * p);
+end
+
+% Panels of the clearest Eye, Muscle, and Brain components
+% Column order: Brain, Muscle, Eye, Heart, Line Noise, Channel Noise, Other
+[~, examples] = max(probs(:, [3 2 1]));
+% pop_viewprops is in the ICLabel plugin folder; the menu adds it to the path, a script must add it
+addpath(fullfile(fileparts(which('iclabel')), 'viewprops'));
+pop_viewprops(EEG, 0, examples);
+```
+
+The loop prints, for each class, how many components have it as their most likely class, and the component with the highest probability for it. The last line opens the panels of the clearest eye, muscle, and brain components. If the highest probability for a class is below 50%, D1 most likely has no clear component of that class.
+
+In D1 expect several brain components and at least one eye component among the first. Heart and channel noise may be missing: not every dataset contains every class.
+
+## Which value should I choose?
+
+The signs of the seven ICLabel classes:
+
+| Class | Scalp map | Spectrum | Time course |
+|---|---|---|---|
+| Brain | Smooth and broad, like one source in the brain | Falls as frequency rises, often with a peak near 10 Hz | Ongoing oscillation without sharp peaks |
+| Eye | Far frontal. A blink: symmetric at the front. A sideways movement: opposite colours on the left and right fronts | Highest at low frequencies, then falls smoothly | Large isolated peaks for blinks, or steps for sideways movements |
+| Muscle | A small, focal spot at the edge, near the temples or neck | Rises or stays high from about 20 Hz upward | Fast, rough activity, often in bursts |
+| Heart | Broad, often a gradient across the whole head | No distinctive peak | Sharp, regular spikes, about one per second |
+| Line Noise | Any shape | A narrow, tall peak at 50 or 60 Hz, depending on the country of recording | Continuous fast oscillation |
+| Channel Noise | Concentrated on a single electrode | Often irregular | Jumps or drifts, like one bad channel |
+| Other | Mixed or scattered | Mixed | No clear pattern |
+
+**Which classes to remove:** on our path, components above 0.9 for Eye or Muscle, after review (the ICLabel lesson). Heart, line noise, and channel noise are removed only after a clear review. Do not remove Other or Brain.
+
+<Callout type="expert">
+**Training your eye:** the official tutorial points to the ICLabel website, where you can practise labelling components and compare your answers with experts. The tutorial also mentions other automatic classifiers, such as MARA, FASTER, SASICA, and ADJUST.
+</Callout>
+
+## Common mistakes
+
+- **Judging by colour.** The sign is arbitrary in ICA. A blue blink map is the same as a red one.
+- **Judging from one panel.** A frontal map alone is not enough: a frontal brain component exists too. Its spectrum has a peak, not a smooth fall from the lowest frequencies.
+- **Treating ICLabel's probability as the truth.** It is an estimate from a trained classifier. A component at 55% Eye and 40% Brain needs your review before any decision.
+- **Expecting every class in every dataset.** Heart components often need an ECG artifact strong enough to reach the EEG, and line noise is often weak after a notch filter.
+- **Removing Other components.** Other means ICLabel could not decide. Removing it may remove brain activity with it.
+
+{/* "From experience" box: waiting for the project owner's story. Do not write it before it arrives. */}
+
+## How to check it worked
+
+1. **You can name the sign** of each of the seven classes: map, spectrum, and time course.
+2. **In D1** you found the clearest eye component and confirmed it with all three panels.
+3. **Your list is written down:** the components you would remove, with a reason for each, and no Brain or Other component on it.
+4. **In the ICA game**, you classified the examples and read the explanation after each answer.

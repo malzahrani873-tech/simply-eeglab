@@ -1,0 +1,226 @@
+---
+title: Creating a STUDY
+titleEn: Creating a STUDY
+description: "How to gather 14 participants' files into one EEGLAB STUDY, give each file its subject, condition and group, then save and reopen the .study file."
+station: 8
+order: 2
+level: core
+status: review
+objectives:
+  - Create a STUDY from the D6 files with the Browse for datasets window and with a script.
+  - Give each file its subject, condition and group with consistent names.
+  - Save and reopen the .study file, and read the number of subjects, conditions and groups in the main window.
+prerequisites: [study-concepts, alleeg-datasets]
+references:
+  - title: EEGLAB Tutorial
+    url: https://eeglab.org/tutorials/10_Group_analysis/study_creation.html
+    section: "10. Group analysis > b. STUDY creation"
+  - title: EEGLAB Tutorial
+    url: https://eeglab.org/tutorials/11_Scripting/command_line_study_functions.html
+    section: "11. Scripting > Creating a STUDY"
+  - title: "EEGLAB introduction part 6: Multi subject analysis and scripting"
+    url: https://www.youtube.com/watch?v=kofJh7biGsE
+    section: "Full video"
+    duration: "10:55"
+  - title: Go-nogo categorization and detection task (OpenNeuro ds002680)
+    url: https://openneuro.org/datasets/ds002680
+    section: "participants.tsv; code/bids_export_animal.m"
+datasets: [D6]
+startingPoint:
+  dataset: D6
+  file: animal.study
+  applied: []
+  script: |
+    [ALLEEG, EEG, CURRENTSET, ALLCOM] = eeglab;
+    % Folder for the course data (change it)
+    dataFolder = 'C:\Users\me\Documents\eeg-course';
+
+    % Download the ready Go-nogo STUDY once and unzip it in its own folder
+    zipDir = fullfile(dataFolder, 'animal_study');
+    studyFile = dir(fullfile(zipDir, '**', 'animal.study'));
+    if isempty(studyFile)
+        zipFile = fullfile(dataFolder, 'animal_study.zip');
+        websave(zipFile, 'https://sccn.ucsd.edu/eeglab/download/animal_study.zip');
+        unzip(zipFile, zipDir);
+        studyFile = dir(fullfile(zipDir, '**', 'animal.study'));
+    end
+    studyDir = studyFile(1).folder;
+
+    % Convert the old .dat data files to .fdt once: resaving them in their old format damages the data in EEGLAB 2026.1
+    setFiles = dir(fullfile(studyDir, '*', '*.set'));
+    for k = 1:numel(setFiles)
+        [~, base] = fileparts(setFiles(k).name);
+        folder = setFiles(k).folder;
+        if ~exist(fullfile(folder, [base '.fdt']), 'file')
+            TMP = pop_loadset('filename', setFiles(k).name, 'filepath', folder);
+            pop_saveset(TMP, 'filename', setFiles(k).name, 'filepath', folder, 'savemode', 'twofiles');
+            if exist(fullfile(folder, [base '.fdt']), 'file') && exist(fullfile(folder, [base '.dat']), 'file')
+                delete(fullfile(folder, [base '.dat']));
+            end
+        end
+    end
+    fprintf('Go-nogo STUDY folder: %s\n', studyDir);
+    eeglab redraw;
+eeglabVersion: "2026.1"
+updated: 2026-10-28
+---
+
+## Why this step matters
+
+In the last lesson you checked the participants' files and confirmed they match. Now you gather them into one STUDY.
+
+Creating it is easy. The hard part is giving each file three correct pieces of information: who the participant is, what the condition is, and what the group is. Every design, plot and statistic in the next lessons is built on these words. One wrong letter creates a new participant or a new condition, and EEGLAB does not warn you.
+
+In D6 each participant has two files: pictures with an animal (`animal`) and pictures without one (`distractor`). We also add gender as a group (`F` or `M`), because we use it in the design lesson.
+
+## Before and after
+
+<Figure src="create-study/create-study-files.svg" alt="Before: 28 small .set files in 14 folders, each folder labelled with a participant code from cba to wpa, two files per folder. After: a sketch of a table with rows for the participants cba, clm and ega and then a row of dots, the conditions animal and distractor as columns, and a narrow group column, F or M, in two colours. An arrow leads from the files to the table, and under it is one file named animal_mine.study." caption="Illustration, no data" source="original" />
+
+## Steps in the GUI
+
+**About the data (D6):** a Go-nogo experiment with 14 participants, 7 women and 7 men. The ready EEGLAB copy has one folder per participant, named by its code, with one dataset per condition: animal and distractor, such as `sph/sphanimal.set` and `sph/sphdistractor.set`. The data of each dataset are in a `.dat` file next to it (only `cba` keeps them inside the `.set`). The "Starting point" script converts every dataset once to the current format, with its data in a `.fdt` file, and deletes the old `.dat` files. In the ready files <UiLabel>subject</UiLabel> and <UiLabel>condition</UiLabel> are filled, while <UiLabel>group</UiLabel> and <UiLabel>session</UiLabel> are empty. The folder also has a ready STUDY called `animal.study`. We build our own copy, `animal_mine.study`, by hand to learn, and compare it with the ready one at the end of the lesson.
+
+<Callout type="warning">
+**Why we convert the old files.** We convert the old files because resaving them in their old format damages them in this version (EEGLAB 2026.1). The conversion runs once and takes a few minutes. If you resaved these files before in EEGLAB 2026.1, delete the `animal_study` folder and run the script again to download a clean copy.
+</Callout>
+
+**1. Prepare the gender table**
+
+Write this table on paper before you start, because the window does not know gender. It comes from the `participants.tsv` file in the OpenNeuro copy of the same data.
+
+| Code | Gender | Code | Gender |
+|---|---|---|---|
+| cba | F | lmi | F |
+| clm | F | mba | F |
+| ega | F | mma | M |
+| fsa | M | mta | F |
+| gro | M | pla | M |
+| hth | M | sce | F |
+| | | sph | M |
+| | | wpa | M |
+
+**2. Open the creation window**
+
+1. Run the "Starting point" script if you have not run it yet.
+2. Open <MenuPath>File > Create study > Browse for datasets</MenuPath>. A window titled <UiLabel>Create a new STUDY set -- pop_studywizard()</UiLabel> opens, with a table called <UiLabel>Select datasets</UiLabel>. Before it, a <UiLabel>Study warning</UiLabel> window about memory appears, suggesting you cancel and change <MenuPath>File > Preferences</MenuPath>. Press <UiLabel>OK</UiLabel>: the files of the 14 participants fit in memory, and its sentence about the "tutorial study" refers to an old STUDY without data.
+3. The table columns are: <UiLabel>Raw dataset filename</UiLabel>, a <UiLabel>...</UiLabel> button to browse, then <UiLabel>subject</UiLabel>, <UiLabel>session</UiLabel>, <UiLabel>run</UiLabel>, <UiLabel>condition</UiLabel>, <UiLabel>group</UiLabel> and <UiLabel>task</UiLabel>, and a <UiLabel>CLear</UiLabel> button to empty the row.
+4. Each page has 10 rows. The <UiLabel>></UiLabel> button under the table moves to the next page. 28 files need 3 pages.
+
+**3. Fill one row per file**
+
+1. In row 1 press <UiLabel>...</UiLabel> and choose `cba/cbaanimal.set`, the animal-condition file of the first participant.
+2. EEGLAB reads the file header and fills the boxes from its fields when they exist. Look at <UiLabel>subject</UiLabel> and <UiLabel>condition</UiLabel>:
+   - If they are filled, check that they match the folder name and the file name.
+   - If they stay empty, type the participant code (the folder name, such as `cba`) in <UiLabel>subject</UiLabel>, and type `animal` in <UiLabel>condition</UiLabel>.
+3. Type the gender letter from your table in <UiLabel>group</UiLabel>.
+4. Leave <UiLabel>session</UiLabel> and <UiLabel>run</UiLabel> as they are. Do not type anything there that is not a real session or run.
+5. In row 2 choose `cba/cbadistractor.set` from the same folder, and type the same code, the same gender, and the condition `distractor`.
+6. Repeat for every participant. Press <UiLabel>Ok</UiLabel> after row 28.
+
+<Callout type="note" title="Saving time">
+Filling 28 rows by hand takes about 10 minutes, and it is good practice in being exact. To save time, fill the first page by hand to understand the window, then press <UiLabel>Cancel</UiLabel> and run the script below, which builds the same complete STUDY.
+</Callout>
+
+**4. Name the STUDY**
+
+The Browse window does not ask for a name. After <UiLabel>Ok</UiLabel> the STUDY appears in the main window without a name.
+
+1. Open <MenuPath>Study > Edit study info</MenuPath>.
+2. Type `Go-nogo animal (mine)` in <UiLabel>STUDY set name:</UiLabel>.
+3. Type `Go-nogo categorization` in <UiLabel>STUDY set task name:</UiLabel>.
+4. Check the table at the bottom of the window one last time, then press <UiLabel>Ok</UiLabel>.
+
+**5. Save, then open again**
+
+1. Open <MenuPath>File > Save current study as</MenuPath>. Save it in the data folder as `animal_mine.study`.
+2. EEGLAB asks: <UiLabel>Some datasets have been modified, do you want to resave them?</UiLabel> Choose <UiLabel>Yes</UiLabel>. This writes the group into each file too, not only into the STUDY file. Saving takes about a minute.
+3. Open <MenuPath>File > Clear study / Clear all</MenuPath> (it clears the STUDY and the datasets from memory, not from disk), then <MenuPath>File > Load existing study</MenuPath>. The <UiLabel>Study warning</UiLabel> window appears again, so press <UiLabel>OK</UiLabel>, then choose `animal_mine.study`.
+4. Read the main window: <UiLabel>STUDY set: Go-nogo animal (mine)</UiLabel>, <UiLabel>Nb of subjects</UiLabel> is 14, <UiLabel>Nb of conditions</UiLabel> is 2 per subject, and <UiLabel>Nb of groups</UiLabel> is 2.
+
+<Callout type="note" title="The third menu option">
+The menu has a third option, <MenuPath>File > Create study > Simple ERP STUDY</MenuPath>, a short window for simple ERP studies. We use <MenuPath>File > Create study > Using all loaded datasets</MenuPath> when the files are already open in ALLEEG. The method in this lesson (Browse) is the clearest, because it shows each file on its own row.
+</Callout>
+
+## The matching script
+
+```matlab
+% studyDir comes from the starting point script
+% Gender per participant code (participants.tsv of ds002680)
+gender = containers.Map( ...
+    {'cba','clm','ega','fsa','gro','hth','lmi','mba','mma','mta','pla','sce','sph','wpa'}, ...
+    {'F',  'F',  'F',  'M',  'M',  'M',  'F',  'F',  'M',  'F',  'M',  'F',  'M',  'M'});
+
+files = dir(fullfile(studyDir, '*', '*.set'));
+commands = {};
+for k = 1:numel(files)
+    hdr = pop_loadset('filename', files(k).name, 'filepath', files(k).folder, 'loadmode', 'info');
+    % Subject: dataset field, otherwise the folder name
+    subj = hdr.subject;
+    if isempty(subj)
+        [~, subj] = fileparts(files(k).folder);
+    end
+    % Condition: dataset field, otherwise the file name
+    cond = hdr.condition;
+    if isempty(cond)
+        if contains(files(k).name, 'distractor'), cond = 'distractor'; else, cond = 'animal'; end
+    end
+    if ~isKey(gender, lower(subj))
+        error('No gender entry for subject %s (%s)', subj, files(k).name);
+    end
+    commands{end+1} = {'index', k, 'load', fullfile(files(k).folder, files(k).name), ...
+        'subject', subj, 'condition', cond, 'group', gender(lower(subj))};
+end
+
+% Create, save (with datasets) and reload the STUDY
+[STUDY, ALLEEG] = std_editset([], [], 'name', 'Go-nogo animal (mine)', ...
+    'task', 'Go-nogo categorization', 'commands', commands, 'updatedat', 'on');
+STUDY = pop_savestudy(STUDY, ALLEEG, 'filename', 'animal_mine.study', ...
+    'filepath', studyDir, 'resavedatasets', 'on');
+[STUDY, ALLEEG] = pop_loadstudy('filename', 'animal_mine.study', 'filepath', studyDir);
+CURRENTSTUDY = 1; EEG = ALLEEG; CURRENTSET = 1:length(EEG);
+
+fprintf('%d datasets, %d subjects, conditions: %s, groups: %s\n', numel(STUDY.datasetinfo), ...
+    numel(STUDY.subject), strjoin(STUDY.condition, ' '), strjoin(STUDY.group, ' '));
+eeglab redraw;
+```
+
+## Which value should I choose?
+
+| Box | What to type in D6 | General rule |
+|---|---|---|
+| subject | The participant code as in the folder name (`cba`) | One fixed code per participant in all their files. Never type the real name. |
+| condition | `animal` or `distractor` | One word per condition, spelled the same way in every file. |
+| group | `F` or `M` | For variables that differ between participants: gender, patient or control, age band. |
+| session | Empty | Only the number of a real session, starting at 1. EEGLAB prints a warning if it does not start at 1. |
+| run | Empty | The run number, if you split the recording into runs and kept them as separate files. |
+| task | Empty | The task name, if you put two different tasks in one STUDY. |
+
+The key difference: **a condition changes within a participant** (every participant saw both kinds of picture), and **a group changes between participants** (each participant has one gender). This decides the kind of statistical test later, so never put gender in condition or the condition in group.
+
+## Common mistakes
+
+- **A participant's code differs between their two files.** `cba` in one file and `CBA ` (with a space) in the other become two participants, so <UiLabel>Nb of subjects</UiLabel> shows more than 14 and <UiLabel>Nb of conditions</UiLabel> shows <UiLabel>(some missing)</UiLabel>.
+- **The group is empty for some files.** If you type a group for one file, type it for all. A file without a group drops out of any design that uses the group.
+- **Pressing No when asked to resave.** The STUDY stays correct, but the files themselves do not know their group. If you later open them with <MenuPath>Using all loaded datasets</MenuPath>, the group box is empty.
+- **Resaving files that still use `.dat`.** In EEGLAB 2026.1, resaving a dataset whose data are in an old `.dat` file writes the data in the wrong order, and the damage grows with every save. Convert the files first, as the "Starting point" script does: after it, each participant folder has two `.fdt` files and no `.dat` file. {/* Folder size: measured in the combined run */}
+- **Moving the folder after saving.** The .study file stores the location of each file. Move the whole folder together with the .study file, not the files alone.
+- **Opening the ready STUDY and saving over it.** Save your copy under a new name (`animal_mine.study`), so `animal.study` stays available for comparison.
+
+{/* "From experience" box: waiting for a story from the project owner. Not written before it arrives. */}
+
+## How do you know it worked?
+
+- **The main window** after opening `animal_mine.study` shows <UiLabel>Nb of subjects</UiLabel> 14, <UiLabel>Nb of conditions</UiLabel> 2 per subject, and <UiLabel>Nb of groups</UiLabel> 2.
+- **The script prints** `28 datasets, 14 subjects, conditions: animal distractor, groups: F M`.
+- **In the data folder** there are 28 `.fdt` files, two per participant, and no `.dat` file next to the `.set` files.
+- **In the** <MenuPath>Study > Edit study info</MenuPath> **window** each participant has two rows with the same code, the same group and two different conditions.
+- **Compared with the ready copy:** open `animal.study` from the same folder. The number of subjects and conditions must match your copy. Only your copy has the group. The ready copy was made with EEGLAB 6: it has no saved design, so EEGLAB creates design 1 when it opens, and it holds nine old component clusters. Your copy has none, and the clustering lesson explains why to delete earlier clusters before clustering.
+
+<Methods>
+A STUDY was created in EEGLAB 2026.1 (Delorme & Makeig, 2004) including [14] participants, with image category ([animal], [distractor]) as a within-subject condition and participant gender as a between-subject group.
+</Methods>
+
+<Callout type="note" title="About the data">
+Data: STUDY version: SCCN/Delorme. Original data: OpenNeuro ds002680 (CC0).
+</Callout>

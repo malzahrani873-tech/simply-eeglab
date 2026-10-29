@@ -1,0 +1,163 @@
+---
+title: High-pass & low-pass filtering
+titleEn: High-pass & low-pass filtering
+description: How to remove slow drift and fast noise from EEG with an FIR filter in EEGLAB, and which edges to choose for ERP, ICA, or spectral analysis.
+station: 3
+order: 2
+level: core
+status: approved
+objectives:
+  - Apply a high-pass and a low-pass filter to continuous data from the GUI and from a script.
+  - Choose filter edges suited to ERP analysis, ICA, or spectral analysis.
+  - Check the effect of the filter by comparing the spectrum before and after.
+prerequisites: [resampling]
+references:
+  - title: EEGLAB Tutorial
+    url: https://eeglab.org/tutorials/05_Preprocess/Filtering.html
+    section: "5. Preprocess data > a. Filtering"
+  - title: EEGLAB Firfilt FAQ
+    url: https://eeglab.org/others/Firfilt_FAQ.html
+    section: "Firfilt FAQ"
+  - title: Luck, Applied Event-Related Potential Data Analysis (1st edition)
+    url: https://socialsci.libretexts.org/Bookshelves/Psychology/Biological_Psychology/Applied_Event-Related_Potential_Data_Analysis_(Luck)
+    section: "Chapter 4: Filtering"
+  - title: "EEGLAB preprocessing #4: Filtering"
+    url: https://www.youtube.com/watch?v=nshi47blz7Q
+    section: "Full video"
+    duration: "10:46"
+datasets: [D1]
+startingPoint:
+  dataset: D1
+  file: eeglab_data.set
+  applied: []
+  script: |
+    [ALLEEG, EEG, CURRENTSET, ALLCOM] = eeglab;
+    eeglabRoot = fileparts(which('eeglab'));
+    EEG = pop_loadset('eeglab_data.set', fullfile(eeglabRoot, 'sample_data'));
+    [ALLEEG, EEG, CURRENTSET] = pop_newset(ALLEEG, EEG, 0, 'setname', 'Continuous EEG Data', 'gui', 'off');
+    eeglab redraw;
+interactive: [FilterDemo]
+eeglabVersion: "2026.1"
+updated: 2026-10-29
+---
+
+## Why this step matters
+
+Raw EEG contains things that do not come from the brain. There is slow drift from sweat and electrode movement, and fast noise from muscles and the power line. On our path you save only a 0.1 Hz high-pass copy now, and try the low-pass as an exercise without saving it.
+
+A high-pass filter lets high frequencies through and removes the slow ones. A low-pass filter lets low frequencies through and removes the fast ones.
+
+Without filtering, slow drift can bury the brain signal you are looking for, and every later step gets harder.
+
+<Callout type="note">
+**Quick reminder:** frequency is how many times a wave repeats per second, measured in hertz (Hz). A spectrum is a plot of how strong each frequency is in the signal. Alpha waves, for example, show up as a peak near 10 Hz.
+</Callout>
+
+## Before and after
+
+Try turning on each filter on its own, and watch what disappears from the signal.
+
+<FilterDemo pipeline="high-pass 0.1 Hz with no low-pass" />
+
+Notice in the panel that the number you type in EEGLAB is the passband edge, not the actual cutoff.
+
+Notice also that a 30 Hz low-pass removed the line-noise peak. That is why the line-noise lesson matters more if you keep high frequencies. This happens in ICA, spectral, and time-frequency analysis. The line frequency depends on where the data were recorded: 60 Hz in Saudi Arabia and the US, 50 Hz in Europe and most other Arab countries. Check the spectrum before you assume.
+
+**Simplifications in this demo:** one channel with a synthetic signal, not real EEG, and a fixed sampling rate of 250 Hz. Your data may have a different rate, so the filter order will differ.
+
+## Steps in the GUI
+
+Start with `eeglab_data.set` loaded, as in the Starting point. We apply two filters, each as a separate step.
+
+**First: high-pass filter**
+
+1. Open <MenuPath>Tools > Filter the data > Basic FIR filter (new, default)</MenuPath>.
+2. In <UiLabel>Lower edge of the frequency pass band (Hz)</UiLabel>, type `0.1`.
+3. Leave <UiLabel>Higher edge of the frequency pass band (Hz)</UiLabel> empty.
+4. Leave <UiLabel>FIR Filter order (Mandatory even. Default is automatic*)</UiLabel> empty, so EEGLAB computes it for you.
+5. Keep <UiLabel>Plot frequency response</UiLabel> checked, then press <UiLabel>OK</UiLabel>.
+6. The filter response window opens. Notice how the response rises from zero to one around 0.1 Hz, then close it.
+7. A window asks what to do with the new dataset. In <UiLabel>Name it:</UiLabel>, type a clear name such as `D1 hp0.1`.
+8. Leave <UiLabel>Overwrite it in memory (set=yes; unset=create a new dataset)</UiLabel> unchecked, so the original stays available for comparison. Press <UiLabel>OK</UiLabel>.
+9. Save this dataset now with <MenuPath>File > Save current dataset as</MenuPath> as `D1_hp0.1.set`. It is the main dataset of the path and the starting point of the next lesson.
+
+**Second, exercise: low-pass filter** on the new dataset
+
+<Callout type="warning">
+**The low-pass here is an exercise only, so do not save it.** The saved copy for the path is `D1 hp0.1` in the file `D1_hp0.1.set`; save it before this exercise, as in step 9. The path postpones the low-pass until after cleaning the data with ICA.
+</Callout>
+
+1. Open the same menu: <MenuPath>Tools > Filter the data > Basic FIR filter (new, default)</MenuPath>.
+2. This time, leave <UiLabel>Lower edge of the frequency pass band (Hz)</UiLabel> empty.
+3. In <UiLabel>Higher edge of the frequency pass band (Hz)</UiLabel>, type `30`.
+4. Press <UiLabel>OK</UiLabel>, then name the dataset `D1 hp0.1 lp30`. This is the exercise dataset. Use it only in the checking section, and do not save it.
+
+<Callout type="note" title="About the filter order">
+The filter order field says that manual definition is recommended. That is true once you understand the transition band and want to control it. The automatic value is a safe start for beginners. What matters most is using the same setting for every participant.
+</Callout>
+
+## The equivalent script
+
+The same two steps as a script. Each filter is on its own line, and the low-pass goes into a separate variable because it is an exercise.
+
+```matlab
+% High-pass: passband edge at 0.1 Hz (removes slow drift)
+EEG = pop_eegfiltnew(EEG, 'locutoff', 0.1);
+EEG.setname = 'D1 hp0.1';
+EEG = eeg_checkset(EEG);
+EEG = pop_saveset(EEG, 'filename', 'D1_hp0.1.set', 'filepath', pwd);   % path copy: the next lesson starts here
+
+% Exercise only: low-pass with passband edge at 30 Hz (removes fast noise)
+EEG_lp = pop_eegfiltnew(EEG, 'hicutoff', 30);   % exercise only: do not save
+EEG_lp.setname = 'D1 hp0.1 lp30';
+```
+
+In a script, the frequency response window does not open, because `'plotfreqz'` defaults to `0`. Add `'plotfreqz', 1` if you want it.
+
+## Which value should I choose?
+
+| Your goal | High-pass | Low-pass | Why this number |
+|---|---|---|---|
+| ERP analysis | 0.1 Hz | 30 Hz | Luck's recommendation for most ERP analyses (Luck, Ch. 4). Removes drift without distorting slow components such as P3 and N400. |
+| Computing ICA | 1 Hz, sometimes 2 | Usually not needed | Official tutorial: ICA quality is notably higher with a high-pass above 1 Hz (Filtering and RunICA pages). **Apply it to a separate copy only**, as shown in the Running ICA lesson. |
+| Spectral analysis | 0.5 to 1 Hz | Not below the highest frequency you study | A practical starting rule, not a number from the official docs. A 30 Hz low-pass, for example, removes upper beta and gamma. |
+
+**The other filters in the menu:** <MenuPath>Tools > Filter the data</MenuPath> also lists <UiLabel>Windowed sinc FIR filter</UiLabel>, <UiLabel>Parks-McClellan (equiripple) FIR filter</UiLabel>, and <UiLabel>Moving average FIR filter</UiLabel>, from the same firfilt plugin, and <UiLabel>Basic FIR filter (legacy)</UiLabel>, the older filter kept for old scripts; do not use it for new work. Each one asks you to choose the filter order and other details yourself, so you need them only when a paper or a special case asks for a specific filter design. On this path <UiLabel>Basic FIR filter (new, default)</UiLabel> is enough.
+
+**A note on Luck's numbers:** Luck uses ERPLAB filters, where the number is the half-amplitude cutoff. In EEGLAB the number is the passband edge, so 0.1 and 30 give actual cutoffs (-6 dB) at 0.05 Hz and about 33.6 Hz for D1. The difference is small and acceptable in practice.
+
+**About these numbers:** choose the edges based on your goal. The official tutorial itself gives no fixed high-pass value for ERPs and says the effect of filters on ERPs is still under discussion. The numbers in the table are starting points, not laws.
+
+**On this site's core path** the goal is ERP analysis. We apply the 0.1 Hz high-pass to the main dataset now, and postpone the 30 Hz low-pass until after cleaning the data with ICA. The reason is that ICA and ICLabel benefit from high frequencies, so the low-pass comes at the end of continuous processing. So the 30 Hz filter in this lesson is an exercise to see its effect.
+
+## Common mistakes
+
+- **Treating the number as the actual cutoff.** The number you type is the passband edge. For a high-pass, the actual cutoff is lower: 1 Hz means a cutoff near 0.5 Hz. For a low-pass, it is higher: 30 Hz means about 33.6 Hz for D1.
+- **Too high a high-pass on ERP data.** A 1 or 2 Hz filter shrinks P3 and N400 and creates opposite-polarity deflections before and after them. Try it yourself:
+
+<FilterDemo mode="erp" pipeline="high-pass 0.1 Hz with no low-pass" />
+
+- **Filtering after epoching.** Filter the continuous data before extracting epochs. Epoching first multiplies edge effects in every short segment.
+- **Applying both filters in one step.** If you fill in both edges in the same window, both filters share the same transition bandwidth, so the low-pass becomes steeper than needed. The official tutorial recommends applying each filter separately.
+- **Different settings across participants.** Use the same edges and the same method for every participant in a study. Otherwise, differences between them come from the filter, not the brain.
+
+{/* "From experience" box: waiting for the project owner's story. Do not write it before it arrives. */}
+
+## How to check it worked
+
+1. **Read what EEGLAB printed in the command window.** With D1 (128 Hz), the high-pass prints a line such as `performing 4225 point highpass filtering`, with an actual cutoff of `0.05` Hz. The low-pass uses a 59-point filter with an actual cutoff of about `33.64` Hz.
+2. **Compare the spectrum.** Open <MenuPath>Plot > Channel spectra and maps</MenuPath> on the original dataset, then on `D1 hp0.1 lp30`. Switch between datasets from the <MenuPath>Datasets</MenuPath> menu. Change <UiLabel>Plotting frequency range [lo_Hz hi_Hz]:</UiLabel> from `2 25` to `1 64`, because the default range hides everything above 25 Hz. Keep the other fields as they are.
+   - Power should drop above about 34 Hz.
+   - In D1, the sharp line-noise peak at 60 Hz disappears.
+   - The alpha peak near 10 Hz should stay the same.
+   - Small ripples in the removed range are normal, and the official tutorial mentions them.
+   - The effect of the 0.1 Hz high-pass does not show in this spectrum, because its resolution is about 1 Hz. You check it in the next step.
+3. **Look at the signal itself.** Open <MenuPath>Plot > Channel data (scroll)</MenuPath> on the original, then on `D1 hp0.1`. Each channel should stay centered on a steady line instead of slowly rising and falling.
+
+<ImageSpec optional>
+D1 spectrum for all channels before and after filtering, from Plot > Channel spectra and maps with a plotting range of 1 to 64 Hz. Before: an alpha peak near 10 Hz and a sharp peak at 60 Hz. After a 0.1 Hz high-pass and a 30 Hz low-pass: a clear drop above about 34 Hz, the 60 Hz peak gone, and the alpha peak unchanged.
+</ImageSpec>
+
+<Methods>
+Data were high-pass filtered using a zero-phase Hamming-windowed sinc FIR filter (passband edge 0.1 Hz, cutoff frequency [0.05] Hz at −6 dB, transition bandwidth [0.1] Hz, filter length [4225] points; pop_eegfiltnew, firfilt plugin 2.8, EEGLAB 2026.1; Widmann et al., 2015).
+</Methods>

@@ -1,0 +1,167 @@
+{
+  "v": 1,
+  "station": 1,
+  "lang": "en",
+  "passPercent": 80,
+  "questions": [
+    {
+      "id": "s01-q01",
+      "type": "single",
+      "lesson": "install-eeglab",
+      "objective": 3,
+      "prompt": "You need the Biosig plugin to read an EDF file. Where do you install it inside EEGLAB?",
+      "options": [
+        {
+          "id": "a",
+          "text": "`File > Manage EEGLAB extensions`"
+        },
+        {
+          "id": "b",
+          "text": "`Tools > Filter the data`"
+        },
+        {
+          "id": "c",
+          "text": "`Help > EEGLAB functions`"
+        },
+        {
+          "id": "d",
+          "text": "`Edit > Preferences`"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "The extension manager is in the File menu: search for Biosig and click `Install/Update`; it needs an internet connection. `Edit > Preferences` holds EEGLAB options, not plugins."
+    },
+    {
+      "id": "s01-q02",
+      "type": "image",
+      "lesson": "eeglab-gui",
+      "objective": 3,
+      "prompt": "This is the main window after opening `eeglab_data.set`. What does it mean that `Epochs` is 1 here?",
+      "image": {
+        "src": "/quiz/01/s01-q02.webp",
+        "w": 720,
+        "h": 480,
+        "status": "pending",
+        "alt": "The EEGLAB main window with the dataset name Continuous EEG Data at the top, and under it the value lines: Channels per frame, Frames per epoch, Epochs, Events, Sampling rate (Hz), Epoch start (sec), Epoch end (sec), Reference, Channel locations, ICA weights.",
+        "spec": "A real EEGLAB 2026.1 screenshot (source: eeglab-ui) of the main window after opening eeglab_data.set, like the \"after\" image in the eeglab-gui lesson but **with no numbers or arrows** on top. Expected values: 32, 30504, 1, 154, 128, 0.000 and 238.305. The interface text is English, so one version serves both languages."
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": "The data are continuous and have not been epoched yet"
+        },
+        {
+          "id": "b",
+          "text": "The dataset has only one channel"
+        },
+        {
+          "id": "c",
+          "text": "The dataset has only one event"
+        },
+        {
+          "id": "d",
+          "text": "The recording is one second long"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "`Epochs` is the number of segments, and 1 means one continuous recording that has not been cut. The channel count is on the `Channels per frame` line, the event count on the `Events` line, and the length on the `Epoch end (sec)` line."
+    },
+    {
+      "id": "s01-q03",
+      "type": "single",
+      "lesson": "eeg-struct",
+      "objective": 2,
+      "prompt": "The command `size(EEG.data)` prints `32 30504`. What do the two numbers mean?",
+      "options": [
+        {
+          "id": "a",
+          "text": "32 channels, and 30504 samples per channel"
+        },
+        {
+          "id": "b",
+          "text": "32 samples, and 30504 channels"
+        },
+        {
+          "id": "c",
+          "text": "32 seconds, and 30504 events"
+        },
+        {
+          "id": "d",
+          "text": "32 epochs, and 30504 channels"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "In EEGLAB channels are rows and samples are columns. So `EEG.data(1, :)` is the whole first channel, and `EEG.data(:, 1)` is all channels at the first sample."
+    },
+    {
+      "id": "s01-q04",
+      "type": "multiple",
+      "lesson": "eeg-struct",
+      "objective": 1,
+      "prompt": "Which statements about the fields of `EEG` are true? (Select all that apply)",
+      "options": [
+        {
+          "id": "a",
+          "text": "`EEG.srate` is the sampling rate in Hz"
+        },
+        {
+          "id": "b",
+          "text": "`EEG.event(1).latency` is the event time in samples, not seconds"
+        },
+        {
+          "id": "c",
+          "text": "`EEG.times` is in seconds"
+        },
+        {
+          "id": "d",
+          "text": "`EEG.trials` = 1 means continuous data"
+        },
+        {
+          "id": "e",
+          "text": "`EEG.icaweights` is always filled after opening any dataset"
+        }
+      ],
+      "answer": [
+        "a",
+        "b",
+        "d"
+      ],
+      "explanation": "`EEG.times` is in milliseconds, while `EEG.xmin` and `EEG.xmax` are in seconds. `EEG.icaweights` stays empty until you compute ICA in station 4. To convert a latency to seconds: (sample number − 1) ÷ sampling rate."
+    },
+    {
+      "id": "s01-q05",
+      "type": "single",
+      "lesson": "eeglab-gui",
+      "objective": 3,
+      "prompt": "In the main window: `Frames per epoch` = 30504, `Sampling rate (Hz)` = 128, and `Epochs` = 1. About how long is the recording?",
+      "options": [
+        {
+          "id": "a",
+          "text": "30504 seconds"
+        },
+        {
+          "id": "b",
+          "text": "238 seconds, about 4 minutes"
+        },
+        {
+          "id": "c",
+          "text": "128 seconds"
+        },
+        {
+          "id": "d",
+          "text": "0.004 seconds"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "`Frames per epoch` is a sample count, not seconds. Divide it by the sampling rate: 30504 ÷ 128 ≈ 238 seconds, roughly the number on the `Epoch end (sec)` line."
+    }
+  ]
+}

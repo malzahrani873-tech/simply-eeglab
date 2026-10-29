@@ -1,0 +1,204 @@
+---
+title: Decoding (MVPA)
+titleEn: Decoding (MVPA)
+description: How to train a classifier that tells faces from cars using the pattern across all channels over time with ERPLAB, and read the accuracy curve against chance.
+station: 10
+order: 3
+level: optional
+status: review
+objectives:
+  - "Prepare data for decoding in ERPLAB: event list, then bins, then bin-based epochs."
+  - Extract a BEST file and run SVM decoding with cross-validation.
+  - Read the decoding accuracy curve over time and compare it with chance.
+  - "Know the main source of false accuracy: different numbers of trials between conditions."
+prerequisites: [erp-average]
+references:
+  - title: ERPLAB Decoding Tutorial
+    url: https://github.com/ucdavis/erplab/wiki/Decoding-Tutorial
+    section: "Part 1 Example of ERP Decoding; Part 2 Interpretation; Part 5 Decoding with ERPLAB Classic"
+  - title: ERP CORE analysis scripts (N170)
+    url: https://github.com/lucklab/ERP_CORE
+    section: "N170/EEG_ERP_Processing: BDF_N170.txt and 5_Elist_Bin_Epoch.m"
+  - title: Luck, Applied Event-Related Potential Data Analysis (2nd ed.)
+    url: https://socialsci.libretexts.org/Bookshelves/Psychology/Book%3A_Applied_Event-Related_Potential_Data_Analysis_(Luck)
+    section: "Chapter 12: Multivariate Pattern Classification (Decoding)"
+datasets: [D3]
+startingPoint:
+  dataset: D3
+  file: 2_N170_shifted_ds_reref_ucbip_hpfilt_ica_corr_cbip.set
+  applied: []
+  script: |
+    [ALLEEG, EEG, CURRENTSET, ALLCOM] = eeglab;
+
+    % ERP CORE N170, participant 2, from the "intermediate-stage processed
+    % files" download. ERP CORE already applied: event shift of 26 ms,
+    % resampling to 256 Hz, average reference, 0.1 Hz high-pass and ICA
+    % correction of blinks and eye movements. Continuous, not epoched.
+    dataDir = fullfile(pwd, 'N170', '2');
+    EEG = pop_loadset('filename', '2_N170_shifted_ds_reref_ucbip_hpfilt_ica_corr_cbip.set', ...
+        'filepath', dataDir);
+
+    % Show the dataset in the main EEGLAB window
+    [ALLEEG, EEG, CURRENTSET] = pop_newset(ALLEEG, EEG, 0, 'setname', 'N170 sub2 ica corr', 'gui', 'off');
+    eeglab redraw;
+eeglabVersion: "2026.1"
+updated: 2026-10-28
+---
+
+## Why this step matters
+
+A classic ERP analysis picks one or two channels and compares the average of the two conditions there. <En>Decoding</En> (also called <En>MVPA</En>) asks a different question: is the voltage pattern across **all channels together** enough to tell which condition was on the screen?
+
+The idea is simple. We take part of the trials and train a classifier (<En>SVM</En>) on them, then test it on trials it has not seen. We repeat this at every time point and get a curve: the proportion of correct answers over time. If the curve rises above the chance line after the stimulus, the brain carries information that separates the two conditions at that moment.
+
+The strength of this method is that you do not need to know in advance which channel carries the difference, and it picks up distributed differences that do not show in any single channel.
+
+In this lesson we decode faces against cars for one participant from the ERP CORE N170 experiment (D3). On each trial the participant saw a face, a car, a scrambled face or a scrambled car, and pressed a button to say whether it was an object or a texture. Faces and cars differ strongly around 170 ms after the image, so the curve should rise clearly above chance.
+
+<Callout type="warning">
+This is an example for one participant. A real study needs group-level statistics across participants (Luck, 2nd edition, chapter 12).
+</Callout>
+
+<Callout type="note" title="How ERPLAB decodes">
+Decoding in ERPLAB does not classify single trials directly. It splits the trials of each condition into groups, averages each group (a small ERP), then classifies these averages. This reduces noise a lot, and it is the approach of Luck's book and the official ERPLAB tutorial.
+</Callout>
+
+The data in this lesson come from ERP CORE by Emily S. Kappenman and Steven J. Luck, under the CC BY-SA 4.0 licence.
+
+## Before and after
+
+<ImageSpec>
+The decoding accuracy curve from ERPLAB > Multivariate Pattern Classification (MVPC) Tools > Plot MVPC Results for ERP CORE N170 participant 2 (faces against cars): horizontal axis time from -200 to 800 ms, vertical axis proportion correct from 0 to 1, a dashed horizontal line at 0.5 (chance), and a vertical line at zero. The curve stays near 0.5 before zero and rises to its peak between about 130 and 250 ms. Source: screenshot from EEGLAB 2026.1 with ERPLAB 13.10 on the project owner's computer. Caption credit: ERP CORE (Kappenman and Luck), CC BY-SA 4.0.
+</ImageSpec>
+
+## Steps in the GUI
+
+**First: install ERPLAB and check the requirements**
+
+1. ERPLAB is a plugin that is not bundled with EEGLAB. Open <MenuPath>File > Manage EEGLAB extensions</MenuPath>, search for ERPLAB and install it (the latest release when this lesson was written is 13.10). Restart `eeglab`, and the <MenuPath>ERPLAB</MenuPath> menu appears in the menu bar.
+2. The decoding tools need the MATLAB <En>Statistics and Machine Learning Toolbox</En> and MATLAB 2020b or later. Type `ver` in the command window and check that it is there.
+
+**Second: event list, then bins, then epochs**
+
+3. Start from `N170 sub2 ica corr`, as in "Starting point". These are continuous data, not epoched yet. Event codes 1 to 40 are faces, 41 to 80 cars, 101 to 180 scrambled images, and 201 is a correct response.
+4. Open <MenuPath>ERPLAB > EventList > Create EEG EVENTLIST</MenuPath>. Enable the option that removes letters from event codes (<En>alphanumeric cleaning</En>), as the ERP CORE scripts do. Run it.
+5. Write a bin descriptor file (<En>BDF</En>) named `n170_faces_cars_bins.txt`. It is a text file with this content, copied from the first two bins of `BDF_N170.txt` in ERP CORE. Each bin takes the image only when a correct response (201) followed it within 200 to 1000 ms:
+
+```text
+bin 1
+Faces, Correct
+.{1-40}{t<200-1000>201}
+
+bin 2
+Cars, Correct
+.{41-80}{t<200-1000>201}
+```
+
+6. Open <MenuPath>ERPLAB > Assign bins (BINLISTER)</MenuPath>, choose the file `n170_faces_cars_bins.txt`, and click <UiLabel>RUN</UiLabel>.
+7. Open <MenuPath>ERPLAB > Extract bin-based epochs</MenuPath>. Type the range `-200 800`, choose baseline correction from the pre-stimulus period (<UiLabel>Pre</UiLabel>), and click <UiLabel>RUN</UiLabel>. Name the dataset `N170 sub2 faces cars`.
+
+**Fourth: the BEST file, then decoding**
+
+8. Open <MenuPath>ERPLAB > Bin-Epoched Single Trial (BEST) Tools > Extract Bin-Epoched Single Trial (BEST) Data</MenuPath>, keep both bins, and click <UiLabel>RUN</UiLabel>. A BEST file gathers the trials of each bin, ready for decoding.
+9. Open <MenuPath>ERPLAB > Multivariate Pattern Classification (MVPC) Tools > ERP Decoding</MenuPath>. Set:
+    - <UiLabel>Iterations</UiLabel>: `100`.
+    - <UiLabel>Cross-Validation Blocks</UiLabel>: `3`.
+    - <UiLabel>Channels</UiLabel>: channels 1 to 28 (the scalp channels, from FP1 to O2). Leave out channels 29 to 35, which are the eye channels and the bipolar EOG channels.
+    - Trial equalization: <UiLabel>Equal Trials, Equal AVGs</UiLabel> with <UiLabel>Across Classes</UiLabel>.
+    - Metric: <UiLabel>ACC</UiLabel> (proportion correct).
+
+    Check that the <UiLabel>Chance</UiLabel> box shows 0.5, then run. The computation takes a few minutes.
+10. Open <MenuPath>ERPLAB > Multivariate Pattern Classification (MVPC) Tools > Plot MVPC Results</MenuPath>. The accuracy curve over time appears.
+11. Save the result with <MenuPath>ERPLAB > Multivariate Pattern Classification (MVPC) Tools > Save current MVPCset as</MenuPath> as `N170_sub2_faces_cars.mvpc`.
+
+## The equivalent script
+
+
+Continues from "Starting point". ERPLAB prints every step to `eegh`, so you can also save your script from the GUI, as you learned in the command history lesson.
+
+```matlab
+% ERPLAB is not bundled with EEGLAB: install it from the extension manager
+plugin_askinstall('ERPLAB', 'pop_decoding', true);
+
+% EventList, with the same options as the ERP CORE scripts
+EEG = pop_creabasiceventlist(EEG, 'AlphanumericCleaning', 'on', ...
+    'BoundaryNumeric', {-99}, 'BoundaryString', {'boundary'});
+
+% Bin descriptor file: bins 1 and 2 of BDF_N170.txt (correct trials only)
+bdfFile = fullfile(pwd, 'n170_faces_cars_bins.txt');
+fid = fopen(bdfFile, 'w');
+fprintf(fid, 'bin 1\nFaces, Correct\n.{1-40}{t<200-1000>201}\n\n');
+fprintf(fid, 'bin 2\nCars, Correct\n.{41-80}{t<200-1000>201}\n');
+fclose(fid);
+
+% Assign bins, then cut bin-based epochs with a pre-stimulus baseline
+EEG = pop_binlister(EEG, 'BDF', bdfFile, 'IndexEL', 1, ...
+    'SendEL2', 'EEG', 'Voutput', 'EEG');
+EEG = pop_epochbin(EEG, [-200 800], 'pre');
+EEG.setname = 'N170 sub2 faces cars';
+fprintf('Trials per bin: %s\n', num2str(EEG.EVENTLIST.trialsperbin));
+
+% BEST: single trials per bin, ready for decoding
+BEST = pop_extractbest(EEG, 'Bins', [1 2], 'Criterion', 'good', ...
+    'ExcludeBoundary', 'on');
+
+% SVM decoding: 3 cross-validation blocks, 100 iterations
+% Channels 1-28 are the scalp channels; 29-35 are eye and bipolar EOG
+chans = 1:28;
+MVPC = pop_decoding(BEST, 'Classes', [1 2], 'Channels', chans, ...
+    'nIter', 100, 'nCrossblocks', 3, 'Method', 'SVM', ...
+    'classcoding', 'OneVsAll', 'TrialsAVGs', 'EqtrlEqagclasses', ...
+    'OutcomeMetric', 'ACC');
+
+% Plot decoding accuracy over time against chance
+figure;
+plot(MVPC.times, MVPC.average_score, 'LineWidth', 1.5); hold on;
+yline(MVPC.chance, '--');
+xline(0, ':');
+xlabel('Time (ms)'); ylabel('Proportion correct');
+title('ERP CORE N170, participant 2: faces vs cars');
+
+% Peak accuracy after stimulus onset
+post = MVPC.times > 0;
+[peakAcc, iPeak] = max(MVPC.average_score(post));
+postTimes = MVPC.times(post);
+fprintf('Peak accuracy %.2f at %d ms (chance %.2f)\n', ...
+    peakAcc, round(postTimes(iPeak)), MVPC.chance);
+
+% Save the results
+MVPC = pop_savemymvpc(MVPC, 'mvpcname', 'N170_sub2_faces_cars', ...
+    'filename', 'N170_sub2_faces_cars.mvpc', 'filepath', pwd, 'Warning', 'off');
+```
+
+## Which value should I choose?
+
+| Setting | Value in this lesson | Why |
+|---|---|---|
+| Cross-validation blocks | 3 | The trials of each condition are split into 3 groups, and the classifier is always tested on a group it was not trained on. With about 80 trials per condition, each average holds about a third of them. The default in `pop_decoding`. |
+| Iterations | 100 | Each iteration assigns trials to groups in a new random way, then the results are averaged. The default. The official ERPLAB tutorial uses 10 only to save time. |
+| Trial equalization | Equal Trials, Equal AVGs | The same number of trials for each condition. Without it, ERPLAB prints an explicit warning: accuracy rises falsely. The script default is not this one, so always write it. |
+| Metric | ACC (proportion correct) | Easier to read: chance with two conditions is 0.5, with four it is 0.25. The script default in this release is AUC, whose chance line is also 0.5. |
+| Channels | The 28 scalp channels, without EOG | Eye channels may classify from eye movements, not from brain activity. |
+| Trial rejection | None | `'Criterion', 'good'` takes every trial, because this lesson does not run ERP CORE's artifact rejection step (script 6). That is why your trial counts can differ from the published ERP CORE numbers. |
+| Time range | -200 to 800 ms | Includes a pre-stimulus period. Accuracy before zero should stay near chance, and that is your first check. |
+
+## Common mistakes
+
+- **Forgetting to equalize the number of trials.** If one condition has more trials, its averages are less noisy, and the classifier learns the difference in noise, not in the brain. Always use <UiLabel>Equal Trials, Equal AVGs</UiLabel>.
+- **Including EOG channels.** If eye movements differ between conditions, the classifier reads the eyes. Leave EOG channels out, and remember that the remaining components may still carry some of their trace.
+- **Decoding data that were not epoched by bin.** `pop_extractbest` needs epochs from <MenuPath>ERPLAB > Extract bin-based epochs</MenuPath>, not from the regular EEGLAB epoching command.
+- **Reading a single accuracy above 0.5 as a result.** A single participant's curve is full of fluctuations. A scientific result needs several participants and a statistical test, which is beyond this lesson.
+- **Reading high accuracy as a larger ERP difference.** Accuracy says the information is in the pattern; it does not say which channel or which direction. For interpretation, go back to the ERP waveforms.
+
+{/* "From experience" box: waiting for the project owner's story. Do not write it before it arrives. */}
+
+## How to check it worked
+
+- The command window prints the number of trials per bin: two close numbers, each 80 or less (only correct trials enter).
+- `MVPC.chance` equals 0.5, and `MVPC.DecodingUnit` equals `proportion correct`.
+- Accuracy before zero fluctuates around 0.5, then rises clearly above it after the image, with its peak between about 130 and 250 ms.
+- The curve appears in the <UiLabel>Plot MVPC Results</UiLabel> window, and the file `N170_sub2_faces_cars.mvpc` is saved in your working folder.
+
+<Methods>
+Faces and cars (correct trials only) were decoded at each time point from the 28 scalp channels with a support vector machine in ERPLAB [version] (EEGLAB 2026.1; Lopez-Calderon & Luck, 2014), using 3-fold cross-validation on averages of equal numbers of trials per class, repeated over 100 iterations; chance was 0.5. Data were from the ERP CORE N170 paradigm (participant 2).
+</Methods>

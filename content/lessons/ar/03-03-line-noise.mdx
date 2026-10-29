@@ -1,0 +1,150 @@
+---
+title: إزالة ضوضاء الكهرباء (50 أو 60 هرتز)
+titleEn: Removing line noise (50/60 Hz)
+description: كيف تكتشف قمة ضوضاء الكهرباء في طيف EEG عند 50 أو 60 هرتز، وتزيلها في EEGLAB بفلتر notch ضيّق، وتتحقق أنها اختفت.
+station: 3
+order: 3
+level: core
+status: approved
+objectives:
+  - يقرّر هل يحتاج تحليله إزالة ضوضاء الكهرباء، حسب الترددات التي يحتفظ بها.
+  - يكتشف قمة الكهرباء في الطيف عند 50 أو 60 هرتز.
+  - يزيلها بفلتر notch ضيّق من الواجهة ومن السكربت.
+  - يتحقق أن القمة اختفت وأن الترددات المجاورة لم تتغيّر.
+prerequisites: [filtering]
+references:
+  - title: EEGLAB Tutorial
+    url: https://eeglab.org/tutorials/05_Preprocess/Filtering.html
+    section: "5. Preprocess data > a. Filtering: Alternative to filtering for line noise removal"
+  - title: Makoto's preprocessing pipeline
+    url: https://eeglab.ucsd.edu/wiki/Makoto%27s_preprocessing_pipeline
+    section: "§9 Remove line noise using CleanLine؛ §9.2 Recommended parameters for CleanLine"
+  - title: "EEGLAB preprocessing #4: Filtering"
+    url: https://www.youtube.com/watch?v=nshi47blz7Q
+    section: "الفيديو كاملاً"
+    duration: "10:46"
+datasets: [D1]
+startingPoint:
+  dataset: D1
+  file: eeglab_data.set
+  applied: [filtering]
+  script: |
+    [ALLEEG, EEG, CURRENTSET, ALLCOM] = eeglab;
+    eeglabRoot = fileparts(which('eeglab'));
+    EEG = pop_loadset('eeglab_data.set', fullfile(eeglabRoot, 'sample_data'));
+
+    % Main dataset: high-pass at 0.1 Hz
+    EEG = pop_eegfiltnew(EEG, 'locutoff', 0.1);
+    EEG.filename = ''; EEG.filepath = ''; EEG.datfile = ''; EEG.saved = 'no';
+    [ALLEEG, EEG, CURRENTSET] = pop_newset(ALLEEG, EEG, 0, 'setname', 'D1 hp0.1', 'gui', 'off');
+    eeglab redraw;
+interactive: []
+eeglabVersion: "2026.1"
+updated: 2026-10-28
+---
+
+## لماذا هذه الخطوة مهمة؟
+
+تحتاج هذه الخطوة إذا كان تحليلك يحتفظ بترددات فوق تردد الكهرباء، مثل ICA والتحليل الطيفي والتحليل الزمني-الترددي. في تحليل ERP مع <En>low-pass</En> عند 30 هرتز، غالباً لا تحتاجها.
+
+في مسارنا نحتفظ بالترددات العالية حتى بعد ICA، فنزيلها هنا.
+
+أسلاك الكهرباء حول جهاز التسجيل تضيف إلى كل القنوات موجة منتظمة بتردد ثابت. تظهر في الطيف كقمة حادة ضيّقة، وقد تكون أقوى من نشاط الدماغ في نفس المنطقة. هذه الموجة اسمها ضوضاء الكهرباء (<En>line noise</En>).
+
+تردد الكهرباء يعتمد على بلد التسجيل: 60 هرتز في السعودية وأمريكا، و50 هرتز في أوروبا وأغلب الدول العربية الأخرى. تحقّق من الطيف قبل أن تفترض.
+
+في D1 القمة عند 60 هرتز، وهي أعلى من الترددات المجاورة بحوالي 20 ديسيبل (<En>dB</En>) في أغلب القنوات.
+
+<Callout type="note">
+**طريقة المسار:** نستخدم فلتر <En>notch</En> ضيّقاً من فلتر EEGLAB الأساسي، لأنه موجود في كل نسخة من EEGLAB 2026.1 بدون تثبيت أي إضافة. يحذف نطاقاً ضيّقاً حول 60 هرتز فقط، ويترك ما تحته وما فوقه. البدائل الأدق في آخر الدرس.
+</Callout>
+
+## قبل وبعد
+
+<BeforeAfter>
+<Figure src="line-noise/line-noise-spectra-before.png" alt="طيف كل القنوات من 1 إلى 64 هرتز قبل فلتر الشبكة: قمة ألفا قرب 10 هرتز وقمة حادة ضيقة عند 60 هرتز." caption="قبل: D1 hp0.1" source="D1" />
+<Figure src="line-noise/line-noise-spectra-after.png" alt="الطيف نفسه بعد فلتر الشبكة: اختفت قمة 60 هرتز وظهر مكانها انخفاض ضيق، وباقي الطيف لم يتغير." caption="بعد: D1 hp0.1 notch60" source="D1" />
+</BeforeAfter>
+
+## الخطوات من الواجهة
+
+ابدأ والنسخة الرئيسية `D1 hp0.1` مفتوحة كما في "نقطة البداية".
+
+**أولاً: ابحث عن القمة في الطيف**
+
+1. افتح <MenuPath>Plot > Channel spectra and maps</MenuPath>.
+2. غيّر خانة <UiLabel>Plotting frequency range [lo_Hz hi_Hz]:</UiLabel> من `2 25` إلى `1 64`. النطاق الافتراضي يتوقف عند 25 هرتز، فلا يُظهر قمة الكهرباء أبداً.
+3. في <UiLabel>Frequencies to plot as scalp maps (Hz):</UiLabel> اكتب `10 60`، واترك باقي الخانات كما هي، ثم اضغط <UiLabel>OK</UiLabel>.
+4. انظر للطيف: قمة حادة ضيّقة عند 60 هرتز. وخريطة الرأس عند 60 تبيّن القنوات التي فيها أكثر ضوضاء.
+
+**ثانياً: طبّق فلتر <En>notch</En>**
+
+1. افتح <MenuPath>Tools > Filter the data > Basic FIR filter (new, default)</MenuPath>.
+2. في <UiLabel>Lower edge of the frequency pass band (Hz)</UiLabel> اكتب `58`.
+3. في <UiLabel>Higher edge of the frequency pass band (Hz)</UiLabel> اكتب `62`.
+4. فعّل <UiLabel>Notch filter the data instead of pass band</UiLabel>. بدون هذا الخيار يُبقي الفلتر النطاق من 58 إلى 62 فقط ويحذف كل الباقي.
+5. اترك باقي الخانات كما هي، واضغط <UiLabel>OK</UiLabel>. تظهر نافذة استجابة الفلتر، لأن <UiLabel>Plot frequency response</UiLabel> مفعّل افتراضياً: حفرة عند 60 هرتز فقط.
+6. تطبع نافذة الأوامر سطراً يبدأ بـ `pop_eegfiltnew() - performing`، وفيه طول الفلتر بالنقاط ونوعه.
+7. سمِّ الداتاست الجديدة `D1 hp0.1 notch60`، واترك <UiLabel>Overwrite it in memory (set=yes; unset=create a new dataset)</UiLabel> غير مفعّل.
+8. احفظها من <MenuPath>File > Save current dataset as</MenuPath>. درس القنوات السيئة يبدأ منها.
+
+**ثالثاً: قارن الطيف** كما في الخطوة الأولى، على الداتاست الجديدة.
+
+## السكربت المقابل
+
+```matlab
+% Line frequency: 60 Hz in Saudi Arabia and the Americas, 50 Hz in Europe
+lineFreq = 60;
+
+% Spectrum before, with scalp maps at 10 Hz and at the line frequency
+figure; pop_spectopo(EEG, 1, [], 'EEG', 'freqrange', [1 64], 'freq', [10 lineFreq]);
+
+% Notch: remove a narrow band around the line frequency (revfilt = 1)
+EEG = pop_eegfiltnew(EEG, 'locutoff', lineFreq - 2, 'hicutoff', lineFreq + 2, 'revfilt', 1);
+EEG.setname = 'D1 hp0.1 notch60';
+
+% Spectrum after
+figure; pop_spectopo(EEG, 1, [], 'EEG', 'freqrange', [1 64], 'freq', [10 lineFreq]);
+
+EEG = pop_saveset(EEG, 'filename', 'D1_hp0.1_notch60.set', 'filepath', pwd);
+```
+
+السطر الذي يدخل في المسار هو سطر الفلتر نفسه، وهو في سكربتات نقطة البداية لكل الدروس التالية: `pop_eegfiltnew(EEG, 'locutoff', 58, 'hicutoff', 62, 'revfilt', 1)`.
+
+## أي قيمة أختار؟
+
+| الإعداد | القيمة | لماذا |
+|---|---|---|
+| تردد الكهرباء | 60 هرتز في D1 وفي السعودية، و50 في أوروبا وأغلب الدول العربية الأخرى | يحدّده بلد التسجيل. تحقّق من الطيف دائماً. |
+| حدود <En>notch</En> | التردد ± 2 هرتز: من 58 إلى 62، أو من 48 إلى 52 | ضيّق بما يكفي ليُبقي الترددات المجاورة. النطاق الانتقالي (<En>transition band</En>) هنا حوالي 2 هرتز، والتوثيق الرسمي يقترح من 1 إلى 5 هرتز لفلتر الكهرباء. عند 128 هرتز طول الفلتر 213 نقطة، والحذف الكامل عند 60، ونصف السعة يُحذف عند 59 و61 تقريباً. |
+| رتبة الفلتر (<En>filter order</En>) | اتركها فارغة (تلقائية) | EEGLAB يحسبها من الحدود ومعدل العيّنات. |
+| التوافقيات (120 و180 هرتز…) | لا تلزم في D1 | أعلى تردد في D1 هو 64 هرتز. مع بيانات بـ 500 هرتز أو أكثر، تحقّق من قمم عند مضاعفات التردد، وأزل كل قمة تظهر بنفس الطريقة. |
+
+**ثلاث طرق لإزالة ضوضاء الكهرباء، ومتى تستخدم كل واحدة:**
+
+| الطريقة | متى تستخدمها | هل تأتي مع EEGLAB 2026.1؟ |
+|---|---|---|
+| فلتر <En>notch</En> (`pop_eegfiltnew`) | ERP وأغلب الحالات. هي طريقة مسارنا | نعم، ضمن إضافة firfilt |
+| CleanLine | تحليل طيفي تريد فيه الإبقاء على الترددات حول 50 أو 60 هرتز. تقدّر موجة الكهرباء وتطرحها بدل حذف نطاق كامل. التوثيق الرسمي يقول إن نتيجتها ممتازة عندما تنجح، وإنها لا تنجح دائماً | لا، تُثبّت من <MenuPath>File > Manage EEGLAB extensions</MenuPath> |
+| Zapline-plus | تحليل طيفي أو زمني-ترددي فوق 40 هرتز، أو ضوضاء كهرباء قوية مع توافقيات كثيرة. تبحث عن الضوضاء وتزيلها تلقائياً | لا، تُثبّت من نفس القائمة |
+
+## أخطاء شائعة
+
+- **افتراض 50 هرتز لأنها "المعروفة".** السعودية وأمريكا 60 هرتز. فلتر على 50 في بيانات سعودية لا يزيل شيئاً، ويحذف نطاقاً سليماً.
+- **فحص الطيف بالنطاق الافتراضي.** نافذة الطيف ترسم من 2 إلى 25 هرتز افتراضياً، فلا ترى القمة وتظن أن البيانات نظيفة. غيّر النطاق دائماً إلى ما يشمل 50 أو 60.
+- **نسيان خيار <En>notch</En>.** بدون <UiLabel>Notch filter the data instead of pass band</UiLabel> يصبح الفلتر <En>band-pass</En> من 58 إلى 62، ويحذف كل نشاط الدماغ.
+- **فلتر <En>notch</En> واسع جداً.** حذف من 45 إلى 75 مثلاً يأخذ معه نشاطاً حقيقياً من الدماغ والعضلات. ابقَ بنطاق ± 2 هرتز.
+- **استخدام <En>low-pass</En> بدل <En>notch</En> مع تحليل يحتاج الترددات العالية.** فلتر <En>low-pass</En> عند 30 يزيل الكهرباء، لكنه يزيل معها كل ما فوق 30. هذا مقبول لـ ERP في آخر المعالجة، لا قبل ICA.
+
+{/* صندوق "من التجربة": بانتظار قصة من صاحب المشروع. لا يُكتب قبل وصولها. */}
+
+## كيف تتأكد أن الخطوة نجحت؟
+
+1. **قارن الطيف** قبل وبعد بنطاق `1 64`. القمة عند 60 هرتز اختفت، وفي مكانها حفرة ضيّقة.
+2. **الترددات المجاورة لم تتغيّر:** القدرة عند 55 هرتز وما تحتها، وعند قمة ألفا قرب 10 هرتز، كما كانت قبل الفلتر.
+3. **خريطة الرأس عند 60 هرتز** لم تعد تبرز قنوات بعينها.
+4. **في نافذة الأوامر** تجد سطراً يبدأ بـ `pop_eegfiltnew() - performing` وفيه طول الفلتر، وسطراً يبدأ بـ `pop_eegfiltnew() - passband edge(s):` وفيه الحدّان 58 و62.
+
+<Methods>
+Line noise was attenuated with a zero-phase Hamming-windowed sinc FIR band-stop (notch) filter (passband edges 58 and 62 Hz, −6 dB cutoffs [59] and [61] Hz, filter length [213] points; pop_eegfiltnew with 'revfilt', firfilt plugin 2.8, EEGLAB 2026.1).
+</Methods>

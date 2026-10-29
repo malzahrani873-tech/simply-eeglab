@@ -1,0 +1,281 @@
+---
+title: الإحصاء والتصحيح المتعدد
+titleEn: Statistics & multiple comparisons
+description: "كيف تختبر في EEGLAB فرق الشرطين عبر المشاركين، وتصحّح لتعدد النقاط والقنوات، ولماذا تُختار النافذة قبل النظر، وحدود التصميم المختلط."
+station: 8
+order: 7
+level: core
+status: review
+objectives:
+  - يجري اختباراً مزدوجاً لنوعي الصور في Pz من زر STATS، ويحدد الأزمنة الدالة مع تصحيح FDR.
+  - يقارن عدد النقاط الزمنية الدالة مع التصحيح وبدونه، ويشرح سبب الفرق.
+  - يختبر نافذة زمنية محددة قبل النظر إلى البيانات في كل القنوات، ويقرأ خريطة قيم p.
+  - يتحقق هل إضافة Fieldtrip-lite مثبّتة، ويجري تصحيح العناقيد إذا كانت مثبّتة.
+prerequisites: [study-plot-channels]
+references:
+  - title: EEGLAB Tutorial
+    url: https://eeglab.org/tutorials/10_Group_analysis/study_statistics.html
+    section: "10. Group analysis > e. STUDY statistics"
+  - title: EEGLAB Tutorial
+    url: https://eeglab.org/tutorials/11_Scripting/command_line_study_functions.html
+    section: "11. Scripting > Retrieving statistical results"
+  - title: "Robust statistics applied to EEG data #5: Correction for multiple comparisons"
+    url: https://www.youtube.com/watch?v=DQQAkID0vNQ
+    section: "الفيديو كاملاً"
+    duration: "15:02"
+  - title: "Thorpe, Fize & Marlot (1996). Speed of processing in the human visual system. Nature 381(6582), 520-522"
+    url: https://doi.org/10.1038/381520a0
+    section: "Results"
+datasets: [D6]
+startingPoint:
+  dataset: D6
+  file: animal_mine.study
+  applied: [create-study, study-design, study-precompute]
+  script: |
+    [ALLEEG, EEG, CURRENTSET, ALLCOM] = eeglab;
+    % Folder for the course data (change it)
+    dataFolder = 'C:\Users\me\Documents\eeg-course';
+
+    % Download the ready Go-nogo STUDY once and unzip it in its own folder
+    zipDir = fullfile(dataFolder, 'animal_study');
+    studyFile = dir(fullfile(zipDir, '**', 'animal.study'));
+    if isempty(studyFile)
+        zipFile = fullfile(dataFolder, 'animal_study.zip');
+        websave(zipFile, 'https://sccn.ucsd.edu/eeglab/download/animal_study.zip');
+        unzip(zipFile, zipDir);
+        studyFile = dir(fullfile(zipDir, '**', 'animal.study'));
+    end
+    studyDir = studyFile(1).folder;
+
+    % Convert the old .dat data files to .fdt once: resaving them in their old format damages the data in EEGLAB 2026.1
+    setFiles = dir(fullfile(studyDir, '*', '*.set'));
+    for k = 1:numel(setFiles)
+        [~, base] = fileparts(setFiles(k).name);
+        folder = setFiles(k).folder;
+        if ~exist(fullfile(folder, [base '.fdt']), 'file')
+            TMP = pop_loadset('filename', setFiles(k).name, 'filepath', folder);
+            pop_saveset(TMP, 'filename', setFiles(k).name, 'filepath', folder, 'savemode', 'twofiles');
+            if exist(fullfile(folder, [base '.fdt']), 'file') && exist(fullfile(folder, [base '.dat']), 'file')
+                delete(fullfile(folder, [base '.dat']));
+            end
+        end
+    end
+
+    % Rebuild animal_mine.study (create-study lesson) if it is missing
+    if ~exist(fullfile(studyDir, 'animal_mine.study'), 'file')
+        gender = containers.Map( ...
+            {'cba','clm','ega','fsa','gro','hth','lmi','mba','mma','mta','pla','sce','sph','wpa'}, ...
+            {'F',  'F',  'F',  'M',  'M',  'M',  'F',  'F',  'M',  'F',  'M',  'F',  'M',  'M'});
+        files = dir(fullfile(studyDir, '*', '*.set'));
+        commands = {};
+        for k = 1:numel(files)
+            hdr = pop_loadset('filename', files(k).name, 'filepath', files(k).folder, 'loadmode', 'info');
+            subj = hdr.subject;
+            if isempty(subj), [~, subj] = fileparts(files(k).folder); end
+            cond = hdr.condition;
+            if isempty(cond)
+                if contains(files(k).name, 'distractor'), cond = 'distractor'; else, cond = 'animal'; end
+            end
+            if ~isKey(gender, lower(subj))
+                error('No gender entry for subject %s (%s)', subj, files(k).name);
+            end
+            commands{end+1} = {'index', k, 'load', fullfile(files(k).folder, files(k).name), ...
+                'subject', subj, 'condition', cond, 'group', gender(lower(subj))};
+        end
+        [STUDY, ALLEEG] = std_editset([], [], 'name', 'Go-nogo animal (mine)', ...
+            'task', 'Go-nogo categorization', 'commands', commands, 'updatedat', 'on');
+        STUDY = pop_savestudy(STUDY, ALLEEG, 'filename', 'animal_mine.study', ...
+            'filepath', studyDir, 'resavedatasets', 'on');
+    end
+    [STUDY, ALLEEG] = pop_loadstudy('filename', 'animal_mine.study', 'filepath', studyDir);
+
+    % Designs 2 and 3 (study-design lesson); design 2 is the current one
+    STUDY = std_makedesign(STUDY, ALLEEG, 2, 'name', 'image x gender', ...
+        'variable1', 'condition', 'values1', {'animal', 'distractor'}, 'vartype1', 'categorical', ...
+        'variable2', 'group', 'values2', {'F', 'M'}, 'vartype2', 'categorical');
+    STUDY = std_makedesign(STUDY, ALLEEG, 3, 'name', 'image only', ...
+        'variable1', 'condition', 'values1', {'animal', 'distractor'}, 'vartype1', 'categorical', ...
+        'variable2', 'none');
+    STUDY = std_selectdesign(STUDY, ALLEEG, 2);
+    STUDY = pop_savestudy(STUDY, ALLEEG, 'savemode', 'resave');
+
+    % Precomputed measures (study-precompute lesson), only if they are missing
+    first = STUDY.datasetinfo(1);
+    timefFile = fullfile(first.filepath, [first.subject '.dattimef']);
+    needMeasures = ~exist(fullfile(first.filepath, [first.subject '.daterp']), 'file') || ~exist(timefFile, 'file');
+    if ~needMeasures
+        tf = load('-mat', timefFile, 'labels');
+        needMeasures = numel(tf.labels) < ALLEEG(1).nbchan;   % ERSP from an older two-channel run
+    end
+    if needMeasures
+        baseline = [round(ALLEEG(1).xmin*1000) 0];
+        [STUDY, ALLEEG] = std_precomp(STUDY, ALLEEG, {}, 'savetrials', 'on', 'interp', 'on', 'recompute', 'on', ...
+            'erp', 'on', 'erpparams', {'rmbase', baseline}, ...
+            'spec', 'on', 'specparams', {'specmode', 'fft', 'logtrials', 'off'}, ...
+            'ersp', 'on', 'itc', 'on', 'erspparams', {'cycles', [3 0.8], 'freqs', [3 30], 'nfreqs', 20, 'ntimesout', 50});
+        STUDY = pop_savestudy(STUDY, ALLEEG, 'savemode', 'resave');
+    end
+
+    CURRENTSTUDY = 1; EEG = ALLEEG; CURRENTSET = 1:length(EEG);
+    eeglab redraw;
+eeglabVersion: "2026.1"
+updated: 2026-10-28
+---
+
+## لماذا هذه الخطوة مهمة؟
+
+في الدرس السابق رأيت المنحنيين يفترقان في Pz. لكن متوسطي مجموعتين لا يتساويان تماماً أبداً، حتى لو لم يكن للصور أي أثر. الاختبار يجيب عن سؤال واحد: **هل الفرق ثابت بما يكفي عبر المشاركين الـ 14 بحيث يصعب أن تفسّره الصدفة وحدها؟**
+
+وهناك مشكلة ثانية. EEGLAB يختبر كل نقطة زمنية وحدها، والإيبوك فيه مئات النقاط. عند عتبة 0.05، إذا اختبرت 100 نقطة زمنية مستقلة لا يوجد فيها فرق حقيقي، فتتوقع أن يخرج نحو 5 منها "دالة" بالصدفة. هذه مشكلة **المقارنات المتعددة**. التصحيح مثل FDR يرفع الحد بحيث تختفي أغلب نقاط الصدفة هذه.
+
+والمشكلة الثالثة بيدك أنت لا بيد EEGLAB: **اختيار النافذة بعد رؤية الفرق.** إذا نظرت إلى الرسم، ووجدت أين يفترق المنحنيان أكثر، ثم اختبرت تلك النافذة، فسينجح الاختبار غالباً حتى في بيانات عشوائية. النافذة تأتي من سؤالك أو من دراسات سابقة، قبل الرسم.
+
+## قبل وبعد
+
+<ImageSpec>
+صورة من سكربت الدرس يوم التشغيل، لا رسم يدوي. يسار: ERP المجموعة في Pz للتصميم 3، منحنيا animal و distractor في لوحة واحدة، مع أشرطة داكنة على طول أسفل اللوحة في الأزمنة التي تجتاز تصحيح FDR. يمين: خريطتا الرأس لـ 150 إلى 250 ms لـ animal و distractor، وبجانبهما خريطة قيم p. نصوص المحاور والعناوين من EEGLAB بالإنجليزية، ونسخة واحدة تكفي للغتين.
+</ImageSpec>
+
+## الخطوات من الواجهة
+
+**عن البيانات (D6):** `animal_mine.study` بتصاميمها الثلاثة والمقاييس من درس الحساب المسبق. نبدأ بالتصميم 3، `image only`: متغيّر واحد داخل المشارك (animal و distractor)، فالاختبار **مزدوج** (paired) عبر المشاركين الـ 14.
+
+**أولاً: جهّز الرسم**
+
+1. شغّل سكربت "نقطة البداية".
+2. افتح <MenuPath>Study > Plot channel measures</MenuPath>. في <UiLabel>Select design:</UiLabel> اختر `image only`، ثم اختر `Pz` في القائمة اليسرى.
+3. اضغط <UiLabel>Params</UiLabel> بجانب <UiLabel>Plot ERPs</UiLabel>. فعّل <UiLabel>Plot first variable on the same panel</UiLabel>، واترك <UiLabel>Time range (ms) [low high]</UiLabel> فارغاً، وتأكد أن <UiLabel>Multiple channels selection</UiLabel> على <UiLabel>Plot channels individually</UiLabel>. اضغط <UiLabel>Ok</UiLabel>.
+
+**ثانياً: اضبط الاختبار**
+
+1. اضغط زر <UiLabel>STATS</UiLabel> بين العمودين (مكتوب تحته `params`). تفتح نافذة <UiLabel>Set statistical parameters -- pop_statparams()</UiLabel>.
+2. فعّل <UiLabel>Compute 1st independent variable statistics if any</UiLabel>. اترك <UiLabel>Compute 2nd independent variable statistics if any</UiLabel> غير مفعّل: التصميم 3 فيه متغيّر واحد فقط.
+3. أبقِ <UiLabel>Use EEGLAB statistics</UiLabel> مفعّلاً، واختر <UiLabel>Use parametric statistics</UiLabel> في القائمة تحته.
+4. في <UiLabel>Statistical threshold (p-value)</UiLabel> ضع `0.05` مكان `exact`.
+5. في قائمة التصحيح اختر <UiLabel>Use FDR correction</UiLabel>. اضغط <UiLabel>Ok</UiLabel>.
+6. اضغط <UiLabel>Plot ERPs</UiLabel>. يظهر المنحنيان في لوحة واحدة، وتحدد أشرطة داكنة على طول أسفل اللوحة الأزمنة التي يجتاز فيها الفرق العتبة المصحّحة.
+
+<Callout type="note" title="صندوق الإحصاء في MATLAB">
+الاختبار البارامتري يحتاج الدالة `fcdf` من صندوق أدوات MATLAB المسمّى Statistics and Machine Learning Toolbox. بدون هذا الصندوق يكتب EEGLAB في نافذة الأوامر رسالة تبدأ بـ `statcond(): parametric testing requires fcdf()` ويجري اختبار التباديل (permutation) بدلاً منه. النتيجة تبقى صحيحة، لكنها أبطأ وقد تتغير قليلاً من تشغيل لآخر.
+</Callout>
+
+**ثالثاً: انظر ماذا يفعل التصحيح**
+
+1. اضغط <UiLabel>STATS</UiLabel> مرة أخرى واختر <UiLabel>Do not correct for multiple comparisons</UiLabel>. اضغط <UiLabel>Ok</UiLabel>، ثم <UiLabel>Plot ERPs</UiLabel>.
+2. قارن بالرسم السابق. بلا تصحيح تظهر أشرطة أكثر، وبعضها قصير ومنعزل، وكثيراً ما يكون في خط الأساس قبل ظهور الصورة. الفرق قبل المثير لا يمكن أن يسبّبه المثير: هذه نقاط الصدفة التي يزيلها التصحيح.
+3. أرجع التصحيح إلى <UiLabel>Use FDR correction</UiLabel>.
+
+**رابعاً: اختبر نافذة محددة مسبقاً**
+
+في هذه المهمة صور الحيوانات هي محاولات go (يرفع المشارك إصبعه)، والمشتّتات هي محاولات no-go (يُبقي الزر مضغوطاً)، كما في وصف الداتاست. ذكر Thorpe وزملاؤه (1996) أن الفرق بين محاولات go و no-go في هذه المهمة يظهر كسالبية فوق المناطق الأمامية في محاولات no-go، ويبدأ عند نحو 150 ms. لذلك بداية النافذة (150 ms) من دراسة سابقة، لا من رسمنا. أما نهايتها (250 ms) فاختيار لهذا الدرس.
+
+1. اضغط <UiLabel>Sel. all</UiLabel> لتحديد كل القنوات.
+2. اضغط <UiLabel>Params</UiLabel> بجانب <UiLabel>Plot ERPs</UiLabel>. اكتب أولاً `150 250` في <UiLabel>Time range (ms) [low high]</UiLabel>، ثم اختر <UiLabel>Plot averaged topography over time range</UiLabel> في <UiLabel>Multiple channels selection</UiLabel>. اضغط <UiLabel>Ok</UiLabel>.
+3. اضغط <UiLabel>Plot ERPs</UiLabel>. تظهر خريطتا رأس، واحدة لكل صورة، وخريطة ثالثة للاختبار في كل قناة. هنا يصحّح FDR عبر كل القنوات، لأن كل قناة أصبحت اختباراً واحداً. المقال يصف الأثر فوق المناطق الأمامية، أما اختبار الخطوة الثانية ففي Pz. هذا تحليل منفصل لا تناقض فيه، فانظر في خريطة الاختبار أين يظهر الفرق.
+4. بعد ذلك أرجع <UiLabel>Multiple channels selection</UiLabel> إلى <UiLabel>Plot channels individually</UiLabel> وامسح <UiLabel>Time range (ms) [low high]</UiLabel>.
+
+**خامساً: تصحيح العناقيد (يحتاج Fieldtrip-lite)**
+
+تصحيح العناقيد (cluster correction) لا يحكم على كل نقطة زمنية وحدها. يبحث عن سلاسل من النقاط الدالة المتجاورة، ويسأل هل سلسلة بهذا الطول نادرة تحت التباديل. وهو غالباً أقوى من FDR لأثر يستمر عشرات المللي ثانية. في EEGLAB يأتي من إضافة Fieldtrip-lite، وهي ليست جزءاً من التثبيت الأساسي.
+
+1. **تحقق هل هي مثبّتة.** افتح <UiLabel>STATS</UiLabel>. إذا كان السطر <UiLabel>Use Fieldtrip statistics (to use install "Fieldtrip-lite" using File > Manage EEGLAB extensions)</UiLabel> ولا يمكن تفعيله، فالإضافة غير موجودة. ويمكنك أيضاً كتابة `exist('ft_freqstatistics', 'file')` في نافذة الأوامر: `2` تعني مثبّتة، و `0` تعني غير موجودة.
+2. **لتثبيتها:** افتح <MenuPath>File > Manage EEGLAB extensions</MenuPath>. في <UiLabel>List of plugins (bolded means installed)</UiLabel> اضغط `Fieldtrip-lite`، ثم <UiLabel>Install/Update</UiLabel>. افتح <UiLabel>STATS</UiLabel> مرة أخرى: يجب أن يصبح السطر <UiLabel>Use Fieldtrip statistics</UiLabel>. إذا بقي رمادياً، أعد تشغيل EEGLAB وشغّل سكربت "نقطة البداية" مرة أخرى.
+3. **لتشغيله:** حدد `Pz` وحدها، وافتح <UiLabel>STATS</UiLabel>، وتأكد أن المتغيّر الأول وحده مفعّل، وفعّل <UiLabel>Use Fieldtrip statistics</UiLabel>، واختر <UiLabel>Use montecarlo/permutation statistics</UiLabel> و <UiLabel>Use cluster correction (CC)</UiLabel>، واكتب `0.05` عتبةً. اضغط <UiLabel>Ok</UiLabel>، ثم <UiLabel>Plot ERPs</UiLabel>.
+4. فعّل <UiLabel>Use EEGLAB statistics</UiLabel> مرة أخرى بعد ذلك، من أجل الخطوة التالية.
+
+**سادساً: التصميم المختلط 2×2**
+
+1. غيّر <UiLabel>Select design:</UiLabel> إلى `image x gender`، مع `Pz` محددة.
+2. افتح <UiLabel>STATS</UiLabel> وفعّل أيضاً <UiLabel>Compute 2nd independent variable statistics if any</UiLabel>. أبقِ <UiLabel>Use FDR correction</UiLabel> والعتبة `0.05`. اضغط <UiLabel>Ok</UiLabel>.
+3. اضغط <UiLabel>Plot ERPs</UiLabel>. تظهر في نافذة الأوامر `Warning: cannot plot condition/group on the same panel while using a fixed`، ويرسم EEGLAB كل خلية في لوحة وحدها، مع لوحات إضافية لأثر الصورة وأثر الجنس والتفاعل بينهما.
+4. ألغِ تفعيل <UiLabel>Compute 2nd independent variable statistics if any</UiLabel> عندما تنتهي.
+
+<Callout type="warning">
+**حدّ يجب أن تعرفه.** في الاختبار الثنائي يمرّر EEGLAB إعداد ازدواج واحداً للاختبار، وإذا كان أحد المتغيّرين غير مزدوج استعمل النسخة غير المزدوجة (في `std_stat.m` تُرتَّب قائمة الازدواج بحيث تأتي `off` أولاً). في تصميمنا المختلط يعني هذا أن التفاعل يُختبر كأن نوع الصورة بين المشاركين أيضاً، فتضيع قوة إحصائية. استخدم النتيجة الثنائية هنا للاستكشاف. أما تحليل ANOVA مختلط حقيقي فصدّر القيم (الدرس التالي) إلى برنامج إحصاء، أو استخدم LIMO (الدرس الذي بعده). ومع 7 مشاركين في كل مجموعة، أي نتيجة عن الجنس هي للتعلم فقط.
+</Callout>
+
+## السكربت المقابل
+
+```matlab
+% STUDY and ALLEEG come from the starting point script
+names = {STUDY.changrp.name};
+pz = names(strcmpi(names, 'Pz'));
+STUDY = pop_erpparams(STUDY, 'plotconditions', 'together', 'plotgroups', 'apart', ...
+    'timerange', [], 'topotime', []);
+
+% Paired test of image category at Pz (design 3), without and with FDR correction
+STUDY = pop_statparams(STUDY, 'condstats', 'on', 'groupstats', 'off', 'mode', 'eeglab', ...
+    'method', 'param', 'alpha', 0.05, 'mcorrect', 'none');
+[STUDY, ~, erptimes, ~, maskRaw] = std_erpplot(STUDY, ALLEEG, 'channels', pz, 'design', 3, 'noplot', 'on');
+STUDY = pop_statparams(STUDY, 'mcorrect', 'fdr');
+[STUDY, ~, erptimes, ~, maskFdr] = std_erpplot(STUDY, ALLEEG, 'channels', pz, 'design', 3);
+fprintf('Significant time points at Pz: %d uncorrected, %d after FDR (of %d)\n', ...
+    nnz(maskRaw{1}), nnz(maskFdr{1}), numel(erptimes));
+sigTimes = erptimes(maskFdr{1} > 0);
+if ~isempty(sigTimes)
+    fprintf('First and last significant time after FDR: %g and %g ms\n', sigTimes(1), sigTimes(end));
+end
+
+% Window fixed before looking at the data: mean of 150-250 ms at every channel, FDR across channels
+STUDY = pop_erpparams(STUDY, 'topotime', [150 250]);
+[STUDY, ~, ~, ~, maskMap] = std_erpplot(STUDY, ALLEEG, 'channels', names, 'design', 3);
+fprintf('Channels with a significant 150-250 ms difference after FDR: %s\n', strjoin(names(maskMap{1} > 0), ' '));
+STUDY = pop_erpparams(STUDY, 'topotime', []);
+
+% Cluster correction over time at Pz (requires the Fieldtrip-lite plugin)
+if exist('ft_freqstatistics', 'file')
+    STUDY = pop_statparams(STUDY, 'mode', 'fieldtrip', 'fieldtripmethod', 'montecarlo', ...
+        'fieldtripmcorrect', 'cluster', 'fieldtripalpha', 0.05, 'fieldtripnaccu', 2000);
+    [STUDY, ~, ~, ~, maskClust] = std_erpplot(STUDY, ALLEEG, 'channels', pz, 'design', 3);
+    fprintf('Significant time points at Pz after cluster correction: %d\n', nnz(maskClust{1}));
+    STUDY = pop_statparams(STUDY, 'mode', 'eeglab');
+else
+    disp('Fieldtrip-lite is not installed: use File > Manage EEGLAB extensions');
+end
+
+% 2 x 2 mixed design at Pz (design 2): picture, gender and their interaction
+STUDY = pop_statparams(STUDY, 'groupstats', 'on', 'mcorrect', 'fdr');
+[STUDY, ~, ~, ~, ~, pinter] = std_erpplot(STUDY, ALLEEG, 'channels', pz, 'design', 2);
+fprintf('Interaction time points after FDR: %d\n', nnz(pinter{3}));
+
+% Back to the image category test only
+STUDY = pop_statparams(STUDY, 'groupstats', 'off');
+```
+
+## أي قيمة أختار؟
+
+| الخيار | في هذا الدرس | متى تغيّره |
+|---|---|---|
+| التصميم | 3 لأثر الصورة، و 2 للتفاعل | التصميم الذي يطابق سؤالك، محدداً قبل التحليل. |
+| <UiLabel>Use parametric statistics</UiLabel> | نعم | <UiLabel>Use permutation statistics</UiLabel> للنتائج النهائية، أو عندما تكون البيانات بعيدة عن التوزيع الطبيعي. اترك <UiLabel>Randomization (n)</UiLabel> على `auto` أو اكتب 2000 أو أكثر: اختبار التباديل لا يعطي قيمة p أصغر من 1 مقسوماً على هذا العدد، والتصحيح يحتاج قيم p صغيرة. |
+| <UiLabel>Use bootstrap statistics</UiLabel> | لا | باقٍ للتحليلات القديمة فقط. EEGLAB نفسه يحذّر أنه يبالغ في الدلالة للبيانات المزدوجة. استخدم التباديل بدلاً منه. |
+| العتبة | 0.05 | `exact` (فارغ) يعرض قيم p بدل الأشرطة، وهذا مفيد للاستكشاف. |
+| التصحيح | FDR | Bonferroni و Holm أشدّ، ويضيّعان آثاراً حقيقية أكثر. تصحيح العناقيد (Fieldtrip-lite) للآثار الممتدة في الزمن أو عبر القنوات. لا تترك التصحيح أبداً لنتيجة نهائية. |
+| <UiLabel>Plot marginal statistics (unckeck to plot main effect)</UiLabel> | غير مفعّل (الأثر الرئيسي) | فعّله لتختبر الصورة داخل كل جنس على حدة. |
+| <UiLabel>Use single trials for statistics (not recommended if more than 1 subject in the study)</UiLabel> | غير مفعّل | فقط في STUDY فيها مشارك واحد. مع مشاركين كثيرين يغيّر السؤال من الناس إلى المحاولات. |
+| النافذة الزمنية | 150 إلى 250 ms: البداية من Thorpe وزملائه (1996)، والنهاية اختيار للدرس | من سؤالك أو دراسات سابقة، مكتوبة قبل التحليل. |
+
+## أخطاء شائعة
+
+- **اختيار النافذة من الرسم ثم اختبارها.** عندها يكاد ينجح الاختبار حتماً. اكتب النافذة قبل أن تفتح الرسم.
+- **نشر الأشرطة غير المصحّحة.** مع مئات النقاط الزمنية، بعض الأشرطة صدفة. انشر النتيجة المصحّحة، واذكر التصحيح الذي استخدمته.
+- **تصديق شريط قصير منعزل.** نقطة أو نقطتان دالتان في خط الأساس، أو بعيداً عن أي أثر متوقع، أقرب إلى الصدفة منها إلى اكتشاف.
+- **ترك المتغيّر الثاني مفعّلاً عند التحويل إلى Fieldtrip.** Fieldtrip-lite لا يجري اختباراً ثنائياً. تظهر نافذة تحذير فيها `Switching to EEGLAB statistics since Fieldtrip cannot perform 2-way statistics`، وترجع النافذة إلى إحصاء EEGLAB.
+- **قراءة "غير دال" على أنها "لا فرق".** مع 14 مشاركاً، قد يفشل أثر حقيقي صغير في الاختبار. غياب الشريط ليس دليلاً على غياب الأثر.
+
+{/* صندوق "من التجربة": بانتظار قصة من صاحب المشروع. لا يُكتب قبل وصولها. */}
+
+## كيف تتأكد أن الخطوة نجحت؟
+
+- **رسم Pz** للتصميم 3 فيه منحنيان في لوحة واحدة، وأشرطة داكنة على طول أسفلها في الأزمنة الدالة.
+- **السكربت يطبع** `Significant time points at Pz:` مع رقمين، والرقم بعد FDR أصغر من غير المصحّح أو يساويه.
+- **اختبار النافذة** يعرض ثلاث خرائط (animal و distractor وخريطة قيم p)، والسكربت يطبع قائمة القنوات الدالة (وقد تكون القائمة فارغة).
+- **Fieldtrip-lite:** السكربت يطبع إما عدد النقاط بعد تصحيح العناقيد، وإما السطر `Fieldtrip-lite is not installed`.
+
+<Methods>
+Animal and distractor ERPs were compared at [Pz] with paired t-tests at each time point across [14] participants (std_stat, EEGLAB 2026.1), with false discovery rate (FDR) correction across time points at q = 0.05. Mean amplitude from [150] to [250] ms, a window chosen a priori [Thorpe et al., 1996], was compared at every channel with FDR correction across channels.
+</Methods>
+
+<Callout type="note" title="مصدر البيانات">
+البيانات: نسخة STUDY من SCCN/Delorme. البيانات الأصلية: OpenNeuro ds002680 (CC0).
+</Callout>

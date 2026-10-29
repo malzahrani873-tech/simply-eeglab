@@ -1,0 +1,153 @@
+---
+title: Extracting epochs
+titleEn: Extracting epochs
+description: How to cut continuous EEG into time windows around one event type in EEGLAB, choose the window length, and check the number of epochs.
+station: 5
+order: 1
+level: core
+status: approved
+objectives:
+  - Extract epochs around a given event type from the GUI and from a script.
+  - Choose a time window that fits the question (ERP or time-frequency analysis).
+  - Check the number of epochs, the window limits, and the data dimensions.
+prerequisites: [events, iclabel]
+references:
+  - title: EEGLAB Tutorial
+    url: https://eeglab.org/tutorials/07_Extract_epochs/Extracting_Data_Epochs.html
+    section: "7. Extract Data Epochs: Extracting data epochs"
+  - title: Makoto's preprocessing pipeline
+    url: https://eeglab.ucsd.edu/wiki/Makoto%27s_preprocessing_pipeline
+    section: "§10 Epoch data"
+  - title: Applied Event-Related Potential Data Analysis (Luck)
+    url: https://socialsci.libretexts.org/Bookshelves/Psychology/Biological_Psychology/Applied_Event-Related_Potential_Data_Analysis_(Luck)
+    section: "2.07 Exercise: Epoching and Baseline Correction"
+datasets: [D1]
+startingPoint:
+  dataset: D1
+  file: eeglab_data.set
+  applied: [filtering, line-noise, bad-channels, interpolation, rereferencing, run-ica, ica-1hz-copy-weights, iclabel]
+  script: |
+    % Shortcut: if you saved D1_main_clean_lp30.set in the ICLabel lesson, keep
+    % the first line and the last three lines, and replace every line between them with:
+    % EEG = pop_loadset('D1_main_clean_lp30.set', pwd);
+    [ALLEEG, EEG, CURRENTSET, ALLCOM] = eeglab;
+    eeglabRoot = fileparts(which('eeglab'));
+    EEG = pop_loadset('eeglab_data.set', fullfile(eeglabRoot, 'sample_data'));
+    fullLocs = EEG.chanlocs;
+
+    % Main dataset: high-pass at 0.1 Hz, then 60 Hz line-noise removal
+    EEG = pop_eegfiltnew(EEG, 'locutoff', 0.1);
+    EEG = pop_eegfiltnew(EEG, 'locutoff', 58, 'hicutoff', 62, 'revfilt', 1);
+
+    % Bad channels you removed earlier, e.g. {'T7'}; leave empty if none
+    badChans = {};
+    if ~isempty(badChans)
+        EEG = pop_select(EEG, 'rmchannel', badChans);
+        EEG = pop_interp(EEG, fullLocs, 'spherical');
+    end
+
+    % Average reference, EOG channels excluded
+    eogIdx = find(ismember({EEG.chanlocs.labels}, {'EOG1', 'EOG2'}));
+    EEG = pop_reref(EEG, [], 'exclude', eogIdx);
+
+    % ICA on a 1-Hz copy, then copy the weights back
+    EEG_ica = pop_eegfiltnew(EEG, 'locutoff', 1);
+    EEG_ica = pop_runica(EEG_ica, 'icatype', 'runica', 'extended', 1);
+    EEG.icaweights  = EEG_ica.icaweights;
+    EEG.icasphere   = EEG_ica.icasphere;
+    EEG.icachansind = EEG_ica.icachansind;
+    EEG.icawinv     = [];
+    EEG.icaact      = [];
+    EEG = eeg_checkset(EEG);
+
+    % Remove components ICLabel rates above 90% Eye or Muscle
+    EEG = pop_iclabel(EEG, 'default');
+    EEG = pop_icflag(EEG, [NaN NaN; 0.9 1; 0.9 1; NaN NaN; NaN NaN; NaN NaN; NaN NaN]);
+    artifactComps = find(EEG.reject.gcompreject);
+    if ~isempty(artifactComps)
+        EEG = pop_subcomp(EEG, artifactComps, 0);
+    end
+
+    % Low-pass at 30 Hz
+    EEG = pop_eegfiltnew(EEG, 'hicutoff', 30);
+    EEG.setname = 'D1 main clean lp30';
+    EEG.filename = ''; EEG.filepath = ''; EEG.datfile = ''; EEG.saved = 'no';
+    [ALLEEG, EEG, CURRENTSET] = pop_newset(ALLEEG, EEG, 0, 'setname', 'D1 main clean lp30', 'gui', 'off');
+    eeglab redraw;
+eeglabVersion: "2026.1"
+updated: 2026-10-28
+---
+
+## Why this step matters
+
+Your data are now one continuous recording, about 4 minutes long. But an ERP question is about specific moments: what does the brain do right after the stimulus appears?
+
+So you cut a time window around each event, called an <En>epoch</En>. It starts a little before the event and ends a little after it. Every epoch starts at the same time relative to its event, so you can compare epochs and later average them.
+
+In D1, a square (`square`) appeared on the screen 80 times, and the participant pressed a button after some of them (event `rt`). We will cut around the square only.
+
+## Before and after
+
+<Figure src="extract-epochs/extract-epochs-concept.svg" alt="Channel Cz from D1 over 15 seconds with five square events every 3 seconds, each inside a window from 1 s before to 2 s after. After epoching the windows become stacked rows that all start at -1 s, with zero at the event. Total size: 32 channels × 384 time points × 80 epochs." source="D1" />
+
+## Steps in the GUI
+
+Start with the dataset `D1 main clean lp30` open, as in "Starting point".
+
+1. Open <MenuPath>Tools > Extract epochs</MenuPath>.
+2. The <UiLabel>Extract data epochs - pop_epoch()</UiLabel> window opens. Press the <UiLabel>...</UiLabel> button next to <UiLabel>Time-locking event type(s) ([]=all)</UiLabel>.
+3. A list of event types appears: `rt` and `square`. Select `square` and press <UiLabel>Ok</UiLabel>. You can also type `square` in the box directly.
+4. In <UiLabel>Epoch limits [start, end] in seconds</UiLabel>, keep the default `-1 2`: from 1 second before the event to 2 seconds after it.
+5. In <UiLabel>Name for the new dataset</UiLabel>, type `D1 epochs`.
+6. Leave <UiLabel>Out-of-bounds EEG limits if any [min max]</UiLabel> empty. Rejecting bad epochs has its own lesson, two lessons from now.
+7. Press <UiLabel>Ok</UiLabel>. The new-dataset window opens with <UiLabel>Name it:</UiLabel> set to the name you typed. Leave <UiLabel>Overwrite it in memory (set=yes; unset=create a new dataset)</UiLabel> unchecked, and press <UiLabel>Ok</UiLabel>.
+
+<Callout type="note" title="The baseline window does not open">
+The official tutorial says a baseline window opens automatically after epoching. In the EEGLAB 2026.1 code it does not; baseline correction is a separate step under <MenuPath>Tools > Remove epoch baseline</MenuPath>, and it is the topic of the next lesson.
+
+Instead of the window, the command window shows a message that starts with `Warning: Do you also want to remove the single-trial ERP baseline`. It is only a reminder, not an error.
+</Callout>
+
+## The equivalent script
+
+```matlab
+% Cut 3-s epochs around every 'square' event: 1 s before to 2 s after
+EEG = pop_epoch(EEG, {'square'}, [-1 2], 'newname', 'D1 epochs', 'epochinfo', 'yes');
+EEG = eeg_checkset(EEG);
+
+% Channels x time points x epochs
+disp(size(EEG.data));
+fprintf('Epochs: %d, from %.3f s to %.3f s\n', EEG.trials, EEG.xmin, EEG.xmax);
+```
+
+## Which value should I choose?
+
+| Goal | Window | Why |
+|---|---|---|
+| ERP only | Start at least 200 ms before the event, and end after the last ERP component you care about | The part before the event is used as the baseline in the next lesson. Example: the N400 experiment in the ERP CORE data is epoched from -200 to 800 ms. |
+| ERP plus time-frequency analysis | Longer, such as `-1 2` here | The official tutorial recommends long epochs so that low frequencies (below 10 Hz) can be analyzed. |
+| Our path on this site | `-1 2` | The EEGLAB and official-tutorial default, and long enough for both the ERP and the ERSP lessons. |
+
+**Rule of thumb:** keep the window shorter than the gap between two events when you can. In D1, squares are about 3 seconds apart and our window is 3 seconds, so no stretch of data appears in two epochs, except once (two squares 0.7 s apart at the start of the recording).
+
+**An experiment with more than one condition:** epoch around all conditions together, then pick one condition before averaging. EEGLAB has a menu for this, <MenuPath>Edit > Select epochs or events</MenuPath>, but in 2026.1 it stops on epoched data with an error. The `channel-erp-plot` lesson shows a short script that does the same. In D1 the two square positions are the two conditions, and we compare them in that lesson.
+
+## Common mistakes
+
+- **Epoching before filtering.** Filtering short epochs distorts their edges. Filter the continuous data first, then epoch, as we did in station 3.
+- **Leaving the event type empty.** An empty box means "all events", so you get 153 epochs that mix square onsets with button presses (from 154 events, because the last button press is too close to the end of the recording and its epoch is lost). Always type the event type.
+- **A window that is too short.** If the window starts at the event itself, there is no pre-event period for baseline correction. If it ends too early, you cut off late ERP components.
+- **Expecting the number of events to equal the number of epochs.** Each epoch keeps every event that falls inside it, including the button press after the square. So `length(EEG.event)` is larger than `EEG.trials`.
+- **Epochs lost at the edges of the recording.** If an event is too close to the start or end of the recording, EEGLAB drops its epoch and prints a warning in the command window. In D1 the first square comes 1 second after the start, so no epoch is lost, but with no margin: a window starting at -1.1 s would lose the first epoch.
+
+{/* "From experience" box: waiting for the project owner's story. Do not write it before it arrives. */}
+
+## How to check it worked
+
+- In the EEGLAB main window: <UiLabel>Epochs</UiLabel> is 80, <UiLabel>Frames per epoch</UiLabel> is 384, <UiLabel>Epoch start (sec)</UiLabel> is -1, and <UiLabel>Epoch end (sec)</UiLabel> is about 1.992.
+- In the command window: `size(EEG.data)` returns `32 384 80`, and the baseline reminder starting with `Warning:` appears, which is expected.
+- Open <MenuPath>Plot > Channel data (scroll)</MenuPath>: the data now appear as separate epochs with dividing lines, and each epoch has a `square` event at zero.
+
+<Methods>
+Continuous data were segmented into epochs from -1 to 2 s relative to the onset of each square stimulus (pop_epoch, EEGLAB 2026.1), yielding [80] epochs.
+</Methods>

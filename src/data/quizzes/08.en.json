@@ -1,0 +1,229 @@
+{
+  "v": 1,
+  "station": 8,
+  "lang": "en",
+  "passPercent": 80,
+  "questions": [
+    {
+      "id": "s08-q01",
+      "type": "multiple",
+      "lesson": "study-concepts",
+      "objective": 2,
+      "prompt": "Before creating a STUDY, which of these must match across the participants' files? (Select all that apply)",
+      "options": [
+        {
+          "id": "a",
+          "text": "The sampling rate"
+        },
+        {
+          "id": "b",
+          "text": "The epoch window and its number of points"
+        },
+        {
+          "id": "c",
+          "text": "Channel names in the same naming system"
+        },
+        {
+          "id": "d",
+          "text": "The number of epochs left after rejection"
+        },
+        {
+          "id": "e",
+          "text": "Event and condition names spelled the same way"
+        }
+      ],
+      "answer": [
+        "a",
+        "b",
+        "c",
+        "e"
+      ],
+      "explanation": "A STUDY neither merges nor processes the data; it trusts that the files match, so a different rate or window makes functions crash or silently go wrong. The number of epochs naturally differs between people, but note it for each participant, because an average of few epochs is weak."
+    },
+    {
+      "id": "s08-q02",
+      "type": "single",
+      "lesson": "create-study",
+      "objective": 2,
+      "prompt": "In the `pop_studywizard` window you typed `cba` for one of a participant's files, and `CBA ` with capitals and a space for their second file. What happens?",
+      "options": [
+        {
+          "id": "a",
+          "text": "EEGLAB corrects it automatically to the same participant"
+        },
+        {
+          "id": "b",
+          "text": "They become two different participants, so `Nb of subjects` shows more than 14 and each is missing a condition"
+        },
+        {
+          "id": "c",
+          "text": "EEGLAB refuses to save the STUDY with an error"
+        },
+        {
+          "id": "d",
+          "text": "`CBA ` becomes a new group"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "The STUDY builds every design, plot and statistic on these words, and a one-letter difference creates a new participant with no warning. So type one fixed code per participant in all their files, and check the counts in the main window after creating it."
+    },
+    {
+      "id": "s08-q03",
+      "type": "single",
+      "lesson": "study-design",
+      "objective": 1,
+      "prompt": "In D6 each participant has one gender (F or M), and every participant saw both animal and other pictures. How do you treat the gender variable?",
+      "options": [
+        {
+          "id": "a",
+          "text": "A within-subject variable, stored in condition, tested paired"
+        },
+        {
+          "id": "b",
+          "text": "A between-subject variable, stored in group, tested unpaired"
+        },
+        {
+          "id": "c",
+          "text": "A between-subject variable, stored in condition, tested paired"
+        },
+        {
+          "id": "d",
+          "text": "It cannot enter any design"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "A condition changes within a participant, and a group changes between participants. Gender is one value per participant, so it is between subjects and compares two groups of different people (unpaired). If you typed it as a condition, EEGLAB would treat it as within subjects, and the `paired` line would reveal it."
+    },
+    {
+      "id": "s08-q04",
+      "type": "single",
+      "lesson": "study-precompute",
+      "objective": 3,
+      "prompt": "Why do you write `'interp', 'on'` explicitly when you call `std_precomp` from a script?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Because its script default is off while the window has it ticked, so you interpolate missing channels as the GUI does"
+        },
+        {
+          "id": "b",
+          "text": "Because it removes flagged ICA components"
+        },
+        {
+          "id": "c",
+          "text": "Because it is required to save single trials"
+        },
+        {
+          "id": "d",
+          "text": "Because it replaces baseline correction"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "`Spherical interpolation of missing channels` is ticked by default in the window, but `interp` defaults to off in a script. If all files have the same channels it changes nothing, and it is better to interpolate in each participant's file before the STUDY, where you can see it. Saving single trials (`savetrials`) is always on in current EEGLAB."
+    },
+    {
+      "id": "s08-q05",
+      "type": "image",
+      "lesson": "study-plot-channels",
+      "objective": 1,
+      "prompt": "This is the group ERP window at Pz. Which design was selected in `Select design:`?",
+      "image": {
+        "src": "/quiz/08/s08-q05.webp",
+        "w": 720,
+        "h": 400,
+        "status": "pending",
+        "alt": "Two side-by-side panels titled F and M. Each panel has two curves in two colors and line styles, with a legend naming animal and distractor. The horizontal axis is time in ms and the vertical axis µV.",
+        "spec": "A screenshot or script figure from the study-plot-channels lesson on the run day (source: script): std_erpplot at Pz for design 2 (image x gender) with plotconditions = together and plotgroups = apart, that is, the left part of the study-plot-channels lesson image alone, with no scalp maps and no text naming the design or its number. EEGLAB text is English, so one version serves both languages."
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": "`image only`: the picture variable only"
+        },
+        {
+          "id": "b",
+          "text": "`image x gender`: picture within subjects, gender between subjects"
+        },
+        {
+          "id": "c",
+          "text": "A design with the group variable only"
+        },
+        {
+          "id": "d",
+          "text": "The design cannot be told from the plot"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "One panel per group (F and M), each with the conditions animal and distractor: this is the 2×2 design. `image only` gives one panel with two curves, and a group-only design gives one curve per gender with no conditions. Look at the number of panels before reading any difference, because the window remembers the last design you chose."
+    },
+    {
+      "id": "s08-q06",
+      "type": "order",
+      "lesson": "study-concepts",
+      "objective": 1,
+      "prompt": "Put the steps of a group analysis in a STUDY in order:",
+      "options": [
+        {
+          "id": "b",
+          "text": "Plot and test with a multiple-comparisons correction"
+        },
+        {
+          "id": "c",
+          "text": "Check that the participants' files match"
+        },
+        {
+          "id": "d",
+          "text": "Precompute the measures (ERP and spectrum)"
+        },
+        {
+          "id": "e",
+          "text": "Create the STUDY and enter subject, condition and group for each file"
+        }
+      ],
+      "answer": [
+        "c",
+        "e",
+        "d",
+        "b"
+      ],
+      "explanation": "Checking comes before creating, because a STUDY is created without error even if the files differ. Precomputing saves the measures that plotting and statistics read, and you can define or change designs before or after it."
+    },
+    {
+      "id": "s08-q07",
+      "type": "single",
+      "lesson": "study-statistics",
+      "objective": 2,
+      "prompt": "You test 200 time points at a 0.05 threshold, and there is no real difference between the conditions. Without correction, about how many \"significant\" points do you expect by chance?",
+      "options": [
+        {
+          "id": "a",
+          "text": "None"
+        },
+        {
+          "id": "b",
+          "text": "One"
+        },
+        {
+          "id": "c",
+          "text": "About 10"
+        },
+        {
+          "id": "d",
+          "text": "About 100"
+        }
+      ],
+      "answer": [
+        "c"
+      ],
+      "explanation": "200 × 0.05 = about 10 points by chance alone. This is the multiple comparisons problem. FDR correction raises the bar so that most chance points disappear, so the corrected count is less than or equal to the uncorrected one. Short isolated bars, especially before the stimulus, are usually this chance."
+    }
+  ]
+}

@@ -1,0 +1,168 @@
+---
+title: تنظيم الملفات والتخزين
+titleEn: Organizing files & storage
+description: كيف تصمّم مجلدات مشروعك وأسماء ملفاته، وتحسب مساحة التخزين قبل أن تبدأ، وتقرر أي مراحل تحفظها وأيها تعيد حسابها، وكيف تحوّل بياناتك إلى BIDS.
+station: 9
+order: 5
+level: recommended
+status: approved
+objectives:
+  - يصمّم هيكل مجلدات يفصل البيانات الخام عن النتائج والكود.
+  - يسمّي ملفات كل مرحلة بأسماء ثابتة تقرأها الآلة والإنسان.
+  - يحسب مساحة التخزين المتوقعة لمشروعه قبل التشغيل.
+  - يقرر أي مراحل يحفظها وأيها يعيد حسابها، ويصدّر بياناته بصيغة BIDS.
+prerequisites: [batch-processing]
+references:
+  - title: EEGLAB Tutorial
+    url: https://eeglab.org/tutorials/04_Import/BIDS.html
+    section: "4. Import data > d. BIDS"
+  - title: EEG-BIDS (GitHub)
+    url: https://github.com/sccn/EEG-BIDS
+    section: "bids_export.m, bids_export_example.m"
+  - title: BIDS specification
+    url: https://bids-specification.readthedocs.io/
+    section: "Derivatives"
+  - title: "From raw EEG to BIDS in 2 minutes"
+    url: https://www.youtube.com/watch?v=LIiRj8-BVk4
+    section: "الفيديو كاملاً"
+    duration: "22:58"
+datasets: [D4, D1]
+startingPoint:
+  dataset: D4
+  file: sub-002_task-FaceRecognition_eeg.set
+  applied: []
+  script: |
+    [ALLEEG, EEG, CURRENTSET, ALLCOM] = eeglab;
+
+    % Run from inside faces_project, where ds002718 sits in rawdata
+    bidsRoot = fullfile(pwd, 'rawdata');
+    EEG = pop_loadset('sub-002_task-FaceRecognition_eeg.set', fullfile(bidsRoot, 'sub-002', 'eeg'));
+
+    % Show the dataset in the main EEGLAB window
+    [ALLEEG, EEG, CURRENTSET] = pop_newset(ALLEEG, EEG, 0, 'setname', 'sub-002 raw', 'gui', 'off');
+    eeglab redraw;
+eeglabVersion: "2026.1"
+updated: 2026-10-28
+---
+
+## لماذا هذه الخطوة مهمة؟
+
+مع مشارك واحد، كل شيء في مجلد واحد يكفي. مع عشرين مشاركاً وخمس مراحل معالجة، يصبح عندك مئة ملف أو أكثر. بعد شهرين لن تتذكر أي ملف نظّفته، ولا بأي إعدادات، ولا أي نسخة استخدمتها في الرسم.
+
+والتخزين يكبر أسرع مما تتوقع. كل نسخة مستمرة تحفظها من مشارك تأخذ تقريباً نفس حجم ملفه الخام. في D4 الملف الخام لكل مشارك حوالي 234 ميجابايت، وفيها 18 مشاركاً، أي حوالي 4.2 جيجابايت للبيانات الخام وحدها. إذا حفظت خمس مراحل لكل مشارك، تصل إلى حوالي 21 جيجابايت قبل أي epoch أو رسم.
+
+هذا الدرس يعطيك ثلاث قواعد قبل أن تبدأ أي مشروع: هيكل مجلدات ثابت، وأسماء ملفات ثابتة، وحساب للتخزين وقرار مسبق بما تحفظه.
+
+## قبل وبعد
+
+<Figure src="file-organization/project-tree.svg" alt="شجرة مجلد faces_project: rawdata للبيانات الخام وعليه قفل لأنه للقراءة فقط، و derivatives/eeglab فيه sub-002/eeg بملفين desc-clean و desc-epochs، و code للسكربتات، و figures للرسوم، و logs لملفات الأخطاء." source="original" />
+
+## الخطوات من الواجهة
+
+**أولاً: الهيكل**
+
+1. أنشئ مجلداً للمشروع، وفيه خمسة مجلدات فقط:
+   - `rawdata`: البيانات الخام كما نزّلتها. لا تكتب فيه شيئاً أبداً.
+   - `derivatives/eeglab`: كل ما تنتجه المعالجة، بمجلد لكل مشارك.
+   - `code`: السكربتات. هي التي تعيد إنتاج كل شيء آخر.
+   - `figures`: الرسوم النهائية.
+   - `logs`: ملفات الأخطاء التي يكتبها سكربت الدفعات من الدرس السابق.
+
+هذا نفس منطق BIDS: البيانات الخام في مكان، والمشتقات (<En>derivatives</En>) في مكان آخر، بنفس أسماء المشاركين.
+
+**ثانياً: الأسماء**
+
+2. سمِّ كل ملف من نفس الأجزاء وبنفس الترتيب: المشارك، ثم المهمة، ثم وصف المرحلة، ثم النوع. مثال: `sub-002_task-FaceRecognition_desc-clean_eeg.set`. الجزء `desc-` يقول أي مرحلة هذه، والباقي منسوخ من الملف الخام.
+3. اجعل اسم الداتاست داخل EEGLAB يقول نفس الشيء. عند الحفظ من <MenuPath>File > Save current dataset as</MenuPath> اكتب الاسم الكامل، وغيّر <UiLabel>Dataset name</UiLabel> من <MenuPath>Edit > Dataset info</MenuPath> عند الحاجة.
+
+**ثالثاً: التخزين**
+
+4. افتح مجلد `rawdata` في مستكشف الملفات، وانظر حجم ملف `.set` لمشارك واحد. اضربه في عدد المشاركين، ثم في عدد المراحل المستمرة التي تنوي حفظها.
+5. قرّر ماذا تحفظ قبل أن تشغّل. قاعدة عملية:
+   - **احفظ** ما هو بطيء أو يعتمد على حكمك: أوزان ICA، وقائمة القنوات السيئة، وأرقام المكوّنات التي حذفتها.
+   - **أعد حسابه** ما هو سريع وآلي: الفلاتر، والمرجع، والتقطيع، والخط القاعدي.
+   - **احفظ دائماً** النسخة النهائية التي تدخل الإحصاء.
+
+**رابعاً: حوّل بياناتك إلى BIDS**
+
+6. إذا كانت بياناتك الخام ليست بصيغة BIDS، فإضافة EEG-BIDS المرفقة مع EEGLAB تحوّلها. افتح <MenuPath>File > BIDS tools > BIDS export wizard (from raw EEG to BIDS)</MenuPath>، واتبع الخطوات: الملفات، ثم المهمة، ثم المشاركين، ثم الأحداث.
+7. إذا كانت عندك STUDY جاهزة، فاستخدم <MenuPath>File > BIDS tools > Export STUDY to BIDS folder</MenuPath>.
+8. افحص الناتج بـ <MenuPath>File > BIDS tools > Validate BIDS dataset</MenuPath>. يفتح صفحة الفاحص الرسمي في المتصفح.
+
+D4 نفسها مثال على BIDS جاهز: افتح مجلدها وانظر `dataset_description.json` و `README` و `task-FaceRecognition_events.json` ومجلدات `sub-002` وما بعدها.
+
+لمشاركة ملف واحد مع شخص يستخدم برنامجاً آخر، يكتبه <MenuPath>File > Export > Data to EDF/BDF/GDF file</MenuPath> بصيغة قياسية تقرؤها أغلب برامج EEG (يحتاج إضافة Biosig من درس التثبيت). استخدمه للمشاركة فقط، وأبقِ داخل مشروعك ملفات `.set` ومجلد BIDS.
+
+## السكربت المقابل
+
+```matlab
+[ALLEEG, EEG, CURRENTSET, ALLCOM] = eeglab;
+eeglabRoot = fileparts(which('eeglab'));
+
+% Project layout: raw data stay untouched, results go to derivatives
+projectRoot = pwd;   % run from inside faces_project
+bidsRoot    = fullfile(projectRoot, 'rawdata');            % ds002718 lives here
+derivRoot   = fullfile(projectRoot, 'derivatives', 'eeglab');
+folders = {bidsRoot, derivRoot, fullfile(projectRoot, 'code'), ...
+           fullfile(projectRoot, 'figures'), fullfile(projectRoot, 'logs')};
+for k = 1:numel(folders)
+    if ~exist(folders{k}, 'dir'), mkdir(folders{k}); end
+end
+
+% Storage estimate from the raw files on disk
+rawFiles  = dir(fullfile(bidsRoot, 'sub-*', 'eeg', '*_eeg.set'));
+rawGB     = sum([rawFiles.bytes]) / 1e9;
+nSubjects = numel(rawFiles);
+fprintf('%d subject(s) on disk, %.2f GB of raw data\n', nSubjects, rawGB);
+
+% Each continuous stage you save costs about one raw copy per subject
+nSavedStages = 2;   % clean continuous + epochs
+fprintf('Derivatives for these subjects: up to about %.1f GB\n', rawGB * nSavedStages);
+fprintf('Full dataset (18 subjects): about %.1f GB raw\n', 18 * rawGB / max(nSubjects, 1));
+
+% BIDS-style derivative name for one subject and one stage
+subj   = 'sub-002';
+stage  = 'clean';
+outDir = fullfile(derivRoot, subj, 'eeg');
+if ~exist(outDir, 'dir'), mkdir(outDir); end
+outName = sprintf('%s_task-FaceRecognition_desc-%s_eeg.set', subj, stage);
+fprintf('Save stage "%s" as %s\n', stage, fullfile(outDir, outName));
+
+% Small files are cheap: keep ICA weights apart from the data
+% icaInfo = struct('icaweights', EEG.icaweights, 'icasphere', EEG.icasphere, ...
+%                  'icachansind', EEG.icachansind);
+% save(fullfile(outDir, sprintf('%s_task-FaceRecognition_desc-ica.mat', subj)), '-struct', 'icaInfo');
+
+% Convert a non-BIDS dataset (here D1) to BIDS with EEG-BIDS
+data = struct('file', {fullfile(eeglabRoot, 'sample_data', 'eeglab_data.set')});
+% Practice export only: delete d1_bids when you are done
+bids_export(data, 'targetdir', fullfile(projectRoot, 'd1_bids'), ...
+    'tInfo', struct('TaskName', 'attention', 'PowerLineFrequency', 60));
+```
+
+## أي قيمة أختار؟
+
+| القرار | الاختيار في الدرس | لماذا |
+|---|---|---|
+| مكان البيانات الخام | `rawdata`، للقراءة فقط | إذا خرّبت ملفاً خاماً بالخطأ لا يمكن إصلاحه. كل ما بعده يُعاد من السكربت. |
+| مكان النتائج | `derivatives/eeglab/sub-XXX/eeg` | نفس منطق مواصفات BIDS للمشتقات، فيفهمه أي باحث، وتقرؤه أدوات BIDS. |
+| عدد المراحل المحفوظة | اثنتان: النسخة النظيفة المستمرة، ثم الـ epochs | تكفي لإعادة أي تحليل لاحق بدون تشغيل ICA من جديد. |
+| ما يُحفظ منفصلاً | أوزان ICA، والقنوات السيئة، والمكوّنات المحذوفة | صغيرة جداً، وهي نتيجة ساعات حساب أو قرارات بعينك. |
+| ملف أو ملفان لكل داتاست | ملفان، `.set` و `.fdt` (افتراضي EEGLAB 2026.1) | تُحمَّل البيانات أسرع في الـ STUDY. انسخ الملفين أو انقلهما معاً دائماً. خيار الملف `.set` الواحد في <MenuPath>File > Preferences</MenuPath>. |
+| صيغة الأرقام | single (افتراضي EEGLAB) | double يضاعف الحجم بلا فائدة لبيانات EEG. |
+
+## أخطاء شائعة
+
+- **الحفظ فوق الملف الخام.** <MenuPath>File > Resave current dataset(s)</MenuPath> يكتب فوق الملف المفتوح. استخدم دائماً <MenuPath>File > Save current dataset as</MenuPath> مع اسم المرحلة.
+- **حفظ كل مرحلة "احتياطاً".** خمس مراحل في 18 مشاركاً تعني أكثر من 20 جيجابايت من D4 وحدها، وأغلبها يُعاد حسابه في دقائق.
+- **أسماء مثل `final2_new_REAL.set`.** بعد شهر لا أحد يعرف الفرق. اسم المرحلة في `desc-` يكفي، والإعدادات مكانها السكربت في `code`.
+- **فصل السكربت عن النتائج.** نتيجة بلا السكربت الذي أنتجها لا يمكن إعادتها. احفظ السكربت مع كل تشغيل، أو استخدم نظام نسخ مثل git لمجلد `code`.
+
+{/* صندوق "من التجربة": مكان قصة صاحب المشروع عن 160 جيجابايت. بانتظار تفاصيلها منه. لا يُكتب قبل وصولها. */}
+
+## كيف تتأكد أن الخطوة نجحت؟
+
+- مجلد المشروع فيه الخمسة مجلدات، ولم يتغيّر أي ملف في `rawdata` منذ نزّلته.
+- السكربت يطبع عدد المشاركين وحجم بياناتهم الخام والتقدير الكلي.
+- كل ملف في `derivatives` اسمه يبدأ بـ `sub-` ويحتوي `desc-` باسم مرحلته.
+- المجلد `d1_bids` فيه `dataset_description.json` ومجلد `sub-001`.

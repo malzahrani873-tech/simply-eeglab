@@ -1,0 +1,197 @@
+---
+title: Running ICA
+titleEn: Running ICA
+description: How to run independent component analysis (ICA) in EEGLAB on a copy filtered at 1 Hz, then copy its weights back to your original data.
+station: 4
+order: 3
+level: core
+status: approved
+objectives:
+  - Run an ICA decomposition from the GUI and from a script on a copy filtered at 1 Hz, and copy the weights to the original data.
+  - Display the ICA component scalp maps and recognize a clear blink component.
+  - Check that the ICA weights were saved in the dataset.
+prerequisites: [ica-concept, filtering]
+references:
+  - title: EEGLAB Tutorial
+    url: https://eeglab.org/tutorials/06_RejectArtifacts/RunICA.html
+    section: "6. Reject artifacts > d. Indep. Comp. Analysis: Running ICA decompositions"
+  - title: EEGLAB Tutorial
+    url: https://eeglab.org/tutorials/06_RejectArtifacts/RunICA.html
+    section: "How to deal with the aggressive high-pass filter applied before running ICA"
+  - title: EEGLAB Tutorial
+    url: https://eeglab.org/tutorials/06_RejectArtifacts/RunICA.html
+    section: "Issues with data rank deficiencies"
+  - title: Luck, Applied Event-Related Potential Data Analysis (1st edition)
+    url: https://socialsci.libretexts.org/Bookshelves/Psychology/Biological_Psychology/Applied_Event-Related_Potential_Data_Analysis_(Luck)
+    section: "Chapter 9: Artifact Correction with ICA"
+  - title: "ICA applied to EEG part 7: Running ICA in EEGLAB and visualizing components"
+    url: https://www.youtube.com/watch?v=2hrYEYSycGI
+    section: "Full video"
+    duration: "11:55"
+datasets: [D1]
+startingPoint:
+  dataset: D1
+  file: eeglab_data.set
+  applied: [filtering, line-noise, bad-channels, interpolation, rereferencing]
+  script: |
+    [ALLEEG, EEG, CURRENTSET, ALLCOM] = eeglab;
+    eeglabRoot = fileparts(which('eeglab'));
+    EEG = pop_loadset('eeglab_data.set', fullfile(eeglabRoot, 'sample_data'));
+    fullLocs = EEG.chanlocs;
+
+    % Main dataset: high-pass at 0.1 Hz, then 60 Hz line-noise removal
+    EEG = pop_eegfiltnew(EEG, 'locutoff', 0.1);
+    EEG = pop_eegfiltnew(EEG, 'locutoff', 58, 'hicutoff', 62, 'revfilt', 1);
+
+    % Bad channels you removed earlier, e.g. {'T7'}; leave empty if none
+    badChans = {};
+    if ~isempty(badChans)
+        EEG = pop_select(EEG, 'rmchannel', badChans);
+        EEG = pop_interp(EEG, fullLocs, 'spherical');
+    end
+
+    % Average reference, EOG channels excluded
+    eogIdx = find(ismember({EEG.chanlocs.labels}, {'EOG1', 'EOG2'}));
+    EEG = pop_reref(EEG, [], 'exclude', eogIdx);
+    EEG.filename = ''; EEG.filepath = ''; EEG.datfile = ''; EEG.saved = 'no';
+    [ALLEEG, EEG, CURRENTSET] = pop_newset(ALLEEG, EEG, 0, 'setname', 'D1 main', 'gui', 'off');
+    eeglab redraw;
+interactive: []
+eeglabVersion: "2026.1"
+updated: 2026-10-28
+---
+
+## Why this step matters
+
+Every channel records a mix of sources: brain activity, eye blinks, muscles, and the heart. Independent component analysis (ICA) unmixes this into separate sources, each called an ICA component.
+
+You then remove the artifact components, meaning the non-brain signals, and keep the rest. You do not remove any channel or any part of the recording.
+
+In this lesson you only run ICA. Classifying and removing components is the ICLabel lesson.
+
+<Callout type="warning">
+**The rule of this lesson:** ICA is computed on a copy filtered at 1 Hz, not on the ERP data filtered at 0.1 Hz.
+</Callout>
+
+The reason is that slow drift confuses ICA, and the official tutorial says decompositions are notably higher quality with a high-pass above 1 Hz. But a 1 Hz filter distorts slow ERP components such as P3.
+
+The solution is two copies of the same data:
+
+1. **The ICA copy**, filtered at 1 Hz, used only to compute ICA.
+2. **The main dataset**, filtered at 0.1 Hz, which receives the ICA result and carries on to the analysis.
+
+The ICA result is a set of weights, a fixed way of combining channels. That is why it is valid to apply it to the main dataset, as the official tutorial explains.
+
+## Before and after
+
+Running ICA alone does not change your signal. You see the before-and-after effect in the ICLabel lesson.
+
+<Figure src="run-ica/ica-two-copies.svg" alt="Two copies of the same data: the main dataset with a 0.1 Hz high-pass and the ICA copy with a 1 Hz high-pass. ICA runs on the ICA copy, then the weights are copied back to the main dataset." source="original" />
+
+<Figure src="run-ica/run-ica-maps-20.png" alt="Scalp maps of the first 20 ICA components of D1, numbered IC 1 to IC 20, in the EEGLAB default colours." source="D1" />
+
+## Steps in the GUI
+
+Start with the main dataset loaded, as in the Starting point. We call it dataset 1.
+
+**First: create the ICA copy**
+
+1. Make sure dataset 1 is current in the <MenuPath>Datasets</MenuPath> menu.
+2. Open <MenuPath>Tools > Filter the data > Basic FIR filter (new, default)</MenuPath>.
+3. In <UiLabel>Lower edge of the frequency pass band (Hz)</UiLabel>, type `1`. Leave the other fields as they are and press <UiLabel>OK</UiLabel>.
+4. Name the new dataset `D1 ica1hz` and leave <UiLabel>Overwrite it in memory (set=yes; unset=create a new dataset)</UiLabel> unchecked. You now have dataset 2, and dataset 1 is unchanged.
+
+<Callout type="note" title="Why 1 Hz on top of 0.1 Hz?">
+The main dataset is already filtered at 0.1 Hz. A 1 Hz filter on top of it gives almost the same result as filtering the raw data at 1 Hz, because the higher filter decides what remains.
+</Callout>
+
+**Second: run ICA on the ICA copy**
+
+1. With dataset 2 current, open <MenuPath>Tools > Decompose data by ICA</MenuPath>.
+2. In <UiLabel>ICA algorithm to use (click to select)</UiLabel>, keep the first option, <UiLabel>Extended Infomax (runica.m; default)</UiLabel>. The options field below shows `'extended', 1`.
+3. Keep <UiLabel>Reorder components by variance (if that's not already the case)</UiLabel> checked, leave <UiLabel>Use only channel type(s) or indices</UiLabel> empty, and press <UiLabel>OK</UiLabel>.
+4. A window may say that the data rank is lower than the number of channels, with a <UiLabel>Proposed rank:</UiLabel> field. Compare it with the expected rank: the number of channels, minus the interpolated channels, minus 1 for the average reference. In D1 it is 31 out of 32. If the number differs, type the expected one, then press <UiLabel>OK</UiLabel>.
+5. Wait. The command window prints the training steps, which can take from under a minute to a few minutes depending on your computer.
+
+**Third: display the component maps**
+
+1. Open <MenuPath>Plot > Component maps > In 2-D</MenuPath> and keep the defaults.
+2. Look for the blink component: a strong map at the front of the head, symmetric between left and right. It is usually among the first components.
+
+**Fourth: copy the weights to the main dataset**
+
+1. Go back to dataset 1 from the <MenuPath>Datasets</MenuPath> menu.
+2. Open <MenuPath>Edit > Dataset info</MenuPath>.
+3. Next to <UiLabel>ICA weights array or text/binary file (if any):</UiLabel>, press <UiLabel>from other dataset</UiLabel>, type `2`, then <UiLabel>OK</UiLabel>. Three fields fill in automatically: `ALLEEG(2).icaweights`, `ALLEEG(2).icasphere`, and `ALLEEG(2).icachansind`.
+4. Press <UiLabel>OK</UiLabel> to close the window.
+5. Save the main dataset with <MenuPath>File > Save current dataset as</MenuPath>. The ICLabel lesson starts from it.
+
+## The equivalent script
+
+```matlab
+% Main dataset (high-pass 0.1 Hz, line noise removed, average reference) is in EEG
+EEG_main = EEG;
+
+% ICA copy: same data, high-pass at 1 Hz
+EEG_ica = pop_eegfiltnew(EEG_main, 'locutoff', 1);
+EEG_ica.setname = 'D1 ica1hz';
+
+% Expected rank: channels - interpolated channels - 1 (average reference)
+expectedRank = EEG_ica.nbchan - numel(badChans) - 1;
+fprintf('Expected data rank: %d\n', expectedRank);
+
+% Extended Infomax on the ICA copy
+EEG_ica = pop_runica(EEG_ica, 'icatype', 'runica', 'extended', 1);
+% If "Data rank (N)" is missing or N differs from expectedRank, run instead:
+% EEG_ica = pop_runica(EEG_ica, 'icatype', 'runica', 'extended', 1, 'pca', expectedRank);
+
+% Copy the decomposition back to the main dataset
+EEG_main.icaweights  = EEG_ica.icaweights;
+EEG_main.icasphere   = EEG_ica.icasphere;
+EEG_main.icachansind = EEG_ica.icachansind;
+EEG_main.icawinv     = [];   % recomputed by eeg_checkset
+EEG_main.icaact      = [];
+EEG = eeg_checkset(EEG_main);
+
+% Scalp maps of the first 20 components
+pop_topoplot(EEG, 0, 1:20);
+
+EEG = pop_saveset(EEG, 'filename', 'D1_main_ica.set', 'filepath', pwd);
+```
+
+In a script, the rank window does not appear. `pop_runica` tries to detect the reduced rank, but its estimate can fail. When it detects it, it prints a line such as `Data rank (31) is smaller than the number of channels (32)`. Compare that number with the `Expected data rank` the script printed. If the line is missing or the numbers differ, use the commented line that passes `'pca'` with the expected value. If your data has bad channels, for example 32 channels with 2 interpolated, the expected rank is 29.
+
+<Callout type="note" title="The two-copy method">
+The full explanation of the two-copy method, and when you need 2 Hz instead of 1, is in the next lesson: 1-Hz filtering for ICA & copying weights.
+</Callout>
+
+## Which value should I choose?
+
+| Setting | Value | Why |
+|---|---|---|
+| High-pass for the ICA copy | 1 Hz, or 2 if components stay ambiguous | Official tutorial: ICA quality is notably higher above 1 Hz, sometimes 2 (RunICA page). |
+| Algorithm | Extended Infomax (`runica`) | The default in EEGLAB 2026.1, used in the official tutorial. Alternatives such as AMICA and Picard are in an optional lesson. |
+| Channels | All EEG channels. In D1 we keep `EOG1` and `EOG2` | The two eye channels record the same blinks we want to isolate, and the official tutorial runs ICA on all 32 channels of D1. |
+| Number of components | Equal to the data rank: 31 in D1 after average reference | Average reference reduces the rank by one, and ICA does not behave well when asked for more components than the rank (RunICA page). |
+
+## Common mistakes
+
+- **Computing ICA on 0.1 Hz data, or continuing the ERP on the 1 Hz copy.** The first gives a weaker decomposition, the second distorts P3 and N400. The two copies together are the solution.
+- **Trusting the automatic rank estimate.** `pop_runica` tries to detect the rank, but the estimate can fail. Signs of a missed rank: several components that look almost identical or like pure noise, or ICA that does not converge. Always compare the printed `Data rank` with the expected rank (channels minus interpolated channels minus 1). If they differ, type `'pca', 31` in the options field, with your expected number instead of 31.
+- **Non-brain channels slipping in by accident.** Exclude EOG and ECG channels according to your goal, and never let them in without a decision. Use <UiLabel>Use only channel type(s) or indices</UiLabel> to choose the channels. In D1 we decided to keep the two eye channels for a clear reason.
+- **Expecting the same result every time.** ICA shuffles the data order at random during training, so the order and shape of components vary slightly between runs. Your component order may not match the picture in this lesson: the blink may be component 1 here and component 3 for you. Find a component by its shape, not its number.
+- **Changing the reference after ICA.** The weights are tied to the reference used when ICA was computed. Re-reference before ICA and leave it unchanged afterward. EEGLAB itself warns you if you change it.
+
+{/* "From experience" box: waiting for the project owner's story. Do not write it before it arrives. */}
+
+## How to check it worked
+
+1. **In the main EEGLAB window**, with dataset 1 current, <UiLabel>ICA weights</UiLabel> should show <UiLabel>Yes</UiLabel>.
+2. **In the command window**, type `size(EEG.icawinv)`. In D1 without interpolated channels it shows `32 31`: 32 channels and 31 ICA components. Each interpolated channel reduces the number of components by one.
+3. **Open the component maps** with <MenuPath>Plot > Component maps > In 2-D</MenuPath> on dataset 1. You should see the same maps as on the ICA copy, including the blink component.
+4. **Reload the saved file** with <MenuPath>File > Load existing dataset</MenuPath>, and check that <UiLabel>ICA weights</UiLabel> still shows <UiLabel>Yes</UiLabel>.
+5. **The rank matches:** the `Data rank` that `pop_runica` printed equals the `Expected data rank`. In D1 both are 31.
+
+<Methods>
+Independent component analysis (extended Infomax; Lee et al., 1999) was computed with runica ([31] components after PCA reduction to the data rank) on a copy of the data high-pass filtered at 1 Hz, and the resulting weights were applied to the 0.1 Hz high-pass filtered data.
+</Methods>

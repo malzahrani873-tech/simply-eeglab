@@ -1,0 +1,137 @@
+---
+title: جودة البيانات SME
+titleEn: Data quality (SME)
+description: كيف تقرأ قيم SME التي يحسبها ERPLAB أثناء المتوسط، وتقارنها بين المشاركين لتقرر هل بيانات مشارك تصلح للتحليل.
+station: 6
+order: 5
+level: optional
+status: review
+objectives:
+  - يعرض قيم aSME لـ ERPset في جدول ERPLAB، ويقرأها لكل قناة ونافذة زمنية.
+  - يجمع SME لقناة ونافذة واحدة عبر كل المشاركين في سكربت، ويحدد المشارك الشاذ.
+  - يشرح لماذا SME أفضل من عدد المحاولات وحده لوصف جودة بيانات مشارك.
+prerequisites: [erplab-amplitude-latency]
+references:
+  - title: ERPLAB Toolbox wiki
+    url: https://github.com/ucdavis/erplab/wiki/ERPLAB-Data-Quality-Metrics
+    section: "ERPLAB Data Quality Metrics"
+  - title: Applied Event-Related Potential Data Analysis (Luck)
+    url: https://socialsci.libretexts.org/Bookshelves/Psychology/Biological_Psychology/Applied_Event-Related_Potential_Data_Analysis_(Luck)/06:_Assigning_Events_to_Bins_Averaging_Baseline_Correction_and_Assessing_Data_Quality
+    section: "Chapter 6: Assessing Data Quality (6.7 The Signal-to-Noise Ratio)"
+  - title: Applied ERP Data Analysis, data master folder
+    url: https://doi.org/10.18115/D50056
+    section: "Chapter_10 folder"
+datasets: [D3]
+startingPoint:
+  dataset: D3
+  file: Chapter_10/Data/ERPsets
+  applied: []
+  script: |
+    [ALLEEG, EEG, CURRENTSET, ALLCOM] = eeglab;
+
+    % The 40 single-participant ERPsets from chapter 10 of Luck's book
+    dataDir = fullfile(pwd, 'Chapter_10', 'Data', 'ERPsets');
+    files = dir(fullfile(dataDir, '*.erp'));
+    ALLERP = [];   % start from an empty ERPset list
+    [ERP, ALLERP] = pop_loaderp('filename', {files.name}, 'filepath', dataDir, ...
+        'UpdateMainGui', 'on');
+    fprintf('Loaded %d ERPsets\n', numel(ALLERP));
+    eeglab redraw
+eeglabVersion: "2026.1"
+updated: 2026-10-28
+---
+
+## لماذا هذه الخطوة مهمة؟
+
+نبدأ هذا الدرس من ERPsets جاهزة من كتاب Luck (الفصل 10). بناء ERPset من بياناتك يشرحه الكتاب في الفصلين 2 و 6.
+
+عدد المحاولات لا يكفي لوصف جودة بيانات مشارك. مشارك عنده 100 محاولة كلها ضوضاء أسوأ من مشارك عنده 60 محاولة نظيفة. ما تحتاجه رقم يقول: كم يمكن أن يتغيّر قياسي لو أعدت التجربة على نفس المشارك؟
+
+هذا الرقم هو <En>SME</En>: مقياس لدقة قياس الـ ERP عند مشارك واحد؛ كلما صغر كانت البيانات أفضل. وحدته الميكروفولت، مثل القياس نفسه. ERPLAB يحسب نسخته التحليلية (<En>aSME</En>) تلقائياً أثناء المتوسط، لقياس متوسط السعة في نوافذ بعرض 100 ميلي ثانية حول الصفر (مثل 0 إلى 100، و 100 إلى 200). لقمة السعة والكمون يحتاج نسخة أخرى بالـ bootstrap، يشرحها Luck في الفصل 10.
+
+<Callout type="note" title="لماذا C3 في 200 إلى 300؟">
+النوافذ الجاهزة في الملفات بعرض 100 ميلي ثانية، ومحسوبة لكل قناة لا لموجة الفرق. لذلك نستخدم هنا C3 في النافذة 200 إلى 300، داخل نافذة الـ LRP، كمؤشر عام على جودة بيانات المشارك. هذا ليس دقة القياس الذي تعلّمته في الدرس السابق (150 إلى 400 على موجة الفرق)؛ ذلك يحتاج bSME، وسكربته `LRP_bSME.m` مع ملفات الفصل 10.
+</Callout>
+
+الفكرة العملية: قارن SME بين المشاركين. المشارك الذي قيمة SME لديه أكبر بكثير من الباقين يضيف ضوضاء للتحليل كله، ويستحق نظرة قبل أن يدخل الإحصاء.
+
+## قبل وبعد
+
+<ImageSpec>
+رسم نقاط: المحور الأفقي المشاركون من 1 إلى 40، والرأسي aSME بالميكروفولت عند C3 في النافذة من 200 إلى 300 ميلي ثانية، bin 1. خط أفقي عند الوسيط، وخط متقطع عند ضعف الوسيط. أغلب النقاط قريبة من الوسيط، والنقاط فوق الخط المتقطع ملوّنة بلون مختلف مع رقم المشارك. المصدر: سكربت على بيانات الفصل 10 من كتاب Luck. البيانات: ERP CORE، رخصة الصورة CC BY-SA 4.0.
+</ImageSpec>
+
+## الخطوات من الواجهة
+
+ابدأ والـ ERPsets الأربعون من `Chapter_10/Data/ERPsets` محمّلة، كما في "نقطة البداية". ERPLAB مثبّت من الدرس السابق.
+
+1. من قائمة <MenuPath>ERPsets</MenuPath> اختر أول ERPset.
+2. افتح <MenuPath>ERPLAB > Data Quality viewing (ERPs only) > Summarize Data Quality (min, median, max)</MenuPath>. تطبع نافذة الأوامر أصغر قيمة aSME والوسيط وأكبر قيمة، ومكان كل منها (القناة والنافذة والـ bin).
+3. افتح <MenuPath>ERPLAB > Data Quality viewing (ERPs only) > Show Data Quality measures in table</MenuPath>.
+4. في <UiLabel>Selected DQ Measure:</UiLabel> اختر `aSME`، وفي <UiLabel>Selected BIN:</UiLabel> اختر bin 1.
+5. الجدول فيه صف لكل قناة وعمود لكل نافذة زمنية في <UiLabel>Time-windows</UiLabel>. فعّل <UiLabel>Color heatmap</UiLabel> لتلوين القيم الكبيرة.
+6. فعّل <UiLabel>Outliers</UiLabel>، واترك <UiLabel>Std from mean</UiLabel> على قيمته. تُعلَّم القنوات التي SME عندها بعيد عن متوسط القنوات، وغالباً تكون قناة سيئة عند هذا المشارك.
+7. للمقارنة بين المشاركين، اضغط <UiLabel>Select ERPset</UiLabel> واختر مشاركاً آخر. لمقارنة الأربعين معاً، استخدم السكربت.
+
+<Callout type="note" title="هل في الملفات قيم جودة؟">
+لتعرف هل الملفات فيها قيم جودة، افتح <MenuPath>ERPLAB > Data Quality viewing (ERPs only) > Show which Data Quality measures are in each loaded ERPSET</MenuPath>. إذا لم يظهر `aSME`، فالملف بُني بدون حساب الجودة. الحل أن تعيد المتوسط من <MenuPath>ERPLAB > Compute averaged ERPs</MenuPath> مع تفعيل حساب الجودة، كما في الفصل 6 من كتاب Luck.
+</Callout>
+
+## السكربت المقابل
+
+```matlab
+% aSME at C3, 200-300 ms window, bin 1, for every participant
+c3 = find(strcmp({ALLERP(1).chanlocs.labels}, 'C3'));
+nSets = numel(ALLERP);
+sme = nan(nSets, 1);
+for k = 1:nSets
+    dq = ALLERP(k).dataquality;
+    iA = find(strcmpi({dq.type}, 'aSME'));
+    if isempty(iA)
+        error('ERPset %d has no aSME values', k);
+    end
+    tw = dq(iA).times;   % one row per time window, in ms
+    iW = find(tw(:, 1) == 200 & tw(:, 2) == 300);
+    sme(k) = dq(iA).data(c3, iW, 1);   % channels x windows x bins
+end
+
+% Summary across participants
+fprintf('aSME at C3, 200-300 ms: median %.2f uV, RMS %.2f uV\n', ...
+    median(sme), sqrt(mean(sme.^2)));
+
+% Participants with aSME more than twice the median
+outliers = find(sme > 2 * median(sme));
+fprintf('Participants to inspect: %s\n', mat2str(outliers'));
+
+% Same summary as the GUI, for one ERPset
+dq_summary(ALLERP(1));
+```
+
+## أي قيمة أختار؟
+
+| الإعداد | القيمة | لماذا |
+|---|---|---|
+| النافذة الزمنية | النافذة التي ستقيس فيها فعلاً | SME يصف دقة قياس معيّن. SME لنافذة 200 إلى 300 لا يصف دقة قياس 150 إلى 400. يمكن تحديد نوافذ مخصّصة عند المتوسط. |
+| القناة | قناة القياس نفسها | هنا C3 لأن الـ LRP يُقاس عند C3 و C4. |
+| حد "المشارك الشاذ" | لا رقم عام. ضعف الوسيط هنا مثال للفحص فقط، وليس معياراً منشوراً | القرار يُتخذ قبل رؤية النتائج، ويُكتب في الورقة. المشارك الشاذ يُفحص أولاً، لا يُحذف تلقائياً. |
+| تجميع المشاركين | RMS بدل المتوسط | ويكي ERPLAB يوصي بالـ RMS لأنه أقرب لأثر الضوضاء على قوة الاختبار الإحصائي. |
+
+## أخطاء شائعة
+
+- **الحكم بعدد المحاولات فقط.** عدد المحاولات جزء من SME، لكن الضوضاء في كل محاولة جزء آخر. انظر لـ SME.
+- **استخدام aSME لقمة السعة.** aSME يصف متوسط السعة فقط. للقمة والكمون تحتاج bootstrap (bSME)، وسكربته مع ملفات الفصل 10 في كتاب Luck.
+- **مقارنة SME من نوافذ أو قنوات مختلفة.** القيم تختلف بين القنوات والنوافذ طبيعياً. قارن نفس القناة ونفس النافذة بين المشاركين.
+- **حذف مشارك بعد رؤية أنه "يفسد" النتيجة.** معيار الاستبعاد يُحدَّد قبل التحليل. وإلا صار اختياراً للنتيجة التي تريدها.
+
+{/* صندوق "من التجربة": بانتظار قصة من صاحب المشروع. لا يُكتب قبل وصولها. */}
+
+## كيف تتأكد أن الخطوة نجحت؟
+
+- `numel(ALLERP)` يساوي 40، ولا تظهر رسالة `has no aSME values`.
+- `sme` فيه 40 قيمة موجبة، كلها بالميكروفولت، وأغلبها قريب من الوسيط.
+- نافذة الأوامر تطبع قائمة المشاركين للفحص، وقد تكون فارغة.
+- الجدول في الواجهة لأول ERPset يعطي عند C3 والنافذة 200 إلى 300 نفس قيمة `sme(1)`.
+
+<Methods>
+Data quality was quantified for each participant with the analytic standardized measurement error (aSME) of mean amplitude from 200 to 300 ms at C3 (ERPLAB 13.10; Luck et al., 2021).
+</Methods>

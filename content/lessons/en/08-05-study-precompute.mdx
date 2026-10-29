@@ -1,0 +1,218 @@
+---
+title: Precomputing measures
+titleEn: Precomputing measures
+description: "How to precompute ERPs, spectra and ERSPs for every participant's channels in EEGLAB, what the interpolation and ICA options mean, and the disk cost."
+station: 8
+order: 5
+level: core
+status: approved
+objectives:
+  - Compute channel ERPs and spectra for all participants with Study > Precompute channel measures.
+  - Compute ERSP and ITC at every channel on a light time-frequency grid with a script, and justify the grid by the file size.
+  - Choose when to interpolate missing channels and when to remove flagged ICA components, and locate the files and their size.
+prerequisites: [study-design]
+references:
+  - title: EEGLAB Tutorial
+    url: https://eeglab.org/tutorials/10_Group_analysis/study_data_visualization_tools.html
+    section: "10. Group analysis > Precomputing ERPs"
+  - title: EEGLAB Tutorial
+    url: https://eeglab.org/tutorials/11_Scripting/command_line_study_functions.html
+    section: "11. Scripting > Computing measures"
+  - title: Go-nogo categorization and detection task (OpenNeuro ds002680)
+    url: https://openneuro.org/datasets/ds002680
+    section: "README"
+datasets: [D6]
+startingPoint:
+  dataset: D6
+  file: animal_mine.study
+  applied: [create-study, study-design]
+  script: |
+    [ALLEEG, EEG, CURRENTSET, ALLCOM] = eeglab;
+    % Folder for the course data (change it)
+    dataFolder = 'C:\Users\me\Documents\eeg-course';
+
+    % Download the ready Go-nogo STUDY once and unzip it in its own folder
+    zipDir = fullfile(dataFolder, 'animal_study');
+    studyFile = dir(fullfile(zipDir, '**', 'animal.study'));
+    if isempty(studyFile)
+        zipFile = fullfile(dataFolder, 'animal_study.zip');
+        websave(zipFile, 'https://sccn.ucsd.edu/eeglab/download/animal_study.zip');
+        unzip(zipFile, zipDir);
+        studyFile = dir(fullfile(zipDir, '**', 'animal.study'));
+    end
+    studyDir = studyFile(1).folder;
+
+    % Convert the old .dat data files to .fdt once: resaving them in their old format damages the data in EEGLAB 2026.1
+    setFiles = dir(fullfile(studyDir, '*', '*.set'));
+    for k = 1:numel(setFiles)
+        [~, base] = fileparts(setFiles(k).name);
+        folder = setFiles(k).folder;
+        if ~exist(fullfile(folder, [base '.fdt']), 'file')
+            TMP = pop_loadset('filename', setFiles(k).name, 'filepath', folder);
+            pop_saveset(TMP, 'filename', setFiles(k).name, 'filepath', folder, 'savemode', 'twofiles');
+            if exist(fullfile(folder, [base '.fdt']), 'file') && exist(fullfile(folder, [base '.dat']), 'file')
+                delete(fullfile(folder, [base '.dat']));
+            end
+        end
+    end
+
+    % Rebuild animal_mine.study (create-study lesson) if it is missing
+    if ~exist(fullfile(studyDir, 'animal_mine.study'), 'file')
+        gender = containers.Map( ...
+            {'cba','clm','ega','fsa','gro','hth','lmi','mba','mma','mta','pla','sce','sph','wpa'}, ...
+            {'F',  'F',  'F',  'M',  'M',  'M',  'F',  'F',  'M',  'F',  'M',  'F',  'M',  'M'});
+        files = dir(fullfile(studyDir, '*', '*.set'));
+        commands = {};
+        for k = 1:numel(files)
+            hdr = pop_loadset('filename', files(k).name, 'filepath', files(k).folder, 'loadmode', 'info');
+            subj = hdr.subject;
+            if isempty(subj), [~, subj] = fileparts(files(k).folder); end
+            cond = hdr.condition;
+            if isempty(cond)
+                if contains(files(k).name, 'distractor'), cond = 'distractor'; else, cond = 'animal'; end
+            end
+            if ~isKey(gender, lower(subj))
+                error('No gender entry for subject %s (%s)', subj, files(k).name);
+            end
+            commands{end+1} = {'index', k, 'load', fullfile(files(k).folder, files(k).name), ...
+                'subject', subj, 'condition', cond, 'group', gender(lower(subj))};
+        end
+        [STUDY, ALLEEG] = std_editset([], [], 'name', 'Go-nogo animal (mine)', ...
+            'task', 'Go-nogo categorization', 'commands', commands, 'updatedat', 'on');
+        STUDY = pop_savestudy(STUDY, ALLEEG, 'filename', 'animal_mine.study', ...
+            'filepath', studyDir, 'resavedatasets', 'on');
+    end
+    [STUDY, ALLEEG] = pop_loadstudy('filename', 'animal_mine.study', 'filepath', studyDir);
+
+    % Designs 2 and 3 (study-design lesson); design 2 is the current one
+    STUDY = std_makedesign(STUDY, ALLEEG, 2, 'name', 'image x gender', ...
+        'variable1', 'condition', 'values1', {'animal', 'distractor'}, 'vartype1', 'categorical', ...
+        'variable2', 'group', 'values2', {'F', 'M'}, 'vartype2', 'categorical');
+    STUDY = std_makedesign(STUDY, ALLEEG, 3, 'name', 'image only', ...
+        'variable1', 'condition', 'values1', {'animal', 'distractor'}, 'vartype1', 'categorical', ...
+        'variable2', 'none');
+    STUDY = std_selectdesign(STUDY, ALLEEG, 2);
+    STUDY = pop_savestudy(STUDY, ALLEEG, 'savemode', 'resave');
+
+    CURRENTSTUDY = 1; EEG = ALLEEG; CURRENTSET = 1:length(EEG);
+    eeglab redraw;
+eeglabVersion: "2026.1"
+updated: 2026-10-28
+---
+
+## Why this step matters
+
+To plot a group ERP, EEGLAB needs each participant's average in each condition. Computing it from the raw data every time you plot is slow, especially for spectra and ERSPs.
+
+So the STUDY computes each measure once and saves it in a file next to each participant's files. After that, plotting and statistics read straight from these files.
+
+Two points make this step more important than it looks:
+
+- **What you choose here enters every result.** The baseline, interpolation and ICA component removal are applied at compute time. If you change your mind, you compute again.
+- **EEGLAB saves every trial separately, not only the average.** This lets you select trials later in the design, but it takes a lot of space with ERSPs.
+
+## Before and after
+
+<Figure src="study-precompute/study-precompute-files.svg" alt="Before precomputing: participant sph's folder holds sphanimal.set and sphdistractor.set with their .dat data files, and below them, faded, old EEGLAB 6 files such as sphanimal.daterp and sphanimal.icaerp, labelled old, not used. After: the same folder also holds three new shaded files: sph.daterp, sph.datspec and sph.dattimef, each with a bar as long as its size." caption="Illustration; sizes are estimates until measured" source="original" />
+
+## Steps in the GUI
+
+**About the data (D6):** the same `animal_mine.study` from the creation lesson, with design 2, `image x gender`, from the design lesson. The "Starting point" script rebuilds both if it cannot find them.
+
+**1. Open the compute window**
+
+1. Run the "Starting point" script. The STUDY appears in the main window.
+2. Open <MenuPath>Study > Precompute channel measures</MenuPath>. The top of the window reads <UiLabel>Pre-compute channel measures for STUDY 'Go-nogo animal (mine)'</UiLabel>.
+
+**2. Data options (top part)**
+
+1. <UiLabel>Spherical interpolation of missing channels (performed after optional ICA removal below)</UiLabel>: keep it ticked; it is ticked by default in the window. If all files have the same channels, as you checked in the first lesson, it changes nothing.
+2. <UiLabel>Remove ICA artifactual components pre-tagged in each dataset</UiLabel>: leave it unticked for now. See "When do I remove ICA components?" below.
+3. <UiLabel>Remove artifactual ICA cluster or clusters (hold shift key)</UiLabel>: leave it unticked. It needs clusters from the component clustering lesson.
+
+**3. Measures (bottom part)**
+
+1. Tick <UiLabel>ERPs</UiLabel>, then press the <UiLabel>...</UiLabel> button next to it. The <UiLabel>Select parameters for ERP</UiLabel> window opens.
+2. In <UiLabel>Baseline (min max) ("rmbase")</UiLabel> type the epoch start in ms, then 0. Take the start from the <UiLabel>Epoch start (sec)</UiLabel> value you noted in the first lesson and multiply it by 1000. In this copy the start is -1 sec, so type `-1000 0`. Press <UiLabel>Ok</UiLabel>.
+3. Tick <UiLabel>Power spectrum</UiLabel> and keep its default value `'specmode', 'fft', 'logtrials', 'off'`.
+4. **Do not tick** <UiLabel>ERSPs</UiLabel> and <UiLabel>ITCs</UiLabel> here. The window computes them at every channel, which takes a long time and a very large amount of space. With the default grid (100 frequencies and 200 time points) they take about 1.5 GB per participant. We compute them with the script on a lighter grid.
+5. Keep <UiLabel>Overwrite files on disk</UiLabel> ticked, so that an old file with different settings is not used. If files already exist, the window asks `WARNING: SOME DATAFILES ALREADY EXIST, OVERWRITE THEM?` and warns that another STUDY on the same files may be affected. Press <UiLabel>Yes</UiLabel>: the ready `animal.study` and `animal_mine.study` share the folders, and we work on our own copy.
+6. Press <UiLabel>Ok</UiLabel>. The computation takes one to two minutes for the 14 participants, and progress lines appear in the command window.
+
+**4. ERSP and ITC with the script**
+
+Run the script below. In one call it recomputes ERPs and spectra with the same choices as the window, and adds ERSP and ITC at every channel with 20 frequencies from 3 to 30 Hz and 50 time points, instead of the default 100 frequencies and 200 time points. Why every channel and not only the two you need? In EEGLAB 2026.1, an ERSP file computed for some channels only cannot be read back: plotting stops with `Unrecognized field name "chan1"`, because the file names each channel by its number in the full list while the reader uses its place in the short list. A lighter grid at every channel avoids this and keeps the files small.
+
+**5. Look at the files**
+
+1. Open the first participant's folder (`cba`). It has three new files named with the participant code only, such as `cba.daterp`: `.daterp` (ERP), `.datspec` (spectrum) and `.dattimef` (the time-frequency decomposition of each trial). ERSP and ITC are both computed from `.dattimef` at plot time, so they have no separate file.
+2. The older files whose names include the condition, such as `cbaanimal.daterp`, are the EEGLAB 6 files from 2007. Their names differ from the new ones, so EEGLAB neither reads nor overwrites them: they stay unused. You can leave them or delete them.
+3. Notice there is one new file per participant, not one per .set file. EEGLAB puts the trials of both conditions in one file, and separates them at plot time according to the design.
+
+<Callout type="note">
+**When do I remove ICA components?** The <UiLabel>Remove ICA artifactual components pre-tagged in each dataset</UiLabel> option removes the components flagged as artifacts in each file at compute time, without changing the files themselves. It works only if the files have ICA weights and flags, which you checked in the first lesson. If ICA weights exist without flags: with the STUDY open, use <MenuPath>Tools > Classify components using ICLabel > Label components</MenuPath>, then <MenuPath>Tools > Classify components using ICLabel > Flag components as artifacts</MenuPath>. They apply to all selected files. Then tick the option and compute again. Do not tick it if the components were already removed from the data before the STUDY.
+</Callout>
+
+## The matching script
+
+```matlab
+% STUDY and ALLEEG come from the starting point script
+% ERPs and spectra as in the GUI, plus ERSP and ITC at every channel on a light grid
+% (20 frequencies from 3 to 30 Hz, 50 time points) to keep the files small
+baseline = [round(ALLEEG(1).xmin*1000) 0];   % from the epoch start to 0 ms
+[STUDY, ALLEEG] = std_precomp(STUDY, ALLEEG, {}, 'savetrials', 'on', 'interp', 'on', 'recompute', 'on', ...
+    'erp', 'on', 'erpparams', {'rmbase', baseline}, ...
+    'spec', 'on', 'specparams', {'specmode', 'fft', 'logtrials', 'off'}, ...
+    'ersp', 'on', 'itc', 'on', 'erspparams', {'cycles', [3 0.8], 'freqs', [3 30], 'nfreqs', 20, 'ntimesout', 50});
+STUDY = pop_savestudy(STUDY, ALLEEG, 'savemode', 'resave');
+
+% Files written for the first participant, with their size on disk
+first = STUDY.datasetinfo(1);
+measureFiles = dir(fullfile(first.filepath, [first.subject '.dat*']));
+for k = 1:numel(measureFiles)
+    fprintf('%-24s %8.1f MB\n', measureFiles(k).name, measureFiles(k).bytes/1e6);
+end
+fprintf('Channel groups in the STUDY: %d\n', numel(STUDY.changrp));
+```
+
+## Which value should I choose?
+
+| Option | In this lesson | General rule |
+|---|---|---|
+| Baseline (`rmbase`) | From the epoch start to 0 ms | The same baseline you used for each participant. If the data are already corrected, a second correction does no harm. |
+| Interpolation (`interp`) | on, as in the window | In the script its default is off, so write it out. It is better to interpolate missing channels in each participant's file before the STUDY, where you can see them. |
+| ICA removal (`rmicacomps`) | off | on only if components are flagged in every file and were not removed from the data before. |
+| Spectrum (`specparams`) | `'specmode', 'fft', 'logtrials', 'off'` | The default suits a first analysis. Change it only for a methodological reason. |
+| ERSP (`erspparams`) | Every channel, 20 frequencies from 3 to 30 Hz, 50 time points | A finer grid only for the frequencies and times in your research question. Keep every channel in EEGLAB 2026.1. |
+| Save trials (`savetrials`) | on | Fixed: current EEGLAB has no other choice, and the window always adds it. |
+| Recompute (`recompute`) | on | on whenever you change any option, otherwise EEGLAB reads the old files. |
+
+<Callout type="warning">
+**Disk space.** Because EEGLAB saves every trial, the `.dattimef` file is large: frequencies × time points × trials × channels. With the default settings (100 frequencies and 200 time points) and every channel it reaches about 1.5 GB per participant, about 21 GB for the 14 participants (an estimate from the file layout, measured on the run day). This is why we use a lighter grid: about 75 MB per participant, about 1 GB in all (an estimate, measured on the run day). The file organization lesson in station 9 explains where to keep these files and how to delete them safely.
+</Callout>
+
+## Common mistakes
+
+- **Changing an option without recomputing.** If you untick <UiLabel>Overwrite files on disk</UiLabel>, EEGLAB uses the existing files even if you computed them with another baseline.
+- **Computing ERSPs at every channel from the window.** The disk fills up and the computation takes a long time.
+- **Computing ERSPs at a few channels only.** The files are written, but plotting them stops with `Unrecognized field name "chan1"` in EEGLAB 2026.1. Compute at every channel with a lighter grid.
+- **Removing ICA components twice.** If you removed components from each file before the STUDY, do not tick the option here. What is still flagged may be a clean component.
+- **Taking the 2007 files for your results.** They were computed with settings you do not know, and EEGLAB does not read them. Use only the files named by participant code that you computed yourself.
+- **Moving the measure files (`.daterp` and the like) alone.** They belong to the participant's files. Move the whole folder.
+
+{/* "From experience" box: waiting for a story from the project owner. Not written before it arrives. */}
+
+## How do you know it worked?
+
+- **The first participant's folder** has three new files named with the code only, `cba.daterp`, `cba.datspec` and `cba.dattimef`, and no new `.datersp` or `.datitc`. The `cbaanimal.*` and `cbadistractor.*` files are the old ones.
+- **The script prints the size of each file.** The three are close, tens of MB each (`.dattimef` about 75 MB, an estimate) {/* daterp and datspec sizes: measured in the combined run */}, because we used a light grid for ERSPs. With the default grid, `.dattimef` would be about 1.5 GB.
+- **The script prints** the number of channel groups, `Channel groups in the STUDY`, which equals the number of channels in the files.
+- **The command window** shows no red errors and no `IMPORTANT WARNING`.
+
+<Methods>
+Channel ERPs and spectra were precomputed for each participant and condition (std_precomp), with baseline correction from [−1000] to 0 ms; with spherical interpolation of any missing channels enabled; event-related spectral perturbations were computed at every channel for [20] frequencies from [3] to [30] Hz.
+</Methods>
+
+<Callout type="note" title="About the data">
+Data: STUDY version: SCCN/Delorme. Original data: OpenNeuro ds002680 (CC0).
+</Callout>

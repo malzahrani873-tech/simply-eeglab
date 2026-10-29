@@ -1,0 +1,127 @@
+---
+import '../styles/fonts.css';
+import '../styles/global.css';
+import '../styles/site.css';
+import { t, dir, otherLang, type Lang } from '../i18n';
+import { url, asset } from '../lib/url';
+import Icon from '../components/Icon.astro';
+import Logo from '../components/Logo.astro';
+import { roadmap } from '../lib/site-data';
+
+interface Props {
+  lang: Lang;
+  title: string;
+  description?: string;
+  path: string; // page path without language prefix, e.g. "lesson/filtering/"
+  current?: 'map' | 'continue' | 'game' | 'plugins' | 'references' | 'about' | 'search' | 'progress';
+  noindex?: boolean;
+  bodyClass?: string;
+  pagefind?: boolean;
+  isHome?: boolean;
+}
+const { lang, title, description, path, current, noindex, bodyClass, isHome } = Astro.props;
+const other = otherLang(lang);
+const site = Astro.site!;
+const canonical = new URL(url(path, lang), site).href;
+const alt = (l: Lang) => new URL(url(path, l), site).href;
+const fullTitle = isHome ? t(lang, 'site.name') : `${title} ${t(lang, 'site.titleSuffix')}`;
+// "Start" opens the first lesson; with progress, the script turns it into "Continue" to the last lesson.
+const firstLesson = url(`lesson/${roadmap.nodes.find((n: any) => n.level === 'core').id}/`, lang);
+const nav = [
+  { key: 'map', href: url('', lang), label: t(lang, 'nav.map') },
+  { key: 'continue', href: firstLesson, label: t(lang, 'nav.start'), cont: true },
+  { key: 'game', href: url('ica-game/', lang), label: t(lang, 'nav.icaGame') },
+  { key: 'plugins', href: url('plugins/', lang), label: t(lang, 'nav.plugins') },
+  { key: 'references', href: url('references/', lang), label: t(lang, 'nav.references') },
+  { key: 'about', href: url('about/', lang), label: t(lang, 'nav.about') },
+];
+const continueScript = asset('scripts/continue-tab.js');
+const themeScript = asset('scripts/theme.js');
+---
+<!doctype html>
+<html lang={lang} dir={dir(lang)}>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <script is:inline>try{var t=localStorage.getItem('simplyeeglab:theme');if(t==='dark'||t==='light')document.documentElement.setAttribute('data-theme',t)}catch(e){}</script>
+  <title>{fullTitle}</title>
+  {description && <meta name="description" content={description} />}
+  {noindex && <meta name="robots" content="noindex" />}
+  <link rel="canonical" href={canonical} />
+  <link rel="alternate" hreflang="ar" href={alt('ar')} />
+  <link rel="alternate" hreflang="en" href={alt('en')} />
+  <link rel="alternate" hreflang="x-default" href={alt('ar')} />
+  <meta property="og:title" content={fullTitle} />
+  {description && <meta property="og:description" content={description} />}
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content={canonical} />
+  <meta property="og:image" content={new URL(asset(lang === 'en' ? 'og/default-en.png' : 'og/default.png'), site).href} />
+  <meta property="og:locale" content={lang === 'ar' ? 'ar_SA' : 'en_US'} />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="color-scheme" content="light dark" />
+  <link rel="icon" href={asset('favicon.svg')} type="image/svg+xml" />
+  <slot name="head" />
+</head>
+<body class={bodyClass}>
+<div class="si">
+  <a class="skip" href="#main">{t(lang, 'a11y.skipToContent')}</a>
+  <header class="hdr"><div class="wrap">
+    <a class="logo" href={url('', lang)} aria-label={t(lang, 'a11y.logoHome')}>
+      <Logo />
+      {lang === 'ar' ? <span><span lang="en">EEGLAB</span> ببساطة</span> : <span>Simply EEGLAB</span>}
+    </a>
+    <nav class="nav" aria-label={t(lang, 'nav.label')}>
+      {nav.map((n) => (
+        <a href={n.href} aria-current={current === n.key ? 'page' : undefined} data-continue={n.cont ? '' : undefined}
+          data-l-start={n.cont ? t(lang, 'nav.start') : undefined} data-l-cont={n.cont ? t(lang, 'nav.continue') : undefined}>{n.label}</a>
+      ))}
+    </nav>
+    <a class="hbtn search" href={url('search/', lang)} aria-label={t(lang, 'nav.search')}><Icon name="search" /></a>
+    <a class="hbtn lang" href={url(path, other)} lang={other} hreflang={other} data-lang-link aria-label={t(lang, 'lang.switchLabel')}>{t(lang, 'lang.switch')}</a>
+    <button class="hbtn" type="button" id="theme-btn" hidden aria-pressed="false" aria-label={t(lang, 'theme.toDark')}
+      data-to-dark={t(lang, 'theme.toDark')} data-to-light={t(lang, 'theme.toLight')}><Icon name="moon" class="ico i-moon" /><Icon name="sun" class="ico i-sun" /></button>
+  </div></header>
+
+  <main id="main" tabindex="-1">
+    <slot />
+  </main>
+
+  <footer class="ftr" id="site-footer"><div class="wrap">
+    <nav aria-label={t(lang, 'nav.more')}>
+      <a href={url('', lang)}>{t(lang, 'nav.map')}</a>
+      <a href={url('progress/', lang)}>{t(lang, 'nav.progress')}</a>
+      <a href={url('ica-game/', lang)}>{t(lang, 'nav.icaGame')}</a>
+      <a href={url('plugins/', lang)}>{t(lang, 'nav.plugins')}</a>
+      <a href={url('references/', lang)}>{t(lang, 'nav.references')}</a>
+      <a href={url('search/', lang)}>{t(lang, 'nav.search')}</a>
+      <a href={url('about/', lang)}>{t(lang, 'nav.about')}</a>
+    </nav>
+    <p style="margin:0">{t(lang, 'footer.disclaimer')}</p>
+    <p style="margin:0"><a href={url('about/#license', lang)} rel="license">{t(lang, 'footer.license')}</a></p>
+  </div></footer>
+
+  <nav class="tabs" aria-label={t(lang, 'nav.tabs')}>
+    <a href={url('', lang)} aria-current={current === 'map' ? 'page' : undefined}><Icon name="map" />{t(lang, 'nav.map')}</a>
+    <a href={firstLesson} data-continue data-l-start={t(lang, 'nav.start')} data-l-cont={t(lang, 'nav.continue')} aria-current={current === 'continue' ? 'page' : undefined}><Icon name="play" /><span>{t(lang, 'nav.start')}</span></a>
+    <a href={url('ica-game/', lang)} aria-current={current === 'game' ? 'page' : undefined}><Icon name="wave" />{t(lang, 'nav.icaGame')}</a>
+    <a href={url('search/', lang)} aria-current={current === 'search' ? 'page' : undefined}><Icon name="search" />{t(lang, 'nav.search')}</a>
+    <a href="#site-footer" id="more-btn" data-popover-target="more-sheet"><Icon name="more" />{t(lang, 'nav.more')}</a>
+  </nav>
+  <div id="more-sheet" popover hidden>
+    <div class="sb">
+      <div class="grab" aria-hidden="true"></div>
+      <h2>{t(lang, 'nav.more')}</h2>
+      <div class="group">
+        <a class="row ic" href={url('progress/', lang)}><Icon name="chart" /><span class="t">{t(lang, 'nav.progress')}</span></a>
+        <a class="row ic" href={url('plugins/', lang)}><Icon name="plug" /><span class="t">{t(lang, 'nav.plugins')}</span></a>
+        <a class="row ic" href={url('references/', lang)}><Icon name="books" /><span class="t">{t(lang, 'nav.references')}</span></a>
+        <a class="row ic" href={url('about/', lang)}><Icon name="about" /><span class="t">{t(lang, 'nav.about')}</span></a>
+        <button class="row ic" type="button" popovertarget="more-sheet" popovertargetaction="hide"><Icon name="close" /><span class="t">{t(lang, 'nav.more.close')}</span></button>
+      </div>
+    </div>
+  </div>
+</div>
+<script is:inline src={continueScript} defer data-base={import.meta.env.BASE_URL} data-lang={lang} data-first={firstLesson}></script>
+<script is:inline src={themeScript} defer></script>
+</body>
+</html>

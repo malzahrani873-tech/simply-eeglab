@@ -1,0 +1,212 @@
+---
+title: Publication-ready figures
+titleEn: Publication-ready figures
+description: "How to export an EEGLAB ERP plot or scalp map as a vector file, with a journal-ready size and font and an honest color scale across conditions."
+station: 7
+order: 4
+level: recommended
+status: approved
+objectives:
+  - Export an ERP plot and a scalp map as vector files (PDF or SVG) at journal column width.
+  - Set the font, line widths, axes and labels so the figure stays readable at final size.
+  - Plot maps of two conditions on one symmetric color scale, and export the numbers behind the figure.
+prerequisites: [topoplot, channel-erp-plot]
+references:
+  - title: EEGLAB Tutorial
+    url: https://eeglab.org/tutorials/11_Scripting/EEG_scalp_measures.html
+    section: "11. Write scripts > d. Advanced plots"
+  - title: EEGLAB Tutorial
+    url: https://eeglab.org/tutorials/misc/Exporting_Data.html
+    section: "Reference Topics > Exporting Data: Exporting data to an ASCII text file"
+datasets: [D1]
+startingPoint:
+  dataset: D1
+  file: eeglab_data.set
+  applied: [filtering, line-noise, bad-channels, interpolation, rereferencing, run-ica, ica-1hz-copy-weights, iclabel, extract-epochs, baseline-correction, epoch-rejection]
+  script: |
+    % Shortcut: if you saved D1_epochs_clean.set in the epoch rejection lesson, keep
+    % the first line and the last two lines (pop_newset, eeglab redraw), and replace
+    % every line between them with:
+    % EEG = pop_loadset('D1_epochs_clean.set', pwd);
+    [ALLEEG, EEG, CURRENTSET, ALLCOM] = eeglab;
+    eeglabRoot = fileparts(which('eeglab'));
+    EEG = pop_loadset('eeglab_data.set', fullfile(eeglabRoot, 'sample_data'));
+    fullLocs = EEG.chanlocs;
+
+    % Main dataset: high-pass at 0.1 Hz, then 60 Hz line-noise removal
+    EEG = pop_eegfiltnew(EEG, 'locutoff', 0.1);
+    EEG = pop_eegfiltnew(EEG, 'locutoff', 58, 'hicutoff', 62, 'revfilt', 1);
+
+    % Bad channels you removed earlier, e.g. {'T7'}; leave empty if none
+    badChans = {};
+    if ~isempty(badChans)
+        EEG = pop_select(EEG, 'rmchannel', badChans);
+        EEG = pop_interp(EEG, fullLocs, 'spherical');
+    end
+
+    % Average reference, EOG channels excluded
+    eogIdx = find(ismember({EEG.chanlocs.labels}, {'EOG1', 'EOG2'}));
+    EEG = pop_reref(EEG, [], 'exclude', eogIdx);
+
+    % ICA on a 1-Hz copy, then copy the weights back
+    EEG_ica = pop_eegfiltnew(EEG, 'locutoff', 1);
+    EEG_ica = pop_runica(EEG_ica, 'icatype', 'runica', 'extended', 1);
+    EEG.icaweights  = EEG_ica.icaweights;
+    EEG.icasphere   = EEG_ica.icasphere;
+    EEG.icachansind = EEG_ica.icachansind;
+    EEG.icawinv     = [];
+    EEG.icaact      = [];
+    EEG = eeg_checkset(EEG);
+
+    % Remove eye and muscle components, then low-pass at 30 Hz
+    EEG = pop_iclabel(EEG, 'default');
+    EEG = pop_icflag(EEG, [NaN NaN; 0.9 1; 0.9 1; NaN NaN; NaN NaN; NaN NaN; NaN NaN]);
+    artifactComps = find(EEG.reject.gcompreject);
+    if ~isempty(artifactComps)
+        EEG = pop_subcomp(EEG, artifactComps, 0);
+    end
+    EEG = pop_eegfiltnew(EEG, 'hicutoff', 30);
+
+    % Epochs around 'square', baseline, and +/-100 uV rejection
+    EEG = pop_epoch(EEG, {'square'}, [-1 2], 'newname', 'D1 epochs', 'epochinfo', 'yes');
+    EEG = pop_rmbase(EEG, [-200 0]);
+    EEG = pop_eegthresh(EEG, 1, 1:EEG.nbchan, -100, 100, EEG.xmin, EEG.xmax, 0, 0);
+    badEpochs = find(EEG.reject.rejthresh);
+    if ~isempty(badEpochs)
+        EEG = pop_rejepoch(EEG, EEG.reject.rejthresh, 0);
+    end
+    EEG.setname = 'D1 epochs clean';
+    EEG = eeg_checkset(EEG);
+    EEG = pop_saveset(EEG, 'filename', 'D1_epochs_clean.set', 'filepath', pwd);
+    EEG.filename = ''; EEG.filepath = ''; EEG.datfile = ''; EEG.saved = 'no';
+    [ALLEEG, EEG, CURRENTSET] = pop_newset(ALLEEG, EEG, 0, 'setname', 'D1 epochs clean', 'gui', 'off');
+    eeglab redraw;
+eeglabVersion: "2026.1"
+updated: 2026-10-28
+---
+
+## Why this step matters
+
+A figure you understand on your screen is not a figure ready for a paper. The journal shrinks it to about one column wide, small text becomes unreadable, and a screenshot turns blurry when zoomed.
+
+Honesty matters even more than looks. Two maps of two conditions drawn on different color scales suggest a difference that is not there, or hide one that is. Reviewers notice.
+
+This lesson takes two figures from the previous lessons and prepares them for publication: a vector format, a fixed size, a readable font, one color scale, and a data file that backs up what the figure shows.
+
+## Before and after
+
+<BeforeAfter>
+<Figure src="publication-figures/publication-before.png" alt="Pz plot for two conditions captured from the screen and shrunk: the text is unreadable, the lines are thin, the edges are jagged, and the vertical axis has no unit." caption="Before: a shrunk screen capture" source="D1" />
+<Figure src="publication-figures/publication-after.png" alt="The same plot exported with exportgraphics: white background, two lines in two colours and two styles (solid and dashed), the vertical axis labelled Potential (µV), and trial counts in the legend." caption="After: a vector file, shown here as an image" source="D1" />
+</BeforeAfter>
+
+## Steps in the GUI
+
+Start with the `D1 epochs clean` dataset loaded, as in "Starting point". For the maps, use `D1 epochs clean scalp`, the 30-channel copy without EOG1 and EOG2. If it is not open, make it as in step 0 of the scalp maps lesson (<MenuPath>Edit > Select data</MenuPath>). The GUI is enough for maps of one dataset. Comparing two conditions in one figure needs the script, as in the channel ERP lesson.
+
+**1. Find the scale limit**
+
+1. With `D1 epochs clean scalp` selected, open <MenuPath>Plot > ERP map series > In 2-D</MenuPath>.
+2. Enter `100 200 300 400` in <UiLabel>Plotting ERP scalp maps at these latencies</UiLabel> and `[1 4]` in <UiLabel>Plot geometry (rows,col.); [] -> near square</UiLabel>. Click <UiLabel>Ok</UiLabel>.
+3. Read the top value on the color bar and round it up to a whole number. That is your limit.
+
+**2. Fix the scale and export**
+
+1. Open the same window again. In the additional options field, enter `'electrodes', 'on', 'maplimits', [-5 5]`, replacing 5 with your limit. Use the same limit for every map you will compare with this one, even from another dataset.
+2. In the figure window, open <MenuPath>File > Save As</MenuPath> and choose PDF or SVG as the file type. This is MATLAB's own menu, not an EEGLAB menu.
+3. Open the file and zoom in: lines and letters stay sharp, and you can select the label text. That is what "vector" means.
+
+**3. Export the numbers behind the figure**
+
+1. Open <MenuPath>File > Export > Data and ICA activity to text file</MenuPath>.
+2. In <UiLabel>Output file name</UiLabel>, enter `erp_all.txt`.
+3. Check <UiLabel>Export ERP average instead of trials:</UiLabel>, and leave <UiLabel>Transpose matrix (elec -> cols):</UiLabel>, <UiLabel>Export channel labels/component numbers:</UiLabel> and <UiLabel>Export time values:</UiLabel> checked as they are. Click <UiLabel>Ok</UiLabel>.
+4. You get a text file: the first row holds channel names, the first column holds time in milliseconds, and each following row is one time point. Put it in the paper's supplementary material, or plot from it in another program.
+
+## The equivalent script
+
+```matlab
+EEG = pop_loadset('D1_epochs_clean.set', pwd);
+pos = eeg_getepochevent(EEG, 'type', {'square'}, 'timewin', [-5 5], 'fieldname', 'position');
+EEG_pos1 = pop_select(EEG, 'trial', find(pos == 1));
+EEG_pos2 = pop_select(EEG, 'trial', find(pos == 2));
+EEG_pos1.setname = 'D1 epochs clean pos1';
+EEG_pos2.setname = 'D1 epochs clean pos2';
+chan = find(strcmp({EEG.chanlocs.labels}, 'Pz'));
+scalp = find(~ismember({EEG.chanlocs.labels}, {'EOG1', 'EOG2'}));   % EOG is not on the average reference
+erp1 = mean(EEG_pos1.data, 3);
+erp2 = mean(EEG_pos2.data, 3);
+
+% Figure 1: Pz waveforms at single-column size, 9-pt font, white background
+fig1 = figure('Color', 'w', 'Units', 'centimeters', 'Position', [2 2 9 7]);
+hold on;
+plot(EEG.times, erp1(chan, :), 'Color', [0 0.45 0.74], 'LineWidth', 1.2);
+plot(EEG.times, erp2(chan, :), 'Color', [0.85 0.33 0.10], 'LineWidth', 1.2, 'LineStyle', '--');
+xline(0, 'k:'); yline(0, 'k-');
+xlim([-200 800]);
+set(gca, 'YDir', 'normal', 'FontName', 'Arial', 'FontSize', 9, 'TickDir', 'out', 'Box', 'off');
+xlabel('Time (ms)'); ylabel('Potential (\muV)');
+legend({sprintf('Position 1 (n = %d)', EEG_pos1.trials), ...
+        sprintf('Position 2 (n = %d)', EEG_pos2.trials)}, 'Location', 'northeast', 'Box', 'off');
+title('Pz', 'FontWeight', 'normal');
+exportgraphics(fig1, 'fig_pz_erp.pdf', 'ContentType', 'vector', 'BackgroundColor', 'white');
+
+% Figure 2: 300 to 500 ms maps for both conditions on one shared symmetric scale
+win = EEG.times >= 300 & EEG.times <= 500;
+map1 = mean(erp1(scalp, win), 2);
+map2 = mean(erp2(scalp, win), 2);
+lim = ceil(max(abs([map1; map2])));
+fprintf('Shared color scale: -%d to %d uV\n', lim, lim);
+fig2 = figure('Color', 'w', 'Units', 'centimeters', 'Position', [2 2 12 6]);
+subplot(1, 2, 1);
+topoplot(map1, EEG.chanlocs(scalp), 'maplimits', [-lim lim], 'electrodes', 'on');
+title('Position 1', 'FontName', 'Arial', 'FontSize', 9, 'FontWeight', 'normal');
+ax = subplot(1, 2, 2);
+topoplot(map2, EEG.chanlocs(scalp), 'maplimits', [-lim lim], 'electrodes', 'on');
+title('Position 2', 'FontName', 'Arial', 'FontSize', 9, 'FontWeight', 'normal');
+axPos = ax.Position;
+cb = colorbar('FontName', 'Arial', 'FontSize', 9);
+ax.Position = axPos;   % keep both maps the same size
+cb.Position = [0.92 0.25 0.02 0.5];
+ylabel(cb, '\muV');
+exportgraphics(fig2, 'fig_maps_300_500.pdf', 'ContentType', 'vector', 'BackgroundColor', 'white');
+exportgraphics(fig2, 'fig_maps_300_500.png', 'Resolution', 600, 'BackgroundColor', 'white');
+
+% The numbers behind the figures: one row per time point, one column per channel
+pop_export(EEG_pos1, 'erp_pos1.txt', 'erp', 'on', 'transpose', 'on', 'elec', 'on', 'time', 'on', 'precision', 4);
+pop_export(EEG_pos2, 'erp_pos2.txt', 'erp', 'on', 'transpose', 'on', 'elec', 'on', 'time', 'on', 'precision', 4);
+```
+
+## Which value should I choose?
+
+| Setting | Value | Why |
+|---|---|---|
+| Format | PDF, SVG or EPS (vector) for waveforms, and PNG at 600 dpi for maps if the vector file is heavy | Vector files stay sharp at any zoom, and journals usually accept them. A scalp map holds thousands of colored polygons, so its vector file can get large. Never use JPEG, which adds noise around lines. |
+| Width | About 9 cm for one column, about 18 cm for two | Draw at the final size from the start instead of shrinking later. Check the journal's guide, as sizes differ slightly. |
+| Font size | 8 to 10 pt at final size | Below 7 pt is unreadable in print. Because you draw at final size, what you choose here is what the reader sees. |
+| Lines | 1 to 1.5 pt, with two different styles for two conditions | Line style (solid and dashed) separates the conditions even in black-and-white print, and for readers who have trouble telling colors apart. |
+| Color scale | One symmetric scale for all maps being compared, with a color bar and its unit | This is the single most important honesty check. Round the limit to a whole number and state it in the caption. |
+| Polarity | Positive up, and say so | Some labs plot negative up. Whatever you choose, the reader needs to see it on the axis or in the caption. |
+| `exportgraphics` | Needs MATLAB R2020a or later | On an older release, use `print(fig1, 'fig_pz_erp', '-dpdf', '-painters')`. |
+
+## Common mistakes
+
+- **Screenshots.** They have your screen's resolution and degrade in print. Always export the figure from MATLAB.
+- **Drawing large, then shrinking.** A 10-pt font on a 25-cm figure becomes 3.6 pt once shrunk to 9 cm. Set the size before you plot.
+- **One color scale per map.** If you plot each condition in its own window, EEGLAB picks each window's limits from its own data. Set `maplimits` to the same value in every window.
+- **EEGLAB's light blue background.** EEGLAB plot windows default to a very light blue. Make the background white on export, as the script does.
+- **An incomplete caption.** Under every ERP figure, state the channel, reference, filters, trials per condition and polarity. Without them the figure cannot be interpreted.
+- **Polishing the data.** Do not add smoothing or crop the axis to enlarge a difference. What you export must match the data file.
+
+{/* "From experience" box: waiting for a story from the project owner. Do not write it before it arrives. */}
+
+## How to check it worked
+
+- **Zoom the PDF to 400%**: waveforms and letters stay sharp, and you can select the axis text with the cursor.
+- **The page size** of `fig_pz_erp.pdf` is about 9 × 7 cm in the file properties.
+- **The two maps in `fig_maps_300_500.pdf`** have 30 electrode dots each, none below the eyes, are the same size and share one color bar whose limits match the number printed by the `Shared color scale` line.
+- **`erp_pos1.txt`** has a header row, then 384 rows (one point every 7.8 ms from -1000 to 1992 ms), and 33 columns: time, then 32 channels.
+
+<Methods>
+Figures were exported as vector PDF files with MATLAB exportgraphics; scalp maps of both conditions (30 average-referenced scalp channels) share one symmetric color scale of ±[X] µV (topoplot, EEGLAB 2026.1).
+</Methods>

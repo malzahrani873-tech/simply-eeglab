@@ -1,0 +1,14 @@
+---
+import Base from '../layouts/Base.astro';
+import { t, type Lang } from '../i18n';
+import { url } from '../lib/url';
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+---
+<Base lang={lang} title={t(lang, '404.title')} path="404/" noindex>
+  <div class="wrap narrow simple">
+    <h1>{t(lang, '404.title')}</h1>
+    <p class="lead">{t(lang, '404.body')}</p>
+    <p><a class="btn pri" href={url('', lang)}>{t(lang, '404.map')}</a></p>
+  </div>
+</Base>

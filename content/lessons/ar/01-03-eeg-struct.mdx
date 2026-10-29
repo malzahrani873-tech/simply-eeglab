@@ -1,0 +1,131 @@
+---
+title: بنية EEG struct
+titleEn: The EEG structure
+description: ماذا يوجد داخل المتغيّر EEG في MATLAB، وكيف تقرأ منه عدد القنوات ومعدل العيّنات والأحداث وأبعاد الإشارة.
+station: 1
+order: 3
+level: core
+status: approved
+objectives:
+  - تستخرج من EEG عدد القنوات ومعدل العيّنات وطول التسجيل.
+  - "تشرح أبعاد EEG.data: القنوات في الصفوف والعيّنات في الأعمدة."
+  - تقرأ نوع أول حدث وتوقيته، وتحوّل التوقيت من عيّنات إلى ثوانٍ.
+prerequisites: [eeglab-gui]
+references:
+  - title: EEGLAB Tutorial
+    url: https://eeglab.org/tutorials/ConceptsGuide/Data_Structures.html
+    section: "EEGLAB Data Structures: EEG.event, Event latencies"
+  - title: EEGLAB Tutorial
+    url: https://eeglab.org/tutorials/02_Quickstart/quickstart.html
+    section: "Exploring event values"
+datasets: [D1]
+startingPoint:
+  dataset: D1
+  file: eeglab_data.set
+  applied: []
+  script: |
+    [ALLEEG, EEG, CURRENTSET, ALLCOM] = eeglab;
+    sampleFolder = fullfile(fileparts(which('eeglab')), 'sample_data');
+    EEG = pop_loadset('filename', 'eeglab_data.set', 'filepath', sampleFolder);
+    [ALLEEG, EEG, CURRENTSET] = pop_newset(ALLEEG, EEG, 0, 'setname', 'Continuous EEG Data', 'gui', 'off');
+    eeglab redraw;
+eeglabVersion: "2026.1"
+updated: 2026-10-28
+---
+
+## لماذا هذه الخطوة مهمة؟
+
+كل ما تراه في نافذة EEGLAB محفوظ في متغيّر واحد في MATLAB اسمه `EEG`. هذا المتغيّر من نوع <En>struct</En>، أي صندوق فيه حقول لكل منها اسم.
+
+النافذة الرئيسية تعرض ملخصاً فقط. أما السكربتات فتقرأ من `EEG` وتكتب فيه مباشرة. إذا فهمت حقوله الأساسية، تستطيع فحص أي خطوة بنفسك.
+
+ستستخدم نفس طريقة النقطة التي استخدمتها مع المتغيّر `demo` في درس أساسيات MATLAB: `EEG.srate` تعني الحقل `srate` داخل `EEG`.
+
+## قبل وبعد
+
+<Figure src="eeg-struct/eeg-struct-tree.svg" alt="شجرة EEG في eeglab_data.set: data مصفوفة 32 × 30504 (القنوات في الصفوف والعيّنات في الأعمدة)، و srate قيمته 128، و chanlocs فيه 32 عنصراً، و event فيه 154 عنصراً، و icaweights فارغ حتى تشغيل ICA." source="original" />
+
+## الخطوات من الواجهة
+
+### 1. افتح الحقول في الـ Workspace
+
+1. افتح الداتاست (<En>dataset</En>) كما في الدرس السابق.
+2. في لوحة <UiLabel>Workspace</UiLabel> في MATLAB، اضغط مرتين على `EEG`.
+3. تظهر حقول `EEG` في جدول. اضغط مرتين على أي حقل لتفتحه، مثل `chanlocs` أو `event`.
+
+### 2. اقرأ الأحداث من EEGLAB
+
+1. افتح <MenuPath>Edit > Event values</MenuPath>.
+2. تظهر نافذة تعرض حدثاً (<En>event</En>) واحداً في كل مرة: `type` و `position` و `latency`. (الحقل `urevent` لا يظهر في هذه النافذة.)
+3. لاحظ أن عنوان حقل التوقيت (<En>latency</En>) في النافذة <UiLabel>latency (sec)</UiLabel>: النافذة تعرض التوقيت **بالثواني**، أما `EEG.event` فيحفظه **بالعيّنات**. أول حدث يظهر هنا عند حوالي 1.0001 ثانية.
+4. أغلق النافذة بزر <UiLabel>Cancel</UiLabel> حتى لا تغيّر شيئاً.
+
+### 3. اقرأ معلومات الداتاست
+
+افتح <MenuPath>Edit > Dataset info</MenuPath>. تظهر قيم مثل اسم الداتاست ومعدل العيّنات (<En>sampling rate</En>). أغلقها بـ <UiLabel>Cancel</UiLabel>.
+
+## السكربت المقابل
+
+اكتب هذه الأسطر في الـ Command Window، سطراً سطراً، وقارن الناتج بالتعليق:
+
+```matlab
+% Basic information
+EEG.setname            % 'Continuous EEG Data'
+EEG.nbchan             % 32 channels
+EEG.srate              % 128 samples per second
+EEG.pnts               % 30504 samples per channel
+(EEG.pnts - 1) / EEG.srate   % 238.3047 seconds (same as EEG.xmax)
+
+% The signal: channels x samples
+size(EEG.data)         % 32 30504
+class(EEG.data)        % 'single'
+EEG.data(1, 1:5)       % first 5 samples of channel 1 (microvolts)
+
+% Channel names
+{EEG.chanlocs(1:3).labels}   % 'FPz' 'EOG1' 'F3'
+
+% First event: type and latency
+EEG.event(1).type      % 'square'
+EEG.event(1).latency   % 129.0087 (in samples)
+(EEG.event(1).latency - 1) / EEG.srate   % 1.0001 (in seconds)
+
+% Empty until ICA is computed
+isempty(EEG.icaweights)   % 1 (true)
+```
+
+- **لماذا نطرح 1؟** في MATLAB أول عيّنة رقمها 1 وتقع عند الزمن صفر. لذلك الزمن بالثواني = (رقم العيّنة − 1) ÷ معدل العيّنات.
+- `EEG.data(1, 1:5)`: الرقم الأول يختار القناة (<En>channel</En>)، أي الصف، والثاني يختار العيّنات (الأعمدة).
+
+## أي قيمة أختار؟
+
+لا توجد قيمة تختارها هنا. هذه الحقول الأساسية التي ستعود لها في كل الدروس:
+
+| الحقل | ماذا يحفظ | الوحدة | القيمة في `eeglab_data.set` |
+|---|---|---|---|
+| `EEG.nbchan` | عدد القنوات | قناة | 32 |
+| `EEG.srate` | معدل العيّنات | هرتز | 128 |
+| `EEG.pnts` | عدد العيّنات في كل قناة | عيّنة | 30504 |
+| `EEG.trials` | عدد المقاطع (1 = بيانات مستمرة) | مقطع | 1 |
+| `EEG.xmin` و `EEG.xmax` | زمن أول عيّنة وآخر عيّنة | ثانية | 0 و 238.3047 (آخر عيّنة) |
+| `EEG.times` | زمن كل عيّنة | **ميلي ثانية** | من 0 إلى 238304.6875 |
+| `EEG.data` | الإشارة نفسها | ميكروفولت | مصفوفة 32 × 30504 |
+| `EEG.chanlocs` | اسم كل قناة وموقعها | — | 32 عنصراً |
+| `EEG.event` | الأحداث: النوع والتوقيت | التوقيت بالعيّنات | 154 حدثاً (80 `square` و 74 `rt`) |
+| `EEG.icaweights` | أوزان ICA | — | فارغ |
+
+## أخطاء شائعة
+
+- **قلب الأبعاد.** في EEGLAB القنوات في الصفوف والعيّنات في الأعمدة. `EEG.data(:, 1)` هي كل القنوات عند أول عيّنة، لا القناة الأولى كاملة. القناة الأولى كاملة هي `EEG.data(1, :)`.
+- **قراءة `latency` على أنها ثوانٍ.** في `EEG.event` التوقيت بالعيّنات. حوّله بالمعادلة أعلاه، ولا تنسَ طرح 1.
+- **نسيان أن `EEG.times` بالميلي ثانية.** بينما `EEG.xmin` و `EEG.xmax` بالثواني.
+- **تعديل `EEG` يدوياً ثم نسيان إبلاغ EEGLAB.** إذا غيّرت حقلاً بنفسك، شغّل `EEG = eeg_checkset(EEG);` ثم خزّنه بـ `[ALLEEG, EEG, CURRENTSET] = eeg_store(ALLEEG, EEG, CURRENTSET);` و `eeglab redraw`. وإلا قد تعرض النافذة الرئيسية قيماً قديمة.
+- **الخلط بين القناة والقطب (<En>electrode</En>).** `EEG.chanlocs(5)` هي القناة الخامسة في البيانات، وموقعها هو موقع القطب الذي سجّلها. ترتيب القنوات في الملف لا يتبع ترتيباً على الرأس.
+
+{/* صندوق "من التجربة": بانتظار قصة من صاحب المشروع. لا يُكتب قبل وصولها. */}
+
+## كيف تتأكد أن الخطوة نجحت؟
+
+1. `size(EEG.data)` يعطي `32 30504`.
+2. `(EEG.pnts - 1) / EEG.srate` يعطي `238.3047`، وهو نفس `EEG.xmax` ونفس <UiLabel>Epoch end (sec)</UiLabel> في النافذة الرئيسية (تعرضه مقرّباً `238.305`).
+3. `EEG.event(1).type` يعطي `'square'`، والتوقيت المحوّل يعطي حوالي `1.0001` ثانية، ويطابق ما رأيته في <MenuPath>Edit > Event values</MenuPath>.
+4. `numel(EEG.event)` يعطي `154`، ويطابق سطر <UiLabel>Events</UiLabel> في النافذة الرئيسية.

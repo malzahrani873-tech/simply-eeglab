@@ -1,0 +1,131 @@
+---
+title: Resampling
+titleEn: Resampling
+description: How to lower the sampling rate safely in EEGLAB, and why you must not go below what the highest frequency in your analysis needs.
+station: 3
+order: 1
+level: core
+status: approved
+objectives:
+  - Lower the sampling rate of a continuous dataset from the GUI and from a script.
+  - Explain why the new rate must stay above twice the highest frequency of interest, with a margin for the anti-aliasing filter.
+  - Check the new rate, the number of samples, and the number of events after the change.
+prerequisites: [events, signal-basics]
+references:
+  - title: EEGLAB Tutorial
+    url: https://eeglab.org/tutorials/05_Preprocess/resampling.html
+    section: "5. Preprocess data > c. Resampling"
+  - title: Makoto's preprocessing pipeline
+    url: https://eeglab.ucsd.edu/wiki/Makoto%27s_preprocessing_pipeline
+    section: "§3 Downsample if necessary"
+  - title: "EEGLAB preprocessing #3: Rereferencing and resampling"
+    url: https://www.youtube.com/watch?v=hByLyGYecjI
+    section: "Full video"
+    duration: "11:48"
+datasets: [D1]
+startingPoint:
+  dataset: D1
+  file: eeglab_data.set
+  applied: []
+  script: |
+    [ALLEEG, EEG, CURRENTSET, ALLCOM] = eeglab;
+    eeglabRoot = fileparts(which('eeglab'));
+    EEG = pop_loadset('eeglab_data.set', fullfile(eeglabRoot, 'sample_data'));
+    [ALLEEG, EEG, CURRENTSET] = pop_newset(ALLEEG, EEG, 0, 'setname', 'Continuous EEG Data', 'gui', 'off');
+    eeglab redraw;
+interactive: []
+eeglabVersion: "2026.1"
+updated: 2026-10-29
+---
+
+## Why this step matters
+
+The sampling rate is the number of measurements per second for each channel. EEG systems often record at 500 or 1000 Hz, or more. D1 is already at 128 Hz, so the path does not downsample it, and the copy you make here is only for comparison.
+
+A high rate makes files large and slows every later step, especially ICA. Most ERP analyses do not need frequencies above about 40 Hz.
+
+So you lower the rate once, at the start of processing, and every later step becomes faster.
+
+But there is a limit. The highest frequency the data can represent is half the sampling rate, called the Nyquist frequency. Any frequency above it does not disappear. It shows up, wrongly, as a lower frequency. This is called aliasing.
+
+That is why EEGLAB applies an anti-aliasing low-pass filter before lowering the rate, automatically.
+
+<Callout type="warning">
+**About D1:** its rate is 128 Hz, which is already low. The official tutorial says you do not need to change the sampling rate of the tutorial data. So in this lesson you make a temporary copy at 64 Hz to compare, then leave it. The path continues on D1 at 128 Hz. This step really matters for your own raw data at 500 or 1000 Hz.
+</Callout>
+
+## Before and after
+
+<Figure src="resampling/resampling-cz-128-64.png" alt="Two seconds of channel Cz at two rates, overlaid: 128 Hz as small dots and 64 Hz as larger circles. The overall shape is the same; the 64 Hz line is slightly smoother." source="D1" />
+
+## Steps in the GUI
+
+Start with D1 loaded, as in the Starting point. In the main EEGLAB window, note the current values: <UiLabel>Sampling rate (Hz)</UiLabel> is 128, <UiLabel>Frames per epoch</UiLabel> is 30504, and <UiLabel>Events</UiLabel> is 154.
+
+1. Open <MenuPath>Tools > Change sampling rate</MenuPath>.
+2. A window titled <UiLabel>Resample current dataset -- pop_resample()</UiLabel> appears. In <UiLabel>New sampling rate</UiLabel>, type `64`, then press <UiLabel>OK</UiLabel>.
+3. The command window prints the channel numbers one by one while it works, then `resampling finished`.
+4. The window for naming the new dataset appears, suggesting `Continuous EEG Data resampled`. Replace it with `D1 64Hz` and leave <UiLabel>Overwrite it in memory (set=yes; unset=create a new dataset)</UiLabel> unchecked. You now have a second dataset, and the first one is unchanged.
+5. Compare the two datasets in the scrolling view: open <MenuPath>Plot > Channel data (scroll)</MenuPath> on each one. The overall shape is similar, and the new copy is a little smoother.
+6. Go back to the first dataset from the <MenuPath>Datasets</MenuPath> menu. Do not save `D1 64Hz`; the path does not use it.
+
+## The equivalent script
+
+```matlab
+% Exercise only: a temporary copy at half the sampling rate
+EEG_64 = pop_resample(EEG, 64);
+EEG_64.setname = 'D1 64Hz';
+
+% Compare rate, length and events
+fprintf('Original : %g Hz, %d samples, %d events\n', EEG.srate, EEG.pnts, length(EEG.event));
+fprintf('Resampled: %g Hz, %d samples, %d events\n', EEG_64.srate, EEG_64.pnts, length(EEG_64.event));
+
+% The same 2 seconds of channel Cz at both rates
+cz = find(strcmp({EEG.chanlocs.labels}, 'Cz'));
+t1 = (0:2*EEG.srate-1) / EEG.srate;
+t2 = (0:2*EEG_64.srate-1) / EEG_64.srate;
+figure; hold on;
+plot(t1, EEG.data(cz, 1:numel(t1)), '.-');
+plot(t2, EEG_64.data(cz, 1:numel(t2)), 'o-');
+legend('128 Hz', '64 Hz');
+xlabel('Time (s)'); ylabel('Amplitude (uV)');
+
+% The main path continues on EEG at 128 Hz; EEG_64 is not saved
+```
+
+With your own raw data at 1000 Hz, for example, the only line you need in your pipeline is `EEG = pop_resample(EEG, 250);`.
+
+## Which value should I choose?
+
+| Setting | Value | Why |
+|---|---|---|
+| D1 | Do not change the rate (128 Hz) | Official tutorial: the tutorial data rate is already acceptable. |
+| Raw data at 500 or 1000 Hz for ERP analysis | 250 Hz, or 256 | Keeps frequencies up to about 100 Hz, far above what ERPs need. |
+| General rule | New rate ≥ 2.5 × the highest frequency of interest | Theory requires more than twice. And the EEGLAB anti-aliasing filter keeps frequencies fully only up to 80% of the new Nyquist, so you need a margin. |
+| Where in the pipeline | On continuous data, before filtering and epoching | It speeds up everything after it. EEGLAB itself warns against resampling epoched data. |
+
+<Callout type="expert">
+**Anti-aliasing filter details:** in EEGLAB 2026.1, `pop_resample` uses a Kaiser-window FIR filter. The cutoff is at 0.9 of the new Nyquist, and the transition band width is 0.2 of it. Going down to 64 Hz, the new Nyquist is 32 Hz, so the cutoff is at 28.8 Hz and the transition runs from about 25.6 to 32 Hz. You can change both values with the function's third and fourth arguments; the defaults suit most cases.
+</Callout>
+
+## Common mistakes
+
+- **Going below what your analysis needs.** If you will study gamma frequencies around 40 to 80 Hz, a 128 Hz rate is not enough. Work out the highest frequency you care about first, then choose the rate.
+- **Resampling after epoching.** Do it on continuous data. With epoched data EEGLAB prints a warning, because the anti-aliasing filter runs over the edges of each epoch separately.
+- **Editing event latencies by hand.** EEGLAB recomputes every event latency for the new rate automatically. Do not divide the numbers yourself.
+- **Resampling for no reason.** If the rate is already acceptable, as in D1, lowering it gains nothing. Every unnecessary step changes the data a little.
+
+{/* "From experience" box: waiting for the project owner's story. Do not write it before it arrives. */}
+
+## How to check it worked
+
+1. **In the main EEGLAB window**, with `D1 64Hz` current: <UiLabel>Sampling rate (Hz)</UiLabel> is 64, and <UiLabel>Frames per epoch</UiLabel> is 15252, half the original number.
+2. **The number of events did not change:** <UiLabel>Events</UiLabel> is still 154.
+3. **The recording length did not change:** <UiLabel>Epoch end (sec)</UiLabel> is 238.297 in the new copy and 238.305 in the original. The difference is less than one sample.
+4. **The original dataset is intact:** go back to the first dataset and check that its rate is still 128.
+
+The sentence below is for your raw data resampled to 250 Hz. In D1 you do not write it, because the path does not change the rate.
+
+<Methods>
+Data were downsampled to 250 Hz using pop_resample (EEGLAB 2026.1), which applies an anti-aliasing low-pass FIR filter (Kaiser window) before resampling.
+</Methods>

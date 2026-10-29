@@ -1,0 +1,220 @@
+---
+title: رسم ERP للقنوات
+titleEn: Plotting channel ERPs
+description: كيف ترسم ERP لكل القنوات ولقناة واحدة في EEGLAB، وتقارن شرطين على محور واحد باتجاه قطبية واضح ومحاور مسمّاة بوحداتها.
+station: 7
+order: 2
+level: core
+status: review
+objectives:
+  - يرسم ERP كل القنوات في ترتيبها على الرأس ويفتح قناة واحدة بالضغط عليها.
+  - يقسّم الـ epochs إلى شرطين حسب حقل في الحدث ويرسم الشرطين على محور واحد.
+  - يضبط اتجاه القطبية ويسمّي المحورين بوحداتهما ويذكر عدد المحاولات لكل شرط.
+prerequisites: [erp-average]
+references:
+  - title: EEGLAB Tutorial
+    url: https://eeglab.org/tutorials/08_Plot_data/Data_Averaging.html
+    section: "8. Plot data > a. ERPs: Plotting ERPs in a Topographic Map; Plotting ERPs in a Column Array"
+  - title: EEGLAB Tutorial
+    url: https://eeglab.org/tutorials/08_Plot_data/Data_Averaging.html
+    section: "Comparing different conditions and performing statistics"
+  - title: Applied Event-Related Potential Data Analysis (Luck)
+    url: https://socialsci.libretexts.org/Bookshelves/Psychology/Biological_Psychology/Applied_Event-Related_Potential_Data_Analysis_(Luck)
+    section: "Chapter 2: Processing the Data from One Participant in the ERP CORE N400 Experiment"
+datasets: [D1]
+startingPoint:
+  dataset: D1
+  file: eeglab_data.set
+  applied: [filtering, line-noise, bad-channels, interpolation, rereferencing, run-ica, ica-1hz-copy-weights, iclabel, extract-epochs, baseline-correction, epoch-rejection]
+  script: |
+    % Shortcut: if you saved D1_epochs_clean.set in the epoch rejection lesson, keep
+    % the first line and the last two lines (pop_newset, eeglab redraw), and replace
+    % every line between them with:
+    % EEG = pop_loadset('D1_epochs_clean.set', pwd);
+    [ALLEEG, EEG, CURRENTSET, ALLCOM] = eeglab;
+    eeglabRoot = fileparts(which('eeglab'));
+    EEG = pop_loadset('eeglab_data.set', fullfile(eeglabRoot, 'sample_data'));
+    fullLocs = EEG.chanlocs;
+
+    % Main dataset: high-pass at 0.1 Hz, then 60 Hz line-noise removal
+    EEG = pop_eegfiltnew(EEG, 'locutoff', 0.1);
+    EEG = pop_eegfiltnew(EEG, 'locutoff', 58, 'hicutoff', 62, 'revfilt', 1);
+
+    % Bad channels you removed earlier, e.g. {'T7'}; leave empty if none
+    badChans = {};
+    if ~isempty(badChans)
+        EEG = pop_select(EEG, 'rmchannel', badChans);
+        EEG = pop_interp(EEG, fullLocs, 'spherical');
+    end
+
+    % Average reference, EOG channels excluded
+    eogIdx = find(ismember({EEG.chanlocs.labels}, {'EOG1', 'EOG2'}));
+    EEG = pop_reref(EEG, [], 'exclude', eogIdx);
+
+    % ICA on a 1-Hz copy, then copy the weights back
+    EEG_ica = pop_eegfiltnew(EEG, 'locutoff', 1);
+    EEG_ica = pop_runica(EEG_ica, 'icatype', 'runica', 'extended', 1);
+    EEG.icaweights  = EEG_ica.icaweights;
+    EEG.icasphere   = EEG_ica.icasphere;
+    EEG.icachansind = EEG_ica.icachansind;
+    EEG.icawinv     = [];
+    EEG.icaact      = [];
+    EEG = eeg_checkset(EEG);
+
+    % Remove eye and muscle components, then low-pass at 30 Hz
+    EEG = pop_iclabel(EEG, 'default');
+    EEG = pop_icflag(EEG, [NaN NaN; 0.9 1; 0.9 1; NaN NaN; NaN NaN; NaN NaN; NaN NaN]);
+    artifactComps = find(EEG.reject.gcompreject);
+    if ~isempty(artifactComps)
+        EEG = pop_subcomp(EEG, artifactComps, 0);
+    end
+    EEG = pop_eegfiltnew(EEG, 'hicutoff', 30);
+
+    % Epochs around 'square', baseline, and +/-100 uV rejection
+    EEG = pop_epoch(EEG, {'square'}, [-1 2], 'newname', 'D1 epochs', 'epochinfo', 'yes');
+    EEG = pop_rmbase(EEG, [-200 0]);
+    EEG = pop_eegthresh(EEG, 1, 1:EEG.nbchan, -100, 100, EEG.xmin, EEG.xmax, 0, 0);
+    badEpochs = find(EEG.reject.rejthresh);
+    if ~isempty(badEpochs)
+        EEG = pop_rejepoch(EEG, EEG.reject.rejthresh, 0);
+    end
+    EEG.setname = 'D1 epochs clean';
+    EEG = eeg_checkset(EEG);
+    EEG = pop_saveset(EEG, 'filename', 'D1_epochs_clean.set', 'filepath', pwd);
+    EEG.filename = ''; EEG.filepath = ''; EEG.datfile = ''; EEG.saved = 'no';
+    [ALLEEG, EEG, CURRENTSET] = pop_newset(ALLEEG, EEG, 0, 'setname', 'D1 epochs clean', 'gui', 'off');
+    eeglab redraw;
+eeglabVersion: "2026.1"
+updated: 2026-10-28
+---
+
+## لماذا هذه الخطوة مهمة؟
+
+موجة ERP على الشاشة تبدو بسيطة. لكن القارئ يحتاج أن يعرف ثلاثة أشياء ليفهمها: أي اتجاه هو الموجب، وما وحدة كل محور، وكم محاولة دخلت في المتوسط.
+
+رسمة بلا هذه الثلاثة تُقرأ خطأ بسهولة. قمة "للأعلى" قد تكون سالبة في رسمة مقلوبة، وفرق بين شرطين قد يكون من عدد محاولات مختلف لا من الدماغ.
+
+في هذا الدرس ترسم ERP كل القنوات، ثم تقارن شرطين على قناة واحدة برسمة كاملة البيانات.
+
+## قبل وبعد
+
+<BeforeAfter>
+<Figure src="channel-erp-plot/channel-erp-before.png" alt="رسم الجهد عند Pz لشرطين بلا عناوين للمحاور، وبلا خط عند الصفر، وبلا مفتاح، والمحور الرأسي مقلوب دون إشارة لذلك." caption="قبل" source="D1" />
+<Figure src="channel-erp-plot/channel-erp-after.png" alt="الرسم نفسه والموجب للأعلى، مع Time (ms) و Potential (µV) على المحورين، وخط عند 0 ملي ثانية وعند 0 ميكروفولت، ومفتاح فيه Position 1 (n = 38) و Position 2 (n = 39)، واسم القناة Pz عنواناً." caption="بعد" source="D1" />
+</BeforeAfter>
+
+## الخطوات من الواجهة
+
+ابدأ والداتاست `D1 epochs clean` مفتوحة، كما في "نقطة البداية".
+
+**أولاً: ERP كل القنوات في مكانها على الرأس**
+
+1. افتح <MenuPath>Plot > Channel ERPs > In scalp/rect. array</MenuPath>. تظهر نافذة <UiLabel>Topographic ERP plot - pop_plottopo()</UiLabel>.
+2. اترك <UiLabel>Channels to plot</UiLabel> على `1:32`.
+3. اترك <UiLabel>Plot single trials</UiLabel> و <UiLabel>Plot in rect. array</UiLabel> غير مفعّلتين.
+4. لاحظ أن <UiLabel>Other plot options (see help)</UiLabel> فيها `'ydir', 1`. هذا يعني الموجب للأعلى. اتركها كما هي، واضغط <UiLabel>Ok</UiLabel>.
+5. تظهر موجة لكل قناة في مكانها التقريبي على الرأس، والأنف للأعلى.
+6. اضغط على موجة `Pz`. تنفتح في نافذة مستقلة بمحاور كاملة. هنا تقرأ السعة والكمون.
+
+**ثانياً: نفس الرسم في أعمدة**
+
+افتح النافذة نفسها مرة أخرى، وفعّل <UiLabel>Plot in rect. array</UiLabel>. تظهر القنوات في شبكة مرتبة بالترتيب. هذا أوضح لقراءة الأرقام، والترتيب على الرأس أوضح لرؤية التوزيع.
+
+**ثالثاً: شرطان على محور واحد**
+
+في D1 كل حدث `square` له حقل `position` بقيمة 1 أو 2، وهو مكان المربع على الشاشة. هذان شرطانا. الموضعان كلاهما في المجال البصري الأيسر، على بعد نحو 5.5 و 2.7 درجة من المركز، فتوقّع فرقاً صغيراً بينهما، ولا فرقاً بين نصفي الرأس.
+
+قوائم EEGLAB تقارن الشروط عبر الـ STUDY، حتى لو كان عندك مشارك واحد. هذا ما يقوله التوتوريال الرسمي، وهو موضوع المحطة 8. هنا نقارن بسكربت قصير، لأنه يعلّمك ما يحدث داخل أي رسمة مقارنة: قسّم المحاولات، واحسب متوسطاً لكل قسم، وارسم الاثنين على محور واحد.
+
+انسخ كتلة السكربت أدناه كاملة إلى نافذة الأوامر.
+
+<Callout type="warning">
+لا تستخدم <MenuPath>Edit > Select epochs or events</MenuPath> لتقسيم D1 في EEGLAB 2026.1. في هذا الإصدار تتوقف الأداة على بيانات مقطّعة برسالة "All epochs have been removed, empty dataset" حتى لو بقيت epochs كثيرة. السكربت أدناه يقسّم بفهارس الـ epochs مباشرة ويتجنّب المشكلة.
+</Callout>
+
+**رابعاً: موجة الفرق**
+
+موجة الفرق هي شرط ناقص الآخر، في كل نقطة زمنية. تُظهر متى وأين يختلف الشرطان، في منحنى واحد بدل اثنين.
+
+1. الجزء الأخير من السكربت أدناه يحفظ الشرطين كداتاستين في EEGLAB، ويطبع رقميهما (مثلاً `Datasets for Sum/Compare ERPs: 2 (position 1) and 3 (position 2)`)، ثم يستدعي `pop_comperp` مرة واحدة.
+2. تظهر رسمة فيها ثلاثة منحنيات في كل قناة: position 1 و position 2 والفرق بينهما (position 1 ناقص position 2)، والموجب للأعلى بسبب `'tplotopt', {'ydir', 1}`. اضغط `Pz` لتفتحها وحدها.
+
+اختياري: لنفس الرسمة قائمة هي <MenuPath>Plot > Sum/Compare ERPs</MenuPath>، لكنها مخفية افتراضياً في EEGLAB 2026.1. لا تظهر إلا بعد تفعيل <UiLabel>If set, show all menu items from previous EEGLAB versions. You must restart EEGLAB for this to take effect.</UiLabel> في <MenuPath>File > Preferences</MenuPath> وإعادة تشغيل EEGLAB. هذا الخيار يغيّر شكل كل القوائم عن صور هذه الدروس، فأطفئه بعد ذلك.
+
+## السكربت المقابل
+
+```matlab
+EEG = pop_loadset('D1_epochs_clean.set', pwd);
+
+% All channels at their scalp positions, positive up
+figure; pop_plottopo(EEG, 1:EEG.nbchan, 'D1 epochs clean', 0, 'ydir', 1);
+
+% Stimulus position of the time-locking 'square' event in each epoch
+pos = eeg_getepochevent(EEG, 'type', {'square'}, 'timewin', [-5 5], 'fieldname', 'position');
+fprintf('Position 1: %d epochs, position 2: %d epochs\n', sum(pos == 1), sum(pos == 2));
+
+% One dataset per condition, for later use
+EEG_pos1 = pop_select(EEG, 'trial', find(pos == 1));
+EEG_pos2 = pop_select(EEG, 'trial', find(pos == 2));
+EEG_pos1.setname = 'D1 epochs clean pos1';
+EEG_pos2.setname = 'D1 epochs clean pos2';
+
+% Both conditions on one axis at Pz
+chan = find(strcmp({EEG.chanlocs.labels}, 'Pz'));
+erp1 = mean(EEG_pos1.data(chan, :, :), 3);
+erp2 = mean(EEG_pos2.data(chan, :, :), 3);
+
+figure; hold on;
+plot(EEG.times, erp1, 'LineWidth', 1.5);
+plot(EEG.times, erp2, 'LineWidth', 1.5);
+xline(0, 'k:');
+yline(0, 'k-');
+xlim([-200 800]);
+set(gca, 'YDir', 'normal');   % positive up
+xlabel('Time (ms)');
+ylabel('Potential (\muV)');
+legend({sprintf('Position 1 (n = %d)', EEG_pos1.trials), ...
+        sprintf('Position 2 (n = %d)', EEG_pos2.trials)}, 'Location', 'best');
+title('Pz');
+
+% Both conditions as datasets in EEGLAB, for Plot > Sum/Compare ERPs
+[ALLEEG, ~, idx1] = eeg_store(ALLEEG, EEG_pos1);
+[ALLEEG, ~, idx2] = eeg_store(ALLEEG, EEG_pos2);
+eeglab redraw;
+fprintf('Datasets for Sum/Compare ERPs: %d (position 1) and %d (position 2)\n', idx1, idx2);
+
+% Difference wave at every channel: position 1, position 2, and position 1 minus position 2
+pop_comperp(ALLEEG, 1, idx1, idx2, 'addavg', 'on', 'subavg', 'on', 'diffavg', 'on', 'diffstd', 'off', 'tplotopt', {'ydir', 1});
+```
+
+## أي قيمة أختار؟
+
+| الإعداد | القيمة | لماذا |
+|---|---|---|
+| اتجاه القطبية | الموجب للأعلى (`'ydir', 1`) | الافتراضي في قوائم EEGLAB 2026.1 (`icadefs.m`: `YDIR = 1`). بعض المجالات ترسم السالب للأعلى تاريخياً. أي اتجاه تختاره، اكتبه على المحور أو في التعليق. |
+| نطاق الرسم | `-200 800` ms | يُظهر فترة الـ baseline كاملة وما بعد المثير حتى تنتهي الاستجابة. الـ epoch أطول (-1 إلى 2 ثانية) لكن الطرفين لا يضيفان معلومة في هذه الرسمة. |
+| القناة | `Pz` في هذا المثال | قناة خلفية وسطى تظهر فيها استجابة المهمة البصرية بوضوح. في بحثك، اختر القناة من الدراسات السابقة قبل أن ترى نتيجتك. |
+| حدود المحور الرأسي | نفس الحدود لكل الرسومات التي تقارنها | حدود تلقائية مختلفة تجعل فرقاً صغيراً يبدو كبيراً. استخدم `ylim` بنفس القيم. |
+| عدد المحاولات | في المفتاح أو التعليق دائماً | المتوسط من 20 محاولة أكثر ضوضاء من متوسط 40. القارئ يحتاج الرقم ليحكم. |
+
+## أخطاء شائعة
+
+- **سكربت مقلوب بدون أن تعرف.** الدالة `plottopo` إذا استُدعيت بدون `'ydir'` ترسم السالب للأعلى، بينما القائمة ترسم الموجب للأعلى. اكتب `'ydir', 1` صراحة في كل سكربت.
+- **محاور بلا وحدات.** "Time (ms)" و "Potential (µV)" ليستا زينة. بدونهما لا يعرف القارئ إن كان المحور بالثواني أو بالعيّنات.
+- **مقارنة شرطين بعدد محاولات مختلف جداً.** ضوضاء المتوسط تقل مع عدد المحاولات، فالقمة في الشرط الأقل محاولات قد تبدو أكبر بالصدفة. اذكر العدد، وانتبه إذا كان الفرق كبيراً.
+- **استنتاج فرق من رسمة مشارك واحد.** الفرق بين position 1 و 2 هنا وصف لهذا التسجيل فقط. الحكم يحتاج مجموعة مشاركين وإحصاءً (المحطة 8).
+- **رسم ERP من بيانات مستمرة.** الرسم يحتاج epochs. إذا كانت القائمة <MenuPath>Plot > Channel ERPs</MenuPath> رمادية، فالداتاست المفتوحة غير مقطّعة.
+
+{/* صندوق "من التجربة": بانتظار قصة من صاحب المشروع. لا يُكتب قبل وصولها. */}
+
+## كيف تتأكد أن الخطوة نجحت؟
+
+- **الأعداد منطقية:** مجموع محاولات الشرطين يساوي `EEG.trials`، وكل شرط قريب من 40 (الأصل 40 و 40 قبل الرفض).
+- **الاتجاه صحيح:** القمة الموجبة في رسمة Pz تتجه للأعلى، كما في نافذة القائمة بعد الضغط على Pz.
+- **الرسمتان متطابقتان:** المتوسط العام في `pop_plottopo` عند Pz يقع بين منحنيي الشرطين في رسمة السكربت.
+- **الرسمة مكتملة:** فيها اسما المحورين بوحداتهما، وخط الصفر الزمني، والمفتاح بعدد المحاولات.
+- **موجة الفرق** في Pz متوسطها 0 µV من -200 إلى 0 ms، لأن تصحيح خط الأساس جعل هذا المتوسط صفراً في الشرطين. لكن النقاط المفردة تتأرجح فوق الصفر وتحته: على طول الإيبوك كله تقارب هذه التأرجحات حجم الفرق بعد 0 ms. مع نحو 38 محاولة لكل شرط في تسجيل واحد، تصنع الضوضاء وحدها فروقاً بهذا الحجم، ولهذا يحتاج الاستنتاج إلى مجموعة مشاركين (المحطة 8).
+
+<Methods>
+ERPs were averaged separately for each stimulus position and plotted at Pz from -200 to 800 ms with positive voltage up (pop_plottopo, EEGLAB 2026.1).
+</Methods>

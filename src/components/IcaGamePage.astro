@@ -1,0 +1,99 @@
+---
+import Base from '../layouts/Base.astro';
+import Icon from './Icon.astro';
+import { t, type Lang } from '../i18n';
+import { url, asset } from '../lib/url';
+import { icaAvailable, icaIsFixture, CAT_KEY, hasDaily } from '../lib/ica-data';
+import { site } from '../site.config';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const classes = ['brain', 'eye', 'muscle', 'heart', 'line', 'chan', 'other'];
+const names = Object.fromEntries(classes.map((c) => [c, t(lang, `game.cat.${CAT_KEY[c]}`)]));
+const terms: Record<string, string> = { brain: 'Brain', eye: 'Eye', muscle: 'Muscle', heart: 'Heart', line: 'Line Noise', chan: 'Channel Noise', other: 'Other' };
+const panels = { topo: t(lang, 'game.panel.topo'), spectrum: t(lang, 'game.panel.spectrum'), time: t(lang, 'game.panel.time') };
+const L = (k: string, v: Record<string, string> = {}) => t(lang, k, v);
+const strings = {
+  progress: L('game.progress', { n: '{n}', total: '{total}' }), score: L('game.score', { n: '{n}' }), correct: L('game.correct'),
+  wrong: L('game.wrong', { category: '{category}' }), lookAt: L('game.lookAt', { panel: '{panel}' }), review: L('game.review'),
+  resumed: L('game.resumed'), sumScore: L('game.summary.score', { n: '{n}', total: '{total}' }), hints: L('game.summary.hintsUsed', { n: '{n}' }),
+  best: L('game.best', { n: '{n}' }), copied: L('game.copied'), share: L('game.share', { level: '{level}', rounds: '{rounds}', score: '{score}', total: '{total}' }),
+  loadError: L('game.loadError'), imgError: L('game.imgError'), dNumber: L('daily.number', { n: '{n}' }),
+  streak: L('daily.streak', { n: '{n}' }), streakTwo: L('daily.streak.two', { n: '{n}' }), streakFew: L('daily.streak.few', { n: '{n}' }),
+  dLine1: L('daily.share.line1', { n: '{n}' }), dTries: [1, 2, 3].map((k) => L(`daily.share.try.${k}`)), dNone: L('daily.share.none'), dNot: L('daily.notThis', { category: '{category}' }), dStreak: L('daily.share.streak', { n: '{n}' }),
+  dLink: L('daily.share.link', { url: '{url}' }), dNext: L('daily.next', { n: '{n}' }), dLoadError: L('daily.loadError'),
+};
+const pageUrl = new URL(url('ica-game/', lang), Astro.site).href;
+const data = asset(`ica-game/data.${lang}.json`);
+const dailyBase = asset('ica-game/daily/');
+const daily = hasDaily();
+const btnList = (daily: boolean) => classes.filter((c) => !daily || c !== 'other');
+---
+<Base lang={lang} title={t(lang, 'game.title')} description={t(lang, 'game.lead')} path="ica-game/" current="game">
+  <div class="wrap narrow simple game-page">
+    <h1>{L('game.title')}</h1>
+    <p class="lead">{L('game.lead')}</p>
+    <p><a href={url('lesson/iclabel/', lang)}>{L('game.before')}</a></p>
+    {icaIsFixture && <p class="preview-note">{L('game.draft')}</p>}
+    <noscript><p class="unavail">{L('game.noJs')} <a href={url('lesson/iclabel/', lang)}>{L('game.backToLesson')}</a></p></noscript>
+
+    {icaAvailable && (
+      <div id="ica" data-src={data} data-daily={daily ? dailyBase : undefined} data-lang={lang} data-epoch={site.dailyEpoch} data-url={pageUrl}
+        data-names={JSON.stringify(names)} data-panels={JSON.stringify(panels)} data-s={JSON.stringify(strings)} hidden>
+        {daily && (
+        <section class="daily gcard" id="daily" aria-labelledby="daily-t" data-budget-include="ica-game/daily/*.json ica/*.webp">
+          <div class="dh"><h2 id="daily-t">{L('daily.title')} <span data-d-num></span></h2><span class="muted" data-d-streak></span></div>
+          <p class="muted small">{L('daily.lead')}</p>
+          <div class="gimg"><img data-d-img alt="" width="720" height="280" /></div>
+          <div class="abs six" data-d-btns>{btnList(true).map((c, i) => <button type="button" class="ab" data-c={c}><span class="k" aria-hidden="true">{i + 1}</span><span class="an">{names[c]}</span><span class="at" lang="en">{terms[c]}</span></button>)}</div>
+          <div class="gfb" data-d-fb role="status" aria-live="polite"></div>
+          <div class="dend" data-d-end hidden>
+            <div class="acts"><button type="button" class="btn sec" data-d-copy><Icon name="copy" class="ico s20" />{L('daily.copy')}</button><a class="btn sec" href="#game">{L('daily.more')}</a></div>
+            <p class="muted small" data-d-next></p>
+          </div>
+          <p class="muted small" data-d-nostore hidden>{L('daily.noStorage')}</p>
+        </section>
+        )}
+
+        <section class="gcard" id="game" aria-labelledby="game-t">
+          <h2 id="game-t" class="sr">{L('game.title')}</h2>
+          <nav class="seg" aria-label={L('game.level', { n: '' })} data-levels></nav>
+          <p class="muted small" data-note role="status"></p>
+          <div class="gbar"><span data-prog></span><span data-score></span></div>
+          <div class="pbar" aria-hidden="true"><i data-pfill></i></div>
+          <div class="gq" data-q>
+            <p class="gchoose">{L('game.choose')}</p>
+            <div class="gimg"><img data-img alt="" width="720" height="280" /><div class="ierr" data-ierr hidden><p>{L('game.imgError')}</p><button type="button" class="btn sec" data-skip>{L('game.skip')}</button></div></div>
+            <div class="panels muted small" aria-hidden="true"><span>{panels.topo}</span><span>{panels.spectrum}</span><span>{panels.time}</span></div>
+            <p class="sign muted small" data-sign hidden>{L('game.signFlip')}</p>
+            <div class="abs" data-btns>{btnList(false).map((c, i) => <button type="button" class="ab" data-c={c}><span class="k" aria-hidden="true">{i + 1}</span><span class="an">{names[c]}</span><span class="at" lang="en">{terms[c]}</span></button>)}</div>
+            <button type="button" class="btn sec hint-btn" data-hint hidden>{L('game.hint')}</button>
+            <div class="gfb" data-fb tabindex="-1"></div>
+            <button type="button" class="btn pri" data-next hidden>{L('game.nextQ')}</button>
+          </div>
+          <div class="gsum" data-sum hidden tabindex="-1">
+            <h3>{L('game.summary.title')}</h3>
+            <p class="qz-score" data-sum-score></p>
+            <p class="muted" data-sum-best></p>
+            <p data-sum-hints hidden></p>
+            <div data-sum-weak hidden><p>{L('game.summary.weak')}</p><ul></ul></div>
+            <div class="acts">
+              <button type="button" class="btn pri" data-new>{L('game.newRound')}</button>
+              <button type="button" class="btn sec" data-copy><Icon name="copy" class="ico s20" />{L('game.copy')}</button>
+              <a class="btn sec" href={url('lesson/iclabel/', lang)}>{L('game.backToLesson')}</a>
+            </div>
+            <p class="muted small">{L('game.summary.local')}</p>
+            <p class="muted small" role="status" aria-live="polite" data-copy-status></p>
+          </div>
+          <p class="muted small">{L('game.keys', { n: '7' })}</p>
+        </section>
+        <template id="ic-ok"><Icon name="ok" class="ico s20" /></template>
+        <template id="ic-bad"><Icon name="bad" class="ico s20" /></template>
+      </div>
+    )}
+    <p class="muted small">{L('game.colormap')}</p>
+  </div>
+  <script>
+    import '../scripts/ica-game.ts';
+  </script>
+</Base>

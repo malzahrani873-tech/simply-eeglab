@@ -1,0 +1,36 @@
+---
+import { t } from '../../i18n';
+import { langOf } from '../../lib/lang';
+import Icon from '../Icon.astro';
+interface Props { type?: 'note' | 'warning' | 'expert' | 'experience'; title?: string }
+// Unknown types (a content error that the checks report) are shown as a note.
+const { title } = Astro.props;
+const type = (['note', 'warning', 'expert', 'experience'].includes(Astro.props.type ?? 'note') ? Astro.props.type ?? 'note' : 'note') as 'note' | 'warning' | 'expert' | 'experience';
+const lang = langOf(Astro.url);
+const html = await Astro.slots.render('default');
+// A note folds into a small toggle. Its label is the title, or the bold lead-in, or the first words.
+let label = title;
+let body = html;
+if (type === 'note' && !label) {
+  const lead = html.match(/^\s*<p>\s*<strong>(.*?)<\/strong>\s*:?\s*/s);
+  if (lead) {
+    label = lead[1].replace(/<[^>]*>/g, '').replace(/[:：]\s*$/, '');
+    body = html.replace(lead[0], '<p>');
+  } else {
+    label = t(lang, 'fold.notes');
+  }
+}
+const icons = { note: 'info', warning: 'warn', expert: 'chat', experience: 'heart' } as const;
+---
+{type === 'note' ? (
+  <details class="inline-fold"><summary><span>{label}</span><Icon name="down" class="ico s20 cv2" /></summary><div set:html={body} /></details>
+  <div class="print-copy" data-pagefind-ignore><p><strong>{label}</strong></p><Fragment set:html={body} /></div>
+) : (
+  <aside class={`callout ${type}`} aria-label={t(lang, `callout.${type}`)}>
+    <Icon name={icons[type]} />
+    <div>
+      <p class="ct">{t(lang, `callout.${type}`)}{type === 'experience' && <span class="by"> · {t(lang, 'callout.experience.by')}</span>}</p>
+      <Fragment set:html={html} />
+    </div>
+  </aside>
+)}

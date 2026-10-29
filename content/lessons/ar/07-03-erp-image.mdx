@@ -1,0 +1,207 @@
+---
+title: ERP image
+titleEn: ERP image
+description: كيف ترسم ERP image لقناة في EEGLAB، وترتّب المحاولات حسب زمن الاستجابة، وترى ما يحدث في كل محاولة ويختفي في المتوسط.
+station: 7
+order: 3
+level: recommended
+status: approved
+objectives:
+  - يرسم ERP image لقناة واحدة بمحاولات مرتّبة حسب زمن حدث الاستجابة rt.
+  - يختار نافذة حدث الترتيب ودرجة التنعيم ومقياس الألوان بوعي.
+  - يفسّر نشاطاً يتبع زمن الاستجابة أو يتذبذب بلا تزامن، ولماذا يضعف أو يختفي في الـ ERP المتوسط.
+prerequisites: [erp-average]
+references:
+  - title: EEGLAB Tutorial
+    url: https://eeglab.org/tutorials/08_Plot_data/Plotting_ERP_images.html
+    section: "8. Plot data > b. ERP-image: Basic plotting options; Sorting trials by reaction time; Using the Align parameter"
+  - title: EEGLAB Concepts Guide
+    url: https://eeglab.org/tutorials/ConceptsGuide/erp_image_background.html
+    section: "ERP image"
+datasets: [D1]
+startingPoint:
+  dataset: D1
+  file: eeglab_data.set
+  applied: [filtering, line-noise, bad-channels, interpolation, rereferencing, run-ica, ica-1hz-copy-weights, iclabel, extract-epochs, baseline-correction, epoch-rejection]
+  script: |
+    % Shortcut: if you saved D1_epochs_clean.set in the epoch rejection lesson, keep
+    % the first line and the last two lines (pop_newset, eeglab redraw), and replace
+    % every line between them with:
+    % EEG = pop_loadset('D1_epochs_clean.set', pwd);
+    [ALLEEG, EEG, CURRENTSET, ALLCOM] = eeglab;
+    eeglabRoot = fileparts(which('eeglab'));
+    EEG = pop_loadset('eeglab_data.set', fullfile(eeglabRoot, 'sample_data'));
+    fullLocs = EEG.chanlocs;
+
+    % Main dataset: high-pass at 0.1 Hz, then 60 Hz line-noise removal
+    EEG = pop_eegfiltnew(EEG, 'locutoff', 0.1);
+    EEG = pop_eegfiltnew(EEG, 'locutoff', 58, 'hicutoff', 62, 'revfilt', 1);
+
+    % Bad channels you removed earlier, e.g. {'T7'}; leave empty if none
+    badChans = {};
+    if ~isempty(badChans)
+        EEG = pop_select(EEG, 'rmchannel', badChans);
+        EEG = pop_interp(EEG, fullLocs, 'spherical');
+    end
+
+    % Average reference, EOG channels excluded
+    eogIdx = find(ismember({EEG.chanlocs.labels}, {'EOG1', 'EOG2'}));
+    EEG = pop_reref(EEG, [], 'exclude', eogIdx);
+
+    % ICA on a 1-Hz copy, then copy the weights back
+    EEG_ica = pop_eegfiltnew(EEG, 'locutoff', 1);
+    EEG_ica = pop_runica(EEG_ica, 'icatype', 'runica', 'extended', 1);
+    EEG.icaweights  = EEG_ica.icaweights;
+    EEG.icasphere   = EEG_ica.icasphere;
+    EEG.icachansind = EEG_ica.icachansind;
+    EEG.icawinv     = [];
+    EEG.icaact      = [];
+    EEG = eeg_checkset(EEG);
+
+    % Remove eye and muscle components, then low-pass at 30 Hz
+    EEG = pop_iclabel(EEG, 'default');
+    EEG = pop_icflag(EEG, [NaN NaN; 0.9 1; 0.9 1; NaN NaN; NaN NaN; NaN NaN; NaN NaN]);
+    artifactComps = find(EEG.reject.gcompreject);
+    if ~isempty(artifactComps)
+        EEG = pop_subcomp(EEG, artifactComps, 0);
+    end
+    EEG = pop_eegfiltnew(EEG, 'hicutoff', 30);
+
+    % Epochs around 'square', baseline, and +/-100 uV rejection
+    EEG = pop_epoch(EEG, {'square'}, [-1 2], 'newname', 'D1 epochs', 'epochinfo', 'yes');
+    EEG = pop_rmbase(EEG, [-200 0]);
+    EEG = pop_eegthresh(EEG, 1, 1:EEG.nbchan, -100, 100, EEG.xmin, EEG.xmax, 0, 0);
+    badEpochs = find(EEG.reject.rejthresh);
+    if ~isempty(badEpochs)
+        EEG = pop_rejepoch(EEG, EEG.reject.rejthresh, 0);
+    end
+    EEG.setname = 'D1 epochs clean';
+    EEG = eeg_checkset(EEG);
+    EEG = pop_saveset(EEG, 'filename', 'D1_epochs_clean.set', 'filepath', pwd);
+    EEG.filename = ''; EEG.filepath = ''; EEG.datfile = ''; EEG.saved = 'no';
+    [ALLEEG, EEG, CURRENTSET] = pop_newset(ALLEEG, EEG, 0, 'setname', 'D1 epochs clean', 'gui', 'off');
+    eeglab redraw;
+eeglabVersion: "2026.1"
+updated: 2026-10-28
+---
+
+## لماذا هذه الخطوة مهمة؟
+
+الـ ERP متوسط. يجمع عشرات المحاولات في موجة واحدة، فيبقى ما يتكرر في نفس الزمن كل مرة ويضعف ما يتغيّر زمنه من محاولة لأخرى.
+
+لكن الدماغ لا يستجيب بنفس التوقيت في كل محاولة. لو كان مكوّن ما يأتي مع ضغطة الزر، وزمن الضغطة يتغيّر بين 330 و 730 ms، فهذا المكوّن ينتشر في المتوسط ويبدو أصغر وأعرض مما هو فعلاً.
+
+الـ ERP image يعرض كل محاولة سطراً ملوّناً، ويرصّ السطور فوق بعض. وإذا رتّبتها حسب زمن الاستجابة، ترى بعينك ما يتبع الاستجابة وما يتبع المثير، قبل أن يختفي الفرق في المتوسط.
+
+## قبل وبعد
+
+<BeforeAfter>
+<ImageSpec>
+قبل: ERP image من EEGLAB 2026.1 للقناة Pz في داتاست D1 epochs clean، من -200 إلى 800 ms، بالمحاولات بترتيب تسجيلها وبلا تنعيم (Smoothing = 1). كل سطر محاولة. الصورة مزدحمة بخطوط أفقية متقطعة، ولا نمط واضح. تحتها موجة الـ ERP المتوسط، وعلى يمينها شريط ألوان بالميكروفولت، وخريطة رأس صغيرة أعلى اليسار عليها نقطة عند Pz. يجب أن تكون الصورتان بنفس الإطار والمقاس والمحاور تماماً.
+</ImageSpec>
+<ImageSpec>
+بعد: نفس القناة ونفس الإطار والمحاور، لكن المحاولات مرتّبة حسب زمن حدث rt (من الأسرع في الأسفل إلى الأبطأ في الأعلى)، ومنعّمة بمتوسط متحرك عرضه 10 محاولات. يظهر منحنى أسود مائل يمثّل زمن الاستجابة في كل محاولة، وتظهر الأنماط بوضوح أكبر. ألوان EEGLAB الافتراضية (turbo)، ومقياس ألوان متماثل حول الصفر.
+</ImageSpec>
+</BeforeAfter>
+
+## الخطوات من الواجهة
+
+ابدأ والداتاست `D1 epochs clean` مفتوحة، كما في "نقطة البداية". فيها حدث `square` عند الزمن 0 في كل إيبوك، وحدث `rt` عند ضغطة الزر في أغلبها.
+
+**أولاً: الصورة الخام**
+
+1. افتح <MenuPath>Plot > Channel ERP image</MenuPath>.
+2. في <UiLabel>Channel</UiLabel> اضغط زر `...` واختر `Pz`.
+3. في <UiLabel>Smoothing</UiLabel> اكتب `1`. الافتراضي 10، لكننا نريد أن نرى كل محاولة وحدها أولاً.
+4. في <UiLabel>Time limits (ms)</UiLabel> اكتب `-200 800`.
+5. تأكد أن <UiLabel>Plot scalp map</UiLabel> و <UiLabel>Plot ERP</UiLabel> و <UiLabel>Plot colorbar</UiLabel> مفعّلة. اضغط <UiLabel>Ok</UiLabel>.
+6. تظهر صورة: المحور الأفقي هو الزمن، وكل سطر من الأسفل للأعلى محاولة بترتيب تسجيلها. تحتها الـ ERP المتوسط.
+
+**ثانياً: رتّب المحاولات حسب زمن الاستجابة**
+
+1. افتح <MenuPath>Plot > Channel ERP image</MenuPath> مرة ثانية. الخانات تتذكر قيمك السابقة.
+2. في <UiLabel>Smoothing</UiLabel> اكتب `10`.
+3. اضغط زر <UiLabel>Epoch-sorting field</UiLabel> واختر `latency`.
+4. اضغط زر <UiLabel>Event type(s)</UiLabel> واختر `rt`.
+5. في <UiLabel>Event time range</UiLabel> اكتب `0 1000`. بهذا يأخذ EEGLAB الاستجابة التي جاءت بعد مثير الإيبوك نفسه فقط.
+6. اترك <UiLabel>Rescale</UiLabel> على `no` و <UiLabel>Align</UiLabel> فارغة. اضغط <UiLabel>Ok</UiLabel>.
+7. تظهر المحاولات مرتّبة: الأسرع في الأسفل والأبطأ في الأعلى، ومنحنى أسود يمر بزمن الاستجابة في كل سطر. انظر في نافذة الأوامر لسطر `Removing ... trials with NaN sortvar values`: هذه محاولات بلا استجابة استُبعدت من الصورة.
+
+**ثالثاً: انظر من جهة الاستجابة**
+
+1. افتح النافذة مرة ثالثة، واكتب `Inf` في <UiLabel>Align</UiLabel>، وامسح <UiLabel>Time limits (ms)</UiLabel>. اضغط <UiLabel>Ok</UiLabel>.
+2. الآن كل المحاولات مزاحة حتى تقع الاستجابة على خط مستقيم عند وسيط زمن الاستجابة، والمنحنى المائل صار يمثّل زمن المثير.
+3. قارن: ما يبقى مستقيماً في الصورة الثانية مرتبط بالمثير، وما يصير مستقيماً هنا مرتبط بالاستجابة.
+
+**رابعاً: اقرأ الصورة**
+
+| ما تراه | معناه |
+|---|---|
+| شريط ملوّن عمودي مستقيم بعد 0 ms | نشاط يأتي بنفس الزمن بعد المثير في كل محاولة. هذا يبقى قوياً في الـ ERP المتوسط. |
+| شريط مائل يتبع المنحنى الأسود | نشاط مرتبط بالاستجابة. في المتوسط حول المثير يتوزّع على مدى أزمنة الاستجابة، فيظهر أضعف وأعرض. |
+| خطوط مائلة متكررة بألوان متناوبة لا تتبع شيئاً | تذبذب مستمر (مثل ألفا قرب 10 Hz) بطور مختلف في كل محاولة. يلغي بعضه بعضاً في المتوسط تقريباً. |
+| سطر واحد بلون شديد يختلف عن جيرانه | محاولة فيها ضوضاء. مع التنعيم تنتشر على السطور المجاورة. |
+| زوايا خالية أسفل اليسار وأعلى اليمين بعد Align | لا بيانات هناك بعد الإزاحة. EEGLAB يلوّنها بلون الصفر. |
+
+<Callout type="note" title="المحاولات بلا rt">
+في D1 ست محاولات بلا حدث `rt` بين 0 و 1000 ms. لو تركت <UiLabel>Event time range</UiLabel> فارغة، يبحث EEGLAB في كل الإيبوك من -1000 إلى 2000 ms، فقد يجد في إحداها استجابة المثير التالي عند نحو 1080 ms ويرتّبها بها خطأً.
+</Callout>
+
+## السكربت المقابل
+
+```matlab
+EEG = pop_loadset('D1_epochs_clean.set', pwd);
+chan = find(strcmp({EEG.chanlocs.labels}, 'Pz'));
+
+% Response latency per epoch, NaN when no response follows the stimulus
+rt = eeg_getepochevent(EEG, 'type', {'rt'}, 'timewin', [0 1000]);
+fprintf('%d of %d epochs have a response, median RT %.0f ms\n', ...
+    sum(~isnan(rt)), EEG.trials, median(rt, 'omitnan'));
+
+% Trials in recording order, no smoothing
+figure; pop_erpimage(EEG, 1, chan, [], 'Pz', 1, 1, {}, [], '', ...
+    'erp', 'on', 'cbar', 'on', 'limits', [-200 800], ...
+    'topo', {chan EEG.chanlocs EEG.chaninfo});
+
+% Trials sorted by response latency, 10-trial moving average
+figure; pop_erpimage(EEG, 1, chan, [], 'Pz sorted by RT', 10, 1, {'rt'}, [0 1000], 'latency', ...
+    'erp', 'on', 'cbar', 'on', 'limits', [-200 800], ...
+    'topo', {chan EEG.chanlocs EEG.chaninfo});
+
+% Same trials aligned to the median response latency
+figure; pop_erpimage(EEG, 1, chan, [], 'Pz aligned to response', 10, 1, {'rt'}, [0 1000], 'latency', ...
+    'align', Inf, 'erp', 'on', 'cbar', 'on', ...
+    'topo', {chan EEG.chanlocs EEG.chaninfo});
+```
+
+## أي قيمة أختار؟
+
+| الإعداد | القيمة | لماذا |
+|---|---|---|
+| <UiLabel>Smoothing</UiLabel> | `1` للنظرة الأولى، ثم 5 إلى 10 | التنعيم متوسط متحرك على المحاولات المتجاورة بعد الترتيب. يوضّح النمط، لكن كبره يمسح الفروق بين المحاولات، وهي سبب رسم الصورة. مع نحو 80 محاولة، 10 حد معقول. |
+| <UiLabel>Event time range</UiLabel> | `0 1000` في D1 | يحصر البحث في استجابة المثير نفسه. الإيبوك من -1000 إلى 2000 ms فيه أحياناً أحداث المثير السابق أو التالي، و EEGLAB يأخذ أول حدث يجده فقط. |
+| القناة | Pz لمكوّن موجب متأخر، و POz أو Oz لألفا | اختر القناة التي يكون فيها الأثر أوضح في رسم ERP للقنوات، ثم افتحها هنا. |
+| <UiLabel>Color limits (see Help)</UiLabel> | فارغة (الافتراضي) أو كسر مثل `0.9` | الافتراضي متماثل حول الصفر من أكبر قيمة مطلقة. إذا جعلت محاولة واحدة شاذة الصورة باهتة، كسر مثل 0.9 يضيّق المقياس. اذكر ذلك في وصف الرسمة. |
+| <UiLabel>Downsampling</UiLabel> | `1` | تحتاجه فقط مع مئات المحاولات. هنا يضيّع معلومات بلا فائدة. |
+| <UiLabel>Align</UiLabel> | فارغة، أو `Inf` للنظر من جهة الاستجابة | `Inf` تعني وسيط قيم الترتيب. يمكنك كتابة رقم بالميلي ثانية بدلاً منه. |
+
+## أخطاء شائعة
+
+- **ترك <UiLabel>Event time range</UiLabel> فارغة.** EEGLAB يأخذ أول `rt` في الإيبوك كله، وقد يكون لمثير آخر. الترتيب يصير خاطئاً بلا أي رسالة خطأ.
+- **تنعيم كبير جداً.** مع تنعيم 40 محاولة من نحو 75، كل سطر متوسط لأكثر من نصف البيانات، فتصير الصورة ERP مكرّراً لا يضيف شيئاً.
+- **نسيان المحاولات المستبعدة.** المحاولات بلا قيمة ترتيب تُحذف من الصورة ومن الموجة التي تحتها. فالموجة تحت الصورة قد تختلف قليلاً عن الـ ERP في درس المتوسط. اقرأ رسالة `Removing ... trials` واذكر العدد.
+- **قراءة شريط مائل كأنه مكوّن جديد.** الصورة تريك العلاقة بالاستجابة، لا مصدرها. التأكد يحتاج تحليلاً بمستوى المجموعة.
+- **رسم ERP image لكل القنوات.** الأداة لقناة واحدة (أو متوسط عدة قنوات) في كل مرة. اختر القناة من رسم ERP للقنوات أولاً.
+
+{/* صندوق "من التجربة": بانتظار قصة من صاحب المشروع. لا يُكتب قبل وصولها. */}
+
+## كيف تتأكد أن الخطوة نجحت؟
+
+- **المنحنى الأسود يرتفع من اليسار لليمين** بين نحو 330 و 730 ms، وأضيق قليلاً مع التنعيم، ولا يتجاوز 800 ms.
+- **رسالة الاستبعاد** في نافذة الأوامر تذكر 6 محاولات أو أقل، وتساوي عدد الإيبوكات ناقص عدد التي لها استجابة في سطر `fprintf` من السكربت.
+- **مع `Align` على `Inf`** يصير المنحنى الأسود مستقيماً عند نحو 400 ms، ويظهر منحنى زمن المثير مائلاً.
+- **مع `Smoothing` على 1** ترى سطوراً أكثر تفصيلاً وأقل انتظاماً مما تراه مع 10.
+
+<Methods>
+Single-trial ERP images at Pz were sorted by reaction time and smoothed with a 10-trial moving average (pop_erpimage, EEGLAB 2026.1); [N] epochs without a response between 0 and 1000 ms were excluded from the image.
+</Methods>

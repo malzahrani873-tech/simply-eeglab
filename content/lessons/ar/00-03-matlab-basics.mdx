@@ -1,0 +1,135 @@
+---
+title: أساسيات MATLAB لـ EEGLAB
+titleEn: MATLAB basics for EEGLAB
+description: ما تحتاجه من MATLAB قبل EEGLAB فقط، مثل المتغيّرات والمصفوفات والـ struct والمسار وتشغيل السكربت، بمثال تسجيل صغير تبنيه بيدك.
+station: 0
+order: 3
+level: core
+status: approved
+objectives:
+  - تشغّل أمراً في Command Window وتقرأ قيمة حقل داخل struct من الـ Workspace.
+  - تستخرج من مصفوفة إشارة قناة واحدة وعيّنات محددة بالفهرسة.
+  - تحفظ سكربتاً في ملف وتشغّله، وتتحقق بالأمر which من مكان أي دالة على المسار.
+prerequisites: []
+references:
+  - title: EEGLAB Tutorial
+    url: https://eeglab.org/tutorials/misc/tutorial_matlab.html
+    section: "Reference Topics > MATLAB tutorial"
+  - title: MATLAB Onramp (MathWorks)
+    url: https://matlabacademy.mathworks.com/
+    section: "MATLAB Onramp"
+  - title: MATLAB Documentation
+    url: https://www.mathworks.com/help/matlab/ref/struct.html
+    section: "struct"
+  - title: MATLAB Documentation
+    url: https://www.mathworks.com/help/matlab/matlab_env/what-is-the-matlab-search-path.html
+    section: "What Is the MATLAB Search Path?"
+eeglabVersion: "2026.1"
+updated: 2026-10-27
+---
+
+## لماذا هذه الخطوة مهمة؟
+
+EEGLAB مكتوب بلغة <En>MATLAB</En>، ويعمل داخلها. كل ضغطة في قوائم EEGLAB تتحوّل في الخلفية إلى سطر MATLAB، وستتعلم في المحطة 9 كيف تجمع هذه السطور في سكربت يعالج كل المشاركين.
+
+والبيانات نفسها تعيش في MATLAB كمتغيّر اسمه `EEG`. لكي تقرأ منه عدد القنوات أو معدل العيّنات، تحتاج أربع أفكار فقط: المتغيّر، والمصفوفة، والـ struct، والمسار.
+
+هذا الدرس ليس دورة MATLAB. إنه أقل ما تحتاجه لتكمل المسار. إذا أردت أكثر، فالتوثيق الرسمي لـ EEGLAB يوصي بدورة MATLAB Onramp المجانية من MathWorks.
+
+## قبل وبعد
+
+<Figure src="matlab-basics/matlab-window.svg" alt="رسم تخطيطي لنافذة MATLAB: Current Folder على اليسار فيه ملفات المجلد الحالي، و Command Window في المنتصف وفيه السطر demo.srate = 128 ونتيجته، و Workspace على اليمين وفيه المتغيّر demo من نوع 1x1 struct." source="original" />
+
+ترتيب الأجزاء عندك قد يختلف، لأن MATLAB يسمح بنقلها. المهم أن تجد الثلاثة بأسمائها.
+
+## الخطوات من الواجهة
+
+هنا "الواجهة" هي نافذة MATLAB نفسها، لا EEGLAB.
+
+1. افتح MATLAB، وابحث عن الأجزاء الثلاثة: <UiLabel>Command Window</UiLabel> و <UiLabel>Workspace</UiLabel> و <UiLabel>Current Folder</UiLabel>.
+2. في الـ Command Window اكتب `x = 5` ثم اضغط <kbd>Enter</kbd>. يطبع MATLAB الناتج، ويظهر المتغيّر `x` في الـ Workspace.
+3. اكتب `y = 7;` مع فاصلة منقوطة في آخره. لا يُطبع شيء، لكن `y` يظهر في الـ Workspace. الفاصلة المنقوطة تمنع الطباعة فقط.
+4. اضغط مرتين على `x` في الـ Workspace. يفتح محرّر المتغيّرات ويعرض قيمته.
+5. افتح سكربتاً جديداً من زر <UiLabel>New Script</UiLabel> في تبويب <UiLabel>Home</UiLabel>. انسخ فيه سكربت القسم التالي.
+6. احفظه باسم `demo_basics.m` في المجلد الظاهر في الـ Current Folder.
+7. شغّله بزر <UiLabel>Run</UiLabel> في تبويب <UiLabel>Editor</UiLabel>، أو اكتب اسمه بدون `.m` في الـ Command Window: `demo_basics`.
+
+<Callout type="note" title="تسمية ملف السكربت">
+اسم ملف السكربت يبدأ بحرف، وفيه حروف إنجليزية وأرقام وشرطة سفلية فقط، بلا مسافات. ولا تسمّه باسم دالة موجودة مثل `plot` أو `eeglab`.
+</Callout>
+
+## السكربت المقابل
+
+السكربت يبني تسجيلاً صغيراً بيدك: 3 قنوات لمدة 10 ثوانٍ بمعدل 128 عيّنة في الثانية، بأرقام عشوائية بدل إشارة حقيقية. اسمه `demo` حتى لا يختلط بالمتغيّر `EEG` الحقيقي الذي ستقابله في المحطة 1.
+
+```matlab
+% A toy recording: 3 channels, 10 seconds at 128 Hz
+demo.srate  = 128;                              % sampling rate (samples per second)
+demo.nbchan = 3;                                % number of channels
+demo.pnts   = 10 * demo.srate;                  % samples per channel
+demo.labels = {'Fz', 'Cz', 'Pz'};               % channel names (a cell array of text)
+demo.data   = randn(demo.nbchan, demo.pnts);    % random numbers, channels x samples
+
+% Read from the struct
+size(demo.data)                                 % rows = channels, columns = samples
+demo.srate                                      % one field
+demo.labels{2}                                  % text of the second channel name
+
+% Indexing: channel 2, samples 1 to 5
+firstSamples = demo.data(2, 1:5)
+
+% Time of each sample in seconds (the first sample is at time 0)
+t = (0:demo.pnts-1) / demo.srate;
+t(end)
+
+% Plot one channel
+figure;
+plot(t, demo.data(2, :));
+xlabel('Time (s)'); ylabel('Amplitude');
+title(['Channel ' demo.labels{2}]);
+
+% Where MATLAB finds things
+whos demo                                       % size and type of a variable
+which plot                                      % location of a function on the path
+```
+
+**ماذا يفعل كل جزء:**
+
+- **struct:** المتغيّر `demo` صندوق فيه حقول، لكل حقل اسم. تصل إلى الحقل بنقطة: `demo.srate`. المتغيّر `EEG` في EEGLAB struct بنفس الفكرة لكن بحقول أكثر.
+- **المصفوفة:** `demo.data` جدول أرقام. كل صف قناة، وكل عمود عيّنة زمنية. وهذا نفس ترتيب `EEG.data` في EEGLAB: القنوات أولاً ثم العيّنات.
+- **الفهرسة:** `demo.data(2, 1:5)` تعني: الصف 2، والأعمدة من 1 إلى 5. والنقطتان وحدهما `:` تعني "كل الأعمدة". الترقيم في MATLAB يبدأ من 1 لا من 0.
+- **الزمن:** أول عيّنة عند الزمن صفر، لذلك نقسم من 0 إلى عدد العيّنات ناقص 1 على معدل العيّنات. آخر عيّنة عند 9.9922 ثانية لا 10.
+- **المسار (<En>path</En>):** MATLAB يجد الدوال والسكربتات في المجلد الحالي وفي قائمة مجلدات اسمها المسار. الأمر `which` يخبرك من أين سيأتي أي اسم. والأمر `addpath` يضيف مجلداً إلى المسار في هذه الجلسة فقط. ستستخدمه في درس التثبيت في المحطة 1 لتضيف مجلد EEGLAB وتحفظه.
+
+## أي قيمة أختار؟
+
+لا قيمة تختارها هنا، لكن هناك رموز متشابهة يختلف معناها. هذا الجدول يكفيك لقراءة أي سطر في دروس EEGLAB.
+
+| تكتب | المعنى | مثال من الدروس |
+|---|---|---|
+| `a = 5` | أنشئ متغيّراً واطبع قيمته | `x = 5` |
+| `a = 5;` | نفس الشيء بلا طباعة | `EEG = pop_eegfiltnew(EEG, 'locutoff', 0.1);` |
+| `s.name` | حقل داخل struct | `EEG.srate` |
+| `m(2, 1:5)` | عناصر من مصفوفة بالأقواس العادية | `EEG.data(1, 1:10)` |
+| `c{2}` | محتوى خانة من cell array بالأقواس المعقوفة | `demo.labels{2}` |
+| `'text'` | نص بين علامتي تنصيص مفردة | `'locutoff'` |
+| `%` | كل ما بعده في السطر تعليق لا يُنفّذ | `% high-pass` |
+| `help name` | شرح دالة في الـ Command Window | `help pop_eegfiltnew` |
+
+## أخطاء شائعة
+
+- **الترقيم من الصفر.** أول عنصر في MATLAB رقمه 1. كتابة `demo.data(0, 1)` تعطي خطأ.
+- **نسيان الفاصلة المنقوطة مع مصفوفة كبيرة.** سطر مثل `x = EEG.data` بلا فاصلة منقوطة يطبع ملايين الأرقام ويجمّد الـ Command Window. إذا حدث هذا اضغط <kbd>Ctrl+C</kbd> لإيقافه.
+- **الخلط بين الأحرف الكبيرة والصغيرة.** `EEG` و `eeg` متغيّران مختلفان. EEGLAB يستخدم `EEG` بأحرف كبيرة دائماً.
+- **الأقواس العادية مع cell array.** `demo.labels(2)` تعطي خانة فيها النص، لا النص نفسه. للنص استخدم `demo.labels{2}`.
+- **ملف سكربت باسم دالة موجودة.** إذا سمّيت سكربتك `plot.m` أو `eeglab.m`، فسيشغّل MATLAB ملفك بدل الدالة الأصلية. تحقّق بالأمر `which` إذا تصرّفت دالة بغرابة.
+
+{/* صندوق "من التجربة": بانتظار قصة من صاحب المشروع. لا يُكتب قبل وصولها. */}
+
+## كيف تتأكد أن الخطوة نجحت؟
+
+- `size(demo.data)` يطبع `3` ثم `1280`.
+- `demo.srate` يطبع `128`، و `demo.labels{2}` يطبع `'Cz'`.
+- `t(end)` يطبع `9.9922`.
+- ظهرت نافذة رسم فيها خط متذبذب حول الصفر لمدة 10 ثوانٍ، وعنوانها `Channel Cz`.
+- `which plot` يطبع مساراً داخل مجلد تثبيت MATLAB، لا داخل مجلدك.

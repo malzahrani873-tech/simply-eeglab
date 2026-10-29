@@ -1,0 +1,51 @@
+# Datasets referenced by lessons. Lessons cite them by code; no data file is hosted on the site.
+# D5 is retired: never reuse the code. dataUrl "TBD" fails the production build.
+
+- code: D1
+  name: EEGLAB sample data (eeglab_data.set)
+  url: https://eeglab.org/tutorials/tutorial_data.html
+  license: No separate data licence (ships with EEGLAB)
+  licenseUrl: null
+  shareAlike: false
+  credit:
+    ar: 'البيانات: عيّنة EEGLAB الرسمية (eeglab_data.set)'
+    en: 'Data: EEGLAB sample data (eeglab_data.set)'
+- code: D2
+  name: PhysioNet EEG Motor Movement/Imagery Dataset (EEGMMIDB)
+  url: https://physionet.org/content/eegmmidb/1.0.0/
+  license: ODC-By 1.0
+  licenseUrl: https://opendatacommons.org/licenses/by/1-0/
+  shareAlike: false
+  credit:
+    ar: 'البيانات: PhysioNet EEGMMIDB، ODC-By'
+    en: 'Data: PhysioNet EEGMMIDB, ODC-By'
+- code: D3
+  name: ERP CORE
+  url: https://erpinfo.org/erp-core
+  dataUrl: https://osf.io/thsqg/
+  license: CC BY-SA 4.0
+  licenseUrl: https://creativecommons.org/licenses/by-sa/4.0/
+  shareAlike: true
+  credit:
+    ar: 'البيانات: ERP CORE (Kappenman وآخرون، 2021)'
+    en: 'Data: ERP CORE (Kappenman et al., 2021)'
+  cite: 'Kappenman, E. S., Farrens, J. L., Zhang, W., Stewart, A. X., & Luck, S. J. (2021). ERP CORE: An open resource for human event-related potential research. NeuroImage, 225, 117465.'
+- code: D4
+  name: Face processing EEG dataset for EEGLAB (OpenNeuro ds002718)
+  url: https://nemar.org/dataexplorer/detail?dataset_id=ds002718
+  license: CC0
+  licenseUrl: https://creativecommons.org/publicdomain/zero/1.0/
+  shareAlike: false
+  credit:
+    ar: 'البيانات: OpenNeuro ds002718 (Wakeman و Henson)'
+    en: 'Data: OpenNeuro ds002718 (Wakeman & Henson)'
+- code: D6
+  name: Go-nogo categorization and detection task (OpenNeuro ds002680)
+  url: https://openneuro.org/datasets/ds002680
+  license: CC0
+  licenseUrl: https://creativecommons.org/publicdomain/zero/1.0/
+  shareAlike: false
+  credit:
+    ar: 'البيانات: OpenNeuro ds002680 (Go-nogo، Delorme)'
+    en: 'Data: OpenNeuro ds002680 (Go-nogo, Delorme)'
+  doi: 10.18112/openneuro.ds002680.v1.2.0

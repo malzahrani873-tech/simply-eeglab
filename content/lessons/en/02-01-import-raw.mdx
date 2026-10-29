@@ -1,0 +1,183 @@
+---
+title: "Importing raw files: EDF, BDF & BrainVision"
+titleEn: "Importing raw files: EDF, BDF & BrainVision"
+description: How to turn a raw EEG file from a recording system into an EEGLAB dataset, and pick the right import method for each format.
+station: 2
+order: 1
+level: core
+status: approved
+objectives:
+  - Import an EDF file into EEGLAB from the GUI and from a script.
+  - Identify the right menu or plugin for a BDF file and for a BrainVision file.
+  - Check the number of channels, the sampling rate and the events after import.
+prerequisites: [eeg-struct]
+references:
+  - title: EEGLAB Tutorial
+    url: https://eeglab.org/tutorials/04_Import/Importing_Continuous_and_Epoched_Data.html
+    section: "4.a Continuous data: Four steps to easily import continuous raw data files"
+  - title: EEGLAB Extensions
+    url: https://eeglab.org/others/EEGLAB_Extensions.html
+    section: "Data import"
+  - title: "EEGLAB preprocessing #1: Importing raw data"
+    url: https://www.youtube.com/watch?v=gEk33jWB0MY
+    section: "Full video"
+    duration: "8:31"
+  - title: EEG Motor Movement/Imagery Dataset (PhysioNet)
+    url: https://physionet.org/content/eegmmidb/1.0.0/
+    section: "Experimental Protocol; Montage"
+datasets: [D2]
+startingPoint:
+  dataset: D2
+  file: S001R03.edf
+  applied: []
+  script: |
+    [ALLEEG, EEG, CURRENTSET, ALLCOM] = eeglab;
+    % Folder where you keep the course data (change it)
+    dataFolder = 'C:\Users\me\Documents\eeg-course';
+    if ~exist(dataFolder, 'dir'), mkdir(dataFolder); end
+    websave(fullfile(dataFolder, 'S001R03.edf'), ...
+        'https://physionet.org/files/eegmmidb/1.0.0/S001/S001R03.edf');
+eeglabVersion: "2026.1"
+updated: 2026-10-28
+---
+
+## Why this step matters
+
+Every EEG system saves its recordings in its own format. EEGLAB, however, works on a single structure: the `EEG` struct.
+
+Importing turns the system's file into this structure: the signal, the channel names, the sampling rate and the events.
+
+Any mistake here carries into every later step. A missing channel or lost events means a wrong analysis from the start.
+
+## Before and after
+
+<BeforeAfter>
+<Figure src="import-raw/S2-eeglab-empty.png" alt="The EEGLAB main window before import: no data loaded, showing &quot;No current dataset&quot;." caption="Before import" source="eeglab-ui" />
+<Figure src="import-raw/S5-main-after-import.png" alt="The EEGLAB main window after importing the EDF file: 64 channels per frame, 20000 frames, 29 events, sampling rate 160 Hz, and Channel locations &quot;No (labels only)&quot;." caption="After import" source="eeglab-ui" />
+</BeforeAfter>
+
+
+## Steps in the GUI
+
+### 1. Download the practice file
+
+We use one file from the open PhysioNet dataset on hand movement and motor imagery: `S001R03.edf`. It has 64 channels at 160 Hz, lasts about two minutes, and stores its events inside the file.
+
+1. Open the dataset page: [EEG Motor Movement/Imagery Dataset](https://physionet.org/content/eegmmidb/1.0.0/).
+2. Go into the `S001` folder and download `S001R03.edf`.
+3. Put it in a folder for these lessons, away from the EEGLAB folder.
+
+### 2. Import the file
+
+1. In the EEGLAB window, open:
+   <MenuPath>File > Import data > Using EEGLAB functions and plugins > From EDF/EDF+/GDF files (BIOSIG toolbox)</MenuPath>
+2. If Biosig is not installed, EEGLAB asks to download it. Click <UiLabel>Yes</UiLabel>.
+3. Select the file `S001R03.edf`.
+4. The <UiLabel>Load data using BIOSIG -- pop_biosig()</UiLabel> window opens. Leave every field at its default value:
+   - <UiLabel>Channel list (default all):</UiLabel> empty, meaning all channels.
+   - <UiLabel>Data range (in seconds) to read (default all [0 ...])</UiLabel> empty, meaning the whole recording.
+   - <UiLabel>Import EDF+ annotations (try also mexSLOAD below)</UiLabel> ticked. Annotations are text notes stored inside an EDF+ file with their timing, and the events in this file come from them.
+5. Click <UiLabel>OK</UiLabel>.
+
+### 3. Name the dataset and save it
+
+1. A window opens to name the new dataset. In the <UiLabel>Name it:</UiLabel> field, type `S001R03`.
+2. Tick <UiLabel>Save it as file:</UiLabel> and choose a name such as `S001R03.set` in your lessons folder.
+3. Click <UiLabel>OK</UiLabel>.
+
+Saving as `.set` means you will not repeat the import in the next lesson. The original `.edf` file stays as it is.
+
+### 4. A BDF or BrainVision file instead of EDF
+
+- **BDF (BioSemi systems):** the same plugin, from <MenuPath>File > Import data > Using EEGLAB functions and plugins > From Biosemi BDF file (BIOSIG toolbox)</MenuPath>. Type a reference channel number in the <UiLabel>Reference chan(s) indices - recommended for BIOSEMI</UiLabel> field, such as the two mastoid channels. The channel number depends on your electrode order, so check your system's montage file. The reason is under "Common mistakes".
+- **BrainVision (Brain Products systems):** a recording is three files with the same name: `.vhdr`, `.vmrk` and `.eeg`. Open <MenuPath>File > Import data > Using EEGLAB functions and plugins > From Brain Vis. Rec. .vhdr file</MenuPath> and select the `.vhdr` file. If the bva-io plugin is not installed, EEGLAB offers to download it. After installation the menu is called <UiLabel>From Brain Vis. Rec. .vhdr or .ahdr file</UiLabel>.
+- **A format you do not know:** try <MenuPath>File > Import data > Using the FILE-IO interface</MenuPath>, then <MenuPath>File > Import data > Using the BIOSIG interface</MenuPath>. If both fail, search for your system's name in <MenuPath>File > Manage EEGLAB extensions</MenuPath>. The documentation says these steps work in about 90% of cases.
+
+From a script, the first two formats look like this. The file names are examples:
+
+```matlab
+% BioSemi BDF: pick a temporary reference at import. Here: the average of
+% the external mastoid electrodes EXG1 and EXG2 (channels 65 and 66 in a
+% 64-channel cap). Check the channel order of your own montage.
+EEG = pop_biosig(fullfile(dataFolder, 'sub01.bdf'), 'ref', [65 66]);
+
+% BrainVision: give the folder and the .vhdr header file (needs bva-io)
+EEG = pop_loadbv(dataFolder, 'sub01.vhdr');
+```
+
+## The equivalent script
+
+```matlab
+% Start EEGLAB and get its main variables
+[ALLEEG, EEG, CURRENTSET, ALLCOM] = eeglab;
+
+% Folder where you saved S001R03.edf (change it)
+dataFolder = 'C:\Users\me\Documents\eeg-course';
+
+% Biosig is required for EDF/BDF files
+if ~exist('sopen', 'file')
+    plugin_askinstall('Biosig', 'sopen', true);
+end
+
+% Import the EDF+ file (all channels, events from annotations)
+EEG = pop_biosig(fullfile(dataFolder, 'S001R03.edf'));
+
+% Store it as a new dataset and save it as .set
+[ALLEEG, EEG, CURRENTSET] = pop_newset(ALLEEG, EEG, 0, ...
+    'setname', 'S001R03', 'gui', 'off');
+EEG = pop_saveset(EEG, 'filename', 'S001R03.set', 'filepath', dataFolder);
+eeglab redraw;
+```
+
+## Which value should I choose?
+
+The main decision: which plugin reads your system's files? All the menus below are under <MenuPath>File > Import data > Using EEGLAB functions and plugins</MenuPath>. If the plugin is not installed, EEGLAB offers to download it the first time you open its menu, as with Biosig.
+
+| Your system | Format | Plugin | Menu | Function |
+|---|---|---|---|---|
+| Many clinical and research systems, PhysioNet, and g.tec (GDF files) | EDF, EDF+ or GDF: `.edf`, `.gdf` | Biosig | <UiLabel>From EDF/EDF+/GDF files (BIOSIG toolbox)</UiLabel> | `pop_biosig` |
+| BioSemi | BDF: `.bdf` | Biosig | <UiLabel>From Biosemi BDF file (BIOSIG toolbox)</UiLabel> | `pop_biosig` with `'ref'` |
+| Brain Products | BrainVision: `.vhdr`, `.vmrk` and `.eeg` | bva-io | <UiLabel>From Brain Vis. Rec. .vhdr file</UiLabel> (after installation: <UiLabel>From Brain Vis. Rec. .vhdr or .ahdr file</UiLabel>) | `pop_loadbv` |
+| EGI / Magstim | MFF: a `.mff` folder | mffmatlabio | <UiLabel>Import Magstim/EGI .mff file</UiLabel> | `pop_mffimport` |
+| Neuroscan | `.cnt` | neuroscanio | <UiLabel>From Neuroscan .CNT file</UiLabel> | `pop_loadcnt` |
+| ANT Neuro (eego) | EEProbe `.cnt` | ANTeepimport | <UiLabel>From ANT EEProbe .CNT file</UiLabel> | `pop_loadeep_v4` |
+| Any system recorded through Lab Streaming Layer (LSL) | XDF: `.xdf` | xdfimport | <UiLabel>From .XDF or .XDFZ file</UiLabel> | `pop_loadxdf` |
+| Any system that exports the signal as text or numbers, or data you already have in MATLAB | ASCII or float file, or a MATLAB array | none, built into EEGLAB | <UiLabel>From ASCII/float file or MATLAB array</UiLabel> | `pop_importdata` |
+
+- A Neuroscan `.cnt` and an ANT `.cnt` are two different formats with the same extension. Choose by the system, not by the extension.
+- If you do not find your system, search for its format name in <MenuPath>File > Manage EEGLAB extensions</MenuPath>.
+
+**Two fields worth your attention in the Biosig window:**
+
+| Field | Value | Why |
+|---|---|---|
+| <UiLabel>Import EDF+ annotations</UiLabel> | Ticked (default) | In EDF+ files, events come from the annotations. If you untick it, you lose the events. |
+| <UiLabel>Reference chan(s) indices - recommended for BIOSEMI</UiLabel> | Empty for EDF, a reference channel for BDF | The `pop_biosig` help page warns that BioSemi data are recorded reference-free and lose about 40 dB of signal-to-noise ratio if left without a reference. This is a temporary reference; you choose the final one in the re-referencing lesson. |
+
+## Common mistakes
+
+- **Picking the wrong BrainVision file.** Always open the `.vhdr` file, not `.eeg` or `.vmrk`. And do not rename one of the three files by hand, because the `.vhdr` file stores the names of the other two inside it. If you need to rename them, use <MenuPath>File > Export > Copy and Rename Brain Vis. exchange files</MenuPath> after installing bva-io.
+- **A BDF file without a reference.** You lose a large part of the signal quality, as in the table above. Choose a reference channel at import.
+- **Turning off event import.** The Biosig window has two event fields, both ticked by default for every format: <UiLabel>Import EDF+ annotations</UiLabel> and <UiLabel>Extract event from marker channel</UiLabel>. If you untick them, the event count may drop to zero, and you cannot epoch the data later.
+- **Not saving after import.** You will repeat the import every time. Save one `.set` copy after import, and never overwrite the original file.
+- **Odd channel names in this file.** The channel names in this dataset end with dots, such as `Fc5.` and `C3..`. This is not an import error, but it stops EEGLAB from recognizing the electrode locations. We fix it in the next lesson.
+
+{/* "From experience" box: waiting for a story from the project owner. Do not write it before it arrives. */}
+
+## How to check it worked
+
+1. **The main window:** under the dataset name, read <UiLabel>Channels per frame</UiLabel> = 64, <UiLabel>Sampling rate (Hz)</UiLabel> = 160, and <UiLabel>Events</UiLabel> above zero. <UiLabel>Channel locations</UiLabel> shows `No (labels only)`, meaning the channel names are there without locations. This is expected for now; we add the locations in the next lesson.
+2. **From the Command Window:** `EEG.nbchan` gives `64`, `EEG.srate` gives `160`, and `EEG.pnts / EEG.srate` gives the length in seconds (about two minutes).
+3. **The events:** `eeg_eventtypes(EEG)` lists the three codes `T0` (rest), `T1` and `T2` (two movements, depending on the task). If the event count is zero, import again and check the annotations field.
+4. **By eye:** open <MenuPath>Plot > Channel data (scroll)</MenuPath>. You should see the channels with a changing signal, and colored vertical lines at the events.
+5. **The saved file:** `S001R03.set` should appear in your lessons folder.
+
+<Methods>
+EEG recordings in EDF+ format (64 channels, 160 Hz) were imported into EEGLAB 2026.1 with pop_biosig (Biosig plugin [version]), and event markers were read from the EDF+ annotations.
+</Methods>
+
+<Callout type="note" title="About the data">
+Data: Schalk, G. (2009). EEG Motor Movement/Imagery Dataset (version 1.0.0). PhysioNet. DOI: 10.13026/C28G6P. License: Open Data Commons Attribution v1.0. Along with the original paper: Schalk et al. (2004), IEEE Transactions on Biomedical Engineering 51(6):1034-1043. And the standard PhysioNet citation: Pollard, T., Moody, B. E., Lehman, L., Gow, B., Fernandes, C., Xie, C., Johnson, A., Mark, R. G., & Heldt, T. (2026). PhysioNet as a global platform for biomedical research. Nature Health. https://doi.org/10.1038/s44360-026-00096-z
+</Callout>
+
+Keep this file. The next two lessons (channel locations and events) continue on it.

@@ -1,0 +1,137 @@
+{
+  "classes": {
+    "brain": {
+      "name": "",
+      "term": "",
+      "signature": ""
+    },
+    "eye": {
+      "name": "",
+      "term": "",
+      "signature": ""
+    },
+    "muscle": {
+      "name": "",
+      "term": "",
+      "signature": ""
+    },
+    "heart": {
+      "name": "",
+      "term": "",
+      "signature": ""
+    },
+    "line": {
+      "name": "",
+      "term": "",
+      "signature": ""
+    },
+    "chan": {
+      "name": "",
+      "term": "",
+      "signature": ""
+    },
+    "other": {
+      "name": "",
+      "term": "",
+      "signature": ""
+    }
+  },
+  "confusions": {
+    "brain>eye": "",
+    "brain>muscle": "",
+    "brain>other": "",
+    "eye>chan": "",
+    "muscle>chan": "",
+    "muscle>line": "",
+    "heart>brain": "",
+    "heart>other": "",
+    "chan>other": "",
+    "line>other": ""
+  },
+  "eye_subtypes": {
+    "blink": "",
+    "saccade": ""
+  },
+  "items": {
+    "c002": {
+      "note": "",
+      "alt": ""
+    },
+    "c004": {
+      "note": "",
+      "alt": ""
+    },
+    "c005": {
+      "note": "",
+      "alt": ""
+    },
+    "c007": {
+      "note": "",
+      "alt": ""
+    },
+    "c010": {
+      "note": "",
+      "alt": ""
+    },
+    "c012": {
+      "note": "",
+      "alt": ""
+    },
+    "c015": {
+      "note": "",
+      "alt": ""
+    },
+    "c016": {
+      "note": "",
+      "alt": ""
+    },
+    "c018": {
+      "note": "",
+      "alt": ""
+    },
+    "c019": {
+      "note": "",
+      "alt": ""
+    },
+    "c020": {
+      "note": "",
+      "alt": ""
+    },
+    "c024": {
+      "note": "",
+      "alt": ""
+    },
+    "c026": {
+      "note": "",
+      "alt": ""
+    },
+    "c029": {
+      "note": "",
+      "alt": ""
+    },
+    "c030": {
+      "note": "",
+      "alt": ""
+    },
+    "c032": {
+      "note": "",
+      "alt": ""
+    },
+    "c033": {
+      "note": "",
+      "alt": ""
+    },
+    "c035": {
+      "note": "",
+      "alt": ""
+    },
+    "c036": {
+      "note": "",
+      "alt": ""
+    },
+    "c037": {
+      "note": "",
+      "alt": ""
+    }
+  }
+}

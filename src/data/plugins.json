@@ -1,0 +1,645 @@
+{
+  "source": "plugins_guide.md",
+  "intro": {
+    "ar": "EEGLAB فيه أكثر من 200 إضافة. أغلب المستخدمين يحتاجون خمساً أو ستاً فقط. هذه الصفحة تجمع أشهرها حسب مرحلة التحليل: ماذا تفعل كل إضافة، ومتى تحتاجها، وأي درس يشرحها.\n\n**قبل أن تبدأ:**\n- الإضافات تُثبّت من <MenuPath>File > Manage EEGLAB extensions</MenuPath>. شرح ذلك في درس `install-eeglab`.\n- خمس إضافات **مرفقة** مع EEGLAB 2026.1 ولا تحتاج تثبيتاً: `firfilt` و `clean_rawdata` و `ICLabel` و `dipfit` و `EEG-BIDS`.\n- هذه الصفحة دليل للتعريف، لا توصية. الدروس تشرح الإضافات المرتبطة بها فقط. قبل استخدام أي إضافة أخرى، اقرأ صفحتها الرسمية وتأكد أنها تعمل مع إصدارك.",
+    "en": "EEGLAB has more than 200 plugins, and most users need only five or six. This page lists the most widely used ones by analysis stage: what each plugin does, when you need it, and which lesson covers it.\n\n**Before you start:**\n- Install plugins from <MenuPath>File > Manage EEGLAB extensions</MenuPath>. The `install-eeglab` lesson shows how.\n- Five plugins **ship with** EEGLAB 2026.1 and need no installation: `firfilt`, `clean_rawdata`, `ICLabel`, `dipfit` and `EEG-BIDS`.\n- This page is a map, not an endorsement. The lessons cover only the plugins linked to them. Before using any other plugin, read its official page and check that it works with your EEGLAB version."
+  },
+  "outro": {
+    "ar": "**لم تجد إضافة تبحث عنها؟** القائمة الكاملة في مدير الإضافات داخل EEGLAB. ابحث بالاسم، واقرأ وصفها وتقييمها وعدد تنزيلاتها قبل التثبيت.",
+    "en": "**Can't find a plugin?** The full list is in the plugin manager inside EEGLAB. Search by name, and check its description, rating and download count before installing."
+  },
+  "groups": [
+    {
+      "n": 1,
+      "title": {
+        "ar": "استيراد البيانات",
+        "en": "Importing data"
+      },
+      "note": {
+        "ar": "",
+        "en": ""
+      },
+      "items": [
+        {
+          "name": "Biosig",
+          "bundled": false,
+          "standalone": false,
+          "lessons": [
+            "import-raw"
+          ],
+          "url": "https://biosig.sourceforge.net/",
+          "text": {
+            "ar": "تستورد صيغاً كثيرة، منها EDF و BDF و GDF. تحتاجها لملفات EDF و BDF.",
+            "en": "Imports many formats, including EDF, BDF and GDF. Use it for EDF and BDF files."
+          }
+        },
+        {
+          "name": "bva-io",
+          "bundled": false,
+          "standalone": false,
+          "lessons": [
+            "import-raw"
+          ],
+          "url": "https://eeglab.org/plugins/BVA-io/",
+          "text": {
+            "ar": "تستورد ملفات BrainVision (`.vhdr`). تحتاجها لأجهزة Brain Products.",
+            "en": "Imports BrainVision files (`.vhdr`). Use it for Brain Products systems."
+          }
+        },
+        {
+          "name": "MFFMatlabIO",
+          "bundled": false,
+          "standalone": false,
+          "lessons": [
+            "import-raw"
+          ],
+          "url": "https://eeglab.org/plugins/MFF-matlab-io/",
+          "text": {
+            "ar": "تستورد ملفات `.mff` وتصدّرها. تحتاجها لأجهزة EGI (Magstim EGI).",
+            "en": "Imports and exports `.mff` files from EGI (Magstim EGI) systems."
+          }
+        },
+        {
+          "name": "neuroscanio",
+          "bundled": false,
+          "standalone": false,
+          "lessons": [
+            "import-raw"
+          ],
+          "url": "https://eeglab.org/plugins/Neuroscan-io",
+          "text": {
+            "ar": "تستورد ملفات Neuroscan (`.cnt` و `.eeg`).",
+            "en": "Imports Neuroscan files (`.cnt` and `.eeg`)."
+          }
+        },
+        {
+          "name": "loadcurry",
+          "bundled": false,
+          "standalone": false,
+          "lessons": [
+            "import-raw"
+          ],
+          "url": null,
+          "text": {
+            "ar": "تستورد ملفات برنامج Curry (الإصدارات 6 و 7 و 8).",
+            "en": "Imports Curry files (versions 6, 7 and 8)."
+          }
+        },
+        {
+          "name": "ANTeepimport",
+          "bundled": false,
+          "standalone": false,
+          "lessons": [
+            "import-raw"
+          ],
+          "url": null,
+          "text": {
+            "ar": "تستورد ملفات أجهزة ANT (`.cnt`) مع ملف الأحداث.",
+            "en": "Imports ANT `.cnt` files with their trigger file."
+          }
+        },
+        {
+          "name": "ctfimport",
+          "bundled": false,
+          "standalone": false,
+          "lessons": [
+            "import-raw"
+          ],
+          "url": "https://eeglab.org/plugins/CTFimport",
+          "text": {
+            "ar": "تستورد بيانات أجهزة CTF (MEG).",
+            "en": "Imports CTF (MEG) data."
+          }
+        },
+        {
+          "name": "xdfimport",
+          "bundled": false,
+          "standalone": false,
+          "lessons": [
+            "import-raw"
+          ],
+          "url": "https://github.com/xdf-modules/xdf-EEGLAB",
+          "text": {
+            "ar": "تستورد ملفات XDF المسجّلة بـ LabRecorder (LSL). تحتاجها إذا سجّلت EEG مع أجهزة أخرى في نفس الوقت.",
+            "en": "Imports XDF files recorded with LabRecorder (LSL). Use it when EEG was recorded together with other devices."
+          }
+        },
+        {
+          "name": "EEG-BIDS",
+          "bundled": true,
+          "standalone": false,
+          "lessons": [
+            "bids-openneuro",
+            "file-organization"
+          ],
+          "url": "https://eeglab.org/plugins/EEG-BIDS/",
+          "text": {
+            "ar": "تستورد داتاست بصيغة BIDS، وتحوّل بياناتك إلى BIDS قبل نشرها.",
+            "en": "Imports BIDS datasets and converts your own data to BIDS before you publish it."
+          }
+        }
+      ]
+    },
+    {
+      "n": 2,
+      "title": {
+        "ar": "المعالجة المسبقة",
+        "en": "Preprocessing"
+      },
+      "note": {
+        "ar": "",
+        "en": ""
+      },
+      "items": [
+        {
+          "name": "firfilt",
+          "bundled": true,
+          "standalone": false,
+          "lessons": [
+            "filtering",
+            "line-noise"
+          ],
+          "url": "https://eeglab.org/plugins/firfilt/",
+          "text": {
+            "ar": "فلاتر FIR في EEGLAB، ومنها فلتر <MenuPath>Basic FIR filter (new, default)</MenuPath>. تستخدمها في كل تحليل.",
+            "en": "EEGLAB's FIR filters, including <MenuPath>Basic FIR filter (new, default)</MenuPath>. You use it in every analysis."
+          }
+        },
+        {
+          "name": "Cleanline",
+          "bundled": false,
+          "standalone": false,
+          "lessons": [
+            "line-noise"
+          ],
+          "url": "https://eeglab.org/plugins/cleanline/",
+          "text": {
+            "ar": "تزيل ضوضاء الكهرباء (50 أو 60 هرتز) بتقدير الموجة وطرحها، بدل قص نطاق كامل.",
+            "en": "Removes line noise (50 or 60 Hz) by estimating the sine wave and subtracting it, instead of cutting out a whole band."
+          }
+        },
+        {
+          "name": "zapline-plus",
+          "bundled": false,
+          "standalone": false,
+          "lessons": [
+            "line-noise"
+          ],
+          "url": "https://eeglab.org/plugins/zapline-plus/",
+          "text": {
+            "ar": "تكتشف قمم الضوضاء في الطيف وتزيلها آلياً، ومنها الكهرباء. مفيدة إذا كان تحليلك يحتاج الترددات العالية.",
+            "en": "Detects and removes noise peaks in the spectrum automatically, including line noise. Useful when your analysis needs high frequencies."
+          }
+        },
+        {
+          "name": "clean_rawdata",
+          "bundled": true,
+          "standalone": false,
+          "lessons": [
+            "bad-channels",
+            "asr"
+          ],
+          "url": "https://eeglab.org/plugins/clean_rawdata/",
+          "text": {
+            "ar": "تكتشف القنوات السيئة، وتصلح المقاطع المشوّهة بطريقة ASR أو تحذفها.",
+            "en": "Detects bad channels and repairs or removes corrupted segments with ASR."
+          }
+        },
+        {
+          "name": "PrepPipeline",
+          "bundled": false,
+          "standalone": false,
+          "lessons": [
+            "bad-channels"
+          ],
+          "url": "https://github.com/VisLab/EEG-Clean-Tools",
+          "text": {
+            "ar": "بايبلاين PREP: يكتشف القنوات السيئة ويحسب مرجعاً متوسطاً لا يتأثر بها (robust reference). بديل آلي لخطوات المحطة 3.",
+            "en": "The PREP pipeline: detects bad channels and computes an average reference that they do not distort (robust reference). An automated alternative to station 3."
+          }
+        }
+      ]
+    },
+    {
+      "n": 3,
+      "title": {
+        "ar": "ICA وتصنيف المكوّنات",
+        "en": "ICA and component classification"
+      },
+      "note": {
+        "ar": "",
+        "en": ""
+      },
+      "items": [
+        {
+          "name": "ICLabel",
+          "bundled": true,
+          "standalone": false,
+          "lessons": [
+            "iclabel",
+            "ic-artifacts"
+          ],
+          "url": "https://eeglab.org/plugins/ICLabel/",
+          "text": {
+            "ar": "تصنّف كل مكوّن ICA في واحدة من سبع فئات (دماغ، عين، عضلة، قلب، كهرباء، قناة، أخرى) مع احتمال لكل فئة.",
+            "en": "Classifies each ICA component into one of seven classes (brain, eye, muscle, heart, line noise, channel noise, other), with a probability for each."
+          }
+        },
+        {
+          "name": "Viewprops",
+          "bundled": false,
+          "standalone": false,
+          "lessons": [
+            "iclabel"
+          ],
+          "url": "https://eeglab.org/plugins/viewprops/",
+          "text": {
+            "ar": "تعرض خصائص المكوّن في نافذة واحدة: خريطة الرأس، والطيف، والنشاط عبر الزمن، مع تصنيف ICLabel.",
+            "en": "Shows a component's properties in one window: scalp map, spectrum and activity over time, with its ICLabel classification."
+          }
+        },
+        {
+          "name": "AMICA",
+          "bundled": false,
+          "standalone": false,
+          "lessons": [
+            "amica-picard"
+          ],
+          "url": "https://eeglab.org/plugins/amica/",
+          "text": {
+            "ar": "خوارزمية ICA أبطأ من `runica` وقد تعطي تفكيكاً أفضل. تحتاج ملفاً تنفيذياً خاصاً بنظامك.",
+            "en": "An ICA algorithm that is slower than `runica` and can give a better decomposition. Needs a compiled binary for your system."
+          }
+        },
+        {
+          "name": "PICARD",
+          "bundled": false,
+          "standalone": false,
+          "lessons": [
+            "amica-picard"
+          ],
+          "url": "https://github.com/pierreablin/picard",
+          "text": {
+            "ar": "خوارزمية ICA أسرع من `runica` بنتائج مقاربة.",
+            "en": "An ICA algorithm that is faster than `runica` with similar results."
+          }
+        },
+        {
+          "name": "MARA",
+          "bundled": false,
+          "standalone": false,
+          "lessons": [
+            "iclabel"
+          ],
+          "url": "https://github.com/irenne/MARA",
+          "text": {
+            "ar": "مصنّف آلي قديم لمكوّنات الآرتفاكت. ستراه في أوراق قديمة، و ICLabel هو الشائع اليوم.",
+            "en": "An older automatic classifier for artifact components. You will see it in older papers; ICLabel is the common choice today."
+          }
+        },
+        {
+          "name": "Adjust",
+          "bundled": false,
+          "standalone": false,
+          "lessons": [
+            "iclabel"
+          ],
+          "url": null,
+          "text": {
+            "ar": "مصنّف آلي قديم لمكوّنات العين والحركة.",
+            "en": "An older automatic classifier for eye and movement components."
+          }
+        },
+        {
+          "name": "SASICA",
+          "bundled": false,
+          "standalone": false,
+          "lessons": [
+            "iclabel"
+          ],
+          "url": "https://github.com/dnacombo/SASICA",
+          "text": {
+            "ar": "تساعدك تختار مكوّنات الآرتفاكت بعدة معايير، وتعرض سبب كل اختيار.",
+            "en": "Helps you select artifact components using several criteria, and shows the reason for each choice."
+          }
+        }
+      ]
+    },
+    {
+      "n": 4,
+      "title": {
+        "ar": "بايبلاينات آلية جاهزة",
+        "en": "Ready-made automated pipelines"
+      },
+      "note": {
+        "ar": "هذه الأدوات تنفّذ المعالجة المسبقة كاملة بأقل تدخّل. **ابنِ البايبلاين بيدك أولاً** (المحطات 3 إلى 5)، ثم استخدمها وأنت تعرف ماذا تفعل كل خطوة فيها.",
+        "en": "These tools run the whole preprocessing stage with little input from you. **Build the pipeline by hand first** (stations 3 to 5), then use them knowing what each step does."
+      },
+      "items": [
+        {
+          "name": "FASTER",
+          "bundled": false,
+          "standalone": false,
+          "lessons": [
+            "automated-pipelines"
+          ],
+          "url": "https://sourceforge.net/projects/faster/",
+          "text": {
+            "ar": "تنظيف آلي كامل لبيانات كثيرة القنوات بمعايير إحصائية.",
+            "en": "Fully automated cleaning of high-density data using statistical criteria."
+          }
+        },
+        {
+          "name": "RELAX",
+          "bundled": false,
+          "standalone": false,
+          "lessons": [
+            "automated-pipelines"
+          ],
+          "url": "https://github.com/NeilwBailey/RELAX",
+          "text": {
+            "ar": "تنظيف آلي كامل بفلاتر Wiener و/أو ICA معزّز بالـ wavelet.",
+            "en": "Fully automated cleaning with Wiener filters and/or wavelet-enhanced ICA."
+          }
+        },
+        {
+          "name": "bemobil-pipeline",
+          "bundled": false,
+          "standalone": false,
+          "lessons": [
+            "automated-pipelines"
+          ],
+          "url": "https://github.com/BeMoBIL/bemobil-pipeline",
+          "text": {
+            "ar": "بايبلاين بالسكربت للاستيراد والمعالجة، مصمّم لبيانات الحركة (MoBI).",
+            "en": "A script-based import and processing pipeline, designed for mobile brain/body imaging (MoBI) data."
+          }
+        },
+        {
+          "name": "automagic",
+          "bundled": false,
+          "standalone": false,
+          "lessons": [
+            "automated-pipelines"
+          ],
+          "url": "https://github.com/methlabUZH/automagic",
+          "text": {
+            "ar": "معالجة موحّدة متوافقة مع BIDS، مع تقييم لجودة كل ملف.",
+            "en": "Standardized, BIDS-compatible preprocessing with a quality rating for every file."
+          }
+        },
+        {
+          "name": "HAPPE",
+          "bundled": false,
+          "standalone": true,
+          "lessons": [
+            "automated-pipelines"
+          ],
+          "url": "https://github.com/PINE-Lab/HAPPE",
+          "text": {
+            "ar": "أداة مستقلة تعمل فوق EEGLAB، صُمّمت لبيانات الأطفال والتسجيلات القصيرة.",
+            "en": "A standalone tool that runs on top of EEGLAB, designed for child data and short recordings."
+          }
+        },
+        {
+          "name": "MADE",
+          "bundled": false,
+          "standalone": true,
+          "lessons": [
+            "automated-pipelines"
+          ],
+          "url": "https://github.com/ChildDevLab/MADE-EEG-preprocessing-pipeline",
+          "text": {
+            "ar": "أداة مستقلة تعمل فوق EEGLAB لبيانات الأطفال والرضّع.",
+            "en": "A standalone tool that runs on top of EEGLAB, for child and infant data."
+          }
+        }
+      ]
+    },
+    {
+      "n": 5,
+      "title": {
+        "ar": "تحليل ERP",
+        "en": "ERP analysis"
+      },
+      "note": {
+        "ar": "",
+        "en": ""
+      },
+      "items": [
+        {
+          "name": "ERPLAB",
+          "bundled": false,
+          "standalone": false,
+          "lessons": [
+            "erplab-amplitude-latency",
+            "data-quality-sme"
+          ],
+          "url": "https://github.com/ucdavis/erplab",
+          "text": {
+            "ar": "أدوات كاملة لتحليل ERP: توزيع الأحداث على bins، والمتوسطات، وقياس السعة والكمون، وجودة البيانات (SME).",
+            "en": "A complete ERP toolbox: assigning events to bins, averaging, measuring amplitude and latency, and data quality (SME)."
+          }
+        }
+      ]
+    },
+    {
+      "n": 6,
+      "title": {
+        "ar": "تحليل المجموعة والإحصاء",
+        "en": "Group analysis and statistics"
+      },
+      "note": {
+        "ar": "",
+        "en": ""
+      },
+      "items": [
+        {
+          "name": "Fieldtrip-lite",
+          "bundled": false,
+          "standalone": false,
+          "lessons": [
+            "study-statistics"
+          ],
+          "url": "https://www.fieldtriptoolbox.org/",
+          "text": {
+            "ar": "تضيف إحصاء FieldTrip إلى STUDY، ومنه تصحيح cluster للمقارنات المتعددة.",
+            "en": "Adds FieldTrip statistics to STUDY, including cluster correction for multiple comparisons."
+          }
+        },
+        {
+          "name": "LIMO",
+          "bundled": false,
+          "standalone": false,
+          "lessons": [
+            "limo"
+          ],
+          "url": "https://eeglab.org/plugins/limo/",
+          "text": {
+            "ar": "نماذج خطية هرمية: نموذج لكل مشارك، ثم نموذج للمجموعة.",
+            "en": "Hierarchical linear models: one model per participant, then one for the group."
+          }
+        }
+      ]
+    },
+    {
+      "n": 7,
+      "title": {
+        "ar": "المصادر والاتصال الوظيفي",
+        "en": "Sources and connectivity"
+      },
+      "note": {
+        "ar": "",
+        "en": ""
+      },
+      "items": [
+        {
+          "name": "dipfit",
+          "bundled": true,
+          "standalone": false,
+          "lessons": [
+            "dipfit"
+          ],
+          "url": "https://eeglab.org/plugins/dipfit/",
+          "text": {
+            "ar": "تقدّر موقع مصدر كل مكوّن ICA بثنائي قطب واحد، وتدعم eLORETA.",
+            "en": "Estimates the source of each ICA component with a single dipole, and supports eLORETA."
+          }
+        },
+        {
+          "name": "NFT",
+          "bundled": false,
+          "standalone": false,
+          "lessons": [
+            "dipfit"
+          ],
+          "url": "https://eeglab.org/plugins/NFT/",
+          "text": {
+            "ar": "تبني نموذج رأس من صور MRI للمشارك نفسه بدل النموذج القياسي.",
+            "en": "Builds a head model from the participant's own MRI instead of a standard template."
+          }
+        },
+        {
+          "name": "SIFT",
+          "bundled": false,
+          "standalone": false,
+          "lessons": [
+            "sift"
+          ],
+          "url": "https://eeglab.org/plugins/SIFT/",
+          "text": {
+            "ar": "تحليل الاتصال الوظيفي بين المصادر بنماذج انحدار ذاتي متعدد المتغيّرات.",
+            "en": "Source-level connectivity analysis using multivariate autoregressive models."
+          }
+        },
+        {
+          "name": "roiconnect",
+          "bundled": false,
+          "standalone": false,
+          "lessons": [
+            "sift"
+          ],
+          "url": "https://eeglab.org/plugins/roiconnect/",
+          "text": {
+            "ar": "الاتصال الوظيفي بين مناطق الدماغ على مستوى المصدر، مع رسوم ثنائية وثلاثية الأبعاد. بديل أحدث لـ SIFT.",
+            "en": "Connectivity between brain regions at the source level, with 2-D and 3-D plots. A newer alternative to SIFT."
+          }
+        }
+      ]
+    },
+    {
+      "n": 8,
+      "title": {
+        "ar": "الحوسبة",
+        "en": "Computing"
+      },
+      "note": {
+        "ar": "",
+        "en": ""
+      },
+      "items": [
+        {
+          "name": "nsgportal",
+          "bundled": false,
+          "standalone": false,
+          "lessons": [
+            "hpc"
+          ],
+          "url": "https://eeglab.org/plugins/nsgportal/",
+          "text": {
+            "ar": "ترسل مهام EEGLAB إلى حواسيب Neuroscience Gateway (NSG) المجانية وتستلم نتائجها. مفيدة لحسابات ICA الطويلة.",
+            "en": "Sends EEGLAB jobs to the free Neuroscience Gateway (NSG) computers and retrieves the results. Useful for long ICA runs."
+          }
+        }
+      ]
+    },
+    {
+      "n": 9,
+      "title": {
+        "ar": "مجالات متخصّصة",
+        "en": "Specialized fields"
+      },
+      "note": {
+        "ar": "لا توجد لها دروس في الموقع. نذكرها حتى تعرف أنها موجودة.",
+        "en": "These have no lessons on this site. We list them so you know they exist."
+      },
+      "items": [
+        {
+          "name": "fMRIb",
+          "bundled": false,
+          "standalone": false,
+          "lessons": [],
+          "url": "https://eeglab.org/plugins/fMRIb/",
+          "text": {
+            "ar": "تزيل آرتفاكت جهاز الرنين من EEG المسجّل داخله (EEG-fMRI).",
+            "en": "Removes MRI-scanner artifacts from EEG recorded inside the scanner (EEG-fMRI)."
+          }
+        },
+        {
+          "name": "TESA",
+          "bundled": false,
+          "standalone": false,
+          "lessons": [],
+          "url": "https://nigelrogasch.github.io/TESA/",
+          "text": {
+            "ar": "معالجة بيانات EEG المسجّلة مع التحفيز المغناطيسي (TMS-EEG).",
+            "en": "Processes EEG recorded with transcranial magnetic stimulation (TMS-EEG)."
+          }
+        },
+        {
+          "name": "EYE-EEG",
+          "bundled": false,
+          "standalone": false,
+          "lessons": [],
+          "url": "https://www.eyetracking-eeg.org/",
+          "text": {
+            "ar": "تربط تتبّع العين مع EEG، وتصحّح آرتفاكت العين بالاستفادة منه.",
+            "en": "Combines eye tracking with EEG, and uses it to correct eye artifacts."
+          }
+        },
+        {
+          "name": "BrainBeats",
+          "bundled": false,
+          "standalone": false,
+          "lessons": [],
+          "url": "https://eeglab.org/plugins/BrainBeats/",
+          "text": {
+            "ar": "تحلّل EEG مع إشارات القلب (ECG أو PPG) معاً.",
+            "en": "Analyzes EEG together with heart signals (ECG or PPG)."
+          }
+        },
+        {
+          "name": "PACT",
+          "bundled": false,
+          "standalone": false,
+          "lessons": [],
+          "url": "https://eeglab.org/plugins/PACT/",
+          "text": {
+            "ar": "تحسب اقتران الطور والسعة (phase-amplitude coupling) في البيانات المستمرة.",
+            "en": "Computes phase-amplitude coupling in continuous data."
+          }
+        }
+      ]
+    }
+  ]
+}

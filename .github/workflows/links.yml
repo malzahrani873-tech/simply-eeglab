@@ -1,0 +1,44 @@
+name: links
+on:
+  schedule: [{ cron: '0 5 * * 0' }]
+  workflow_dispatch:
+permissions: { contents: read, issues: write }
+jobs:
+  lychee:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - id: lychee
+        uses: lycheeverse/lychee-action@v2
+        with:
+          args: --no-progress --max-concurrency 4 --accept 200,206,429 'content/lessons/**/*.mdx' 'src/data/*.yaml' 'src/data/*.json' 'src/i18n/*.json'
+          output: ./lychee/out.md
+          fail: false
+      - name: Videos still public
+        run: |
+          mkdir -p lychee
+          grep -rhoE 'https://(www\.)?(youtube\.com/watch\?v=|youtu\.be/)[A-Za-z0-9_-]{11}' content/lessons | sort -u | while read -r url; do
+            code=$(curl -s -o /dev/null -w '%{http_code}' "https://www.youtube.com/oembed?url=${url}&format=json")
+            if [ "$code" = 404 ] || [ "$code" = 401 ]; then echo "- video unavailable: ${url}" >> lychee/videos.md; fi
+          done
+          if [ -s lychee/videos.md ]; then { echo; echo '## Videos'; cat lychee/videos.md; } >> lychee/out.md; echo 'broken=1' >> "$GITHUB_ENV"; fi
+      - if: steps.lychee.outputs.exit_code != 0 || env.broken == '1'
+        uses: peter-evans/create-issue-from-file@v6
+        with:
+          title: Broken links (weekly check)
+          content-filepath: ./lychee/out.md
+          labels: links
+  uptime:
+    runs-on: ubuntu-latest
+    if: vars.SITE_URL != ''
+    steps:
+      - name: Site responds
+        run: |
+          for p in / /en/ /lesson/filtering/ /pagefind/pagefind.js; do
+            curl -fsSL --max-time 20 -o /dev/null "${{ vars.SITE_URL }}$p" || { echo "down: $p"; exit 1; }
+          done
+      - if: failure()
+        uses: actions/github-script@v8
+        with:
+          script: |
+            await github.rest.issues.create({ owner: context.repo.owner, repo: context.repo.repo, title: 'Site is not responding', labels: ['uptime'] });

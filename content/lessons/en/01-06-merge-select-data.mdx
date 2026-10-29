@@ -1,0 +1,177 @@
+---
+title: Merging & selecting data
+titleEn: Merging & selecting data
+description: How to cut part of a dataset by time or around events, how to merge several datasets from one participant, and what boundary events mean at the joins.
+station: 1
+order: 6
+level: recommended
+status: approved
+objectives:
+  - Select part of a continuous dataset by time with Edit > Select data.
+  - Append datasets from one participant with Edit > Append datasets, and find the boundary event at the join.
+  - Keep only the data around one event type with Edit > Select data using events.
+prerequisites: [alleeg-datasets]
+references:
+  - title: EEGLAB Tutorial
+    url: https://eeglab.org/tutorials/ConceptsGuide/Data_Structures.html
+    section: "EEGLAB data structures: Event boundaries"
+  - title: EEGLAB Tutorial
+    url: https://eeglab.org/tutorials/07_Extract_epochs/Extracting_Data_Epochs.html
+    section: "7. Extract Data Epochs: Selecting a subset of data epochs (Edit > Select data)"
+  - title: EEGLAB Tutorial
+    url: https://eeglab.org/tutorials/06_RejectArtifacts/Scrolling_data.html
+    section: "b. Remove bad data by visual inspection: Rejecting bad portions of data surrounding events"
+  - title: pop_mergeset (EEGLAB function help)
+    url: https://sccn.ucsd.edu/~arno/eeglab/auto/pop_mergeset.html
+    section: "help pop_mergeset"
+datasets: [D1]
+startingPoint:
+  dataset: D1
+  file: eeglab_data.set
+  applied: []
+  script: |
+    [ALLEEG, EEG, CURRENTSET, ALLCOM] = eeglab;
+    sampleFolder = fullfile(fileparts(which('eeglab')), 'sample_data');
+    EEG = pop_loadset('filename', 'eeglab_data.set', 'filepath', sampleFolder);
+    [ALLEEG, EEG, CURRENTSET] = pop_newset(ALLEEG, EEG, 0, 'setname', 'Continuous EEG Data', 'gui', 'off');
+    eeglab redraw;
+eeglabVersion: "2026.1"
+updated: 2026-10-28
+---
+
+## Why this step matters
+
+Many experiments record each participant in several runs, with a break in between. To analyze them together, you merge them into one dataset. Sometimes you need the opposite: only one part of the recording. But how does EEGLAB know that the signal was broken at the join?
+
+The answer is a special event called `boundary`. EEGLAB adds it automatically at every join or cut, and later filtering and epoching respect it. So that you need no new data, we practice on `eeglab_data.set`: we split it into two parts, merge them again, and see where the `boundary` event appears.
+
+In real experiments, each participant is often recorded in several runs. For example, the raw version of the station 8 data on OpenNeuro (ds002680) has two sessions of 12 or 13 runs for each participant. The ready copy we use in station 8 has already been prepared, with one file per condition.
+
+## Before and after
+
+<Figure src="merge-select-data/merge-select-timeline.svg" alt="A faded time bar of the whole of D1, with scissors and an arrow labelled Select data leading to two bars: D1 part 1 from 0 to 120 s (15361 samples) and D1 part 2 from 120 to 238.3 s (15143 samples), with a small gap between them. Then an arrow labelled Append datasets leads to one bar, D1 merged (30504 samples), with a thick red vertical line labelled boundary at the join." source="original" />
+
+## Steps in the GUI
+
+### 1. Cut the first part
+
+1. With `eeglab_data.set` open as dataset 1, open <MenuPath>Edit > Select data</MenuPath>.
+2. In the <UiLabel>Time range [min max] (s)</UiLabel> row, type `0 120`. Leave the checkbox under <UiLabel>on->remove these</UiLabel> in the same row unticked.
+3. Click <UiLabel>OK</UiLabel>. In the <UiLabel>What do you want to do with the new dataset?</UiLabel> window, type `D1 part 1` in <UiLabel>Name it:</UiLabel>, then click <UiLabel>OK</UiLabel>.
+4. The first line of the main window is now `#2: D1 part 1`, and <UiLabel>Frames per epoch</UiLabel> shows 15361.
+
+### 2. Cut the second part
+
+1. From the <UiLabel>Datasets</UiLabel> menu, choose `Dataset 1:Continuous EEG Data`. Always cut from the original, not from part 1.
+2. Open <MenuPath>Edit > Select data</MenuPath> again.
+3. Type the same range `0 120` in <UiLabel>Time range [min max] (s)</UiLabel>, and this time **tick** the checkbox under <UiLabel>on->remove these</UiLabel>. EEGLAB now removes the first 120 seconds and keeps the rest.
+4. Click <UiLabel>OK</UiLabel>, and name the new dataset `D1 part 2`.
+5. The main window shows `#3: D1 part 2` and 15143 samples.
+
+Using the same range with and without the checkbox makes sure that the two parts do not overlap and that no sample is lost between them.
+
+### 3. Merge the two parts
+
+1. Open <MenuPath>Edit > Append datasets</MenuPath>.
+2. In <UiLabel>Dataset indices to merge</UiLabel>, type `2 3`. The order matters: the first dataset comes first in time.
+3. Leave <UiLabel>Preserve ICA weights of the first dataset ?</UiLabel> unticked, and click <UiLabel>OK</UiLabel>.
+4. EEGLAB suggests the name `Merged datasets`. Change it to `D1 merged`, then click <UiLabel>OK</UiLabel>.
+5. The main window shows `#4: D1 merged`: 30504 samples like the original, and <UiLabel>Events</UiLabel> shows 155 instead of 154.
+
+The Command Window may print `Warning: duplicate boundary event removed`. This is normal: each part already had a `boundary` at its cut edge, and EEGLAB keeps only one at the join.
+
+### 4. Find the join
+
+1. With `D1 merged` as the current dataset, open <MenuPath>Plot > Channel data (scroll)</MenuPath>.
+2. In the box between the two arrows at the bottom of the window, type `118` and press Enter.
+3. At 120 seconds you see a thick red line labelled `boundary`. This is the extra event: number 155.
+
+### 5. Select the data around one event type
+
+1. Go back to `Dataset 1:Continuous EEG Data` in the <UiLabel>Datasets</UiLabel> menu.
+2. Open <MenuPath>Edit > Select data using events</MenuPath>. The window <UiLabel>Remove data portions around events - pop_rmdat()</UiLabel> opens.
+3. In <UiLabel>Event type(s) ([]=all)</UiLabel>, type `square`.
+4. In <UiLabel>Time limits [start, end] in sec.</UiLabel>, type `-0.5 1`: from half a second before each `square` event to one second after it.
+5. Leave the list on <UiLabel>Keep selected</UiLabel>, and click <UiLabel>OK</UiLabel>. Name the dataset `D1 around square`.
+6. 15336 samples remain (about 120 seconds), and <UiLabel>Events</UiLabel> shows 234: all 154 original events, plus 80 `boundary` events, one at each removed part.
+
+## The equivalent script
+
+```matlab
+% Start EEGLAB and load the sample dataset as dataset 1
+[ALLEEG, EEG, CURRENTSET, ALLCOM] = eeglab;
+sampleFolder = fullfile(fileparts(which('eeglab')), 'sample_data');
+EEG = pop_loadset('filename', 'eeglab_data.set', 'filepath', sampleFolder);
+[ALLEEG, EEG, CURRENTSET] = pop_newset(ALLEEG, EEG, 0, ...
+    'setname', 'Continuous EEG Data', 'gui', 'off');
+
+% Part 1: keep the first 120 seconds (dataset 2)
+EEG = pop_select(ALLEEG(1), 'time', [0 120]);
+[ALLEEG, EEG, CURRENTSET] = pop_newset(ALLEEG, EEG, CURRENTSET, ...
+    'setname', 'D1 part 1', 'gui', 'off');
+
+% Part 2: remove the same 120 seconds and keep the rest (dataset 3)
+EEG = pop_select(ALLEEG(1), 'rmtime', [0 120]);
+[ALLEEG, EEG, CURRENTSET] = pop_newset(ALLEEG, EEG, CURRENTSET, ...
+    'setname', 'D1 part 2', 'gui', 'off');
+
+% Append datasets 2 and 3 (dataset 4)
+EEG = pop_mergeset(ALLEEG, [2 3], 0);
+[ALLEEG, EEG, CURRENTSET] = pop_newset(ALLEEG, EEG, CURRENTSET, ...
+    'setname', 'D1 merged', 'gui', 'off');
+
+[ALLEEG.pnts]                                  % 30504 15361 15143 30504
+isequal(ALLEEG(4).data, ALLEEG(1).data)        % 1: same signal as the original
+eeg_eventtypes(EEG)                            % square 80, rt 74, boundary 1
+EEG.event(eeg_findboundaries(EEG)).latency     % 15361.5: between samples 15361 and 15362
+
+% Keep only the data from -0.5 to 1 s around each square event (dataset 5)
+EEG = pop_rmdat(ALLEEG(1), {'square'}, [-0.5 1], 0);
+[ALLEEG, EEG, CURRENTSET] = pop_newset(ALLEEG, EEG, CURRENTSET, ...
+    'setname', 'D1 around square', 'gui', 'off');
+EEG.pnts                                       % 15336
+numel(eeg_findboundaries(EEG))                 % 80
+eeglab redraw;
+```
+
+- `'time'` keeps the range, and `'rmtime'` removes it. They are the checkbox under <UiLabel>on->remove these</UiLabel>, unticked and ticked.
+- `pop_mergeset(ALLEEG, [2 3], 0)` merges dataset 2, then 3. The final zero means: do not keep the ICA weights.
+- The last number in `pop_rmdat` is the list in the window: `0` means <UiLabel>Keep selected</UiLabel>, and `1` means <UiLabel>Remove selected</UiLabel>.
+
+## Which value should I choose?
+
+| What you want | Menu | What to type |
+|---|---|---|
+| One continuous part of the recording | <MenuPath>Edit > Select data</MenuPath> | The range in seconds in <UiLabel>Time range [min max] (s)</UiLabel>, checkbox unticked. |
+| Remove one continuous part (start, end or a break) | <MenuPath>Edit > Select data</MenuPath> | The same range, with the checkbox under <UiLabel>on->remove these</UiLabel> ticked. |
+| The data around one event type | <MenuPath>Edit > Select data using events</MenuPath> | The event type, the limits in seconds around it, and <UiLabel>Keep selected</UiLabel>. |
+| Remove the data around an event, such as a TMS pulse that saturates the amplifier | <MenuPath>Edit > Select data using events</MenuPath> | The event type, short limits around it, and <UiLabel>Remove selected</UiLabel>. The official tutorial gives this example. |
+| Several runs of one participant in one dataset | <MenuPath>Edit > Append datasets</MenuPath> | The dataset numbers in the order they were recorded. |
+
+**When to merge?** Usually right after import and channel locations, before filtering and ICA. ICA needs a lot of data, and the runs of one session share the same electrodes.
+
+## Common mistakes
+
+- **Merging datasets with a different number of channels or sampling rate.** <MenuPath>Edit > Append datasets</MenuPath> stops with the error `The two datasets must have the same number of channels` or `The two datasets must have the same sampling rate`. Make channels and rate match before merging.
+- **Merging datasets with the same number of channels in a different order.** EEGLAB checks the number only, not the names. The `Cz` signal of one run can end up under the name `Pz` of another, with no warning. Compare `{EEG.chanlocs.labels}` in both datasets before merging.
+- **Deleting or ignoring `boundary` events in an old script.** EEGLAB filters each part between two `boundary` events on its own, and epoching skips any epoch that crosses a join. If you delete them, or filter `EEG.data` directly with a MATLAB function, the join is treated as a continuous signal and a false jump appears.
+- **Forgetting that every cut and every merge is a new dataset.** <MenuPath>Edit > Select data</MenuPath> and <MenuPath>Edit > Append datasets</MenuPath> add a new dataset to `ALLEEG`, and the original stays as it is. Give each copy a clear name, and look at the first line of the main window before each step.
+- **Cutting from part 1 instead of the original.** In step 2, if `D1 part 1` is still the current dataset, you remove the first 120 seconds of it, and almost nothing is left. Go back to dataset 1 first.
+
+{/* "From experience" box: waiting for a story from the project owner. Do not write it before it arrives. */}
+
+## How to check it worked
+
+1. The <UiLabel>Datasets</UiLabel> menu lists five datasets: `Continuous EEG Data`, `D1 part 1`, `D1 part 2`, `D1 merged` and `D1 around square`.
+2. <UiLabel>Frames per epoch</UiLabel> for the first four: 30504, 15361, 15143 and 30504.
+3. `D1 merged` has 155 events, `eeg_eventtypes` shows `boundary 1`, and you see it as a red line at 120 seconds in the scroll window.
+4. `isequal(ALLEEG(4).data, ALLEEG(1).data)` gives `1`: merging gave back exactly the original signal.
+5. `D1 around square` has 15336 samples and 80 `boundary` events.
+
+Nothing in this lesson is saved to disk. Delete datasets 2 to 5 from memory with <MenuPath>Edit > Delete dataset(s) from memory</MenuPath> before the next lesson, or close EEGLAB.
+
+The Methods sentence below is for real use, when you merge several runs of one participant, not for the two-halves exercise in this lesson.
+
+<Methods>
+Data from the [N] recording runs were concatenated into a single continuous dataset (pop_mergeset, EEGLAB 2026.1), with boundary events marking the joins.
+</Methods>

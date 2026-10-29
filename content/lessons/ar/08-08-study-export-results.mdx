@@ -1,0 +1,243 @@
+---
+title: إخراج النتائج للورقة والتحليل الإحصائي
+titleEn: Exporting results for papers & stats software
+description: "كيف تقرأ قيم ERP لكل مشارك من STUDY بـ std_readdata، وتحسب متوسط نافذة محددة مسبقاً، وتحفظ جدول CSV لبرامج الإحصاء."
+station: 8
+order: 8
+level: recommended
+status: approved
+objectives:
+  - يقرأ ERP كل مشارك وشرط في قنوات مختارة بـ std_readdata.
+  - يحسب متوسط سعة واحداً لكل مشارك في نافذة محددة قبل النظر إلى البيانات.
+  - يحفظ جدول CSV بالصيغة الطويلة بـ writetable، ويطابقه مع رسم المجموعة.
+prerequisites: [study-statistics]
+references:
+  - title: EEGLAB Tutorial
+    url: https://eeglab.org/tutorials/11_Scripting/command_line_study_functions.html
+    section: "11. Scripting > Retrieving computed measures for subsequent processing"
+  - title: EEGLAB Tutorial
+    url: https://eeglab.org/tutorials/11_Scripting/command_line_study_functions.html
+    section: "11. Scripting > Saving results for processing in other software packages"
+  - title: MATLAB documentation
+    url: https://www.mathworks.com/help/matlab/ref/writetable.html
+    section: "writetable"
+  - title: Go-nogo categorization and detection task (OpenNeuro ds002680)
+    url: https://openneuro.org/datasets/ds002680
+    section: "participants.tsv"
+datasets: [D6]
+startingPoint:
+  dataset: D6
+  file: animal_mine.study
+  applied: [create-study, study-design, study-precompute]
+  script: |
+    [ALLEEG, EEG, CURRENTSET, ALLCOM] = eeglab;
+    % Folder for the course data (change it)
+    dataFolder = 'C:\Users\me\Documents\eeg-course';
+
+    % Download the ready Go-nogo STUDY once and unzip it in its own folder
+    zipDir = fullfile(dataFolder, 'animal_study');
+    studyFile = dir(fullfile(zipDir, '**', 'animal.study'));
+    if isempty(studyFile)
+        zipFile = fullfile(dataFolder, 'animal_study.zip');
+        websave(zipFile, 'https://sccn.ucsd.edu/eeglab/download/animal_study.zip');
+        unzip(zipFile, zipDir);
+        studyFile = dir(fullfile(zipDir, '**', 'animal.study'));
+    end
+    studyDir = studyFile(1).folder;
+
+    % Convert the old .dat data files to .fdt once: resaving them in their old format damages the data in EEGLAB 2026.1
+    setFiles = dir(fullfile(studyDir, '*', '*.set'));
+    for k = 1:numel(setFiles)
+        [~, base] = fileparts(setFiles(k).name);
+        folder = setFiles(k).folder;
+        if ~exist(fullfile(folder, [base '.fdt']), 'file')
+            TMP = pop_loadset('filename', setFiles(k).name, 'filepath', folder);
+            pop_saveset(TMP, 'filename', setFiles(k).name, 'filepath', folder, 'savemode', 'twofiles');
+            if exist(fullfile(folder, [base '.fdt']), 'file') && exist(fullfile(folder, [base '.dat']), 'file')
+                delete(fullfile(folder, [base '.dat']));
+            end
+        end
+    end
+
+    % Rebuild animal_mine.study (create-study lesson) if it is missing
+    if ~exist(fullfile(studyDir, 'animal_mine.study'), 'file')
+        gender = containers.Map( ...
+            {'cba','clm','ega','fsa','gro','hth','lmi','mba','mma','mta','pla','sce','sph','wpa'}, ...
+            {'F',  'F',  'F',  'M',  'M',  'M',  'F',  'F',  'M',  'F',  'M',  'F',  'M',  'M'});
+        files = dir(fullfile(studyDir, '*', '*.set'));
+        commands = {};
+        for k = 1:numel(files)
+            hdr = pop_loadset('filename', files(k).name, 'filepath', files(k).folder, 'loadmode', 'info');
+            subj = hdr.subject;
+            if isempty(subj), [~, subj] = fileparts(files(k).folder); end
+            cond = hdr.condition;
+            if isempty(cond)
+                if contains(files(k).name, 'distractor'), cond = 'distractor'; else, cond = 'animal'; end
+            end
+            if ~isKey(gender, lower(subj))
+                error('No gender entry for subject %s (%s)', subj, files(k).name);
+            end
+            commands{end+1} = {'index', k, 'load', fullfile(files(k).folder, files(k).name), ...
+                'subject', subj, 'condition', cond, 'group', gender(lower(subj))};
+        end
+        [STUDY, ALLEEG] = std_editset([], [], 'name', 'Go-nogo animal (mine)', ...
+            'task', 'Go-nogo categorization', 'commands', commands, 'updatedat', 'on');
+        STUDY = pop_savestudy(STUDY, ALLEEG, 'filename', 'animal_mine.study', ...
+            'filepath', studyDir, 'resavedatasets', 'on');
+    end
+    [STUDY, ALLEEG] = pop_loadstudy('filename', 'animal_mine.study', 'filepath', studyDir);
+
+    % Designs 2 and 3 (study-design lesson); design 2 is the current one
+    STUDY = std_makedesign(STUDY, ALLEEG, 2, 'name', 'image x gender', ...
+        'variable1', 'condition', 'values1', {'animal', 'distractor'}, 'vartype1', 'categorical', ...
+        'variable2', 'group', 'values2', {'F', 'M'}, 'vartype2', 'categorical');
+    STUDY = std_makedesign(STUDY, ALLEEG, 3, 'name', 'image only', ...
+        'variable1', 'condition', 'values1', {'animal', 'distractor'}, 'vartype1', 'categorical', ...
+        'variable2', 'none');
+    STUDY = std_selectdesign(STUDY, ALLEEG, 2);
+    STUDY = pop_savestudy(STUDY, ALLEEG, 'savemode', 'resave');
+
+    % Precomputed measures (study-precompute lesson), only if they are missing
+    first = STUDY.datasetinfo(1);
+    timefFile = fullfile(first.filepath, [first.subject '.dattimef']);
+    needMeasures = ~exist(fullfile(first.filepath, [first.subject '.daterp']), 'file') || ~exist(timefFile, 'file');
+    if ~needMeasures
+        tf = load('-mat', timefFile, 'labels');
+        needMeasures = numel(tf.labels) < ALLEEG(1).nbchan;   % ERSP from an older two-channel run
+    end
+    if needMeasures
+        baseline = [round(ALLEEG(1).xmin*1000) 0];
+        [STUDY, ALLEEG] = std_precomp(STUDY, ALLEEG, {}, 'savetrials', 'on', 'interp', 'on', 'recompute', 'on', ...
+            'erp', 'on', 'erpparams', {'rmbase', baseline}, ...
+            'spec', 'on', 'specparams', {'specmode', 'fft', 'logtrials', 'off'}, ...
+            'ersp', 'on', 'itc', 'on', 'erspparams', {'cycles', [3 0.8], 'freqs', [3 30], 'nfreqs', 20, 'ntimesout', 50});
+        STUDY = pop_savestudy(STUDY, ALLEEG, 'savemode', 'resave');
+    end
+
+    CURRENTSTUDY = 1; EEG = ALLEEG; CURRENTSET = 1:length(EEG);
+    eeglab redraw;
+eeglabVersion: "2026.1"
+updated: 2026-10-28
+---
+
+## لماذا هذه الخطوة مهمة؟
+
+انتهى الدرس السابق بحدّ: الاختبار الثنائي في EEGLAB لا يعالج التصميم المختلط كما يجب. وكثير من الباحثين يحتاجون أيضاً اختبارات لا يقدّمها EEGLAB أصلاً: ANOVA مختلط، أو نموذج خطي مختلط، أو اختبار بايزي، أو متغيّر مصاحب مثل العمر.
+
+والطريق المعتاد بسيط. تلخّص ERP كل مشارك في رقم واحد لكل شرط (مثلاً متوسط السعة من 150 إلى 250 ms)، وتضع هذه الأرقام في جدول، وتفتح الجدول في برنامج إحصاء. والجدول أيضاً هو ما تنشره في الورقة، وما يستطيع المحكّم أن يتحقق منه.
+
+لا توجد قائمة في EEGLAB تكتب هذا الجدول. يحتاج بضعة أسطر من السكربت، وهذا الدرس يعطيك إياها.
+
+## قبل وبعد
+
+قبل: قيم ERP في ملفات `.daterp` لكل مشارك، ولا يقرؤها إلا EEGLAB. بعد: ملف واحد `erp_150_250_mean.csv` بجانب `animal_mine.study`، يفتحه أي برنامج إحصاء. أول صفوفه تبدو هكذا (ترتيب المشاركين والقيم من تشغيلك أنت):
+
+| subject | gender | condition | channel | mean_uV |
+|---|---|---|---|---|
+| cba | F | animal | Fz | … |
+| clm | F | animal | Fz | … |
+| ega | F | animal | Fz | … |
+| fsa | M | animal | Fz | … |
+
+الجدول الكامل فيه 56 صفاً: 14 مشاركاً × شرطان × قناتان.
+
+## الخطوات من الواجهة
+
+**عن البيانات (D6):** `animal_mine.study` مع ERP المحسوب في درس الحساب المسبق. نستخدم التصميم 3، `image only`، لأن كل مشارك موجود في الشرطين، فكل عمود في البيانات شخص واحد. والجنس مأخوذ من STUDY، حيث حفظه درس الإنشاء في `group`.
+
+**أولاً: انظر إلى ما ستُخرجه**
+
+1. شغّل سكربت "نقطة البداية".
+2. افتح <MenuPath>Study > Plot channel measures</MenuPath>، واختر `image only` في <UiLabel>Select design:</UiLabel>، وحدد `Pz`.
+3. اضغط <UiLabel>Params</UiLabel> بجانب <UiLabel>Plot ERPs</UiLabel> واكتب `150 250` في <UiLabel>Time range (ms) [low high]</UiLabel>. اضغط <UiLabel>Ok</UiLabel>، ثم <UiLabel>Plot ERPs</UiLabel>. الرسم يعرض الآن النافذة التي ستأخذ متوسطها فقط. امسح نطاق الزمن بعد ذلك.
+
+**ثانياً: اعثر على الأمر خلف الرسم**
+
+1. في نافذة أوامر MATLAB اكتب `eegh`. آخر الأسطر تعرض الأوامر التي شغّلتها الواجهة، مثل `STUDY = std_erpplot(STUDY,ALLEEG,'channels',...`.
+2. كل دوال رسم STUDY تقرأ بياناتها بـ `std_readdata`. السكربت التالي يستدعيها مباشرة، فتحصل على الأرقام بدل الرسم.
+
+**ثالثاً: شغّل السكربت وافتح الجدول**
+
+1. شغّل السكربت في "السكربت المقابل". تعرض نافذة الأوامر `56 rows written to` مع مسار الملف، ثم أول أربعة صفوف.
+2. افتح `erp_150_250_mean.csv` في محرر نصوص أولاً. يجب أن ترى سطر عناوين، وقيماً تفصلها فواصل.
+3. في JASP أو R الأعمدة جاهزة: `subject` يحدد الشخص، و `condition` داخل المشارك، و `gender` بين المشاركين.
+
+<Callout type="note">
+**طويل أم عريض؟** الجدول بالصيغة **الطويلة** (long): صف لكل مشارك وشرط وقناة. R (مثلاً مع `lme4` أو `afex`) والنماذج المختلطة في JASP تستخدم هذه الصيغة مباشرة. أما SPSS و ANOVA القياسات المتكررة الكلاسيكي في JASP فيريدان الصيغة **العريضة** (wide): صف لكل مشارك وعمود لكل شرط. البرنامجان يستطيعان التحويل، أو حوّل في MATLAB بـ `unstack`.
+</Callout>
+
+## السكربت المقابل
+
+```matlab
+% STUDY, ALLEEG and studyDir come from the starting point script
+names = {STUDY.changrp.name};
+chans = names(ismember(lower(names), {'fz', 'pz'}));
+win = [150 250];   % window fixed before looking at the data (Thorpe et al., 1996)
+d = 3;             % design 'image only': every participant appears in both conditions
+subjects = STUDY.design(d).cases.value;
+conds = STUDY.design(d).variable(1).value;
+
+rows = {};
+for c = 1:numel(chans)
+    [STUDY, erp, times] = std_readdata(STUDY, ALLEEG, 'channels', chans(c), 'design', d, 'datatype', 'erp');
+    inWin = times >= win(1) & times <= win(2);
+    for k = 1:numel(conds)
+        if size(erp{k}, 2) ~= numel(subjects)
+            error('Condition %s does not hold every participant', conds{k});
+        end
+        amp = mean(erp{k}(inWin, :), 1);   % one mean amplitude per participant
+        for s = 1:numel(subjects)
+            info = STUDY.datasetinfo(strcmp({STUDY.datasetinfo.subject}, subjects{s}));
+            rows(end+1, :) = {subjects{s}, info(1).group, conds{k}, chans{c}, double(amp(s))};
+        end
+    end
+end
+
+% Long format: one row per participant, condition and channel
+T = cell2table(rows, 'VariableNames', {'subject', 'gender', 'condition', 'channel', 'mean_uV'});
+csvFile = fullfile(studyDir, 'erp_150_250_mean.csv');
+writetable(T, csvFile);
+fprintf('%d rows written to %s\n', height(T), csvFile);
+disp(T(1:4, :));
+
+% Check: the group mean at Pz for each condition, to compare with the plot
+for k = 1:numel(conds)
+    sel = strcmpi(T.channel, 'Pz') & strcmp(T.condition, conds{k});
+    fprintf('Pz %s: mean %.2f uV over %d participants\n', conds{k}, mean(T.mean_uV(sel)), nnz(sel));
+end
+```
+
+## أي قيمة أختار؟
+
+| الاختيار | في هذا الدرس | متى تغيّره |
+|---|---|---|
+| المقياس | متوسط السعة في نافذة | سعة القمة وزمنها أكثر ضجيجاً لكل مشارك وحده. إذا احتجتهما، انظر درس السعة والزمن في ERPLAB. |
+| النافذة | 150 إلى 250 ms: البداية من Thorpe وزملائه (1996)، والنهاية اختيار للدرس | من سؤالك أو دراسات سابقة، محددة قبل أن تنظر. لا تأخذها أبداً من رسم المجموعة لنفس البيانات. |
+| القنوات | Fz و Pz | القنوات المذكورة في فرضيتك. متوسط بضع قنوات متجاورة أثبت من قناة واحدة. |
+| التصميم | 3، كل المشاركين في الشرطين | أي تصميم، لكن عندها تحوي كل خلية بعض المشاركين فقط: `setinds` (المخرج السابع لـ `std_readdata`) يعطي أرقام الداتاست في كل خلية، وأسماء المشاركين في `STUDY.datasetinfo(setinds{c}).subject`. |
+| الصيغة | CSV، طويلة | العريضة لـ SPSS. استخدم `writetable(T, 'file.xlsx')` إذا احتجت Excel. |
+
+## أخطاء شائعة
+
+- **افتراض ترتيب أعمدة البيانات.** في التصميم 3 يتبع كل عمود `STUDY.design(3).cases.value`. في تصميم تحوي فيه الخلية بعض المشاركين فقط، لا يعود هذا الترتيب صحيحاً. السكربت يتوقف بخطأ إذا كان شرط لا يحوي كل المشاركين.
+- **اختيار النافذة من رسم نفس البيانات.** هي نفس مشكلة "الصيد" في درس الإحصاء، وتنتقل معك إلى أي برنامج تصدّر إليه.
+- **فتح CSV مباشرة في Excel بإعداد إقليمي يستخدم الفاصلة علامة عشرية.** عندها تقع كل القيم في عمود واحد. استخدم استيراد النص في Excel واختر الفاصلة فاصلاً، أو افتح الملف في JASP أو R.
+- **نسيان الوحدة.** القيم بالـ µV، بعد تصحيح خط الأساس الذي اخترته في درس الحساب المسبق. اكتب الاثنين في Methods.
+- **تصدير قيمة لكل محاولة وتحليلها كأن المحاولات أشخاص.** مع 14 مشاركاً، وحدة التحليل هي المشارك، إلا إذا استخدمت نموذجاً مختلطاً يعرف أي محاولة لأي شخص.
+
+{/* صندوق "من التجربة": بانتظار قصة من صاحب المشروع. لا يُكتب قبل وصولها. */}
+
+## كيف تتأكد أن الخطوة نجحت؟
+
+- **نافذة الأوامر** تعرض `56 rows written to` ثم المسار الكامل لـ `erp_150_250_mean.csv`.
+- **الملف** يُفتح في محرر نصوص بسطر العناوين `subject,gender,condition,channel,mean_uV` و 56 سطراً من القيم.
+- **عمود الجنس** فيه 28 صفاً `F` و 28 صفاً `M` (7 نساء و 7 رجال، 4 صفوف لكل منهم).
+- **سطرا الفحص** `Pz animal: mean` و `Pz distractor: mean` يعطيان قيماً تطابق ارتفاع المنحنيين بين 150 و 250 ms في رسم Pz.
+
+<Methods>
+For each participant and image category, the mean ERP amplitude from [150] to [250] ms was extracted at [Fz] and [Pz] (std_readdata, EEGLAB 2026.1; window chosen a priori from [Thorpe et al., 1996]) and exported for analysis in [software and version].
+</Methods>
+
+<Callout type="note" title="مصدر البيانات">
+البيانات: نسخة STUDY من SCCN/Delorme. البيانات الأصلية: OpenNeuro ds002680 (CC0).
+</Callout>

@@ -1,0 +1,162 @@
+---
+title: AMICA و Picard
+titleEn: AMICA & Picard
+description: كيف تقارن AMICA و Picard بـ runica في EEGLAB من حيث الوقت والنتيجة، وكيف تثبّت واحدة منهما كإضافة وتشغّلها بالرتبة الصحيحة.
+station: 4
+order: 7
+level: optional
+status: approved
+objectives:
+  - يقارن بين runica و AMICA و Picard من حيث السرعة وما تعطيه كل واحدة.
+  - يثبّت واحدة منها كإضافة في EEGLAB ويشغّلها على نسخة 1 هرتز بعدد المكوّنات الصحيح.
+  - يشرح لماذا تحتاج Picard و AMICA تحديد الرتبة يدوياً.
+prerequisites: [run-ica]
+references:
+  - title: EEGLAB plugin
+    url: https://eeglab.org/plugins/amica/
+    section: "AMICA"
+  - title: Picard
+    url: https://github.com/pierreablin/picard
+    section: "Picard"
+  - title: Makoto's preprocessing pipeline
+    url: https://eeglab.ucsd.edu/wiki/Makoto%27s_preprocessing_pipeline
+    section: "§13.7 Unofficial instruction to install and use AMICA؛ §18.8 What does AMICA do?"
+datasets: [D1]
+startingPoint:
+  dataset: D1
+  file: eeglab_data.set
+  applied: [filtering, line-noise, bad-channels, interpolation, rereferencing]
+  script: |
+    [ALLEEG, EEG, CURRENTSET, ALLCOM] = eeglab;
+    eeglabRoot = fileparts(which('eeglab'));
+    EEG = pop_loadset('eeglab_data.set', fullfile(eeglabRoot, 'sample_data'));
+    fullLocs = EEG.chanlocs;
+
+    % Main dataset: high-pass at 0.1 Hz, then 60 Hz line-noise removal
+    EEG = pop_eegfiltnew(EEG, 'locutoff', 0.1);
+    EEG = pop_eegfiltnew(EEG, 'locutoff', 58, 'hicutoff', 62, 'revfilt', 1);
+
+    % Bad channels you removed earlier, e.g. {'T7'}; leave empty if none
+    badChans = {};
+    if ~isempty(badChans)
+        EEG = pop_select(EEG, 'rmchannel', badChans);
+        EEG = pop_interp(EEG, fullLocs, 'spherical');
+    end
+
+    % Average reference, EOG channels excluded
+    eogIdx = find(ismember({EEG.chanlocs.labels}, {'EOG1', 'EOG2'}));
+    EEG = pop_reref(EEG, [], 'exclude', eogIdx);
+    EEG.filename = ''; EEG.filepath = ''; EEG.datfile = ''; EEG.saved = 'no';
+    [ALLEEG, EEG, CURRENTSET] = pop_newset(ALLEEG, EEG, 0, 'setname', 'D1 main', 'gui', 'off');
+    eeglab redraw;
+interactive: []
+eeglabVersion: "2026.1"
+updated: 2026-10-28
+---
+
+## لماذا هذه الخطوة مهمة؟
+
+`runica`، أي Extended Infomax، هو ICA الافتراضي في EEGLAB، وهو الذي في مسارنا. لكنه ليس الخيار الوحيد. خوارزميتان أخريان تظهران كثيراً في أبحاث EEG:
+
+- **AMICA:** يعرضها EEGLAB في نافذة ICA باسم <UiLabel>AMICA (slowest; best)</UiLabel>. تستطيع أن تتعلّم أكثر من نموذج ICA لنفس البيانات.
+- **Picard:** طريقة أسرع للوصول إلى حل Infomax أو FastICA. وضع Infomax فيه هو Infomax العادي، لا Extended Infomax الذي يستخدمه `runica` في مسارنا. يعرضها EEGLAB باسمين: <UiLabel>Infomax picard.m</UiLabel> و <UiLabel>FastICA picard.m (fastest)</UiLabel>.
+
+الاثنتان إضافات. نافذة ICA تعرض الخوارزمية فقط إذا كانت دالتها موجودة في جهازك، فلا تظهر AMICA و Picard في القائمة إلا بعد تثبيتهما.
+
+هذا الدرس اختياري. كل باقي الخريطة يعمل بـ `runica`.
+
+## قبل وبعد
+
+<ImageSpec>
+صفّان من خرائط الرأس من D1، لأول 10 مكوّنات ICA من نفس نسخة 1 هرتز: الصف الأعلى من runica، والصف الأسفل من Picard بوضع Infomax. مكوّن العين ظاهر في الصفين، وقد يكون في موضع مختلف أو بألوان مقلوبة. نفس خريطة الألوان ونفس المقياس في الصفين. المصدر: الأشكال التي يرسمها سكربت هذا الدرس.
+</ImageSpec>
+
+## الخطوات من الواجهة
+
+ابدأ والنسخة الرئيسية `D1 main` مفتوحة كما في "نقطة البداية".
+
+**أولاً: ثبّت إضافة**
+
+1. افتح <MenuPath>File > Manage EEGLAB extensions</MenuPath>.
+2. ابحث عن `picard` أو عن `AMICA`، واخترها وثبّتها. أعد تشغيل EEGLAB إذا طلب ذلك.
+
+**ثانياً: Picard من نافذة ICA**
+
+1. اصنع نسخة ICA مفلترة عند 1 هرتز، كما في درس تشغيل ICA.
+2. افتح <MenuPath>Tools > Decompose data by ICA</MenuPath>. في <UiLabel>ICA algorithm to use (click to select)</UiLabel> اختر <UiLabel>Infomax picard.m</UiLabel>. خانة <UiLabel>Commandline options (See help messages)</UiLabel> تُظهر `'maxiter', 500, 'mode', 'standard'`.
+3. أضف الرتبة إلى الخيارات بنفسك: `'maxiter', 500, 'mode', 'standard', 'pca', 31` في D1. مع Picard لا يفحص `pop_runica` الرتبة عنك.
+4. اضغط <UiLabel>OK</UiLabel>، ثم قارن الخرائط من <MenuPath>Plot > Component maps > In 2-D</MenuPath> بخرائط `runica`.
+
+**ثالثاً (اختياري): AMICA**
+
+1. بعد تثبيت AMICA، افتح <MenuPath>Tools > Run AMICA</MenuPath> على نسخة ICA.
+2. تأكد أن خانة <UiLabel>In File:</UiLabel> فارغة. إذا ظهر فيها `eeglab_data.fdt` فامسحها، وإلا قرأ AMICA البيانات الأصلية من القرص بدل نسخة ICA. واجعل <UiLabel># PCA Dims.:</UiLabel> مساوياً للرتبة المتوقّعة، 31 في D1، واختر مجلد مخرجات تعرف مكانه.
+3. AMICA يستغرق وقتاً أطول بكثير من `runica`. اتركه يعمل، وقارن الخرائط عندما ينتهي.
+
+أياً كانت الخوارزمية، انسخ الأوزان إلى النسخة الرئيسية بنفس طريقة درس فلتر 1 هرتز.
+
+## السكربت المقابل
+
+```matlab
+% The same ICA copy, decomposed by runica and by Picard (Infomax mode)
+EEG_ica = pop_eegfiltnew(EEG, 'locutoff', 1);
+expectedRank = EEG_ica.nbchan - numel(badChans) - 1;
+
+tic;
+EEG_runica = pop_runica(EEG_ica, 'icatype', 'runica', 'extended', 1);
+tRunica = toc;
+
+% pop_runica does not reduce the rank for Picard, so pass 'pca' yourself
+tic;
+EEG_picard = pop_runica(EEG_ica, 'icatype', 'picard', 'maxiter', 500, ...
+    'mode', 'standard', 'pca', expectedRank);
+tPicard = toc;
+
+fprintf('runica: %.0f s, %d components\n', tRunica, size(EEG_runica.icaweights, 1));
+fprintf('Picard: %.0f s, %d components\n', tPicard, size(EEG_picard.icaweights, 1));
+
+% First 10 scalp maps of each, to compare by eye
+pop_topoplot(EEG_runica, 0, 1:10);
+pop_topoplot(EEG_picard, 0, 1:10);
+
+% AMICA, after installing the AMICA extension; it also needs the rank
+% EEG_ica.datfile = '';   % AMICA must use the filtered data in memory, not eeglab_data.fdt on disk
+% EEG_amica = pop_runamica(EEG_ica, 'pcakeep', expectedRank, 'outdir', fullfile(pwd, 'amicaout'));
+```
+
+السكربت يقيس وقت `runica` و Picard على نفس النسخة، ويطبع عدد مكوّنات كل منهما: 31 في D1 للاثنين. سطر AMICA تعليق، لأنه لا يعمل إلا بعد تثبيت الإضافة.
+
+## أي قيمة أختار؟
+
+| | runica (Extended Infomax) | Picard | AMICA |
+|---|---|---|---|
+| يأتي مع EEGLAB | نعم، الافتراضي | لا، إضافة | لا، إضافة |
+| السرعة كما يكتبها EEGLAB | الافتراضي | <UiLabel>FastICA picard.m (fastest)</UiLabel> | <UiLabel>AMICA (slowest; best)</UiLabel> |
+| ماذا يعطي | نموذج ICA واحد | حل Infomax العادي (لا Extended) أو FastICA، أسرع | نموذج ICA واحد أو أكثر |
+| الرتبة | `pop_runica` يحاول اكتشافها | مرّر `'pca'` بنفسك | حدّد عدد المكوّنات المحفوظة بنفسك |
+| متى تختاره | أغلب الدراسات، وكل ما في هذه الخريطة | داتاست كثيرة أو قنوات كثيرة، عندما يهمّ الوقت | عندما تريد التفكيك الأبطأ والأدق ولديك الوقت |
+
+<Callout type="note">
+**تغيير الخوارزمية لا يغيّر باقي المسار.** ICLabel وحذف المكوّنات ونسخ الأوزان تعمل بنفس الطريقة مع أي من الثلاث.
+</Callout>
+
+## أخطاء شائعة
+
+- **البحث عن الخوارزمية قبل تثبيتها.** القائمة في <MenuPath>Tools > Decompose data by ICA</MenuPath> تخفي أي خوارزمية دالتها غير مثبّتة.
+- **نسيان الرتبة مع Picard أو AMICA.** فحص الرتبة التلقائي في `pop_runica` خاص بـ `runica`. مع الاثنتين الأخريين حدّد عدد المكوّنات بنفسك.
+- **انتظار مكوّنات متطابقة.** الخوارزميات المختلفة، بل حتى تشغيلان لـ `runica`، تعطي المكوّنات بترتيب وإشارة مختلفين. قارنها بالشكل.
+- **قراءة AMICA للملف على القرص.** إذا كانت الداتاست مرتبطة بملف `.fdt`، يقرأ AMICA ذلك الملف لا البيانات المفلترة في الذاكرة. امسح <UiLabel>In File:</UiLabel>، أو اكتب `EEG.datfile = ''` في السكربت.
+- **خلط الخوارزميات في دراسة واحدة.** استخدم نفس الخوارزمية والإعدادات لكل المشاركين، واكتبها في Methods.
+
+{/* صندوق "من التجربة": بانتظار قصة من صاحب المشروع. لا يُكتب قبل وصولها. */}
+
+## كيف تتأكد أن الخطوة نجحت؟
+
+1. **تظهر الخوارزمية** في <UiLabel>ICA algorithm to use (click to select)</UiLabel> بعد تثبيتها.
+2. **عدد المكوّنات** يساوي الرتبة المتوقّعة: 31 في D1 لكل خوارزمية.
+3. **الخرائط متشابهة:** مكوّن العين يظهر في التفكيكين، وقد يكون في موضع آخر.
+4. **سجّلت الوقت** لكل خوارزمية على جهازك، من السكربت.
+
+<Methods>
+Independent component analysis was computed with Picard (Infomax mode, maximum 500 iterations; picard plugin [version], EEGLAB 2026.1; [31] components after PCA reduction to the data rank) on a copy of the data high-pass filtered at 1 Hz, and the resulting weights were applied to the 0.1 Hz high-pass filtered data.
+</Methods>

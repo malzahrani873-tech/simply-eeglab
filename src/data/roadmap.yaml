@@ -1,0 +1,110 @@
+# Map data: stations and nodes in learning order.
+# "next" is computed at build time from order and level; set it here only as an explicit exception.
+# Source: curriculum v7.1. Do not edit by hand without updating the curriculum.
+
+- station: 0
+  title: "قبل أن تبدأ"
+  titleEn: "Before you start"
+  nodes:
+    - { id: "eeg-origin", title: "أصل إشارة EEG", titleEn: "Where the EEG signal comes from", level: "core", minutes: 10 }
+    - { id: "electrode-10-20", title: "نظام 10-20 والأقطاب", titleEn: "The 10-20 system & electrodes", level: "core", minutes: 10 }
+    - { id: "matlab-basics", title: "أساسيات MATLAB لـ EEGLAB", titleEn: "MATLAB basics for EEGLAB", level: "core", minutes: 15 }
+    - { id: "signal-basics", title: "مفاهيم الإشارات والترددات", titleEn: "Signals & frequencies", level: "core", minutes: 15 }
+    - { id: "experiment-design", title: "تصميم تجارب EEG", titleEn: "Designing EEG experiments", level: "optional", minutes: 15 }
+- station: 1
+  title: "التعرّف على EEGLAB"
+  titleEn: "Getting to know EEGLAB"
+  nodes:
+    - { id: "install-eeglab", title: "التثبيت والإضافات", titleEn: "Installing EEGLAB & plugins", level: "core", minutes: 12 }
+    - { id: "eeglab-gui", title: "الواجهة والقوائم", titleEn: "The EEGLAB window & menus", level: "core", minutes: 12 }
+    - { id: "eeg-struct", title: "بنية EEG struct", titleEn: "The EEG structure", level: "core", minutes: 12 }
+    - { id: "alleeg-datasets", title: "ALLEEG وإدارة الداتاست", titleEn: "ALLEEG & dataset management", level: "recommended", minutes: 10 }
+    - { id: "set-fdt-files", title: "ملفات .set و .fdt", titleEn: ".set and .fdt files", level: "recommended", minutes: 8 }
+    - { id: "merge-select-data", title: "دمج الداتاست وتقسيمها", titleEn: "Merging & selecting data", level: "recommended", minutes: 12 }
+- station: 2
+  title: "استيراد البيانات"
+  titleEn: "Importing data"
+  nodes:
+    - { id: "import-raw", title: "استيراد ملف خام: EDF و BDF و BrainVision", titleEn: "Importing raw files: EDF, BDF & BrainVision", level: "core", minutes: 15 }
+    - { id: "channel-locations", title: "مواقع الأقطاب", titleEn: "Channel locations", level: "core", minutes: 12 }
+    - { id: "events", title: "الأحداث (events)", titleEn: "Events", level: "core", minutes: 12 }
+    - { id: "bids-openneuro", title: "بيانات BIDS و OpenNeuro", titleEn: "BIDS & OpenNeuro data", level: "recommended", minutes: 15 }
+- station: 3
+  title: "المعالجة المسبقة"
+  titleEn: "Preprocessing"
+  nodes:
+    - { id: "resampling", title: "إعادة أخذ العينات", titleEn: "Resampling", level: "core", minutes: 10 }
+    - { id: "filtering", title: "فلترة high-pass و low-pass", titleEn: "High-pass & low-pass filtering", level: "core", minutes: 15 }
+    - { id: "line-noise", title: "إزالة ضوضاء الكهرباء (50 أو 60 هرتز)", titleEn: "Removing line noise (50/60 Hz)", level: "core", minutes: 12 }
+    - { id: "bad-channels", title: "القنوات السيئة", titleEn: "Bad channels", level: "core", minutes: 15 }
+    - { id: "asr", title: "clean_rawdata و ASR", titleEn: "clean_rawdata & ASR", level: "recommended", minutes: 15 }
+    - { id: "interpolation", title: "الاستيفاء (interpolation)", titleEn: "Channel interpolation", level: "core", minutes: 10 }
+    - { id: "rereferencing", title: "إعادة المرجع (re-referencing)", titleEn: "Re-referencing", level: "core", minutes: 15 }
+- station: 4
+  title: "ICA وتنظيف الآرتفاكتس"
+  titleEn: "ICA & artifact cleaning"
+  nodes:
+    - { id: "ica-concept", title: "فكرة ICA ببساطة", titleEn: "ICA, simply explained", level: "core", minutes: 12 }
+    - { id: "ica-data-requirements", title: "شروط كمية البيانات لـ ICA", titleEn: "How much data ICA needs", level: "recommended", minutes: 10 }
+    - { id: "run-ica", title: "تشغيل ICA", titleEn: "Running ICA", level: "core", minutes: 15 }
+    - { id: "ica-1hz-copy-weights", title: "فلتر 1 هرتز قبل ICA ونسخ الأوزان", titleEn: "1-Hz filtering for ICA & copying weights", level: "core", minutes: 12 }
+    - { id: "iclabel", title: "ICLabel وحذف المكوّنات", titleEn: "ICLabel & removing components", level: "core", minutes: 15 }
+    - { id: "ic-artifacts", title: "قراءة مكوّنات الآرتفاكت", titleEn: "Reading artifact components", level: "core", minutes: 15 }
+    - { id: "amica-picard", title: "AMICA و Picard", titleEn: "AMICA & Picard", level: "optional", minutes: 12 }
+- station: 5
+  title: "تقطيع البيانات (epochs)"
+  titleEn: "Epoching"
+  nodes:
+    - { id: "extract-epochs", title: "استخراج epochs", titleEn: "Extracting epochs", level: "core", minutes: 12 }
+    - { id: "baseline-correction", title: "تصحيح baseline", titleEn: "Baseline correction", level: "core", minutes: 10 }
+    - { id: "epoch-rejection", title: "رفض epochs السيئة", titleEn: "Rejecting bad epochs", level: "core", minutes: 15 }
+- station: 6
+  title: "التحليل"
+  titleEn: "Analysis"
+  nodes:
+    - { id: "erp-average", title: "ERP والمتوسطات", titleEn: "ERPs & averaging", level: "core", minutes: 15 }
+    - { id: "power-spectrum", title: "الطيف الترددي PSD", titleEn: "Power spectrum (PSD)", level: "core", minutes: 12 }
+    - { id: "erplab-amplitude-latency", title: "ERPLAB وقياس السعة والكمون", titleEn: "ERPLAB: measuring amplitude & latency", level: "recommended", minutes: 15 }
+    - { id: "ersp-itc", title: "التحليل الزمني-الترددي ERSP و ITC", titleEn: "Time-frequency: ERSP & ITC", level: "recommended", minutes: 15 }
+    - { id: "data-quality-sme", title: "جودة البيانات SME", titleEn: "Data quality (SME)", level: "optional", minutes: 12 }
+- station: 7
+  title: "الرسم والعرض"
+  titleEn: "Plotting & figures"
+  nodes:
+    - { id: "topoplot", title: "خرائط الرأس topoplot", titleEn: "Scalp maps (topoplot)", level: "core", minutes: 12 }
+    - { id: "channel-erp-plot", title: "رسم ERP للقنوات", titleEn: "Plotting channel ERPs", level: "core", minutes: 12 }
+    - { id: "erp-image", title: "ERP image", titleEn: "ERP image", level: "recommended", minutes: 12 }
+    - { id: "publication-figures", title: "تجهيز رسومات للنشر", titleEn: "Publication-ready figures", level: "recommended", minutes: 12 }
+- station: 8
+  title: "تحليل مجموعة مشاركين (STUDY)"
+  titleEn: "Group analysis (STUDY)"
+  nodes:
+    - { id: "study-concepts", title: "ما هو STUDY ومتى تحتاجه", titleEn: "What a STUDY is and when you need one", level: "core", minutes: 10 }
+    - { id: "create-study", title: "إنشاء STUDY", titleEn: "Creating a STUDY", level: "core", minutes: 15, prerequisitesException: true }
+    - { id: "study-from-bids", title: "إنشاء STUDY من BIDS", titleEn: "Creating a STUDY from BIDS", level: "recommended", minutes: 12 }
+    - { id: "study-design", title: "التصميم والمتغيّرات", titleEn: "STUDY designs & variables", level: "core", minutes: 15 }
+    - { id: "study-precompute", title: "حساب المقاييس مسبقاً (precompute)", titleEn: "Precomputing measures", level: "core", minutes: 15 }
+    - { id: "study-plot-channels", title: "رسم نتائج المجموعة للقنوات", titleEn: "Plotting group channel measures", level: "core", minutes: 15 }
+    - { id: "study-statistics", title: "الإحصاء والتصحيح المتعدد", titleEn: "Statistics & multiple comparisons", level: "core", minutes: 15 }
+    - { id: "study-export-results", title: "إخراج النتائج للورقة والتحليل الإحصائي", titleEn: "Exporting results for papers & stats software", level: "recommended", minutes: 12 }
+    - { id: "ic-clustering", title: "تجميع مكوّنات ICA (clustering)", titleEn: "IC clustering", level: "recommended", minutes: 15 }
+    - { id: "limo", title: "LIMO", titleEn: "LIMO EEG", level: "recommended", minutes: 15 }
+- station: 9
+  title: "السكربتات والأتمتة"
+  titleEn: "Scripting & automation"
+  nodes:
+    - { id: "eegh-history", title: "الأمر eegh وسجل الأوامر", titleEn: "eegh & the command history", level: "core", minutes: 10 }
+    - { id: "single-subject-script", title: "سكربت لمشارك واحد", titleEn: "A single-subject script", level: "core", minutes: 15 }
+    - { id: "batch-processing", title: "معالجة دفعات (batch)", titleEn: "Batch processing", level: "recommended", minutes: 15 }
+    - { id: "automated-pipelines", title: "البايبلاينات الجاهزة: متى تستخدمها", titleEn: "Automated pipelines: when to use them", level: "optional", minutes: 15 }
+    - { id: "file-organization", title: "تنظيم الملفات والتخزين", titleEn: "Organizing files & storage", level: "recommended", minutes: 12 }
+    - { id: "hpc", title: "الحوسبة على HPC", titleEn: "Running on HPC", level: "optional", minutes: 12 }
+- station: 10
+  title: "مواضيع متقدّمة"
+  titleEn: "Advanced topics"
+  nodes:
+    - { id: "dipfit", title: "تحليل المصدر DIPFIT", titleEn: "Source localization with DIPFIT", level: "optional", minutes: 15 }
+    - { id: "sift", title: "الاتصال الوظيفي SIFT", titleEn: "Connectivity with SIFT", level: "optional", minutes: 15 }
+    - { id: "mvpa", title: "MVPA", titleEn: "Decoding (MVPA)", level: "optional", minutes: 15 }
+    - { id: "write-plugin", title: "كتابة plugin", titleEn: "Writing an EEGLAB plugin", level: "optional", minutes: 15 }
+    - { id: "mne-fieldtrip", title: "MNE-Python و FieldTrip (بدائل ومقارنة)", titleEn: "MNE-Python & FieldTrip compared", level: "optional", minutes: 12 }

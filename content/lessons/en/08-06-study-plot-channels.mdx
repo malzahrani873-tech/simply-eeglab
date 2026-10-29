@@ -1,0 +1,234 @@
+---
+title: Plotting group channel measures
+titleEn: Plotting group channel measures
+description: "How to plot group ERPs, spectra and ERSPs at channels for each design cell in EEGLAB, show each participant, and read a scalp map over a time window."
+station: 8
+order: 6
+level: core
+status: review
+objectives:
+  - Plot the group ERP at a channel for each cell of the design with Study > Plot channel measures.
+  - Show each participant's curve, and decide whether the average represents most participants.
+  - Plot a scalp map of the mean over a time window, the spectrum at a channel and the ERSP at a channel.
+prerequisites: [study-precompute, channel-erp-plot]
+references:
+  - title: EEGLAB Tutorial
+    url: https://eeglab.org/tutorials/10_Group_analysis/study_data_visualization_tools.html
+    section: "10. Group analysis > Plotting grand-average ERPs"
+  - title: EEGLAB Tutorial
+    url: https://eeglab.org/tutorials/11_Scripting/command_line_study_functions.html
+    section: "11. Scripting > Plotting measures"
+  - title: Go-nogo categorization and detection task (OpenNeuro ds002680)
+    url: https://openneuro.org/datasets/ds002680
+    section: "README"
+datasets: [D6]
+startingPoint:
+  dataset: D6
+  file: animal_mine.study
+  applied: [create-study, study-design, study-precompute]
+  script: |
+    [ALLEEG, EEG, CURRENTSET, ALLCOM] = eeglab;
+    % Folder for the course data (change it)
+    dataFolder = 'C:\Users\me\Documents\eeg-course';
+
+    % Download the ready Go-nogo STUDY once and unzip it in its own folder
+    zipDir = fullfile(dataFolder, 'animal_study');
+    studyFile = dir(fullfile(zipDir, '**', 'animal.study'));
+    if isempty(studyFile)
+        zipFile = fullfile(dataFolder, 'animal_study.zip');
+        websave(zipFile, 'https://sccn.ucsd.edu/eeglab/download/animal_study.zip');
+        unzip(zipFile, zipDir);
+        studyFile = dir(fullfile(zipDir, '**', 'animal.study'));
+    end
+    studyDir = studyFile(1).folder;
+
+    % Convert the old .dat data files to .fdt once: resaving them in their old format damages the data in EEGLAB 2026.1
+    setFiles = dir(fullfile(studyDir, '*', '*.set'));
+    for k = 1:numel(setFiles)
+        [~, base] = fileparts(setFiles(k).name);
+        folder = setFiles(k).folder;
+        if ~exist(fullfile(folder, [base '.fdt']), 'file')
+            TMP = pop_loadset('filename', setFiles(k).name, 'filepath', folder);
+            pop_saveset(TMP, 'filename', setFiles(k).name, 'filepath', folder, 'savemode', 'twofiles');
+            if exist(fullfile(folder, [base '.fdt']), 'file') && exist(fullfile(folder, [base '.dat']), 'file')
+                delete(fullfile(folder, [base '.dat']));
+            end
+        end
+    end
+
+    % Rebuild animal_mine.study (create-study lesson) if it is missing
+    if ~exist(fullfile(studyDir, 'animal_mine.study'), 'file')
+        gender = containers.Map( ...
+            {'cba','clm','ega','fsa','gro','hth','lmi','mba','mma','mta','pla','sce','sph','wpa'}, ...
+            {'F',  'F',  'F',  'M',  'M',  'M',  'F',  'F',  'M',  'F',  'M',  'F',  'M',  'M'});
+        files = dir(fullfile(studyDir, '*', '*.set'));
+        commands = {};
+        for k = 1:numel(files)
+            hdr = pop_loadset('filename', files(k).name, 'filepath', files(k).folder, 'loadmode', 'info');
+            subj = hdr.subject;
+            if isempty(subj), [~, subj] = fileparts(files(k).folder); end
+            cond = hdr.condition;
+            if isempty(cond)
+                if contains(files(k).name, 'distractor'), cond = 'distractor'; else, cond = 'animal'; end
+            end
+            if ~isKey(gender, lower(subj))
+                error('No gender entry for subject %s (%s)', subj, files(k).name);
+            end
+            commands{end+1} = {'index', k, 'load', fullfile(files(k).folder, files(k).name), ...
+                'subject', subj, 'condition', cond, 'group', gender(lower(subj))};
+        end
+        [STUDY, ALLEEG] = std_editset([], [], 'name', 'Go-nogo animal (mine)', ...
+            'task', 'Go-nogo categorization', 'commands', commands, 'updatedat', 'on');
+        STUDY = pop_savestudy(STUDY, ALLEEG, 'filename', 'animal_mine.study', ...
+            'filepath', studyDir, 'resavedatasets', 'on');
+    end
+    [STUDY, ALLEEG] = pop_loadstudy('filename', 'animal_mine.study', 'filepath', studyDir);
+
+    % Designs 2 and 3 (study-design lesson); design 2 is the current one
+    STUDY = std_makedesign(STUDY, ALLEEG, 2, 'name', 'image x gender', ...
+        'variable1', 'condition', 'values1', {'animal', 'distractor'}, 'vartype1', 'categorical', ...
+        'variable2', 'group', 'values2', {'F', 'M'}, 'vartype2', 'categorical');
+    STUDY = std_makedesign(STUDY, ALLEEG, 3, 'name', 'image only', ...
+        'variable1', 'condition', 'values1', {'animal', 'distractor'}, 'vartype1', 'categorical', ...
+        'variable2', 'none');
+    STUDY = std_selectdesign(STUDY, ALLEEG, 2);
+    STUDY = pop_savestudy(STUDY, ALLEEG, 'savemode', 'resave');
+
+    % Precomputed measures (study-precompute lesson), only if they are missing
+    first = STUDY.datasetinfo(1);
+    timefFile = fullfile(first.filepath, [first.subject '.dattimef']);
+    needMeasures = ~exist(fullfile(first.filepath, [first.subject '.daterp']), 'file') || ~exist(timefFile, 'file');
+    if ~needMeasures
+        tf = load('-mat', timefFile, 'labels');
+        needMeasures = numel(tf.labels) < ALLEEG(1).nbchan;   % ERSP from an older two-channel run
+    end
+    if needMeasures
+        baseline = [round(ALLEEG(1).xmin*1000) 0];
+        [STUDY, ALLEEG] = std_precomp(STUDY, ALLEEG, {}, 'savetrials', 'on', 'interp', 'on', 'recompute', 'on', ...
+            'erp', 'on', 'erpparams', {'rmbase', baseline}, ...
+            'spec', 'on', 'specparams', {'specmode', 'fft', 'logtrials', 'off'}, ...
+            'ersp', 'on', 'itc', 'on', 'erspparams', {'cycles', [3 0.8], 'freqs', [3 30], 'nfreqs', 20, 'ntimesout', 50});
+        STUDY = pop_savestudy(STUDY, ALLEEG, 'savemode', 'resave');
+    end
+
+    CURRENTSTUDY = 1; EEG = ALLEEG; CURRENTSET = 1:length(EEG);
+    eeglab redraw;
+eeglabVersion: "2026.1"
+updated: 2026-10-28
+---
+
+## Why this step matters
+
+In the channel ERP lesson (station 7) you read one participant's curve: time on the horizontal axis, amplitude in µV on the vertical one, and two conditions in two colors. **The same reading applies here.** The difference is that each curve is now the average of 14 participants (or 7 per group), not the average of one person's trials.
+
+The average hides differences between people. One participant with a very large amplitude can create a "difference" in the average that the others do not have. So this lesson teaches two things together: plotting the average, and looking at each participant before you trust the average.
+
+## Before and after
+
+<ImageSpec>
+An image from the lesson script on the run day, not a hand drawing. Left: the group ERP window at Pz for design 2, two panels (F and M), each with two curves, animal and distractor, in two colors and two line styles. Right: two scalp maps of the 150 to 250 ms mean for design 3 (animal and distractor) on one color scale. Axis text and titles come from EEGLAB in English, so one version serves both languages.
+</ImageSpec>
+
+## Steps in the GUI
+
+**About the data (D6):** `animal_mine.study` with its three designs from the design lesson, and the measures from the last lesson: ERPs, spectra and ERSPs at all channels (ERSPs on a light grid: 20 frequencies from 3 to 30 Hz).
+
+**1. Open the plot window**
+
+1. Run the "Starting point" script. It computes the measures only if it cannot find them.
+2. Open <MenuPath>Study > Plot channel measures</MenuPath>. The <UiLabel>View and edit current channels -- pop_chanplot()</UiLabel> window opens.
+3. At the top is <UiLabel>Select design:</UiLabel>. Choose `image x gender`.
+4. The left column, <UiLabel>Select channel to plot</UiLabel>, holds the channel list and the buttons that plot the average: <UiLabel>Plot ERPs</UiLabel>, <UiLabel>Plot spectra</UiLabel> and <UiLabel>Plot ERSPs</UiLabel>. Next to each button is <UiLabel>Params</UiLabel> for its options.
+5. The right column, <UiLabel>Select subject(s) to plot</UiLabel>, holds a list starting with <UiLabel>All subjects</UiLabel> followed by the participant codes, and the buttons <UiLabel>Plot ERP(s)</UiLabel>, <UiLabel>Plot spectra</UiLabel> and <UiLabel>Plot ERSP(s)</UiLabel> that plot participants.
+
+**2. The group ERP at Pz**
+
+1. Choose `Pz` in the left list.
+2. Press <UiLabel>Params</UiLabel> next to <UiLabel>Plot ERPs</UiLabel>. The <UiLabel>ERP plotting options -- pop_erpparams()</UiLabel> window opens.
+3. Tick <UiLabel>Plot first variable on the same panel</UiLabel>, so animal and distractor appear in one panel. Leave <UiLabel>Plot second variable on the same panel</UiLabel> unticked, so each group has its own panel. Leave <UiLabel>Time range (ms) [low high]</UiLabel> empty for the whole epoch. Press <UiLabel>Ok</UiLabel>.
+4. Press <UiLabel>Plot ERPs</UiLabel>. Two panels appear, F and M, each with the curves of both pictures.
+5. Read them as in the station 7 lesson: where do the two curves start to separate? Is the difference similar in both panels? Look first at the y axis and its direction.
+
+**3. Each participant**
+
+1. With `Pz` selected, choose <UiLabel>All subjects</UiLabel> in the right list, then press <UiLabel>Plot ERP(s)</UiLabel>. A thin curve appears for each participant.
+2. Look for a curve far from the others. Choose its code in the list and press <UiLabel>Plot ERP(s)</UiLabel> to see that participant alone.
+
+**4. A scalp map over a time window**
+
+1. Change <UiLabel>Select design:</UiLabel> to `image only`, so all participants are plotted together.
+2. Press <UiLabel>Sel. all</UiLabel> to select every channel.
+3. Press <UiLabel>Params</UiLabel> next to <UiLabel>Plot ERPs</UiLabel>. First type `150 250` in <UiLabel>Time range (ms) [low high]</UiLabel>, then choose <UiLabel>Plot averaged topography over time range</UiLabel> in <UiLabel>Multiple channels selection</UiLabel>. The order matters: if you choose the map while the time is empty, the list returns to the first option and a warning appears: `Select time range first for plotting topography, then select that setting again.` Press <UiLabel>Ok</UiLabel>.
+4. Press <UiLabel>Plot ERPs</UiLabel>. Two maps appear: the 150 to 250 ms mean for each picture.
+5. Afterwards set <UiLabel>Multiple channels selection</UiLabel> back to <UiLabel>Plot channels individually</UiLabel> and clear <UiLabel>Time range (ms) [low high]</UiLabel>. Going back alone does not clear the time, so every later ERP plot stays cut to 150 to 250 ms.
+
+The 150 to 250 ms window here is an example for learning. In your research the window is chosen before looking at the difference, from earlier studies or from your question, not from the plot itself. The reason is in the next lesson, on statistics.
+
+**5. Spectrum and ERSP**
+
+1. Select `Oz` alone. Press <UiLabel>Params</UiLabel> next to <UiLabel>Plot spectra</UiLabel>, type `3 40` in <UiLabel>Frequency [low_Hz high_Hz]</UiLabel>, and tick <UiLabel>Plot first variable on the same panel</UiLabel>. Then <UiLabel>Plot spectra</UiLabel>.
+2. Select `Pz` alone, then <UiLabel>Plot ERSPs</UiLabel>. A time × frequency image appears for each picture.
+3. ERSPs were computed at every channel, so you can select any channel. The plot covers 3 to 30 Hz only, because that is the grid computed in the last lesson.
+
+## The matching script
+
+```matlab
+% STUDY and ALLEEG come from the starting point script (design 2 is current)
+names = {STUDY.changrp.name};
+pz = names(strcmpi(names, 'Pz'));
+oz = names(strcmpi(names, 'Oz'));
+
+% Group ERP at Pz: both pictures on one panel, one panel per gender (design 2)
+STUDY = pop_erpparams(STUDY, 'plotconditions', 'together', 'plotgroups', 'apart', 'topotime', []);
+STUDY = std_erpplot(STUDY, ALLEEG, 'channels', pz, 'design', 2);
+
+% The same channel for every participant
+STUDY = std_erpplot(STUDY, ALLEEG, 'channels', pz, 'plotsubjects', 'on', 'design', 2);
+
+% Scalp maps of the mean ERP from 150 to 250 ms, all participants together (design 3)
+STUDY = pop_erpparams(STUDY, 'topotime', [150 250]);
+STUDY = std_erpplot(STUDY, ALLEEG, 'channels', names, 'design', 3);
+STUDY = pop_erpparams(STUDY, 'topotime', []);
+
+% Group spectrum at Oz and ERSP at Pz (design 3)
+STUDY = pop_specparams(STUDY, 'plotconditions', 'together', 'freqrange', [3 40]);
+STUDY = std_specplot(STUDY, ALLEEG, 'channels', oz, 'design', 3);
+STUDY = std_erspplot(STUDY, ALLEEG, 'channels', pz, 'design', 3);
+```
+
+## Which value should I choose?
+
+| Option | In this lesson | When to change it |
+|---|---|---|
+| Design | 2 to compare the pictures within each gender, and 3 for the maps, spectra and ERSPs | Always plot the design that will go into the statistics. |
+| Conditions on one panel | Yes (`plotconditions` = `together`) | Separate panels when you want to see the shape of each curve alone. |
+| Groups on one panel | No (`plotgroups` = `apart`) | One panel gets crowded with four curves. |
+| Time range | Empty, meaning the whole epoch | Narrow it for publication only, after you have seen everything. |
+| y limits (<UiLabel>Plot limits [low high]</UiLabel>) | Empty | Fix them when you compare different plots, so a change of scale does not fool you. |
+| <UiLabel>Lowpass plotted data [Hz]</UiLabel> | Empty | It changes the plot only, not the data. Do not use it to make a weak curve look better. |
+| Map window | 150 to 250 ms (example) | From your question or earlier studies, before looking at the result. |
+
+## Common mistakes
+
+- **The wrong design in <UiLabel>Select design:</UiLabel>.** The window remembers the last choice. Look at the number of panels: design 2 gives two panels, and design 3 one panel.
+- **Trusting the average without looking at the participants.** If one or two participants create the difference, the average does not represent the group.
+- **Choosing the map window after seeing the difference.** This greatly raises the chance of finding a "difference" even in random data. We explain this in the statistics lesson.
+- **ERSPs computed at a few channels only.** In EEGLAB 2026.1, reading them back fails with `Unrecognized field name "chan1"`. Recompute at every channel, as the start block does.
+- **Comparing two panels on different scales.** EEGLAB picks the scale for each plot. Fix <UiLabel>Plot limits [low high]</UiLabel> before comparing.
+
+{/* "From experience" box: waiting for a story from the project owner. Not written before it arrives. */}
+
+## How do you know it worked?
+
+- **The group ERP at Pz** with design 2: two panels titled F and M, each with two curves and a legend for animal and distractor.
+- **The all-participants plot:** a thin curve for each participant, and you can tell whether most of them follow the direction of the average.
+- **The maps:** two maps for animal and distractor, with a title that shows 150 to 250 ms.
+- **The ERSP at Pz:** two time × frequency images, one per picture, with no error in the command window.
+
+<Methods>
+Grand-average ERPs at [Pz] were plotted for each image category and gender group, and spectra at [Oz] and event-related spectral perturbations at [Pz] for each image category (std_erpplot, std_specplot, std_erspplot, EEGLAB 2026.1); scalp maps show the mean amplitude from [150] to [250] ms.
+</Methods>
+
+<Callout type="note" title="About the data">
+Data: STUDY version: SCCN/Delorme. Original data: OpenNeuro ds002680 (CC0).
+</Callout>

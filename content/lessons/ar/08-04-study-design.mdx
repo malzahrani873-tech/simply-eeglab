@@ -1,0 +1,225 @@
+---
+title: التصميم والمتغيّرات
+titleEn: STUDY designs and variables
+description: "كيف تعرّف في EEGLAB تصميماً يجمع متغيّراً داخل المشارك (نوع الصورة) ومتغيّراً بين المشاركين (الجنس)، وما معنى paired و unpaired."
+station: 8
+order: 4
+level: core
+status: approved
+objectives:
+  - يفرّق بين متغيّر داخل المشارك ومتغيّر بين المشاركين، ويحدد أيهما paired وأيهما unpaired.
+  - ينشئ من Study > Select/Edit study design(s) تصميماً مختلطاً 2×2 وتصميماً بمتغيّر واحد.
+  - يختار التصميم المناسب لكل سؤال بحث، ويجعله التصميم الحالي قبل الرسم والإحصاء.
+prerequisites: [create-study]
+references:
+  - title: EEGLAB Tutorial
+    url: https://eeglab.org/tutorials/10_Group_analysis/working_with_study_designs.html
+    section: "10. Group analysis > c. STUDY designs"
+  - title: EEGLAB Tutorial
+    url: https://eeglab.org/tutorials/11_Scripting/command_line_study_functions.html
+    section: "11. Scripting > Creating a STUDY"
+  - title: "Introduction to the EEGLAB STUDY and Study Design by Arnaud Delorme"
+    url: https://www.youtube.com/watch?v=HAGrNeh-kgA
+    section: "الفيديو كاملاً"
+    duration: "39:05"
+  - title: Go-nogo categorization and detection task (OpenNeuro ds002680)
+    url: https://openneuro.org/datasets/ds002680
+    section: "participants.tsv"
+datasets: [D6]
+startingPoint:
+  dataset: D6
+  file: animal_mine.study
+  applied: [create-study]
+  script: |
+    [ALLEEG, EEG, CURRENTSET, ALLCOM] = eeglab;
+    % Folder for the course data (change it)
+    dataFolder = 'C:\Users\me\Documents\eeg-course';
+
+    % Download the ready Go-nogo STUDY once and unzip it in its own folder
+    zipDir = fullfile(dataFolder, 'animal_study');
+    studyFile = dir(fullfile(zipDir, '**', 'animal.study'));
+    if isempty(studyFile)
+        zipFile = fullfile(dataFolder, 'animal_study.zip');
+        websave(zipFile, 'https://sccn.ucsd.edu/eeglab/download/animal_study.zip');
+        unzip(zipFile, zipDir);
+        studyFile = dir(fullfile(zipDir, '**', 'animal.study'));
+    end
+    studyDir = studyFile(1).folder;
+
+    % Convert the old .dat data files to .fdt once: resaving them in their old format damages the data in EEGLAB 2026.1
+    setFiles = dir(fullfile(studyDir, '*', '*.set'));
+    for k = 1:numel(setFiles)
+        [~, base] = fileparts(setFiles(k).name);
+        folder = setFiles(k).folder;
+        if ~exist(fullfile(folder, [base '.fdt']), 'file')
+            TMP = pop_loadset('filename', setFiles(k).name, 'filepath', folder);
+            pop_saveset(TMP, 'filename', setFiles(k).name, 'filepath', folder, 'savemode', 'twofiles');
+            if exist(fullfile(folder, [base '.fdt']), 'file') && exist(fullfile(folder, [base '.dat']), 'file')
+                delete(fullfile(folder, [base '.dat']));
+            end
+        end
+    end
+
+    % Rebuild animal_mine.study (create-study lesson) if it is missing
+    if ~exist(fullfile(studyDir, 'animal_mine.study'), 'file')
+        gender = containers.Map( ...
+            {'cba','clm','ega','fsa','gro','hth','lmi','mba','mma','mta','pla','sce','sph','wpa'}, ...
+            {'F',  'F',  'F',  'M',  'M',  'M',  'F',  'F',  'M',  'F',  'M',  'F',  'M',  'M'});
+        files = dir(fullfile(studyDir, '*', '*.set'));
+        commands = {};
+        for k = 1:numel(files)
+            hdr = pop_loadset('filename', files(k).name, 'filepath', files(k).folder, 'loadmode', 'info');
+            subj = hdr.subject;
+            if isempty(subj), [~, subj] = fileparts(files(k).folder); end
+            cond = hdr.condition;
+            if isempty(cond)
+                if contains(files(k).name, 'distractor'), cond = 'distractor'; else, cond = 'animal'; end
+            end
+            if ~isKey(gender, lower(subj))
+                error('No gender entry for subject %s (%s)', subj, files(k).name);
+            end
+            commands{end+1} = {'index', k, 'load', fullfile(files(k).folder, files(k).name), ...
+                'subject', subj, 'condition', cond, 'group', gender(lower(subj))};
+        end
+        [STUDY, ALLEEG] = std_editset([], [], 'name', 'Go-nogo animal (mine)', ...
+            'task', 'Go-nogo categorization', 'commands', commands, 'updatedat', 'on');
+        STUDY = pop_savestudy(STUDY, ALLEEG, 'filename', 'animal_mine.study', ...
+            'filepath', studyDir, 'resavedatasets', 'on');
+    end
+    [STUDY, ALLEEG] = pop_loadstudy('filename', 'animal_mine.study', 'filepath', studyDir);
+
+    CURRENTSTUDY = 1; EEG = ALLEEG; CURRENTSET = 1:length(EEG);
+    eeglab redraw;
+eeglabVersion: "2026.1"
+updated: 2026-10-28
+---
+
+## لماذا هذه الخطوة مهمة؟
+
+الـ STUDY تعرف لكل ملف المشارك والشرط والمجموعة. لكنها لا تعرف سؤالك. التصميم (design) هو السؤال مكتوباً بلغة EEGLAB: أي متغيّرات تقارن، وأي قيم منها، وأي مشاركين.
+
+كل رسم وكل اختبار في الدروس التالية يعمل على **التصميم الحالي**. إذا اخترت تصميماً خاطئاً، يرسم EEGLAB ويحسب بلا خطأ، لكن لسؤال غير سؤالك.
+
+وفي التصميم يقرر EEGLAB نوع الاختبار: هل القيم من نفس المشاركين (paired) أم من مشاركين مختلفين (unpaired)؟ هذا يغيّر النتيجة الإحصائية كثيراً.
+
+## قبل وبعد
+
+<Figure src="study-design/study-design-2x2.svg" alt="شبكة 2×2. العمودان animal و distractor مظلّلان بلونين، وهما متغيّر داخل المشارك، وبينهما سهم مزدوج مكتوب عليه نفس المشاركين: paired. الصفان F و M متغيّر بين المجموعات، وبينهما خط فاصل مكتوب عليه مشاركون مختلفون: unpaired. في كل خلية دوائر صغيرة برموز المشاركين: سبع في كل صف، ونفس الدوائر تتكرر في العمودين." caption="رسم توضيحي، بلا بيانات" source="original" />
+
+## الخطوات من الواجهة
+
+**عن البيانات (D6):** نفس `animal_mine.study` من درس الإنشاء. كل مشارك رأى الصورتين (animal و distractor)، فنوع الصورة **داخل المشارك**. وكل مشارك له جنس واحد (7 نساء و 7 رجال)، فالجنس **بين المشاركين**. معاً: تصميم مختلط 2×2.
+
+**أولاً: انظر إلى التصميم الذي أنشأه EEGLAB**
+
+1. شغّل سكربت "نقطة البداية" إذا لم تكن الـ STUDY مفتوحة.
+2. افتح <MenuPath>Study > Select/Edit study design(s)</MenuPath>. تفتح نافذة <UiLabel>Edit STUDY design -- pop_studydesign()</UiLabel>.
+3. في قائمة <UiLabel>Design name</UiLabel> تصميم واحد اسمه `STUDY.design 1`. أنشأه EEGLAB وحده عند إنشاء الـ STUDY.
+4. في الجزء <UiLabel>Edit the independent variables for this design</UiLabel> سطران: `Categorical variable: condition - Values (animal - distractor)` و `Categorical variable: group - Values (F - M)`. EEGLAB يضع في التصميم الأول كل متغيّر قياسي له أكثر من قيمة.
+
+**ثانياً: أنشئ التصميم 2 باسم واضح**
+
+1. اضغط <UiLabel>New</UiLabel> بجانب قائمة التصاميم. يظهر `Design 2` بلا متغيّرات.
+2. اضغط <UiLabel>Rename</UiLabel>، واكتب في <UiLabel>Study design name:</UiLabel> الاسم `image x gender`، ثم <UiLabel>Ok</UiLabel>.
+3. في جزء المتغيّرات اضغط <UiLabel>New</UiLabel>. تفتح نافذة <UiLabel>Add variable</UiLabel>.
+4. في <UiLabel>Select independent variable</UiLabel> اختر `condition`. تتحدد القيمتان `animal` و `distractor` في <UiLabel>Select variable values</UiLabel>. أبقهما محددتين، ثم <UiLabel>Ok</UiLabel>.
+5. اضغط <UiLabel>New</UiLabel> مرة أخرى، واختر `group`، وأبقِ `F` و `M` محددتين، ثم <UiLabel>Ok</UiLabel>.
+
+**ثالثاً: أنشئ التصميم 3 بمتغيّر واحد**
+
+1. اضغط <UiLabel>New</UiLabel> بجانب قائمة التصاميم، ثم <UiLabel>Rename</UiLabel> باسم `image only`.
+2. أضف متغيّراً واحداً فقط: `condition` بقيمتيه.
+
+**رابعاً: اختر التصميم الحالي واحفظ**
+
+1. اضغط على `image x gender` في قائمة <UiLabel>Design name</UiLabel>. التصميم المحدد عند الضغط على <UiLabel>Ok</UiLabel> يصير التصميم الحالي.
+2. أبقِ <UiLabel>Re-save STUDY file (if saved previously)</UiLabel> مفعّلاً، فيُحفظ `animal_mine.study` بتصاميمه الثلاثة.
+3. اضغط <UiLabel>Ok</UiLabel>. في نافذة الأوامر: `Selecting STUDY design 2` ثم `Resaving STUDY`.
+
+<Callout type="note">
+**إذا جاءت الـ STUDY من BIDS** (الدرس السابق)، فالجنس في حقل اسمه `gender` لا في `group`. يظهر `gender` في نفس قائمة <UiLabel>Select independent variable</UiLabel>، ويعمل بنفس الطريقة.
+</Callout>
+
+## السكربت المقابل
+
+```matlab
+% STUDY and ALLEEG come from the starting point script
+% Design 2: image (within subjects) x gender (between subjects)
+STUDY = std_makedesign(STUDY, ALLEEG, 2, 'name', 'image x gender', ...
+    'variable1', 'condition', 'values1', {'animal', 'distractor'}, 'vartype1', 'categorical', ...
+    'variable2', 'group', 'values2', {'F', 'M'}, 'vartype2', 'categorical');
+
+% Design 3: image only, all participants in one group
+STUDY = std_makedesign(STUDY, ALLEEG, 3, 'name', 'image only', ...
+    'variable1', 'condition', 'values1', {'animal', 'distractor'}, 'vartype1', 'categorical', ...
+    'variable2', 'none');
+
+% Make design 2 the current design and save
+STUDY = std_selectdesign(STUDY, ALLEEG, 2);
+STUDY = pop_savestudy(STUDY, ALLEEG, 'savemode', 'resave');
+
+% Every design with its variables, values and pairing
+for k = 1:numel(STUDY.design)
+    d = STUDY.design(k);
+    fprintf('Design %d: %s\n', k, d.name);
+    for v = 1:numel(d.variable)
+        if ~isempty(d.variable(v).label)
+            fprintf('   %-10s paired: %-4s values: %s\n', d.variable(v).label, ...
+                d.variable(v).pairing, strjoin(d.variable(v).value, ' '));
+        end
+    end
+end
+fprintf('Current design: %d\n', STUDY.currentdesign);
+eeglab redraw;
+```
+
+## أي قيمة أختار؟
+
+**داخل المشارك أم بين المشاركين؟**
+
+| | داخل المشارك (within) | بين المشاركين (between) |
+|---|---|---|
+| المعنى | كل مشارك له كل القيم | كل مشارك له قيمة واحدة |
+| في D6 | نوع الصورة: animal و distractor | الجنس: F و M |
+| يُكتب عادة في | condition | group |
+| الاختبار | paired: يقارن كل مشارك بنفسه، فيزيل الفروق بين الأشخاص | unpaired: يقارن مجموعتين من أشخاص مختلفين |
+| القوة الإحصائية | أعلى مع نفس العدد | أقل، وتحتاج مشاركين أكثر |
+
+EEGLAB يقرر paired أو unpaired وحده من البيانات: إذا كان كل المشاركين في كل القيم فهو paired. السكربت يطبع القرار في السطر `paired: on` أو `paired: off`.
+
+**أي تصميم لأي سؤال؟**
+
+| سؤالك | التصميم | لماذا |
+|---|---|---|
+| هل يختلف الـ ERP بين صورة الحيوان وغيرها؟ | 3، `image only` | اختبار paired مباشر على 14 مشاركاً، ورسم بمنحنيين بدل أربعة. التصميم 2×2 يحسب أثر الصورة الرئيسي أيضاً، لكن قراءته أصعب. |
+| هل يختلف أثر الصورة بين النساء والرجال؟ | 2، `image x gender` | التفاعل بين المتغيّرين يحتاج الاثنين في تصميم واحد. |
+| هل يختلف الـ ERP بين النساء والرجال؟ | تصميم بمتغيّر group فقط | unpaired، 7 مقابل 7. |
+
+<Callout type="warning">
+7 مشاركين في كل مجموعة عدد صغير لمقارنة بين المجموعات. نستخدم الجنس هنا لنتعلم التصميم المختلط، لا لنستنتج فرقاً بين الجنسين. في بحثك، حدد عدد المشاركين قبل جمع البيانات حسب حجم الأثر الذي تتوقعه.
+</Callout>
+
+## أخطاء شائعة
+
+- **نسيان اختيار التصميم الحالي.** الرسم والإحصاء يعملان على التصميم المحدد في القائمة عند آخر <UiLabel>Ok</UiLabel>. السكربت يطبع `Current design`.
+- **وضع متغيّر بين المشاركين في condition.** إذا كتبت الجنس كشرط، يظن EEGLAB أنه داخل المشارك. السطر `paired` يكشف ذلك: الجنس يجب أن يكون `off`.
+- **تصميم واحد لكل الأسئلة.** التصميم 2×2 يجيب عن التفاعل، لكن أثر الصورة وحده أبسط في القراءة في تصميم بمتغيّر واحد: منحنيان بدل أربعة، واختبار paired مباشر.
+- **اختيار قيم ناقصة.** إذا حددت `animal` فقط في <UiLabel>Select variable values</UiLabel>، لا توجد مقارنة. تأكد من القيمتين.
+- **الظن أن تغيير التصميم يحتاج حساباً جديداً.** منذ EEGLAB 2019 تُحفظ المحاولات منفردة، والتصميم يختارها وقت الرسم. لا تعيد الحساب المسبق بسبب تصميم جديد.
+
+{/* صندوق "من التجربة": بانتظار قصة من صاحب المشروع. لا يُكتب قبل وصولها. */}
+
+## كيف تتأكد أن الخطوة نجحت؟
+
+- **قائمة <UiLabel>Design name</UiLabel>** فيها ثلاثة تصاميم: `STUDY.design 1` و `image x gender` و `image only`.
+- **السكربت يطبع** للتصميم 2 السطرين `condition   paired: on` و `group   paired: off`.
+- **السكربت يطبع** `Current design: 2`.
+- **بعد** <MenuPath>File > Clear study / Clear all</MenuPath> **ثم فتح** `animal_mine.study` من جديد، تبقى التصاميم الثلاثة في النافذة.
+
+<Methods>
+A 2 × 2 mixed design was defined in the STUDY, with image category (animal, distractor) as a within-subject factor and gender ([7] female, [7] male) as a between-subject factor (std_makedesign, EEGLAB 2026.1).
+</Methods>
+
+<Callout type="note" title="مصدر البيانات">
+البيانات: نسخة STUDY من SCCN/Delorme. البيانات الأصلية: OpenNeuro ds002680 (CC0).
+</Callout>

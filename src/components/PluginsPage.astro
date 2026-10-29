@@ -1,0 +1,55 @@
+---
+import Base from '../layouts/Base.astro';
+import Icon from './Icon.astro';
+import T from './T.astro';
+import { t, type Lang } from '../i18n';
+import { url } from '../lib/url';
+import { lessons, nodeTitle, roadmap, pad } from '../lib/site-data';
+import { md, mdInline } from '../lib/mini-md';
+import data from '../data/plugins.json';
+import { site } from '../site.config';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const pub = await lessons();
+const lessonHref = (slug: string) => {
+  if (pub.has(`${lang}/${slug}`)) return url(`lesson/${slug}/`, lang);
+  const n = roadmap.byId.get(slug);
+  return n ? url(`station/${pad(n.station)}/`, lang) + `#card-${slug}` : null;
+};
+const standalone = lang === 'ar' ? 'أداة مستقلة' : 'Standalone tool';
+---
+<Base lang={lang} title={t(lang, 'plugins.title')} path="plugins/" current="plugins">
+  <div class="wrap narrow simple plugins">
+    <h1>{t(lang, 'plugins.title')}</h1>
+    <div class="intro" set:html={md(data.intro[lang], lang)} />
+    <nav class="toc" aria-labelledby="pl-idx">
+      <h2 id="pl-idx" class="sr">{t(lang, 'plugins.index')}</h2>
+      <ol>{data.groups.map((g) => <li><a href={`#g${g.n}`}>{g.title[lang]}</a></li>)}</ol>
+    </nav>
+    {data.groups.map((g) => (
+      <section aria-labelledby={`g${g.n}`}>
+        <h2 id={`g${g.n}`}>{g.title[lang]}</h2>
+        {g.note[lang] && <div set:html={md(g.note[lang], lang)} />}
+        <ul class="plist">
+          {g.items.map((p) => (
+            <li id={`p-${p.name.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`}>
+              <p class="pn2"><code dir="ltr" lang="en">{p.name}</code>
+                {p.bundled && <span class="tag ok">{t(lang, 'plugins.bundled')}</span>}
+                {p.standalone && <span class="tag">{standalone}</span>}</p>
+              <p set:html={mdInline(p.text[lang], lang)} />
+              <p class="plinks">
+                {p.lessons.map((slug) => { const h = lessonHref(slug); return h && (
+                  <a class="tag lesson" href={h}><Icon name="book" class="ico s16" /><span aria-hidden="true">{t(lang, 'plugins.hasLesson')}: </span><span class="sr">{t(lang, 'plugins.hasLesson.sr', { title: '' })}</span><T s={nodeTitle(lang, slug)} lang={lang} /></a>
+                ); })}
+                {p.url && <a href={p.url} rel="noopener" target="_blank" aria-label={t(lang, 'plugins.official.sr', { name: p.name })}>{t(lang, 'plugins.official')}</a>}
+              </p>
+            </li>
+          ))}
+        </ul>
+      </section>
+    ))}
+    <div class="outro" set:html={md(data.outro[lang], lang)} />
+    <p class="muted small">{t(lang, 'plugins.note', { version: site.eeglabVersion })}</p>
+  </div>
+</Base>

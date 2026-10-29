@@ -1,0 +1,114 @@
+---
+import Base from '../layouts/Base.astro';
+import Icon from './Icon.astro';
+import T from './T.astro';
+import StationQuiz from './station/StationQuiz.astro';
+import { t, tn, type Lang } from '../i18n';
+import { url } from '../lib/url';
+import { roadmap, lessons, allLessonFiles, pad } from '../lib/site-data';
+import { quizFor, stationText, qtext } from '../lib/quiz';
+
+interface Props { lang: Lang; station: number }
+const { lang, station } = Astro.props;
+const st = roadmap.stations.find((s: any) => s.station === station)!;
+const text = stationText(station)!;
+const pub = await lessons();
+const files = await allLessonFiles();
+const published = (slug: string) => pub.has(`${lang}/${slug}`);
+const nodes = roadmap.nodes.filter((n: any) => n.station === station);
+const title = lang === 'ar' ? st.title : st.titleEn;
+const nodeT = (n: any) => (lang === 'ar' ? n.title : n.titleEn);
+const count = (lvl: string) => nodes.filter((n: any) => n.level === lvl).length;
+const glyph: Record<string, string> = { core: '●', recommended: '◐', optional: '○' };
+const cls: Record<string, string> = { core: 'c', recommended: 'r', optional: 'o' };
+const anyPublished = nodes.some((n: any) => published(n.id));
+// Nearest station that has a published lesson, for the "all soon" line.
+const nearest = anyPublished ? null : roadmap.stations
+  .filter((s: any) => roadmap.nodes.some((n: any) => n.station === s.station && published(n.id)))
+  .sort((a: any, b: any) => Math.abs(a.station - station) - Math.abs(b.station - station))[0];
+const refType = (r: any) => r.type ?? (/youtube\.com|youtu\.be|doi\.org/.test(r.url) ? 'other' : 'docs');
+const soonInfo = (slug: string) => {
+  const f = files.get(`${lang}/${slug}`);
+  if (!f) return null;
+  const docs = f.data.references.find((r: any) => refType(r) === 'docs') ?? f.data.references[0];
+  return { objective: f.data.objectives[0], docs };
+};
+const prev = roadmap.stations.find((s: any) => s.station === station - 1);
+const next = roadmap.stations.find((s: any) => s.station === station + 1);
+const hasQuiz = !!quizFor(station, lang);
+const sTitle = (s: any) => (lang === 'ar' ? s.title : s.titleEn);
+const allSoon = t(lang, 'station.allSoon', { station: '{station}' }).split(/(\{station\})/).filter(Boolean);
+// "{lessons}: {core} core, {rec} recommended, {opt} optional", without the levels this station has none of.
+const countsTpl = t(lang, 'station.counts');
+const [countsHead, countsTail] = [countsTpl.slice(0, countsTpl.indexOf(':') + 1), countsTpl.slice(countsTpl.indexOf(':') + 1)];
+const levelVars: Record<string, number> = { core: count('core'), rec: count('recommended'), opt: count('optional') };
+const counts = countsHead.replace('{lessons}', tn(lang, 'map.station.lessons', nodes.length)) + ' ' +
+  countsTail.split(/[،,]/).map((p) => p.trim()).filter((p) => levelVars[p.match(/\{(\w+)\}/)![1]] > 0)
+    .map((p) => p.replace(/\{(\w+)\}/, (_, k) => String(levelVars[k]))).join(lang === 'ar' ? '، ' : ', ');
+const outcomes = lang === 'ar' ? text.outcomes : text.outcomesEn;
+---
+<Base lang={lang} title={`${t(lang, 'station.label', { n: station })}: ${title}`} description={lang === 'ar' ? text.description : text.descriptionEn} path={`station/${pad(station)}/`} bodyClass="station-page">
+  <div class="wrap narrow">
+    <nav class="crumbs" aria-label={t(lang, 'nav.breadcrumb')}>
+      <a href={url('', lang) + `#station-${pad(station)}`}>{t(lang, 'nav.map')}</a><span class="sep" aria-hidden="true">›</span>
+      <span aria-current="page">{t(lang, 'station.label', { n: station })}</span>
+    </nav>
+    <header class="shead" data-station={station}>
+      <span class="ch" aria-hidden="true">{t(lang, 'station.channel', { nn: pad(station) })}</span>
+      <h1><T s={title} lang={lang} /> <span class="st-done" hidden><Icon name="check" class="ico s20" />{t(lang, 'station.complete')}</span></h1>
+      <p class="lead" set:html={qtext(lang === 'ar' ? text.description : text.descriptionEn, lang)} />
+      <p class="muted">{counts}
+        <span class="st-prog" hidden data-l={t(lang, 'station.progress', { n: '{n}', total: '{total}' })}></span></p>
+      {nearest && <p class="note-line">{allSoon.map((part) => part === '{station}'
+        ? <a href={url(`station/${pad(nearest.station)}/`, lang)}><T s={`${t(lang, 'station.label', { n: nearest.station })}: ${sTitle(nearest)}`} lang={lang} /></a>
+        : part)}</p>}
+    </header>
+
+    <section aria-labelledby="out-t">
+      <h2 id="out-t">{t(lang, 'station.outcomes')}</h2>
+      <ul class="outcomes">{outcomes.map((o) => <li set:html={qtext(o, lang)} />)}</ul>
+    </section>
+
+    <section aria-labelledby="ls-t">
+      <h2 id="ls-t">{t(lang, 'station.lessons')}</h2>
+      <ol class="slist">
+        {nodes.map((n: any) => {
+          const p = published(n.id);
+          const soon = p ? null : soonInfo(n.id);
+          return (
+            <li class={`srow ${cls[n.level]}${p ? '' : ' soon'}`} id={p ? undefined : `card-${n.id}`} data-id={n.id}>
+              <span class="g" aria-hidden="true">{glyph[n.level]}</span>
+              <div class="sr-main">
+                {p ? <a class="st" href={url(`lesson/${n.id}/`, lang)}><T s={nodeT(n)} lang={lang} /></a> : <span class="st"><T s={nodeT(n)} lang={lang} /></span>}
+                <span class="smeta">
+                  <span class={`badge ${cls[n.level]}`}>{t(lang, `level.${n.level}`)}</span>
+                  <span>{tn(lang, 'common.minutes', n.minutes)}</span>
+                  {!p && <span class="soonp">{t(lang, 'status.soon')}</span>}
+                  <span class="done" hidden><Icon name="check" class="ico s16" /> {t(lang, 'status.done')}</span>
+                </span>
+                {soon && (
+                  <div class="soon-card">
+                    <p><b>{t(lang, 'station.soonCard.objective')}</b> <span set:html={qtext(soon.objective, lang)} /></p>
+                    {soon.docs && <p><a href={soon.docs.url} rel="noopener" target="_blank" lang="en">{t(lang, 'station.soonCard.docs')}<span class="sr"> {t(lang, 'a11y.newTab')}</span></a></p>}
+                    <p class="muted">{t(lang, 'station.soonCard.note')}</p>
+                  </div>
+                )}
+              </div>
+            </li>
+          );
+        })}
+      </ol>
+    </section>
+
+    {hasQuiz ? <StationQuiz lang={lang} station={station} published={published} />
+      : <section id="quiz"><h2>{t(lang, 'station.quiz.title')}</h2><p class="muted">{t(lang, 'status.soon')}</p></section>}
+
+    <nav class="pn" aria-label={t(lang, 'station.next')}>
+      {prev && <a class="pv" href={url(`station/${pad(prev.station)}/`, lang)}><small>{t(lang, 'station.prev')}</small><b><T s={sTitle(prev)} lang={lang} /></b></a>}
+      {next && <a class="nx" href={url(`station/${pad(next.station)}/`, lang)}><small>{t(lang, 'station.next')}</small><b><T s={sTitle(next)} lang={lang} /></b></a>}
+    </nav>
+  </div>
+  <script>
+    import '../scripts/station.ts';
+  </script>
+</Base>

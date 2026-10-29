@@ -1,0 +1,331 @@
+---
+title: تجميع مكوّنات ICA (clustering)
+titleEn: IC clustering
+description: "كيف تجمع في EEGLAB المكوّنات المستقلة من مشاركين كثيرين في مجموعات داخل STUDY، وتحكم على تجانس المجموعة من خرائطها وثنائيات أقطابها."
+station: 8
+order: 9
+level: recommended
+status: review
+objectives:
+  - يختار المكوّنات للتجميع بالتباين المتبقي لثنائي القطب من Study > Edit study info.
+  - يحسب مقاييس المكوّنات مسبقاً ويبني مصفوفة ما قبل التجميع من مواقع ثنائيات القطب وخرائط الرأس.
+  - يجمّع المكوّنات بـ k-means ويعزل المكوّنات الشاذة.
+  - يحكم على المجموعة من خرائط أعضائها، وثنائيات أقطابها، وعدد المشاركين فيها، واحتمال Brain في ICLabel.
+prerequisites: [study-precompute, ic-artifacts]
+references:
+  - title: EEGLAB Tutorial
+    url: https://eeglab.org/tutorials/10_Group_analysis/component_clustering_tools.html
+    section: "10. Group analysis > f. STUDY ICA clusters"
+  - title: EEGLAB Tutorial
+    url: https://eeglab.org/tutorials/11_Scripting/command_line_study_functions.html
+    section: "11. Scripting > Component pre-clustering and clustering"
+  - title: Go-nogo categorization and detection task (OpenNeuro ds002680)
+    url: https://openneuro.org/datasets/ds002680
+    section: "README"
+datasets: [D6]
+startingPoint:
+  dataset: D6
+  file: animal_mine.study
+  applied: [create-study, study-design, study-precompute, iclabel, dipfit]
+  script: |
+    [ALLEEG, EEG, CURRENTSET, ALLCOM] = eeglab;
+    % Folder for the course data (change it)
+    dataFolder = 'C:\Users\me\Documents\eeg-course';
+
+    % Download the ready Go-nogo STUDY once and unzip it in its own folder
+    zipDir = fullfile(dataFolder, 'animal_study');
+    studyFile = dir(fullfile(zipDir, '**', 'animal.study'));
+    if isempty(studyFile)
+        zipFile = fullfile(dataFolder, 'animal_study.zip');
+        websave(zipFile, 'https://sccn.ucsd.edu/eeglab/download/animal_study.zip');
+        unzip(zipFile, zipDir);
+        studyFile = dir(fullfile(zipDir, '**', 'animal.study'));
+    end
+    studyDir = studyFile(1).folder;
+
+    % Convert the old .dat data files to .fdt once: resaving them in their old format damages the data in EEGLAB 2026.1
+    setFiles = dir(fullfile(studyDir, '*', '*.set'));
+    for k = 1:numel(setFiles)
+        [~, base] = fileparts(setFiles(k).name);
+        folder = setFiles(k).folder;
+        if ~exist(fullfile(folder, [base '.fdt']), 'file')
+            TMP = pop_loadset('filename', setFiles(k).name, 'filepath', folder);
+            pop_saveset(TMP, 'filename', setFiles(k).name, 'filepath', folder, 'savemode', 'twofiles');
+            if exist(fullfile(folder, [base '.fdt']), 'file') && exist(fullfile(folder, [base '.dat']), 'file')
+                delete(fullfile(folder, [base '.dat']));
+            end
+        end
+    end
+
+    % Rebuild animal_mine.study (create-study lesson) if it is missing
+    if ~exist(fullfile(studyDir, 'animal_mine.study'), 'file')
+        gender = containers.Map( ...
+            {'cba','clm','ega','fsa','gro','hth','lmi','mba','mma','mta','pla','sce','sph','wpa'}, ...
+            {'F',  'F',  'F',  'M',  'M',  'M',  'F',  'F',  'M',  'F',  'M',  'F',  'M',  'M'});
+        files = dir(fullfile(studyDir, '*', '*.set'));
+        commands = {};
+        for k = 1:numel(files)
+            hdr = pop_loadset('filename', files(k).name, 'filepath', files(k).folder, 'loadmode', 'info');
+            subj = hdr.subject;
+            if isempty(subj), [~, subj] = fileparts(files(k).folder); end
+            cond = hdr.condition;
+            if isempty(cond)
+                if contains(files(k).name, 'distractor'), cond = 'distractor'; else, cond = 'animal'; end
+            end
+            if ~isKey(gender, lower(subj))
+                error('No gender entry for subject %s (%s)', subj, files(k).name);
+            end
+            commands{end+1} = {'index', k, 'load', fullfile(files(k).folder, files(k).name), ...
+                'subject', subj, 'condition', cond, 'group', gender(lower(subj))};
+        end
+        [STUDY, ALLEEG] = std_editset([], [], 'name', 'Go-nogo animal (mine)', ...
+            'task', 'Go-nogo categorization', 'commands', commands, 'updatedat', 'on');
+        STUDY = pop_savestudy(STUDY, ALLEEG, 'filename', 'animal_mine.study', ...
+            'filepath', studyDir, 'resavedatasets', 'on');
+    end
+    [STUDY, ALLEEG] = pop_loadstudy('filename', 'animal_mine.study', 'filepath', studyDir);
+
+    % Designs 2 and 3 (study-design lesson); design 2 is the current one
+    STUDY = std_makedesign(STUDY, ALLEEG, 2, 'name', 'image x gender', ...
+        'variable1', 'condition', 'values1', {'animal', 'distractor'}, 'vartype1', 'categorical', ...
+        'variable2', 'group', 'values2', {'F', 'M'}, 'vartype2', 'categorical');
+    STUDY = std_makedesign(STUDY, ALLEEG, 3, 'name', 'image only', ...
+        'variable1', 'condition', 'values1', {'animal', 'distractor'}, 'vartype1', 'categorical', ...
+        'variable2', 'none');
+    STUDY = std_selectdesign(STUDY, ALLEEG, 2);
+    STUDY = pop_savestudy(STUDY, ALLEEG, 'savemode', 'resave');
+
+    % Precomputed measures (study-precompute lesson), only if they are missing
+    first = STUDY.datasetinfo(1);
+    timefFile = fullfile(first.filepath, [first.subject '.dattimef']);
+    needMeasures = ~exist(fullfile(first.filepath, [first.subject '.daterp']), 'file') || ~exist(timefFile, 'file');
+    if ~needMeasures
+        tf = load('-mat', timefFile, 'labels');
+        needMeasures = numel(tf.labels) < ALLEEG(1).nbchan;   % ERSP from an older two-channel run
+    end
+    if needMeasures
+        baseline = [round(ALLEEG(1).xmin*1000) 0];
+        [STUDY, ALLEEG] = std_precomp(STUDY, ALLEEG, {}, 'savetrials', 'on', 'interp', 'on', 'recompute', 'on', ...
+            'erp', 'on', 'erpparams', {'rmbase', baseline}, ...
+            'spec', 'on', 'specparams', {'specmode', 'fft', 'logtrials', 'off'}, ...
+            'ersp', 'on', 'itc', 'on', 'erspparams', {'cycles', [3 0.8], 'freqs', [3 30], 'nfreqs', 20, 'ntimesout', 50});
+        STUDY = pop_savestudy(STUDY, ALLEEG, 'savemode', 'resave');
+    end
+
+    % Dipoles and ICLabel for each participant (ic-clustering lesson), only if missing
+    % The ready files hold the authors' ICA and dipoles (spherical BESA head model, part of dipfit)
+    if any(arrayfun(@(x) isempty(x.icaweights), ALLEEG))
+        error('Use the ready STUDY files (animal_study.zip): ICA weights are missing');
+    end
+    needDip = ~isfield(ALLEEG(1).dipfit, 'model') || isempty(ALLEEG(1).dipfit.model) || ...
+        ~isfield(ALLEEG(1).dipfit, 'hdmfile') || ~exist(ALLEEG(1).dipfit.hdmfile, 'file');
+    needLab = ~isfield(ALLEEG(1).etc, 'ic_classification');
+    if needDip || needLab
+        if needDip && ~exist('ft_dipolefitting', 'file')
+            error('Install Fieldtrip-lite first: File > Manage EEGLAB extensions');
+        end
+        tStart = tic;
+        if needDip
+            fprintf('Fitting dipoles and running ICLabel: about 25 minutes for 14 participants (runs once)\n');
+        else
+            fprintf('Running ICLabel for 14 participants (runs once)\n');
+        end
+        dipfitdefs;   % template head model and electrode file
+        subjects = unique({ALLEEG.subject});
+        nShared = 0;
+        for s = 1:numel(subjects)
+            idx = find(strcmp({ALLEEG.subject}, subjects{s}));
+            shared = isequal(ALLEEG(idx(1)).icaweights, ALLEEG(idx(end)).icaweights);
+            nShared = nShared + shared;
+            for k = idx
+                TMP = eeg_checkset(ALLEEG(k), 'loaddata');
+                if needDip
+                    if k == idx(1) || ~shared
+                        % Fit once per ICA decomposition
+                        [~, coreg] = coregister(TMP.chanlocs, template_models(2).chanfile, 'warp', 'auto', 'manual', 'off');
+                        TMP = pop_dipfit_settings(TMP, 'model', 'standardBEM', 'coord_transform', coreg);
+                        TMP = pop_multifit(TMP, [], 'threshold', 100);
+                        fitted = TMP.dipfit;
+                    else
+                        TMP.dipfit = fitted;   % same ICA in both files, so the same dipoles
+                    end
+                end
+                TMP = pop_iclabel(TMP, 'default');
+                pop_saveset(TMP, 'savemode', 'resave');
+            end
+            fprintf('Participant %s done (%d of %d)\n', subjects{s}, s, numel(subjects));
+        end
+        fprintf('Participants with the same ICA in both files: %d of %d\n', nShared, numel(subjects));
+        fprintf('Dipoles and ICLabel took %.0f minutes\n', toc(tStart)/60);
+        [STUDY, ALLEEG] = pop_loadstudy('filename', 'animal_mine.study', 'filepath', studyDir);
+        STUDY = std_selectdesign(STUDY, ALLEEG, 2);
+    end
+
+    CURRENTSTUDY = 1; EEG = ALLEEG; CURRENTSET = 1:length(EEG);
+    eeglab redraw;
+eeglabVersion: "2026.1"
+updated: 2026-10-28
+---
+
+## لماذا هذه الخطوة مهمة؟
+
+القناة Pz عند شخص و Pz عند شخص آخر لا تسجّلان نفس المصادر في الدماغ. الجمجمة وطيّات القشرة والمرجع كلها تختلف. و ICA يعطي طريقاً آخر: كل مكوّن مصدر واحد مقدّر من بيانات مشارك واحد. لكن المكوّنات ليس لها أسماء مشتركة بين الناس. المكوّن 5 عند مشارك لا علاقة له بالمكوّن 5 عند غيره.
+
+التجميع (clustering) يحل هذه المشكلة. يجمع مكوّنات من مشاركين مختلفين تبدو كأنها نفس المصدر: خرائط رأس متشابهة وثنائيات قطب متقاربة. وبعدها يمكن أن تعامل كل مجموعة كأنها "قناة افتراضية" في رسوم المجموعة وإحصائها.
+
+ليس للتجميع جواب صحيح واحد. غيّر المقاييس أو عدد المجموعات، فتتغيّر المجموعات. لذلك يعلّمك هذا الدرس أن تبني المجموعات، وأن تحكم عليها قبل أن تثق بها.
+
+## قبل وبعد
+
+<ImageSpec>
+صورة من سكربت الدرس يوم التشغيل، لا رسم يدوي. يسار: خرائط الرأس لمكوّنات المجموعة التي فيها أكثر عدد من المشاركين، وعنوان كل خريطة مشاركها ومكوّنها (مثل `cba IC6`)، وخريطة متوسط المجموعة أولاً. يمين: ثنائيات أقطاب نفس المجموعة في الرأس القالب، الأعضاء بالأزرق ومتوسط المجموعة بالأحمر. نصوص الخرائط وثنائيات القطب من EEGLAB بالإنجليزية، ونسخة واحدة تكفي للغتين.
+</ImageSpec>
+
+## الخطوات من الواجهة
+
+**عن البيانات (D6):** `animal_mine.study` بتصاميمها ومقاييس قنواتها. التجميع يحتاج ICA و ICLabel وثنائي قطب لكل مكوّن في كل ملف. الملفات الجاهزة فيها ICA من المؤلفين (31 مكوّناً لكل مشارك، و 29 لـ `cba`)، فلا نحسبها من جديد. وفيها ثنائي قطب لكل مكوّن، حسبه المؤلفون بنموذج الرأس الكروي BESA (`standard_BESA.mat`، ويأتي مع إضافة dipfit)، فنُبقيها أيضاً. ولا توجد نتائج ICLabel، لذلك يشغّل سكربت "نقطة البداية" ICLabel. ولا يحسب ثنائيات القطب إلا إذا كانت ناقصة أو لم يجد ملف نموذج رأسها.
+
+<Callout type="warning">
+**قبل أن تبدأ: ماذا تفعل نقطة البداية، وشرط واحد.**
+
+- **يجب أن تكون Fieldtrip-lite مثبّتة**، لأن إبقاء ثنائيات القطب التي داخل الدماغ فقط يستخدمها، وكذلك حسابها لو لزم (انظر درس الإحصاء لطريقة التحقق والتثبيت). إذا لزم حساب ثنائيات القطب، يتوقف السكربت بالرسالة `Install Fieldtrip-lite first` عندما لا تكون موجودة.
+- **نقطة البداية تشغّل ICLabel لكل مشارك**: بضع دقائق لـ 14 مشاركاً. {/* زمن ICLabel: يُقاس في التشغيل المجمّع */} ولو كانت ثنائيات القطب ناقصة لحسبتها أيضاً، وهذا يأخذ نحو 25 دقيقة. السكربت يطبع كل مشارك عند انتهائه، والزمن الكلي في النهاية. شغّلها مرة واحدة: النتائج تُحفظ في ملفات الداتاست، والتشغيل التالي يتخطى هذه الخطوة.
+- **لا تُحسب ICA من جديد.** هي مع البيانات، فمكوّناتك نفس مكوّنات صور الدرس. أما في بياناتك فشغّل ICA على البيانات المتصلة مع نسخة مفلترة بـ 1 Hz، كما في المحطة 4.
+</Callout>
+
+**أولاً: شغّل نقطة البداية وتأكد من النتيجة**
+
+1. شغّل سكربت "نقطة البداية"، وانتظر حتى ينتهي.
+2. ينبغي أن يحمل ملفا المشارك **نفس ICA**. EEGLAB يعرف أنهما تحليل واحد فقط إذا كانت أوزانهما متطابقة. السكربت يفحص ذلك: إذا تطابقت الأوزان حسب ثنائيات القطب مرة ونسخها للملف الثاني، وإلا حسبها لكل ملف.
+
+**ثانياً: اختر المكوّنات للتجميع**
+
+1. افتح <MenuPath>Study > Edit study info</MenuPath>. تفتح نافذة <UiLabel>Create a new STUDY set -- pop_study()</UiLabel> (لها هذا العنوان عند التعديل أيضاً).
+2. اضغط <UiLabel>Select by r.v.</UiLabel>. في النافذة الصغيرة أبقِ `15` حداً أعلى للتباين المتبقي، وأبقِ <UiLabel>Keep only in-brain dipoles (requires Fieldtrip extension).</UiLabel> مفعّلاً. اضغط <UiLabel>Ok</UiLabel>.
+3. عمود المكوّنات لكل داتاست يعرض الآن مكوّنات أقل: فقط التي يفسّر ثنائي قطبها خريطتها بتباين متبقٍّ أقل من 15%. اضغط <UiLabel>Ok</UiLabel>. تغيير اختيار المكوّنات يحذف أيضاً أي مجموعات سابقة، فتبدأ من الصفر. والسكربت يفعل نفس الشيء بـ `STUDY.cluster = []`.
+
+**ثالثاً: احسب مقاييس المكوّنات مسبقاً**
+
+1. افتح <MenuPath>Study > Precompute component measures</MenuPath>.
+2. أبقِ <UiLabel>Compute ERP/spectrum/ERSP only for components selected by RV (set) or for all components (unset)</UiLabel> مفعّلاً.
+3. فعّل <UiLabel>Scalp maps</UiLabel> و <UiLabel>Power spectrum</UiLabel> و <UiLabel>ERPs</UiLabel>. اضغط <UiLabel>Ok</UiLabel>. يكتب EEGLAB ملفات المكوّنات بجانب كل داتاست.
+
+**رابعاً: ابنِ مصفوفة ما قبل التجميع**
+
+1. من <MenuPath>Study > Select/Edit study design(s)</MenuPath> اجعل `image only` التصميم الحالي. EEGLAB لا يجمّع إلا بتصميم فيه كل الداتاست. التصميمان 2 و 3 كلاهما كذلك، واخترنا `image only` لأن التجميع لا يستعمل المجموعتين.
+2. افتح <MenuPath>Study > PCA clustering (original) > Build preclustering array</MenuPath>. تفتح نافذة <UiLabel>Select and compute component measures for later clustering -- pop_preclust()</UiLabel>.
+3. في جزء المعلومات المكانية من النافذة، فعّل `dipole locations` واكتب `10` في خانة وزنه.
+4. فعّل `scalp maps`، وأبقِ `3` في خانة PCA و `1` وزناً، وأبقِ <UiLabel>Use channel values</UiLabel>، وأبقِ <UiLabel>Absolute values</UiLabel> مفعّلاً.
+5. اترك كل أسطر الجزء الزمني (`spectra` و `ERPs` و `ERSPs` و `ITCs`) غير مفعّلة. اضغط <UiLabel>Ok</UiLabel>.
+
+النافذة نفسها تحذّر: <UiLabel>Mixing time-based and location-based measures might result in statistical double-dipping</UiLabel>. إذا جمّعت على ERP ثم اختبرت ERP المجموعات، فالمجموعات بُنيت جزئياً من الأثر الذي تختبره. التجميع على الموقع فقط يتجنب هذا.
+
+**خامساً: جمّع**
+
+1. افتح <MenuPath>Study > PCA clustering (original) > Cluster components</MenuPath>. تفتح نافذة <UiLabel>Set clustering algorithm -- pop_clust()</UiLabel>.
+2. في <UiLabel>Clustering algorithm:</UiLabel> اختر <UiLabel>Kmeans (stat. toolbox)</UiLabel>. بدون Statistics and Machine Learning Toolbox اختر <UiLabel>Kmeanscluster (no toolbox)</UiLabel>.
+3. أبقِ القيمة التي يقترحها EEGLAB في <UiLabel>Number of clusters to compute:</UiLabel>. هي متوسط عدد المكوّنات المختارة لكل داتاست، فتحوي كل مجموعة نحو مكوّن واحد لكل مشارك في المتوسط.
+4. فعّل <UiLabel>Separate outliers (enter std.)</UiLabel> وأبقِ `3`. اضغط <UiLabel>Ok</UiLabel>.
+
+**سادساً: انظر إلى المجموعات واحكم عليها**
+
+1. افتح <MenuPath>Study > Edit/plot component clusters</MenuPath>. تفتح نافذة <UiLabel>View and edit current component clusters -- pop_clustedit()</UiLabel>. القائمة اليسرى تعرض كل مجموعة مع عدد مكوّناتها، مثل `Cls 3 (12 ICs)`.
+2. اختر مجموعة، ثم اضغط <UiLabel>Plot scalp maps</UiLabel> في اليسار: خريطة متوسط المجموعة. في القائمة اليمنى اختر كل مكوّناتها، ثم <UiLabel>Plot scalp map(s)</UiLabel>: خريطة لكل عضو.
+3. اضغط <UiLabel>Plot dipoles</UiLabel>: ثنائيات أقطاب الأعضاء بالأزرق ومتوسطها بالأحمر.
+4. احكم على المجموعة بأربعة أسئلة:
+   - هل تتشابه خرائط الأعضاء، أم يختلف أحدها بوضوح؟
+   - هل ثنائيات القطب متقاربة، أم منتشرة في الرأس؟
+   - كم **مشاركاً مختلفاً** فيها؟ مجموعة من 4 أشخاص من 14 لا تقول الكثير عن المجموعة كلها.
+   - هل يصنّف ICLabel أغلب أعضائها "Brain"؟ السكربت يطبع وسيط احتمال Brain لكل مجموعة.
+5. إذا كان عضو مختلفاً بوضوح، اختره واضغط <UiLabel>Remove selected outlier comps.</UiLabel>. اضغط <UiLabel>Ok</UiLabel> لتحفظ تغييراتك، ثم احفظ بـ <MenuPath>File > Save current study</MenuPath>.
+
+## السكربت المقابل
+
+```matlab
+% STUDY and ALLEEG come from the starting point script (ICA, dipoles and ICLabel present)
+STUDY = std_selectdesign(STUDY, ALLEEG, 3);   % a design that holds every dataset
+
+% 0. Remove earlier clusters, so new clusters do not mix with old ones
+STUDY.cluster = [];
+STUDY = std_checkset(STUDY, ALLEEG);   % recreates the parent cluster only
+
+% 1. Keep components whose dipole explains the map well (residual variance below 15%)
+[STUDY, ALLEEG] = std_editset(STUDY, ALLEEG, 'commands', {'inbrain', 'on', 'dipselect', 0.15});
+nComps = cellfun(@numel, {STUDY.datasetinfo.comps});
+fprintf('Components kept per dataset: median %g, range %d to %d\n', median(nComps), min(nComps), max(nComps));
+
+% 2. Component measures: scalp maps for clustering, spectra and ERPs for reading the clusters
+baseline = [round(ALLEEG(1).xmin*1000) 0];
+[STUDY, ALLEEG] = std_precomp(STUDY, ALLEEG, 'components', 'savetrials', 'on', 'recompute', 'on', ...
+    'scalp', 'on', 'spec', 'on', 'specparams', {'specmode', 'fft', 'logtrials', 'off'}, ...
+    'erp', 'on', 'erpparams', {'rmbase', baseline});
+
+% 3. Preclustering on location only: dipole positions (weight 10) and scalp maps (3 PCA dimensions)
+[STUDY, ALLEEG] = std_preclust(STUDY, ALLEEG, 1, {'dipoles', 'weight', 10}, ...
+    {'scalp', 'npca', 3, 'weight', 1, 'abso', 1});
+
+% 4. k-means with outliers; fixed seed so the clusters are the same on every run
+rng(1);
+if exist('kmeans', 'file'), alg = 'kmeans'; else, alg = 'kmeanscluster'; end
+nClust = ceil(mean(nComps));
+STUDY = pop_clust(STUDY, ALLEEG, 'algorithm', alg, 'clus_num', nClust, 'outliers', 3);
+
+% 5. Size, participants and ICLabel brain probability of each cluster
+best = 0; bestN = 0;
+for c = 2:numel(STUDY.cluster)
+    cl = STUDY.cluster(c);
+    if strncmpi(cl.name, 'outlier', 7) || isempty(cl.comps), continue; end
+    sets = cl.sets(1, :);
+    brain = zeros(1, numel(sets));
+    for m = 1:numel(sets)
+        brain(m) = ALLEEG(sets(m)).etc.ic_classification.ICLabel.classifications(cl.comps(m), 1);
+    end
+    nSubj = numel(unique({STUDY.datasetinfo(sets).subject}));
+    fprintf('%-10s %3d ICs from %2d participants, median brain probability %.2f\n', ...
+        cl.name, numel(cl.comps), nSubj, median(brain));
+    if nSubj > bestN, best = c; bestN = nSubj; end
+end
+
+% 6. Maps and dipoles of the cluster with the most participants, then save
+STUDY = std_topoplot(STUDY, ALLEEG, 'clusters', best, 'mode', 'apart');
+STUDY = std_dipplot(STUDY, ALLEEG, 'clusters', best);
+STUDY = pop_savestudy(STUDY, ALLEEG, 'savemode', 'resave');
+```
+
+## أي قيمة أختار؟
+
+| الخيار | في هذا الدرس | متى تغيّره |
+|---|---|---|
+| حد التباين المتبقي | 15% | الافتراضي في EEGLAB. الأقل (مثل 10%) يُبقي مكوّنات أقل لكنها أنظف. |
+| مقاييس التجميع | مواقع ثنائيات القطب (وزن 10) وخرائط الرأس | أضف الطيف عندما تريد مجموعات حسب الإيقاع (مثل alpha)، واقبل خطر double-dipping في اختبارات الطيف. |
+| عدد المجموعات | متوسط عدد المكوّنات المختارة لكل داتاست | مجموعات أكثر تعطي مجموعات أصغر وأضيق، وفي كل منها مشاركون أقل. |
+| الخوارزمية | k-means مع الشاذ عند 3 انحرافات معيارية | <UiLabel>Affinity Propagation</UiLabel> يختار العدد بنفسه، لكنه في هذا الإصدار يحتاج إضافة LIMO. |
+| البذرة | `rng(1)` في السكربت | k-means يبدأ عشوائياً، فبدون بذرة ثابتة تتغيّر المجموعات قليلاً في كل تشغيل. |
+| بذرة ICA | `'rndreset', 'no'` عندما تشغّل ICA بنفسك | هنا ICA مع البيانات. أما في بياناتك فبدونها يبدأ runica من نقطة عشوائية من الساعة. اتركها `'no'` ما دمت تريد نتيجة قابلة للتكرار. |
+
+## أخطاء شائعة
+
+- **ICA لكل ملف بدل كل مشارك.** عندها يرى EEGLAB تحليلين لا علاقة بينهما لنفس الشخص، ولا يعود شرطا المجموعة يحويان نفس المكوّنات.
+- **الثقة برقم المجموعة.** `Cls 3` في تشغيلك ليست `Cls 3` في تشغيل آخر أو تحليل شخص آخر. سمِّ المجموعة بموقعها وخريطتها، مثل "جداري وسطي".
+- **مجموعة من مشاركين قليلين.** يحذّر الدليل أن وجود عدة مكوّنات من نفس المشارك في مجموعة واحدة يغيّر السؤال من الناس إلى المكوّنات. انظر إلى عدد المشاركين، لا إلى عدد المكوّنات فقط.
+- **التجميع على المقياس الذي ستختبره.** هذا double-dipping: المجموعات بُنيت جزئياً من الأثر نفسه.
+- **ICA بلا `'rndreset', 'no'`** في بياناتك. عندها يبدأ runica من نقطة عشوائية مختلفة، فتتغيّر المكوّنات ثم المجموعات في كل تشغيل، حتى مع `rng(1)` قبل k-means.
+- **التجميع فوق مجموعات قديمة.** `animal.study` الجاهزة فيها تسع مجموعات من المؤلفين (`Cls 2` إلى `Cls 9` تحت المجموعة الأم)، وكل تشغيل جديد لـ `pop_clust` يضيف مجموعات إلى القائمة. احذف المجموعات السابقة أولاً كما يفعل السكربت، واعمل على `animal_mine.study`.
+- **نسيان الحفظ.** المجموعات محفوظة داخل STUDY. بدون حفظ تضيع عند إغلاق EEGLAB.
+
+{/* صندوق "من التجربة": بانتظار قصة من صاحب المشروع. لا يُكتب قبل وصولها. */}
+
+## كيف تتأكد أن الخطوة نجحت؟
+
+- **السكربت يطبع** `Components kept per dataset:` مع وسيط ومدى، وكل داتاست يُبقي بضعة مكوّنات على الأقل.
+- **السكربت يطبع** سطراً لكل مجموعة فيه عدد مكوّناتها وعدد مشاركيها ووسيط احتمال Brain.
+- **محرّر المجموعات** يعرض المجموعات مع عدد مكوّناتها، ومجموعة `outlier` إذا وُجدت مكوّنات شاذة.
+- **في المجموعة التي فيها أكثر عدد من المشاركين،** تتشابه خرائط الأعضاء وتتجمع ثنائيات القطب في منطقة واحدة من الرأس.
+
+<Methods>
+Independent components whose equivalent dipole had a residual variance below [15]% and lay inside the brain were clustered across participants (EEGLAB 2026.1, std_preclust and pop_clust) using k-means on dipole locations (weight [10]) and scalp maps reduced to [3] principal dimensions; components further than [3] standard deviations from any centroid were assigned to an outlier cluster. The ICA decompositions (one per participant) and equivalent dipoles (spherical four-shell BESA head model, dipfit) distributed with the EEGLAB STUDY version of the dataset were used.
+</Methods>
+
+<Callout type="note" title="مصدر البيانات">
+البيانات: نسخة STUDY من SCCN/Delorme. البيانات الأصلية: OpenNeuro ds002680 (CC0).
+</Callout>

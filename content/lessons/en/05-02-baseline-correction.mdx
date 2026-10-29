@@ -1,0 +1,160 @@
+---
+title: Baseline correction
+titleEn: Baseline correction
+description: How to subtract the mean of the pre-stimulus period from every epoch in EEGLAB, and why the length of that period changes the ERP.
+station: 5
+order: 2
+level: core
+status: approved
+objectives:
+  - Apply baseline correction on the pre-stimulus period from the GUI and from a script.
+  - Choose a baseline length and explain its effect on the ERP.
+  - Check that the mean of every channel in the baseline period is now zero.
+prerequisites: [extract-epochs]
+references:
+  - title: EEGLAB Tutorial
+    url: https://eeglab.org/tutorials/07_Extract_epochs/Extracting_Data_Epochs.html
+    section: "7. Extract Data Epochs: Removing baseline values"
+  - title: Applied Event-Related Potential Data Analysis (Luck)
+    url: https://socialsci.libretexts.org/Bookshelves/Psychology/Biological_Psychology/Applied_Event-Related_Potential_Data_Analysis_(Luck)
+    section: "2.07 Exercise: Epoching and Baseline Correction"
+  - title: "What is the best ERP baseline?"
+    url: https://www.youtube.com/watch?v=2wS7-XILNso
+    section: "Full video"
+    duration: "16:59"
+datasets: [D1]
+startingPoint:
+  dataset: D1
+  file: eeglab_data.set
+  applied: [filtering, line-noise, bad-channels, interpolation, rereferencing, run-ica, ica-1hz-copy-weights, iclabel, extract-epochs]
+  script: |
+    % Shortcut: if you saved D1_main_clean_lp30.set in the ICLabel lesson, keep
+    % the first line and the last three lines, and replace every line between them with:
+    % EEG = pop_loadset('D1_main_clean_lp30.set', pwd);
+    [ALLEEG, EEG, CURRENTSET, ALLCOM] = eeglab;
+    eeglabRoot = fileparts(which('eeglab'));
+    EEG = pop_loadset('eeglab_data.set', fullfile(eeglabRoot, 'sample_data'));
+    fullLocs = EEG.chanlocs;
+
+    % Main dataset: high-pass at 0.1 Hz, then 60 Hz line-noise removal
+    EEG = pop_eegfiltnew(EEG, 'locutoff', 0.1);
+    EEG = pop_eegfiltnew(EEG, 'locutoff', 58, 'hicutoff', 62, 'revfilt', 1);
+
+    % Bad channels you removed earlier, e.g. {'T7'}; leave empty if none
+    badChans = {};
+    if ~isempty(badChans)
+        EEG = pop_select(EEG, 'rmchannel', badChans);
+        EEG = pop_interp(EEG, fullLocs, 'spherical');
+    end
+
+    % Average reference, EOG channels excluded
+    eogIdx = find(ismember({EEG.chanlocs.labels}, {'EOG1', 'EOG2'}));
+    EEG = pop_reref(EEG, [], 'exclude', eogIdx);
+
+    % ICA on a 1-Hz copy, then copy the weights back
+    EEG_ica = pop_eegfiltnew(EEG, 'locutoff', 1);
+    EEG_ica = pop_runica(EEG_ica, 'icatype', 'runica', 'extended', 1);
+    EEG.icaweights  = EEG_ica.icaweights;
+    EEG.icasphere   = EEG_ica.icasphere;
+    EEG.icachansind = EEG_ica.icachansind;
+    EEG.icawinv     = [];
+    EEG.icaact      = [];
+    EEG = eeg_checkset(EEG);
+
+    % Remove components ICLabel rates above 90% Eye or Muscle
+    EEG = pop_iclabel(EEG, 'default');
+    EEG = pop_icflag(EEG, [NaN NaN; 0.9 1; 0.9 1; NaN NaN; NaN NaN; NaN NaN; NaN NaN]);
+    artifactComps = find(EEG.reject.gcompreject);
+    if ~isempty(artifactComps)
+        EEG = pop_subcomp(EEG, artifactComps, 0);
+    end
+
+    % Low-pass at 30 Hz
+    EEG = pop_eegfiltnew(EEG, 'hicutoff', 30);
+    EEG.setname = 'D1 main clean lp30';
+
+    % Epochs around 'square'
+    EEG = pop_epoch(EEG, {'square'}, [-1 2], 'newname', 'D1 epochs', 'epochinfo', 'yes');
+    EEG = eeg_checkset(EEG);
+    EEG.filename = ''; EEG.filepath = ''; EEG.datfile = ''; EEG.saved = 'no';
+    [ALLEEG, EEG, CURRENTSET] = pop_newset(ALLEEG, EEG, 0, 'setname', 'D1 epochs', 'gui', 'off');
+    eeglab redraw;
+eeglabVersion: "2026.1"
+updated: 2026-10-28
+---
+
+## Why this step matters
+
+Each epoch starts from a slightly different level. The cause is slow drifts left after filtering, or small changes in the electrode contact from moment to moment. This offset is not a response to the stimulus, but it is added to every point in the epoch.
+
+The fix: take the period before the stimulus, called the <En>baseline</En>, when the participant has not seen the stimulus yet. Compute its mean for each channel and each epoch, then subtract that mean from the whole epoch.
+
+After correction, every epoch starts near zero, and any change after the stimulus is measured relative to what came before it.
+
+The high-pass filter in station 3 removed most of the drift, and the official tutorial counts it as a form of baseline correction. But the offsets left between epochs are still enough to affect the average, so baseline correction is a standard step in ERP analysis.
+
+## Before and after
+
+<BeforeAfter>
+<Figure src="baseline-correction/baseline-correction-pz-before.png" alt="Twenty Pz epochs overlaid from -1000 to 1992 ms, with the -200 to 0 ms baseline shaded. The lines start at different levels." caption="Before baseline correction" source="D1" />
+<Figure src="baseline-correction/baseline-correction-pz-after.png" alt="The same epochs after pop_rmbase on -200 to 0 ms, same axes: inside the shaded period the lines meet around zero." caption="After baseline correction" source="D1" />
+</BeforeAfter>
+
+## Steps in the GUI
+
+Start with the dataset `D1 epochs` open, as in "Starting point".
+
+1. Open <MenuPath>Tools > Remove epoch baseline</MenuPath>.
+2. The <UiLabel>Baseline removal - pop_rmbase()</UiLabel> window opens. In <UiLabel>Baseline latency range ([min max] in ms) ([ ] = whole epoch):</UiLabel> the default is `-1000 0`, the whole pre-event period. Change it to `-200 0`.
+3. Leave <UiLabel>Or remove baseline points vector (ex:1:56):</UiLabel> empty. It is an alternative that uses point numbers instead of time.
+4. Leave <UiLabel>Channel type(s)</UiLabel> and <UiLabel>OR channel(s) (default all)</UiLabel> empty, so the correction applies to all channels.
+5. Press <UiLabel>Ok</UiLabel>. In the new-dataset window, type `D1 epochs bl` in <UiLabel>Name it:</UiLabel>, leave <UiLabel>Overwrite it in memory (set=yes; unset=create a new dataset)</UiLabel> unchecked, then press <UiLabel>Ok</UiLabel>.
+
+<Callout type="note" title="Milliseconds, not seconds">
+Time in this window is in milliseconds, while the epoch limits in the previous lesson were in seconds. Type `-200 0` here, not `-0.2 0`.
+</Callout>
+
+## The equivalent script
+
+```matlab
+% Subtract the mean of -200 to 0 ms from every channel and epoch
+EEG = pop_rmbase(EEG, [-200 0]);
+EEG.setname = 'D1 epochs bl';
+EEG = eeg_checkset(EEG);
+
+% Check: the baseline mean should now be close to zero everywhere
+blIdx = EEG.times >= -200 & EEG.times <= 0;
+blMeans = mean(EEG.data(:, blIdx, :), 2);
+fprintf('Baseline points: %d, largest baseline mean: %.2g uV\n', sum(blIdx), max(abs(blMeans(:))));
+```
+
+## Which value should I choose?
+
+| Setting | Value | Why |
+|---|---|---|
+| Baseline for ERP analysis | -200 to 0 ms | A common value in ERP studies, used for example in the N400 experiment of the ERP CORE data. Short enough to sit close to the stimulus, long enough for a stable mean. |
+| The whole pre-event period | -1000 to 0 ms | The default in the EEGLAB window. A more stable mean because it uses more points, but it may include activity from the previous trial when trials are close together. |
+| A very short period | 100 ms or less | The official tutorial advises avoiding it when possible, because the mean of few points is noisy. At 128 Hz, 100 ms is only about 13 points. |
+| Our path on this site | -200 to 0 ms | 26 points at 128 Hz. The same value for every participant and every condition. |
+
+**Rule:** choose the baseline period before you see the results, and apply it unchanged to all participants. Changing it after seeing the waveform changes your result.
+
+## Common mistakes
+
+- **Typing the time in seconds.** The window expects milliseconds. `-0.2 0` means a 0.2-ms period, so only the zero point falls inside it, and the "correction" subtracts the value of a single point.
+- **Keeping the default without thinking.** The default here is the whole second before the stimulus. That is not wrong, but it is a decision you should make on purpose and report in your paper.
+- **A baseline that contains a response.** If another event (a button press or an earlier stimulus) falls inside the baseline period, you subtract a real response from the whole epoch. In D1 trials are 3 seconds apart, so -200 to 0 ms is clean. The exception is the second trial: its -1000 to 0 ms period contains the first square, which is one more reason to choose -200.
+- **A difference before the stimulus.** If two conditions already differ during the baseline (for example, a slow wave that starts before the stimulus), correction turns it into a reversed difference after the stimulus. Look at the whole waveform from -200 ms, not only after zero.
+- **Correcting the baseline before ICA.** The official tutorial warns that baseline correction adds random offsets to each channel, which ICA does not handle well. In our path ICA runs before epoching, so this is not a problem.
+
+{/* "From experience" box: waiting for the project owner's story. Do not write it before it arrives. */}
+
+## How to check it worked
+
+- Run the check lines at the end of the script: there are 26 baseline points, and the largest mean is very close to zero (below 0.001 µV).
+- Open <MenuPath>Plot > Channel data (scroll)</MenuPath>: every epoch starts near the zero line in every channel.
+- The number of epochs did not change: <UiLabel>Epochs</UiLabel> in the main window is still 80.
+
+<Methods>
+Epochs were baseline-corrected by subtracting the mean voltage from -200 to 0 ms before stimulus onset (pop_rmbase, EEGLAB 2026.1).
+</Methods>

@@ -1,0 +1,163 @@
+---
+title: Power spectrum (PSD)
+titleEn: Power spectrum (PSD)
+description: How to plot channel spectra in EEGLAB with Channel spectra and maps, and read the alpha peak, the 1/f decline, and noise peaks.
+station: 6
+order: 2
+level: core
+status: approved
+objectives:
+  - Plot the power spectrum of all channels with a scalp map at a chosen frequency, from the GUI and from a script.
+  - Identify the alpha peak, its frequency, and its location on the head from the spectrum and its map.
+  - Tell the normal 1/f decline apart from a narrow noise peak such as line noise.
+prerequisites: [filtering]
+references:
+  - title: EEGLAB Tutorial
+    url: https://eeglab.org/tutorials/08_Plot_data/Plotting_Channel_Spectra_and_Maps.html
+    section: "8. Plot data > c. Channel spectra and maps"
+  - title: EEGLAB Tutorial
+    url: https://eeglab.org/tutorials/ConceptsGuide/Time_frequency_tutorial.html
+    section: "Concepts guide: time-frequency"
+  - title: "Time-Frequency Analysis of EEG Time Series Part 2: EEG Spectrum and ERSP"
+    url: https://www.youtube.com/watch?v=BcOuRxeZTtA
+    section: "Full video"
+    duration: "9:05"
+datasets: [D1]
+startingPoint:
+  dataset: D1
+  file: eeglab_data.set
+  applied: [filtering, line-noise, bad-channels, interpolation, rereferencing, run-ica, ica-1hz-copy-weights, iclabel]
+  script: |
+    % Shortcut: if you saved D1_main_clean.set in the ICLabel lesson, keep
+    % the first line and the last three lines, and replace every line between them with:
+    % EEG = pop_loadset('D1_main_clean.set', pwd);
+    [ALLEEG, EEG, CURRENTSET, ALLCOM] = eeglab;
+    eeglabRoot = fileparts(which('eeglab'));
+    EEG = pop_loadset('eeglab_data.set', fullfile(eeglabRoot, 'sample_data'));
+    fullLocs = EEG.chanlocs;
+
+    % Main dataset: high-pass at 0.1 Hz, then 60 Hz line-noise removal
+    EEG = pop_eegfiltnew(EEG, 'locutoff', 0.1);
+    EEG = pop_eegfiltnew(EEG, 'locutoff', 58, 'hicutoff', 62, 'revfilt', 1);
+
+    % Bad channels you removed earlier, e.g. {'T7'}; leave empty if none
+    badChans = {};
+    if ~isempty(badChans)
+        EEG = pop_select(EEG, 'rmchannel', badChans);
+        EEG = pop_interp(EEG, fullLocs, 'spherical');
+    end
+
+    % Average reference, EOG channels excluded
+    eogIdx = find(ismember({EEG.chanlocs.labels}, {'EOG1', 'EOG2'}));
+    EEG = pop_reref(EEG, [], 'exclude', eogIdx);
+
+    % ICA on a 1-Hz copy, then copy the weights back
+    EEG_ica = pop_eegfiltnew(EEG, 'locutoff', 1);
+    EEG_ica = pop_runica(EEG_ica, 'icatype', 'runica', 'extended', 1);
+    EEG.icaweights  = EEG_ica.icaweights;
+    EEG.icasphere   = EEG_ica.icasphere;
+    EEG.icachansind = EEG_ica.icachansind;
+    EEG.icawinv     = [];
+    EEG.icaact      = [];
+    EEG = eeg_checkset(EEG);
+
+    % Remove components ICLabel rates above 90% Eye or Muscle
+    EEG = pop_iclabel(EEG, 'default');
+    EEG = pop_icflag(EEG, [NaN NaN; 0.9 1; 0.9 1; NaN NaN; NaN NaN; NaN NaN; NaN NaN]);
+    artifactComps = find(EEG.reject.gcompreject);
+    if ~isempty(artifactComps)
+        EEG = pop_subcomp(EEG, artifactComps, 0);
+    end
+    EEG.setname = 'D1 main clean';
+    EEG.filename = ''; EEG.filepath = ''; EEG.datfile = ''; EEG.saved = 'no';
+    [ALLEEG, EEG, CURRENTSET] = pop_newset(ALLEEG, EEG, 0, 'setname', 'D1 main clean', 'gui', 'off');
+    eeglab redraw;
+eeglabVersion: "2026.1"
+updated: 2026-10-28
+---
+
+## Why this step matters
+
+The ERP answers "what happens after the stimulus?". The power spectrum (<En>PSD</En>) answers a different question: which frequencies are in the signal, and how much <En>power</En> does each one have?
+
+The spectrum is a core analysis tool, in resting-state and sleep studies for example. It is also the fastest check of your data quality: a clear alpha peak means a healthy brain signal, and a narrow peak at 50 or 60 Hz means line noise.
+
+We compute it here on the continuous data after removing ICA components and before the 30 Hz <En>low-pass</En>, so the full spectrum up to 64 Hz is visible.
+
+## Before and after
+
+<Figure src="power-spectrum/power-spectrum-spectopo-10hz.png" alt="Spectrum of all channels from 1 to 64 Hz with a map at 10 Hz: a peak near 10 Hz, an overall decline with frequency, and a narrow dip at 60 Hz from the line-noise filter." source="D1" />
+
+## Steps in the GUI
+
+Start with the dataset `D1 main clean` open, as in "Starting point". This is a continuous dataset, not epochs. The starting-point script reruns ICA, so it may take a few minutes, unless you use the shortcut line at its top.
+
+1. Open <MenuPath>Plot > Channel spectra and maps</MenuPath>.
+2. The <UiLabel>Channel spectra and maps -- pop_spectopo()</UiLabel> window opens. Keep <UiLabel>Epoch time range to analyze [min_ms max_ms]:</UiLabel> at its value, that is, the whole recording.
+3. Keep <UiLabel>Percent data to sample (1 to 100):</UiLabel> at `100`.
+4. In <UiLabel>Frequencies to plot as scalp maps (Hz):</UiLabel>, type `10` instead of the default `6 10 22`.
+5. In <UiLabel>Plotting frequency range [lo_Hz hi_Hz]:</UiLabel>, type `1 64` instead of the default `2 25`. The default hides line noise and everything above 25 Hz.
+6. Keep <UiLabel>Spectral and scalp map options (see topoplot):</UiLabel> as it is, and press <UiLabel>Ok</UiLabel>.
+7. Read the figure in this order:
+   - **Alpha peak:** a clear rise near 10 Hz. The scalp map above it shows where it is strongest.
+   - **1/f decline:** power falls gradually as frequency rises. This is the normal shape of every EEG signal.
+   - **Narrow peaks or dips:** a narrow peak at 60 Hz in uncleaned data means line noise. In our data you will find the opposite: a narrow dip between 58 and 62 Hz, left by the line-noise filter.
+8. Click any line to see its channel name.
+
+<Callout type="note" title="About the scalp map">
+The scalp map in this figure is drawn by <En>topoplot</En>. Its options and how to read it in detail are in the scalp maps lesson in station 7.
+</Callout>
+
+## The equivalent script
+
+```matlab
+% Spectra of all channels from 1 to 64 Hz, with a scalp map at 10 Hz
+figure;
+[spectra, freqs] = pop_spectopo(EEG, 1, [0 EEG.xmax*1000], 'EEG', ...
+    'freq', 10, 'freqrange', [1 64], 'electrodes', 'off');
+
+% spectra: channels x frequencies, in 10*log10(uV^2/Hz)
+fprintf('Frequency step: %.2f Hz\n', freqs(2) - freqs(1));
+
+% Alpha peak at Pz between 8 and 13 Hz
+pz = find(strcmp({EEG.chanlocs.labels}, 'Pz'));
+alphaBand = freqs >= 8 & freqs <= 13;
+alphaFreqs = freqs(alphaBand);
+[peakPow, iPeak] = max(spectra(pz, alphaBand));
+fprintf('Alpha peak at Pz: %.0f Hz, %.1f dB\n', alphaFreqs(iPeak), peakPow);
+
+% Channels with the strongest 10 Hz power
+[~, order] = sort(spectra(:, freqs == 10), 'descend');
+disp({EEG.chanlocs(order(1:5)).labels});
+```
+
+## Which value should I choose?
+
+| Setting | Value | Why |
+|---|---|---|
+| Plotting range | 1 to 64 Hz here (up to half the sampling rate) | The default 2 to 25 Hz hides line noise and muscle activity. To check quality, plot the full range. |
+| Scalp map frequencies | 10 Hz for alpha | You can add others, such as 6 for theta and 20 for beta, depending on your question. |
+| Percent of data | 100 | Lower values are faster, but on continuous data they use only the first part of the recording. D1 is small, so there is no need. |
+| Window length | The default (1 second, 128 points) | Gives a frequency resolution of 1 Hz, enough to see the alpha peak. |
+| Which data | Continuous, clean, before the low-pass | The 30 Hz low-pass removes everything above 30 Hz, so you would not see the full spectrum. |
+
+## Common mistakes
+
+- **Judging the data from the default plotting range.** From 2 to 25 Hz you cannot see 50 or 60 Hz at all. Change the range.
+- **Reading the decline as a problem.** Power naturally falls with frequency (the 1/f decline). The problem is an unexpected narrow peak, or one channel whose spectrum is far from the others.
+- **Forgetting the vertical axis is logarithmic.** A 10 dB difference means 10 times more power, not 10 microvolts.
+- **Computing the spectrum on very short epochs.** Epochs shorter than the computation window lower the resolution. For an overall spectrum, continuous data are better.
+- **Assuming the line frequency.** It is 60 Hz in Saudi Arabia and the US, and 50 Hz in Europe and most other Arab countries. Look at the spectrum before you assume.
+
+{/* "From experience" box: waiting for the project owner's story. Do not write it before it arrives. */}
+
+## How to check it worked
+
+- `freqs(2) - freqs(1)` equals 1 Hz, and `size(spectra)` gives 32 channels by the number of frequencies.
+- The alpha peak at Pz is at roughly 9 to 11 Hz.
+- The 10 Hz map is strongest at posterior channels, such as <En>POz</En> and <En>Pz</En>.
+- At 58 to 62 Hz there is a narrow dip, not a peak.
+
+<Methods>
+Power spectral density was estimated for each channel from the continuous ICA-cleaned data using Welch's method with 1-s Hamming windows and no overlap (pop_spectopo, EEGLAB 2026.1).
+</Methods>

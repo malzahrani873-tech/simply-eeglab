@@ -1,0 +1,131 @@
+---
+title: The EEG structure
+titleEn: The EEG structure
+description: What lives inside the EEG variable in MATLAB, and how to read the channel count, sampling rate, events and signal dimensions from it.
+station: 1
+order: 3
+level: core
+status: approved
+objectives:
+  - Get the channel count, sampling rate and recording length from EEG.
+  - "Explain the dimensions of EEG.data: channels in rows, samples in columns."
+  - Read the type and latency of the first event, and convert the latency from samples to seconds.
+prerequisites: [eeglab-gui]
+references:
+  - title: EEGLAB Tutorial
+    url: https://eeglab.org/tutorials/ConceptsGuide/Data_Structures.html
+    section: "EEGLAB Data Structures: EEG.event, Event latencies"
+  - title: EEGLAB Tutorial
+    url: https://eeglab.org/tutorials/02_Quickstart/quickstart.html
+    section: "Exploring event values"
+datasets: [D1]
+startingPoint:
+  dataset: D1
+  file: eeglab_data.set
+  applied: []
+  script: |
+    [ALLEEG, EEG, CURRENTSET, ALLCOM] = eeglab;
+    sampleFolder = fullfile(fileparts(which('eeglab')), 'sample_data');
+    EEG = pop_loadset('filename', 'eeglab_data.set', 'filepath', sampleFolder);
+    [ALLEEG, EEG, CURRENTSET] = pop_newset(ALLEEG, EEG, 0, 'setname', 'Continuous EEG Data', 'gui', 'off');
+    eeglab redraw;
+eeglabVersion: "2026.1"
+updated: 2026-10-28
+---
+
+## Why this step matters
+
+Everything you see in the EEGLAB window is stored in a single MATLAB variable called `EEG`. This variable is a struct: a box of fields, each with a name.
+
+The main window shows only a summary. Scripts read from `EEG` and write to it directly. Once you understand its main fields, you can check any step yourself.
+
+You will use the same dot syntax you used with the `demo` variable in the MATLAB basics lesson: `EEG.srate` means the `srate` field inside `EEG`.
+
+## Before and after
+
+<Figure src="eeg-struct/eeg-struct-tree.svg" alt="The EEG tree in eeglab_data.set: data is a 32 × 30504 matrix (channels in rows, samples in columns), srate is 128, chanlocs has 32 elements, event has 154 elements, and icaweights is empty until ICA is run." source="original" />
+
+## Steps in the GUI
+
+### 1. Open the fields in the Workspace
+
+1. Open the dataset as in the previous lesson.
+2. In the MATLAB <UiLabel>Workspace</UiLabel> panel, double-click `EEG`.
+3. The fields of `EEG` appear in a table. Double-click any field to open it, such as `chanlocs` or `event`.
+
+### 2. Read the events from EEGLAB
+
+1. Open <MenuPath>Edit > Event values</MenuPath>.
+2. A window shows one event at a time: `type`, `position` and `latency`. (The `urevent` field is not shown in this window.)
+3. Notice that the latency field in this window is titled <UiLabel>latency (sec)</UiLabel>: the window shows the latency **in seconds**, while `EEG.event` stores it **in samples**. The first event appears here at about 1.0001 seconds.
+4. Close the window with <UiLabel>Cancel</UiLabel> so you do not change anything.
+
+### 3. Read the dataset information
+
+Open <MenuPath>Edit > Dataset info</MenuPath>. Values such as the dataset name and sampling rate appear. Close it with <UiLabel>Cancel</UiLabel>.
+
+## The equivalent script
+
+Type these lines in the Command Window, one at a time, and compare the output with the comment:
+
+```matlab
+% Basic information
+EEG.setname            % 'Continuous EEG Data'
+EEG.nbchan             % 32 channels
+EEG.srate              % 128 samples per second
+EEG.pnts               % 30504 samples per channel
+(EEG.pnts - 1) / EEG.srate   % 238.3047 seconds (same as EEG.xmax)
+
+% The signal: channels x samples
+size(EEG.data)         % 32 30504
+class(EEG.data)        % 'single'
+EEG.data(1, 1:5)       % first 5 samples of channel 1 (microvolts)
+
+% Channel names
+{EEG.chanlocs(1:3).labels}   % 'FPz' 'EOG1' 'F3'
+
+% First event: type and latency
+EEG.event(1).type      % 'square'
+EEG.event(1).latency   % 129.0087 (in samples)
+(EEG.event(1).latency - 1) / EEG.srate   % 1.0001 (in seconds)
+
+% Empty until ICA is computed
+isempty(EEG.icaweights)   % 1 (true)
+```
+
+- **Why subtract 1?** In MATLAB the first sample is number 1 and sits at time zero. So time in seconds = (sample number − 1) ÷ sampling rate.
+- `EEG.data(1, 1:5)`: the first number selects the channel (row), and the second selects the samples (columns).
+
+## Which value should I choose?
+
+There is no value to choose here. These are the main fields you will come back to in every lesson:
+
+| Field | What it stores | Unit | Value in `eeglab_data.set` |
+|---|---|---|---|
+| `EEG.nbchan` | Number of channels | channels | 32 |
+| `EEG.srate` | Sampling rate | Hz | 128 |
+| `EEG.pnts` | Number of samples per channel | samples | 30504 |
+| `EEG.trials` | Number of segments (1 = continuous data) | segments | 1 |
+| `EEG.xmin` and `EEG.xmax` | Time of the first and the last sample | seconds | 0 and 238.3047 (last sample) |
+| `EEG.times` | Time of each sample | **milliseconds** | from 0 to 238304.6875 |
+| `EEG.data` | The signal itself | microvolts | a 32 × 30504 matrix |
+| `EEG.chanlocs` | Name and position of each channel | — | 32 elements |
+| `EEG.event` | Events: type and latency | latency in samples | 154 events (80 `square` and 74 `rt`) |
+| `EEG.icaweights` | ICA weights | — | empty |
+
+## Common mistakes
+
+- **Swapping the dimensions.** In EEGLAB channels are rows and samples are columns. `EEG.data(:, 1)` is all channels at the first sample, not the whole first channel. The whole first channel is `EEG.data(1, :)`.
+- **Reading `latency` as seconds.** In `EEG.event` the latency is in samples. Convert it with the formula above, and do not forget to subtract 1.
+- **Forgetting that `EEG.times` is in milliseconds.** While `EEG.xmin` and `EEG.xmax` are in seconds.
+- **Editing `EEG` by hand and not telling EEGLAB.** If you change a field yourself, run `EEG = eeg_checkset(EEG);`, then store it with `[ALLEEG, EEG, CURRENTSET] = eeg_store(ALLEEG, EEG, CURRENTSET);` and `eeglab redraw`. Otherwise the main window may show outdated values.
+- **Mixing up channel and electrode.** `EEG.chanlocs(5)` is the fifth channel in the data, and its position is the position of the electrode that recorded it. The channel order in a file does not follow any order on the head.
+
+{/* "From experience" box: waiting for a story from the project owner. Do not write it before it arrives. */}
+
+## How to check it worked
+
+1. `size(EEG.data)` gives `32 30504`.
+2. `(EEG.pnts - 1) / EEG.srate` gives `238.3047`, the same as `EEG.xmax` and as <UiLabel>Epoch end (sec)</UiLabel> in the main window (shown rounded as `238.305`).
+3. `EEG.event(1).type` gives `'square'`, and the converted latency gives about `1.0001` seconds, matching what you saw in <MenuPath>Edit > Event values</MenuPath>.
+4. `numel(EEG.event)` gives `154`, matching the <UiLabel>Events</UiLabel> line in the main window.

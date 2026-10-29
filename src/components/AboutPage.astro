@@ -1,0 +1,74 @@
+---
+import Base from '../layouts/Base.astro';
+import Icon from './Icon.astro';
+import ResetProgress from './ResetProgress.astro';
+import { t, type Lang } from '../i18n';
+import { url } from '../lib/url';
+import { site } from '../site.config';
+import bodies from '../i18n/about.json';
+import { iso } from '../lib/bidi';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const body = (k: string) => (bodies as any)[lang][`about.${k}.body`] as string;
+const x = (s: string) => iso(s, lang);
+---
+<Base lang={lang} title={t(lang, 'about.title')} path="about/" current="about">
+  <div class="wrap narrow simple about">
+    <h1>{t(lang, 'about.title')}</h1>
+
+    <section aria-labelledby="a-how">
+      <h2 id="a-how">{t(lang, 'about.how.title')}</h2>
+      <ol class="steps3">{['1', '2', '3'].map((n) => <li set:html={x(t(lang, `about.how.${n}`))} />)}</ol>
+    </section>
+
+    <section aria-labelledby="a-aud">
+      <h2 id="a-aud">{t(lang, 'about.audience.title')}</h2>
+      <ul>{['beginner', 'hasData', 'matlab'].map((k) => <li set:html={x(t(lang, `about.audience.${k}`))} />)}</ul>
+    </section>
+
+    <section class="card-row" aria-labelledby="a-game">
+      <Icon name="wave" class="ico s32" />
+      <div>
+        <h2 id="a-game" set:html={x(t(lang, 'about.game.title'))} />
+        <p set:html={x(t(lang, 'about.game.body'))} />
+        <a class="btn pri" href={url('ica-game/', lang)}>{t(lang, 'about.game.cta')}</a>
+      </div>
+    </section>
+
+    <p><Fragment set:html={x(t(lang, 'about.sources'))} /> <a href={url('references/', lang)}>{t(lang, 'about.sources.link')}</a></p>
+
+    <section aria-labelledby="a-nav" id="navigation">
+      <h2 id="a-nav">{t(lang, 'about.nav.title')}</h2>
+      <p>{t(lang, 'tip.back')}</p>
+      <p set:html={x(t(lang, 'about.nav.body'))} />
+    </section>
+
+    <section aria-labelledby="a-why"><h2 id="a-why">{t(lang, 'about.why.title')}</h2><Fragment set:html={body('why')} /></section>
+    <section aria-labelledby="a-who"><h2 id="a-who">{t(lang, 'about.who.title')}</h2><Fragment set:html={body('who')} /></section>
+    <section aria-labelledby="a-method"><h2 id="a-method">{t(lang, 'about.method.title')}</h2><Fragment set:html={body('method')} /></section>
+    <section aria-labelledby="a-priv" id="privacy">
+      <h2 id="a-priv">{t(lang, 'about.privacy.title')}</h2>
+      <Fragment set:html={body('privacy')} />
+      <p class="links"><a href={url('progress/', lang)}>{t(lang, 'progress.manage')}</a></p>
+      <ResetProgress lang={lang} followSystem noReset />
+    </section>
+    <section aria-labelledby="a-a11y" id="accessibility"><h2 id="a-a11y">{t(lang, 'about.a11y.title')}</h2><Fragment set:html={body('a11y')} /></section>
+    <section aria-labelledby="a-contrib" id="contribute">
+      <h2 id="a-contrib">{t(lang, 'about.contribute.title')}</h2>
+      <Fragment set:html={body('contribute')} />
+      {(site.issuesUrl || site.feedbackFormUrl) && (
+        <p class="links">
+          {site.issuesUrl && <a href={`${site.issuesUrl}/new`} rel="noopener" target="_blank">{t(lang, 'footer.reportError')}</a>}
+          {site.feedbackFormUrl && <a href={site.feedbackFormUrl} rel="noopener" target="_blank">{t(lang, 'feedback.share')}</a>}
+        </p>
+      )}
+    </section>
+    <section aria-labelledby="a-lic" id="license">
+      <h2 id="a-lic">{t(lang, 'about.license.title')}</h2>
+      <ul>{['text', 'code', 'images'].map((k) => <li set:html={x(t(lang, `about.license.${k}`))} />)}</ul>
+      <p><a href={url('references/#credits', lang)}>{t(lang, 'about.license.more')}</a></p>
+    </section>
+    <section aria-labelledby="a-disc"><h2 id="a-disc">{t(lang, 'about.disclaimer.title')}</h2><Fragment set:html={body('disclaimer')} /></section>
+  </div>
+</Base>

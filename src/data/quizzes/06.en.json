@@ -1,0 +1,204 @@
+{
+  "v": 1,
+  "station": 6,
+  "lang": "en",
+  "passPercent": 80,
+  "questions": [
+    {
+      "id": "s06-q01",
+      "type": "image",
+      "lesson": "erp-average",
+      "objective": 2,
+      "prompt": "This is the ERP at channel Pz in D1, positive up. At about what time is the largest positive peak?",
+      "image": {
+        "src": "/quiz/06/s06-q01.webp",
+        "w": 720,
+        "h": 400,
+        "status": "pending",
+        "alt": "One ERP waveform from -200 to 800 ms, positive up, with a dashed vertical line at zero and a horizontal line at 0 µV. Before zero the wave stays near zero. After it, a small negative deflection, then a large positive wave that rises and returns before 800.",
+        "spec": "Script figure on D1 epochs clean (source: script, like fig_erp_average): the Pz ERP from -200 to 800 ms, positive up, axes Time (ms) and Amplitude (µV), with no marker or number at the peak, and with tick marks only at -200, 0, 200, 400, 600 and 800. One version for both languages."
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": "About 100 ms"
+        },
+        {
+          "id": "b",
+          "text": "About 200 ms"
+        },
+        {
+          "id": "c",
+          "text": "About 400 ms"
+        },
+        {
+          "id": "d",
+          "text": "About 700 ms"
+        }
+      ],
+      "answer": [
+        "c"
+      ],
+      "explanation": "The first thing after the stimulus is a small negative deflection near 200 ms, clearest at posterior channels. Then comes a large positive wave peaking around 400 ms, largest at central and parietal channels such as Cz and Pz. Check the axis direction before you call a peak positive."
+    },
+    {
+      "id": "s06-q02",
+      "type": "single",
+      "lesson": "erp-average",
+      "objective": 3,
+      "prompt": "Why does the ERP show up in the average but hardly in a single trial?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Because the response repeats with the same shape and timing in every trial, while other activity is random and cancels out in the average"
+        },
+        {
+          "id": "b",
+          "text": "Because averaging removes high frequencies like a filter"
+        },
+        {
+          "id": "c",
+          "text": "Because averaging multiplies the signal by the number of trials"
+        },
+        {
+          "id": "d",
+          "text": "Because EEGLAB removes noisy trials before averaging"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "A point-by-point average keeps what repeats with the same timing and weakens what varies at random from trial to trial. That is why the waveform gets clearer with more trials."
+    },
+    {
+      "id": "s06-q03",
+      "type": "single",
+      "lesson": "erp-average",
+      "objective": 3,
+      "prompt": "You raise the number of trials in the average from 20 to 80, four times as many. Roughly what happens to the noise in the average?",
+      "options": [
+        {
+          "id": "a",
+          "text": "It stays the same"
+        },
+        {
+          "id": "b",
+          "text": "It becomes half"
+        },
+        {
+          "id": "c",
+          "text": "It becomes a quarter"
+        },
+        {
+          "id": "d",
+          "text": "It disappears completely"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "Noise in the average falls with the square root of the number of trials, and the square root of 4 is 2, so it halves. That is why a small gain needs many trials, and why similar trial counts per condition matter."
+    },
+    {
+      "id": "s06-q04",
+      "type": "image",
+      "lesson": "power-spectrum",
+      "objective": 2,
+      "prompt": "This is the D1 spectrum after removing ICA components, with a scalp map at 10 Hz. What do you read from it?",
+      "image": {
+        "src": "/quiz/06/s06-q04.webp",
+        "w": 720,
+        "h": 520,
+        "status": "pending",
+        "alt": "Spectrum lines for all channels from 1 to 64 Hz, vertical axis 10*log10(µV²/Hz). A clear rise near 10 Hz, a gradual fall with frequency, and a narrow dip between 58 and 62 Hz. Above the spectrum, a scalp map at 10 Hz whose strongest colors are at the back of the head.",
+        "spec": "The same image as the power-spectrum lesson (fig_power_spectrum.m on D1 main clean, 1 to 64 Hz, map at 10 Hz), unchanged. One version for both languages."
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": "An alpha peak near 10 Hz, strongest at the back of the head"
+        },
+        {
+          "id": "b",
+          "text": "An alpha peak near 10 Hz, strongest at the front of the head"
+        },
+        {
+          "id": "c",
+          "text": "A line-noise peak at 60 Hz"
+        },
+        {
+          "id": "d",
+          "text": "The fall in power with frequency is a sign of a bad channel"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "The rise near 10 Hz is the alpha peak, and the map shows it is strongest at posterior channels such as POz and Pz. At 60 Hz there is a dip, not a peak, left by the notch filter. The gradual fall with frequency (1/f) is the normal shape of every EEG signal."
+    },
+    {
+      "id": "s06-q05",
+      "type": "multiple",
+      "lesson": "power-spectrum",
+      "objective": 3,
+      "prompt": "Which statements about reading a spectrum in EEGLAB are true? (Select all that apply)",
+      "options": [
+        {
+          "id": "a",
+          "text": "A gradual fall in power as frequency rises is normal"
+        },
+        {
+          "id": "b",
+          "text": "A 10 dB difference means ten times more power"
+        },
+        {
+          "id": "c",
+          "text": "A narrow peak at 50 or 60 Hz in uncleaned data is a sign of line noise"
+        },
+        {
+          "id": "d",
+          "text": "The default plotting range of 2 to 25 Hz is enough to spot line noise"
+        },
+        {
+          "id": "e",
+          "text": "You compute the spectrum after a 30 Hz low-pass to see the full spectrum"
+        }
+      ],
+      "answer": [
+        "a",
+        "b",
+        "c"
+      ],
+      "explanation": "The vertical axis is logarithmic, so a difference in dB is a ratio, not units. The default range stops at 25 Hz, so 50 and 60 are not visible; widen it. After a 30 Hz low-pass everything above it is gone, so compute the spectrum before it."
+    },
+    {
+      "id": "s06-q06",
+      "type": "single",
+      "lesson": "erp-average",
+      "objective": 2,
+      "prompt": "In an ERP plot from another program, the largest peak points down. Before you say it is negative, what do you check?",
+      "options": [
+        {
+          "id": "a",
+          "text": "The direction of the vertical axis: is positive up or negative up"
+        },
+        {
+          "id": "b",
+          "text": "The number of channels in the dataset"
+        },
+        {
+          "id": "c",
+          "text": "The sampling rate"
+        },
+        {
+          "id": "d",
+          "text": "The line color"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "Some books and programs plot negative up. In EEGLAB menus positive is up (the `'ydir', 1` option), but check the axis label of every plot before you say \"positive peak\" or \"negative\"."
+    }
+  ]
+}

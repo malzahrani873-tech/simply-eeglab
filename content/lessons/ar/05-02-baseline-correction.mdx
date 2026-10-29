@@ -1,0 +1,160 @@
+---
+title: تصحيح baseline
+titleEn: Baseline correction
+description: كيف تطرح متوسط فترة ما قبل المثير من كل epoch في EEGLAB، ولماذا يغيّر طول هذه الفترة شكل الـ ERP.
+station: 5
+order: 2
+level: core
+status: approved
+objectives:
+  - يطبّق تصحيح baseline على فترة ما قبل المثير من الواجهة ومن السكربت.
+  - يختار طول فترة baseline ويشرح أثر طولها على الـ ERP.
+  - يتحقق أن متوسط كل قناة في فترة baseline صار صفراً.
+prerequisites: [extract-epochs]
+references:
+  - title: EEGLAB Tutorial
+    url: https://eeglab.org/tutorials/07_Extract_epochs/Extracting_Data_Epochs.html
+    section: "7. Extract Data Epochs: Removing baseline values"
+  - title: Applied Event-Related Potential Data Analysis (Luck)
+    url: https://socialsci.libretexts.org/Bookshelves/Psychology/Biological_Psychology/Applied_Event-Related_Potential_Data_Analysis_(Luck)
+    section: "2.07 Exercise: Epoching and Baseline Correction"
+  - title: "What is the best ERP baseline?"
+    url: https://www.youtube.com/watch?v=2wS7-XILNso
+    section: "الفيديو كاملاً"
+    duration: "16:59"
+datasets: [D1]
+startingPoint:
+  dataset: D1
+  file: eeglab_data.set
+  applied: [filtering, line-noise, bad-channels, interpolation, rereferencing, run-ica, ica-1hz-copy-weights, iclabel, extract-epochs]
+  script: |
+    % Shortcut: if you saved D1_main_clean_lp30.set in the ICLabel lesson, keep
+    % the first line and the last three lines, and replace every line between them with:
+    % EEG = pop_loadset('D1_main_clean_lp30.set', pwd);
+    [ALLEEG, EEG, CURRENTSET, ALLCOM] = eeglab;
+    eeglabRoot = fileparts(which('eeglab'));
+    EEG = pop_loadset('eeglab_data.set', fullfile(eeglabRoot, 'sample_data'));
+    fullLocs = EEG.chanlocs;
+
+    % Main dataset: high-pass at 0.1 Hz, then 60 Hz line-noise removal
+    EEG = pop_eegfiltnew(EEG, 'locutoff', 0.1);
+    EEG = pop_eegfiltnew(EEG, 'locutoff', 58, 'hicutoff', 62, 'revfilt', 1);
+
+    % Bad channels you removed earlier, e.g. {'T7'}; leave empty if none
+    badChans = {};
+    if ~isempty(badChans)
+        EEG = pop_select(EEG, 'rmchannel', badChans);
+        EEG = pop_interp(EEG, fullLocs, 'spherical');
+    end
+
+    % Average reference, EOG channels excluded
+    eogIdx = find(ismember({EEG.chanlocs.labels}, {'EOG1', 'EOG2'}));
+    EEG = pop_reref(EEG, [], 'exclude', eogIdx);
+
+    % ICA on a 1-Hz copy, then copy the weights back
+    EEG_ica = pop_eegfiltnew(EEG, 'locutoff', 1);
+    EEG_ica = pop_runica(EEG_ica, 'icatype', 'runica', 'extended', 1);
+    EEG.icaweights  = EEG_ica.icaweights;
+    EEG.icasphere   = EEG_ica.icasphere;
+    EEG.icachansind = EEG_ica.icachansind;
+    EEG.icawinv     = [];
+    EEG.icaact      = [];
+    EEG = eeg_checkset(EEG);
+
+    % Remove components ICLabel rates above 90% Eye or Muscle
+    EEG = pop_iclabel(EEG, 'default');
+    EEG = pop_icflag(EEG, [NaN NaN; 0.9 1; 0.9 1; NaN NaN; NaN NaN; NaN NaN; NaN NaN]);
+    artifactComps = find(EEG.reject.gcompreject);
+    if ~isempty(artifactComps)
+        EEG = pop_subcomp(EEG, artifactComps, 0);
+    end
+
+    % Low-pass at 30 Hz
+    EEG = pop_eegfiltnew(EEG, 'hicutoff', 30);
+    EEG.setname = 'D1 main clean lp30';
+
+    % Epochs around 'square'
+    EEG = pop_epoch(EEG, {'square'}, [-1 2], 'newname', 'D1 epochs', 'epochinfo', 'yes');
+    EEG = eeg_checkset(EEG);
+    EEG.filename = ''; EEG.filepath = ''; EEG.datfile = ''; EEG.saved = 'no';
+    [ALLEEG, EEG, CURRENTSET] = pop_newset(ALLEEG, EEG, 0, 'setname', 'D1 epochs', 'gui', 'off');
+    eeglab redraw;
+eeglabVersion: "2026.1"
+updated: 2026-10-28
+---
+
+## لماذا هذه الخطوة مهمة؟
+
+كل epoch يبدأ من مستوى مختلف قليلاً. السبب انجرافات بطيئة بقيت بعد الفلترة، أو اختلاف بسيط في حالة القطب بين لحظة وأخرى. هذا الفرق ليس استجابة للمثير، لكنه يضاف لكل نقطة في الـ epoch.
+
+الحل: خذ فترة ما قبل المثير (<En>baseline</En>)، وهي فترة لم يرَ فيها المشارك المثير بعد. احسب متوسطها في كل قناة وكل epoch، ثم اطرحه من الـ epoch كله.
+
+بعد التصحيح، كل epoch يبدأ من الصفر تقريباً، وأي تغيّر بعد المثير يُقاس بالنسبة لما قبله.
+
+الـ high-pass في المحطة 3 أزال أغلب الانجراف، والتوتوريال الرسمي يعدّه نوعاً من تصحيح baseline. لكن الفرق الباقي بين الـ epochs ما زال يكفي ليؤثر في المتوسط، ولذلك تصحيح baseline خطوة قياسية في تحليل ERP.
+
+## قبل وبعد
+
+<BeforeAfter>
+<Figure src="baseline-correction/baseline-correction-pz-before.png" alt="20 حقبة من القناة Pz فوق بعضها من -1000 إلى 1992 ملي ثانية، وفترة الأساس من -200 إلى 0 مظللة. الخطوط تبدأ من مستويات مختلفة." caption="قبل تصحيح خط الأساس" source="D1" />
+<Figure src="baseline-correction/baseline-correction-pz-after.png" alt="الحقب نفسها بعد pop_rmbase على -200 إلى 0 وبنفس المحاور: داخل الفترة المظللة تلتقي الخطوط حول الصفر." caption="بعد تصحيح خط الأساس" source="D1" />
+</BeforeAfter>
+
+## الخطوات من الواجهة
+
+ابدأ والداتاست `D1 epochs` مفتوحة، كما في "نقطة البداية".
+
+1. افتح <MenuPath>Tools > Remove epoch baseline</MenuPath>.
+2. تظهر نافذة <UiLabel>Baseline removal - pop_rmbase()</UiLabel>. في <UiLabel>Baseline latency range ([min max] in ms) ([ ] = whole epoch):</UiLabel> القيمة الافتراضية `-1000 0`، أي كل الفترة قبل الحدث. غيّرها إلى `-200 0`.
+3. اترك <UiLabel>Or remove baseline points vector (ex:1:56):</UiLabel> فارغة. هي طريقة بديلة بأرقام النقاط بدل الزمن.
+4. اترك <UiLabel>Channel type(s)</UiLabel> و<UiLabel>OR channel(s) (default all)</UiLabel> فارغتين، فيُطبّق التصحيح على كل القنوات.
+5. اضغط <UiLabel>Ok</UiLabel>. في نافذة الداتاست الجديدة اكتب في <UiLabel>Name it:</UiLabel> الاسم `D1 epochs bl`، واترك <UiLabel>Overwrite it in memory (set=yes; unset=create a new dataset)</UiLabel> غير مفعّل، ثم <UiLabel>Ok</UiLabel>.
+
+<Callout type="note" title="ميلي ثانية لا ثوانٍ">
+الزمن في هذه النافذة بالميلي ثانية، أما حدود الـ epoch في درس التقطيع فبالثواني. اكتب `-200 0` هنا، لا `-0.2 0`.
+</Callout>
+
+## السكربت المقابل
+
+```matlab
+% Subtract the mean of -200 to 0 ms from every channel and epoch
+EEG = pop_rmbase(EEG, [-200 0]);
+EEG.setname = 'D1 epochs bl';
+EEG = eeg_checkset(EEG);
+
+% Check: the baseline mean should now be close to zero everywhere
+blIdx = EEG.times >= -200 & EEG.times <= 0;
+blMeans = mean(EEG.data(:, blIdx, :), 2);
+fprintf('Baseline points: %d, largest baseline mean: %.2g uV\n', sum(blIdx), max(abs(blMeans(:))));
+```
+
+## أي قيمة أختار؟
+
+| الإعداد | القيمة | لماذا |
+|---|---|---|
+| فترة baseline لتحليل ERP | من -200 إلى 0 ميلي ثانية | قيمة شائعة في دراسات ERP، وهي المستخدمة مثلاً في تجربة N400 في بيانات ERP CORE. قصيرة بما يكفي لتكون قريبة من المثير، وطويلة بما يكفي ليكون متوسطها مستقراً. |
+| كل الفترة قبل الحدث | من -1000 إلى 0 | الافتراضي في نافذة EEGLAB. متوسط أكثر استقراراً لأنه من نقاط أكثر، لكنه قد يضم نشاطاً من المحاولة السابقة إذا كانت المحاولات متقاربة. |
+| فترة قصيرة جداً | 100 ميلي ثانية أو أقل | التوتوريال الرسمي ينصح بتجنّبها قدر الإمكان، لأن متوسط عدد قليل من النقاط يتأثر بالضوضاء. عند 128 هرتز، 100 ميلي ثانية حوالي 13 نقطة فقط. |
+| مسارنا في هذا الموقع | من -200 إلى 0 | 26 نقطة عند 128 هرتز. نفس القيمة لكل المشاركين ولكل الشروط. |
+
+**القاعدة:** اختر فترة baseline قبل أن ترى النتائج، وطبّقها كما هي على كل المشاركين. تغييرها بعد رؤية الموجة يغيّر نتيجتك.
+
+## أخطاء شائعة
+
+- **كتابة الزمن بالثواني.** النافذة تطلب ميلي ثانية. `-0.2 0` يعني فترة طولها 0.2 ميلي ثانية، فلا يدخلها إلا نقطة الصفر وحدها، ويصير "التصحيح" طرح قيمة نقطة واحدة.
+- **ترك القيمة الافتراضية دون تفكير.** الافتراضي هنا كل الثانية قبل المثير. هذا ليس خطأ، لكنه قرار يجب أن تختاره وتذكره في ورقتك.
+- **baseline تضم استجابة.** إذا كان في فترة baseline حدث آخر (ضغطة زر أو مثير سابق)، فأنت تطرح استجابة حقيقية من كل الـ epoch. في D1 المحاولات بينها 3 ثوانٍ، فالفترة من -200 إلى 0 نظيفة. الاستثناء المحاولة الثانية: فترة -1000 إلى 0 فيها تضم المربع الأول، وهذا سبب آخر لاختيار -200.
+- **فرق قبل المثير.** إذا كان في فترة baseline فرق بين شرطين (مثلاً موجة بطيئة تبدأ قبل المثير)، فالتصحيح يحوّله إلى فرق معكوس بعد المثير. انظر للموجة كاملة من -200، لا بعد الصفر فقط.
+- **التصحيح قبل ICA.** التوتوريال الرسمي ينبّه أن تصحيح baseline يضيف إزاحات عشوائية لكل قناة، و ICA لا يتعامل معها جيداً. في مسارنا ICA قبل التقطيع، فلا مشكلة.
+
+{/* صندوق "من التجربة": بانتظار قصة من صاحب المشروع. لا يُكتب قبل وصولها. */}
+
+## كيف تتأكد أن الخطوة نجحت؟
+
+- شغّل أسطر الفحص في آخر السكربت: عدد نقاط baseline يساوي 26، وأكبر متوسط قريب جداً من الصفر (أصغر من 0.001 ميكروفولت).
+- افتح <MenuPath>Plot > Channel data (scroll)</MenuPath>: كل epoch يبدأ قرب خط الصفر في كل قناة.
+- عدد الـ epochs لم يتغيّر: <UiLabel>Epochs</UiLabel> في النافذة الرئيسية ما زالت 80.
+
+<Methods>
+Epochs were baseline-corrected by subtracting the mean voltage from -200 to 0 ms before stimulus onset (pop_rmbase, EEGLAB 2026.1).
+</Methods>

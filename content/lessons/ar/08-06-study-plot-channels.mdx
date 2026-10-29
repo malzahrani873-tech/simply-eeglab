@@ -1,0 +1,234 @@
+---
+title: رسم نتائج المجموعة للقنوات
+titleEn: Plotting group channel measures
+description: كيف ترسم في EEGLAB متوسط ERP المجموعة والطيف و ERSP لقناة أو أكثر لكل خلية في التصميم، وكيف تعرض كل مشارك بدل المتوسط، وكيف تقرأ خريطة الرأس في نافذة زمنية.
+station: 8
+order: 6
+level: core
+status: review
+objectives:
+  - يرسم ERP المجموعة في قناة لكل خلية في التصميم من Study > Plot channel measures.
+  - يعرض منحنى كل مشارك، ويحدد هل يمثّل المتوسط أغلب المشاركين.
+  - يرسم خريطة الرأس لمتوسط نافذة زمنية، والطيف في قناة، و ERSP في قناة.
+prerequisites: [study-precompute, channel-erp-plot]
+references:
+  - title: EEGLAB Tutorial
+    url: https://eeglab.org/tutorials/10_Group_analysis/study_data_visualization_tools.html
+    section: "10. Group analysis > Plotting grand-average ERPs"
+  - title: EEGLAB Tutorial
+    url: https://eeglab.org/tutorials/11_Scripting/command_line_study_functions.html
+    section: "11. Scripting > Plotting measures"
+  - title: Go-nogo categorization and detection task (OpenNeuro ds002680)
+    url: https://openneuro.org/datasets/ds002680
+    section: "README"
+datasets: [D6]
+startingPoint:
+  dataset: D6
+  file: animal_mine.study
+  applied: [create-study, study-design, study-precompute]
+  script: |
+    [ALLEEG, EEG, CURRENTSET, ALLCOM] = eeglab;
+    % Folder for the course data (change it)
+    dataFolder = 'C:\Users\me\Documents\eeg-course';
+
+    % Download the ready Go-nogo STUDY once and unzip it in its own folder
+    zipDir = fullfile(dataFolder, 'animal_study');
+    studyFile = dir(fullfile(zipDir, '**', 'animal.study'));
+    if isempty(studyFile)
+        zipFile = fullfile(dataFolder, 'animal_study.zip');
+        websave(zipFile, 'https://sccn.ucsd.edu/eeglab/download/animal_study.zip');
+        unzip(zipFile, zipDir);
+        studyFile = dir(fullfile(zipDir, '**', 'animal.study'));
+    end
+    studyDir = studyFile(1).folder;
+
+    % Convert the old .dat data files to .fdt once: resaving them in their old format damages the data in EEGLAB 2026.1
+    setFiles = dir(fullfile(studyDir, '*', '*.set'));
+    for k = 1:numel(setFiles)
+        [~, base] = fileparts(setFiles(k).name);
+        folder = setFiles(k).folder;
+        if ~exist(fullfile(folder, [base '.fdt']), 'file')
+            TMP = pop_loadset('filename', setFiles(k).name, 'filepath', folder);
+            pop_saveset(TMP, 'filename', setFiles(k).name, 'filepath', folder, 'savemode', 'twofiles');
+            if exist(fullfile(folder, [base '.fdt']), 'file') && exist(fullfile(folder, [base '.dat']), 'file')
+                delete(fullfile(folder, [base '.dat']));
+            end
+        end
+    end
+
+    % Rebuild animal_mine.study (create-study lesson) if it is missing
+    if ~exist(fullfile(studyDir, 'animal_mine.study'), 'file')
+        gender = containers.Map( ...
+            {'cba','clm','ega','fsa','gro','hth','lmi','mba','mma','mta','pla','sce','sph','wpa'}, ...
+            {'F',  'F',  'F',  'M',  'M',  'M',  'F',  'F',  'M',  'F',  'M',  'F',  'M',  'M'});
+        files = dir(fullfile(studyDir, '*', '*.set'));
+        commands = {};
+        for k = 1:numel(files)
+            hdr = pop_loadset('filename', files(k).name, 'filepath', files(k).folder, 'loadmode', 'info');
+            subj = hdr.subject;
+            if isempty(subj), [~, subj] = fileparts(files(k).folder); end
+            cond = hdr.condition;
+            if isempty(cond)
+                if contains(files(k).name, 'distractor'), cond = 'distractor'; else, cond = 'animal'; end
+            end
+            if ~isKey(gender, lower(subj))
+                error('No gender entry for subject %s (%s)', subj, files(k).name);
+            end
+            commands{end+1} = {'index', k, 'load', fullfile(files(k).folder, files(k).name), ...
+                'subject', subj, 'condition', cond, 'group', gender(lower(subj))};
+        end
+        [STUDY, ALLEEG] = std_editset([], [], 'name', 'Go-nogo animal (mine)', ...
+            'task', 'Go-nogo categorization', 'commands', commands, 'updatedat', 'on');
+        STUDY = pop_savestudy(STUDY, ALLEEG, 'filename', 'animal_mine.study', ...
+            'filepath', studyDir, 'resavedatasets', 'on');
+    end
+    [STUDY, ALLEEG] = pop_loadstudy('filename', 'animal_mine.study', 'filepath', studyDir);
+
+    % Designs 2 and 3 (study-design lesson); design 2 is the current one
+    STUDY = std_makedesign(STUDY, ALLEEG, 2, 'name', 'image x gender', ...
+        'variable1', 'condition', 'values1', {'animal', 'distractor'}, 'vartype1', 'categorical', ...
+        'variable2', 'group', 'values2', {'F', 'M'}, 'vartype2', 'categorical');
+    STUDY = std_makedesign(STUDY, ALLEEG, 3, 'name', 'image only', ...
+        'variable1', 'condition', 'values1', {'animal', 'distractor'}, 'vartype1', 'categorical', ...
+        'variable2', 'none');
+    STUDY = std_selectdesign(STUDY, ALLEEG, 2);
+    STUDY = pop_savestudy(STUDY, ALLEEG, 'savemode', 'resave');
+
+    % Precomputed measures (study-precompute lesson), only if they are missing
+    first = STUDY.datasetinfo(1);
+    timefFile = fullfile(first.filepath, [first.subject '.dattimef']);
+    needMeasures = ~exist(fullfile(first.filepath, [first.subject '.daterp']), 'file') || ~exist(timefFile, 'file');
+    if ~needMeasures
+        tf = load('-mat', timefFile, 'labels');
+        needMeasures = numel(tf.labels) < ALLEEG(1).nbchan;   % ERSP from an older two-channel run
+    end
+    if needMeasures
+        baseline = [round(ALLEEG(1).xmin*1000) 0];
+        [STUDY, ALLEEG] = std_precomp(STUDY, ALLEEG, {}, 'savetrials', 'on', 'interp', 'on', 'recompute', 'on', ...
+            'erp', 'on', 'erpparams', {'rmbase', baseline}, ...
+            'spec', 'on', 'specparams', {'specmode', 'fft', 'logtrials', 'off'}, ...
+            'ersp', 'on', 'itc', 'on', 'erspparams', {'cycles', [3 0.8], 'freqs', [3 30], 'nfreqs', 20, 'ntimesout', 50});
+        STUDY = pop_savestudy(STUDY, ALLEEG, 'savemode', 'resave');
+    end
+
+    CURRENTSTUDY = 1; EEG = ALLEEG; CURRENTSET = 1:length(EEG);
+    eeglab redraw;
+eeglabVersion: "2026.1"
+updated: 2026-10-28
+---
+
+## لماذا هذه الخطوة مهمة؟
+
+في درس رسم ERP القناة (المحطة 7) قرأت منحنى مشارك واحد: الزمن على المحور الأفقي، والسعة بالـ µV على العمودي، وشرطان بلونين. **نفس القراءة تنطبق هنا.** الفرق أن كل منحنى الآن متوسط 14 مشاركاً (أو 7 في كل مجموعة)، لا متوسط محاولات شخص واحد.
+
+المتوسط يخفي الاختلاف بين الناس. مشارك واحد بسعة كبيرة جداً قد يصنع "فرقاً" في المتوسط لا يوجد عند الباقين. لذلك يعلّمك هذا الدرس شيئين معاً: رسم المتوسط، والنظر إلى كل مشارك قبل أن تصدّق المتوسط.
+
+## قبل وبعد
+
+<ImageSpec>
+صورة من سكربت الدرس يوم التشغيل، لا رسم يدوي. يسار: نافذة ERP المجموعة في Pz للتصميم 2، لوحتان (F و M)، وفي كل لوحة منحنيان animal و distractor بلونين ونمطي خط مختلفين. يمين: خريطتا رأس لمتوسط 150 إلى 250 ms للتصميم 3 (animal و distractor) بمقياس ألوان واحد. نصوص المحاور والعناوين من EEGLAB بالإنجليزية، ونسخة واحدة تكفي للغتين.
+</ImageSpec>
+
+## الخطوات من الواجهة
+
+**عن البيانات (D6):** `animal_mine.study` بتصاميمها الثلاثة من درس التصميم، والمقاييس المحسوبة من الدرس السابق: ERP والطيف و ERSP لكل القنوات (ERSP على شبكة خفيفة: 20 تردداً من 3 إلى 30 Hz).
+
+**أولاً: افتح نافذة الرسم**
+
+1. شغّل سكربت "نقطة البداية". يحسب المقاييس فقط إذا لم يجدها.
+2. افتح <MenuPath>Study > Plot channel measures</MenuPath>. تفتح نافذة <UiLabel>View and edit current channels -- pop_chanplot()</UiLabel>.
+3. في الأعلى <UiLabel>Select design:</UiLabel>. اختر `image x gender`.
+4. في العمود الأيسر <UiLabel>Select channel to plot</UiLabel> قائمة القنوات، وأزرار رسم المتوسط: <UiLabel>Plot ERPs</UiLabel> و <UiLabel>Plot spectra</UiLabel> و <UiLabel>Plot ERSPs</UiLabel>. وبجانب كل زر <UiLabel>Params</UiLabel> لخياراته.
+5. في العمود الأيمن <UiLabel>Select subject(s) to plot</UiLabel> قائمة تبدأ بـ <UiLabel>All subjects</UiLabel> ثم رموز المشاركين، وأزرار <UiLabel>Plot ERP(s)</UiLabel> و <UiLabel>Plot spectra</UiLabel> و <UiLabel>Plot ERSP(s)</UiLabel> لرسم المشاركين.
+
+**ثانياً: ERP المجموعة في Pz**
+
+1. اختر `Pz` في القائمة اليسرى.
+2. اضغط <UiLabel>Params</UiLabel> بجانب <UiLabel>Plot ERPs</UiLabel>. تفتح <UiLabel>ERP plotting options -- pop_erpparams()</UiLabel>.
+3. فعّل <UiLabel>Plot first variable on the same panel</UiLabel>، فيظهر animal و distractor في لوحة واحدة. اترك <UiLabel>Plot second variable on the same panel</UiLabel> غير مفعّل، فتظهر كل مجموعة في لوحة. اترك <UiLabel>Time range (ms) [low high]</UiLabel> فارغاً لكل الإيبوك. اضغط <UiLabel>Ok</UiLabel>.
+4. اضغط <UiLabel>Plot ERPs</UiLabel>. تظهر لوحتان: F و M، وفي كل منهما منحنيا الصورتين.
+5. اقرأها كما في درس المحطة 7: أين يبدأ المنحنيان بالافتراق؟ هل الفرق متشابه في اللوحتين؟ انظر أولاً إلى محور y واتجاهه.
+
+**ثالثاً: كل مشارك**
+
+1. مع `Pz` محددة، اختر <UiLabel>All subjects</UiLabel> في القائمة اليمنى، ثم اضغط <UiLabel>Plot ERP(s)</UiLabel>. يظهر منحنى رفيع لكل مشارك.
+2. ابحث عن منحنى بعيد عن الباقين. اختر رمزه من القائمة واضغط <UiLabel>Plot ERP(s)</UiLabel> لترى ذلك المشارك وحده.
+
+**رابعاً: خريطة الرأس في نافذة زمنية**
+
+1. غيّر <UiLabel>Select design:</UiLabel> إلى `image only`، فيُرسم كل المشاركين معاً.
+2. اضغط <UiLabel>Sel. all</UiLabel> لتحديد كل القنوات.
+3. اضغط <UiLabel>Params</UiLabel> بجانب <UiLabel>Plot ERPs</UiLabel>. اكتب أولاً في <UiLabel>Time range (ms) [low high]</UiLabel> القيمة `150 250`، ثم اختر في <UiLabel>Multiple channels selection</UiLabel> الخيار <UiLabel>Plot averaged topography over time range</UiLabel>. الترتيب مهم: إذا اخترت الخريطة والوقت فارغ، ترجع القائمة إلى الخيار الأول ويظهر تحذير `Select time range first for plotting topography, then select that setting again.` اضغط <UiLabel>Ok</UiLabel>.
+4. اضغط <UiLabel>Plot ERPs</UiLabel>. تظهر خريطتان: متوسط 150 إلى 250 ms لكل صورة.
+5. بعد ذلك أرجع <UiLabel>Multiple channels selection</UiLabel> إلى <UiLabel>Plot channels individually</UiLabel> وامسح <UiLabel>Time range (ms) [low high]</UiLabel>. الرجوع وحده لا يمسح الوقت، فتبقى كل رسوم ERP التالية مقصوصة على 150 إلى 250 ms.
+
+النافذة 150 إلى 250 ms هنا مثال للتعلم. في بحثك تُختار النافذة قبل النظر إلى الفرق، من دراسات سابقة أو من سؤالك، لا من الرسم نفسه. السبب في درس الإحصاء التالي.
+
+**خامساً: الطيف و ERSP**
+
+1. حدد `Oz` وحدها. اضغط <UiLabel>Params</UiLabel> بجانب <UiLabel>Plot spectra</UiLabel>، واكتب في <UiLabel>Frequency [low_Hz high_Hz]</UiLabel> القيمة `3 40`، وفعّل <UiLabel>Plot first variable on the same panel</UiLabel>. ثم <UiLabel>Plot spectra</UiLabel>.
+2. حدد `Pz` وحدها، ثم <UiLabel>Plot ERSPs</UiLabel>. تظهر صورة زمن × تردد لكل صورة.
+3. ERSP محسوب لكل القنوات، فيمكنك تحديد أي قناة. الرسم يغطي من 3 إلى 30 Hz فقط، لأن هذه هي الشبكة المحسوبة في الدرس السابق.
+
+## السكربت المقابل
+
+```matlab
+% STUDY and ALLEEG come from the starting point script (design 2 is current)
+names = {STUDY.changrp.name};
+pz = names(strcmpi(names, 'Pz'));
+oz = names(strcmpi(names, 'Oz'));
+
+% Group ERP at Pz: both pictures on one panel, one panel per gender (design 2)
+STUDY = pop_erpparams(STUDY, 'plotconditions', 'together', 'plotgroups', 'apart', 'topotime', []);
+STUDY = std_erpplot(STUDY, ALLEEG, 'channels', pz, 'design', 2);
+
+% The same channel for every participant
+STUDY = std_erpplot(STUDY, ALLEEG, 'channels', pz, 'plotsubjects', 'on', 'design', 2);
+
+% Scalp maps of the mean ERP from 150 to 250 ms, all participants together (design 3)
+STUDY = pop_erpparams(STUDY, 'topotime', [150 250]);
+STUDY = std_erpplot(STUDY, ALLEEG, 'channels', names, 'design', 3);
+STUDY = pop_erpparams(STUDY, 'topotime', []);
+
+% Group spectrum at Oz and ERSP at Pz (design 3)
+STUDY = pop_specparams(STUDY, 'plotconditions', 'together', 'freqrange', [3 40]);
+STUDY = std_specplot(STUDY, ALLEEG, 'channels', oz, 'design', 3);
+STUDY = std_erspplot(STUDY, ALLEEG, 'channels', pz, 'design', 3);
+```
+
+## أي قيمة أختار؟
+
+| الخيار | في هذا الدرس | متى تغيّره |
+|---|---|---|
+| التصميم | 2 لمقارنة الصورتين داخل كل جنس، و 3 للخرائط والطيف و ERSP | ارسم دائماً التصميم الذي سيدخل الإحصاء. |
+| الشرطان في لوحة واحدة | نعم (`plotconditions` = `together`) | لوحات منفصلة عندما تريد رؤية شكل كل منحنى وحده. |
+| المجموعتان في لوحة واحدة | لا (`plotgroups` = `apart`) | لوحة واحدة تزدحم بأربعة منحنيات. |
+| نطاق الزمن | فارغ، أي كل الإيبوك | ضيّقه للنشر فقط، بعد أن رأيت الكل. |
+| حدود y (<UiLabel>Plot limits [low high]</UiLabel>) | فارغة | ثبّتها عندما تقارن رسوماً مختلفة، حتى لا يخدعك تغيّر المقياس. |
+| <UiLabel>Lowpass plotted data [Hz]</UiLabel> | فارغ | يغيّر الرسم فقط لا البيانات. لا تستخدمه لتجميل منحنى ضعيف. |
+| نافذة الخريطة | 150 إلى 250 ms (مثال) | من سؤالك أو دراسات سابقة، قبل النظر إلى النتيجة. |
+
+## أخطاء شائعة
+
+- **التصميم الخاطئ في <UiLabel>Select design:</UiLabel>.** النافذة تتذكر آخر اختيار. انظر إلى عدد اللوحات: التصميم 2 يعطي لوحتين، والتصميم 3 لوحة واحدة.
+- **تصديق المتوسط بلا نظر إلى المشاركين.** إذا كان مشارك أو اثنان يصنعان الفرق، فالمتوسط لا يمثّل المجموعة.
+- **اختيار نافذة الخريطة بعد رؤية الفرق.** هذا يرفع كثيراً احتمال إيجاد "فرق" حتى في بيانات عشوائية. نشرحه في درس الإحصاء.
+- **حساب ERSP لقنوات قليلة فقط.** في EEGLAB 2026.1 تفشل قراءته بالخطأ `Unrecognized field name "chan1"`. أعد الحساب لكل القنوات، كما تفعل كتلة البداية.
+- **مقارنة لوحتين بمقياسين مختلفين.** EEGLAB يختار المقياس لكل رسم. ثبّت <UiLabel>Plot limits [low high]</UiLabel> قبل المقارنة.
+
+{/* صندوق "من التجربة": بانتظار قصة من صاحب المشروع. لا يُكتب قبل وصولها. */}
+
+## كيف تتأكد أن الخطوة نجحت؟
+
+- **ERP المجموعة في Pz** بالتصميم 2: لوحتان بعنواني F و M، وفي كل لوحة منحنيان بمفتاح animal و distractor.
+- **رسم كل المشاركين:** منحنيات رفيعة لكل مشارك، ويمكنك أن تحدد هل يتبع أغلبهم اتجاه المتوسط.
+- **الخرائط:** خريطتان لـ animal و distractor بعنوان فيه 150 إلى 250 ms.
+- **ERSP في Pz:** صورتان زمن × تردد، واحدة لكل صورة، بلا خطأ في نافذة الأوامر.
+
+<Methods>
+Grand-average ERPs at [Pz] were plotted for each image category and gender group, and spectra at [Oz] and event-related spectral perturbations at [Pz] for each image category (std_erpplot, std_specplot, std_erspplot, EEGLAB 2026.1); scalp maps show the mean amplitude from [150] to [250] ms.
+</Methods>
+
+<Callout type="note" title="مصدر البيانات">
+البيانات: نسخة STUDY من SCCN/Delorme. البيانات الأصلية: OpenNeuro ds002680 (CC0).
+</Callout>

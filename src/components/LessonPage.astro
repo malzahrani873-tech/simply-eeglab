@@ -1,0 +1,121 @@
+---
+import { render } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import Icon from './Icon.astro';
+import T from './T.astro';
+import { t, tn, type Lang } from '../i18n';
+import { url } from '../lib/url';
+import { roadmap, datasetByCode, lessons, nodeTitle, stationTitle, nextAvailable, type Lesson } from '../lib/site-data';
+import { site, isProduction } from '../site.config';
+import { LESSON_LAYOUT } from '../lesson-layout.mjs';
+import { components } from './lesson/index';
+
+interface Props { lang: Lang; entry: Lesson; slug: string }
+const { lang, entry, slug } = Astro.props;
+const d = entry.data;
+const node = roadmap.byId.get(slug)!;
+const all = await lessons();
+const has = (id: string) => all.has(`${lang}/${id}`);
+const { Content } = await render(entry);
+const ds = d.startingPoint ? datasetByCode.get(d.startingPoint.dataset) : null;
+const levelCls = { core: 'c', recommended: 'r', optional: 'o' }[d.level];
+const levelGlyph = { core: '●', recommended: '◐', optional: '○' }[d.level];
+const minutes = node.minutes;
+const { planned, available } = await nextAvailable(lang, slug);
+const idx = roadmap.nodes.findIndex((n: any) => n.id === slug);
+const prev = roadmap.nodes.slice(0, idx).reverse().find((n: any) => has(n.id));
+const refTypes = (r: any) => r.type ?? (/youtube\.com|youtu\.be/.test(r.url) ? 'video' : /eeglab\.org|sccn\.ucsd\.edu/.test(r.url) ? 'docs' : undefined);
+const refLang = (r: any) => r.lang ?? 'en';
+const foldTitle = (id: string, fallback: string) => (LESSON_LAYOUT === 'questions' ? t(lang, `fold.${id}.title`) : fallback);
+// "تبدأ من: {file} ({dataset}) {applied}": the text before the first colon is bold, tokens become elements.
+const startTpl = t(lang, 'start.line', { file: '{file}', dataset: '{dataset}', applied: '{applied}' });
+const colon = startTpl.indexOf(':');
+const startLead = startTpl.slice(0, colon + 1);
+const startParts = ['LEAD', ...startTpl.slice(colon + 1).split(/(\{\w+\})/).filter(Boolean)];
+const lessonUrl = new URL(url(`lesson/${slug}/`, lang), Astro.site).href;
+const issueUrl = site.issuesUrl
+  ? `${site.issuesUrl}/new?title=${encodeURIComponent(`[${slug}] `)}&body=${encodeURIComponent(lessonUrl)}`
+  : '';
+const helpItems = [
+  site.discussions.enabled && site.discussions.url ? { href: `${site.discussions.url}?title=${encodeURIComponent(t(lang, 'ask.discussionTitle', { title: d.title }))}`, label: t(lang, 'ask.link'), note: t(lang, 'ask.githubNote') } : null,
+  site.feedbackFormUrl ? { href: site.feedbackFormUrl, label: t(lang, 'feedback.share'), note: '' } : null,
+  issueUrl ? { href: issueUrl, label: t(lang, 'feedback.report'), note: t(lang, 'feedback.githubNote') } : null,
+].filter(Boolean) as { href: string; label: string; note: string }[];
+const jsonLd = {
+  '@context': 'https://schema.org', '@type': 'LearningResource', name: d.title, description: d.description,
+  inLanguage: lang, educationalLevel: d.level, timeRequired: `PT${minutes}M`, url: lessonUrl,
+  license: 'https://creativecommons.org/licenses/by-nc-sa/4.0/', dateModified: d.updated.toISOString().slice(0, 10),
+};
+---
+<Base lang={lang} title={d.title} description={d.description} path={`lesson/${slug}/`} bodyClass="lesson-page">
+  <script slot="head" type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+  <script slot="head" is:inline>(()=>{const o=()=>{const i=decodeURIComponent(location.hash.slice(1)),e=i&&document.getElementById(i),d=e&&(e.tagName==='DETAILS'?e:e.closest('details'));if(d&&!d.open){d.open=true;e.scrollIntoView()}};addEventListener('hashchange',o);addEventListener('pageshow',o)})();</script>
+  <div class="wrap">
+    <nav class="crumbs" aria-label={t(lang, 'nav.breadcrumb')}>
+      <a href={url('', lang) + `#${slug}`}>{t(lang, 'nav.map')}</a><span class="sep" aria-hidden="true">›</span>
+      <a href={url(`station/${String(d.station).padStart(2, '0')}/`, lang)}><T s={`${t(lang, 'station.label', { n: d.station })}: ${stationTitle(lang, d.station)}`} lang={lang} /></a>
+    </nav>
+    <div class="lgrid">
+      <article class="art" data-pagefind-body data-lesson={slug}>
+        <header class="lhead">
+          <p class="pos">{t(lang, 'lesson.position', { station: d.station, n: node.order })}</p>
+          <h1><T s={d.title} lang={lang} /></h1>
+          <svg class="trace" viewBox="0 0 160 14" preserveAspectRatio="none" aria-hidden="true"><path d="M0 7 L20 7 L26 3 L31 11 L36 5 L41 8 L60 7 L66 2 L71 12 L76 6 L80 7 L100 7 L105 4 L110 10 L114 7 L160 7" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" /></svg>
+          <div class="meta-row">
+            <span class={`badge ${levelCls}`}><span aria-hidden="true">{levelGlyph}</span>{t(lang, `level.${d.level}`)}</span>
+            <span>{tn(lang, 'common.minutes', minutes)}</span>
+            <span data-pagefind-ignore>{t(lang, 'lesson.prereq')}: {d.prerequisites.length === 0 ? t(lang, 'lesson.prereq.none') : d.prerequisites.map((p, i) => (
+              <>{i > 0 && (lang === 'ar' ? '، ' : ', ')}{has(p) ? <a href={url(`lesson/${p}/`, lang)}><T s={nodeTitle(lang, p)} lang={lang} /></a> : <span><T s={nodeTitle(lang, p)} lang={lang} /> {t(lang, 'lesson.prereq.soon')}</span>}</>
+            ))}</span>
+            <a href={url(`lesson/${slug}/card/`, lang)} data-pagefind-ignore>{t(lang, 'card.link')}</a>
+            <span class="done-badge" hidden><Icon name="check" class="ico s16" /> {t(lang, 'status.done')}</span>
+          </div>
+          {!isProduction && d.status !== 'approved' && <p class="preview-note" data-pagefind-ignore>{t(lang, 'preview.banner')}</p>}
+          {d.startingPoint && ds && (
+            <div class="start1" data-pagefind-ignore>
+              <span>{startParts.map((part) => part === '{file}' ? <code class="i" dir="ltr">{d.startingPoint!.file}</code>
+                : part === '{dataset}' ? <span lang="en">{d.startingPoint!.dataset}</span>
+                : part === '{applied}' ? <span class="ap">· {d.startingPoint!.applied.length === 0 ? t(lang, 'start.applied.none') : <>{t(lang, 'start.applied')}: {d.startingPoint!.applied.map((a, i) => <>{i > 0 && (lang === 'ar' ? '، ' : ', ')}{has(a) ? <a href={url(`lesson/${a}/`, lang)}><T s={nodeTitle(lang, a)} lang={lang} /></a> : <T s={nodeTitle(lang, a)} lang={lang} />}</>)}</>}</span>
+                : part === 'LEAD' ? <b>{startLead}</b> : part)}
+              </span>
+              <a href={ds.dataUrl && ds.dataUrl !== 'TBD' ? ds.dataUrl : ds.url} rel="noopener" target="_blank" style="text-decoration:none;font-weight:600">{t(lang, 'start.dataset')}<span class="sr"> {t(lang, 'a11y.newTab')}</span></a>
+              <details><summary>{t(lang, 'start.scriptToggle')}</summary>
+                <div class="code"><div class="ch2"><span>{t(lang, 'code.lang')}</span><button type="button" class="cp" hidden data-copy data-done={t(lang, 'code.copied')} data-fail={t(lang, 'code.copyFailed')}><Icon name="copy" class="ico s20" /><span>{t(lang, 'code.copy')}</span></button></div><pre dir="ltr" tabindex="0"><code>{d.startingPoint.script.trimEnd()}</code></pre></div>
+              </details>
+            </div>
+          )}
+        </header>
+        <div class="backnote" hidden data-backnote data-pagefind-ignore>
+          <p>{t(lang, 'tip.back')}</p><button type="button" data-backnote-close aria-label={t(lang, 'common.close')}><Icon name="close" class="ico s20" /></button>
+        </div>
+
+        <Content components={components} />
+
+        <details class="fold" id="further">
+          <summary><Icon name="books" class="ico fi" /><span class="ft"><h2>{foldTitle('further', t(lang, 'section.further'))}</h2><span class="fh">{tn(lang, 'fold.further.hint', d.references.length)}</span></span><Icon name="down" class="ico s20 cv2" /></summary>
+          <div class="fb"><ul class="refs">
+            {d.references.map((r) => (
+              <li><a href={r.url} rel="noopener" target="_blank" lang={refLang(r)}>{r.title}</a>{refTypes(r) && <span class="rt">{t(lang, `ref.type.${refTypes(r)}`)}</span>}<span>{r.section}{r.duration && ` · ${r.duration}`}</span></li>
+            ))}
+          </ul><p class="ver">{t(lang, 'lesson.version', { version: d.eeglabVersion })} · {d.updated.toISOString().slice(0, 10)}</p></div>
+        </details>
+        <div class="print-copy" data-pagefind-ignore><h2>{t(lang, 'section.further')}</h2><ul>{d.references.map((r) => <li>{r.title}: {r.url} ({r.section})</li>)}</ul></div>
+
+        <nav class="pn" aria-label={t(lang, 'section.next')} data-pagefind-ignore>
+          {prev && <a class="pv" href={url(`lesson/${prev.id}/`, lang)}><small>{t(lang, 'lesson.prev')}</small><b><T s={nodeTitle(lang, prev.id)} lang={lang} /></b></a>}
+          {available && <a class="nx" id="next-lesson" href={url(`lesson/${available}/`, lang)}><small>{available === planned ? t(lang, 'lesson.next') : t(lang, 'lesson.next.soon', { title: '' }).replace(/[:：]?\s*$/, '')}</small><b><T s={nodeTitle(lang, available)} lang={lang} /></b></a>}
+        </nav>
+
+        {helpItems.length > 0 && (
+          <details class="fold" id="help" data-pagefind-ignore>
+            <summary><Icon name="help" class="ico fi" /><span class="ft"><h2>{foldTitle('help', t(lang, 'help.title'))}</h2><span class="fh">{t(lang, 'fold.help.hint')}</span></span><Icon name="down" class="ico s20 cv2" /></summary>
+            <div class="fb"><ul class="help-list">{helpItems.map((h) => <li><a href={h.href} rel="noopener" target="_blank">{h.label}</a>{h.note && <span class="muted small"> · {h.note}</span>}</li>)}</ul></div>
+          </details>
+        )}
+      </article>
+    </div>
+  </div>
+  <script>
+    import '../scripts/lesson.ts';
+  </script>
+</Base>

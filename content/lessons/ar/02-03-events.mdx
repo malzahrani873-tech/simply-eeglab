@@ -1,0 +1,160 @@
+---
+title: الأحداث (events)
+titleEn: Events
+description: كيف تعرض أحداث الداتاست، وتتحقق من أنواعها وعددها وتوقيتها، وتحوّل توقيت الحدث من عيّنات إلى ثوانٍ.
+station: 2
+order: 3
+level: core
+status: approved
+objectives:
+  - تعرض الأحداث في نافذة التمرير وفي Edit > Event values.
+  - تتحقق من أنواع الأحداث وعددها بـ eeg_eventtypes.
+  - تحوّل توقيت الحدث من عيّنات إلى ثوانٍ، وتشرح الفرق بينهما.
+prerequisites: [import-raw]
+references:
+  - title: EEGLAB Tutorial
+    url: https://eeglab.org/tutorials/04_Import/Importing_Event_Epoch_Info.html
+    section: "b. Events: Plotting events; Recognized event fields"
+  - title: EEGLAB Tutorial
+    url: https://eeglab.org/tutorials/11_Scripting/Event_Processing_command_line.html
+    section: "b. Event Processing"
+  - title: "EEGLAB preprocessing #2: Events and channel locations"
+    url: https://www.youtube.com/watch?v=2CPmmPG5Beo
+    section: "الفيديو كاملاً"
+    duration: "11:40"
+  - title: EEG Motor Movement/Imagery Dataset (PhysioNet)
+    url: https://physionet.org/content/eegmmidb/1.0.0/
+    section: "Experimental Protocol"
+datasets: [D2]
+startingPoint:
+  dataset: D2
+  file: S001R03.set
+  applied: [import-raw, channel-locations]
+  script: |
+    [ALLEEG, EEG, CURRENTSET, ALLCOM] = eeglab;
+    % Folder where you keep the course data (change it)
+    dataFolder = 'C:\Users\me\Documents\eeg-course';
+    EEG = pop_loadset('filename', 'S001R03.set', 'filepath', dataFolder);
+    [ALLEEG, EEG, CURRENTSET] = pop_newset(ALLEEG, EEG, 0, 'setname', 'S001R03', 'gui', 'off');
+    eeglab redraw;
+eeglabVersion: "2026.1"
+updated: 2026-10-28
+---
+
+## لماذا هذه الخطوة مهمة؟
+
+الحدث (<En>event</En>) علامة في التسجيل تقول "هنا حصل شيء": ظهر مثير، أو ضغط المشارك زراً، أو بدأت مهمة. لكل حدث نوع (اسمه) وتوقيت (<En>latency</En>) (متى حصل).
+
+كل التحليلات اللاحقة تقريباً تعتمد على الأحداث. التقطيع يقصّ البيانات حولها، والـ ERP يُحسب بالمتوسط عليها. إذا غابت الأحداث، أو جاءت بأسماء خاطئة، أو في توقيت خاطئ، فكل نتيجة بعدها خاطئة، حتى لو كانت الإشارة نظيفة.
+
+لذلك تحقّق بعد الاستيراد مباشرة من ثلاثة أشياء: هل أنواع الأحداث هي المتوقعة؟ وهل عددها صحيح؟ وهل توقيتها صحيح؟
+
+في `S001R03.edf` تأتي الأحداث من تعليقات EDF+ (الـ annotations). وصفحة الداتاست (<En>dataset</En>) تعرّف ثلاثة رموز:
+
+- `T0`: راحة.
+- `T1` و `T2`: بداية حركتين مختلفتين، حقيقية أو متخيَّلة. وأي حركة يعنيها كل رمز يعتمد على مهمة التسجيل. صفحة الداتاست تشرح ذلك.
+
+## قبل وبعد
+
+<ImageSpec>
+نافذة Channel data (scroll) لـ S001R03 بعد إضافة المواقع: بضع قنوات بأسمائها على اليسار، وخطوط أحداث عمودية ملوّنة وأسماؤها فوقها (T2 ثم T0 ثم T1 ثم T0)، بينها حوالي 4 ثوانٍ. زر Event types في الأسفل مُعلَّم بسهم. لقطة واجهة حقيقية من EEGLAB 2026.1 (source: eeglab-ui).
+</ImageSpec>
+
+## الخطوات من الواجهة
+
+### 1. شاهد الأحداث على الإشارة
+
+1. افتح `S001R03.set`، وفيه الآن مواقع الأقطاب.
+2. افتح <MenuPath>Plot > Channel data (scroll)</MenuPath>.
+3. الخطوط العمودية هي الأحداث، ونوع كل حدث مكتوب فوقه. لكل نوع لونه.
+4. اضغط <UiLabel>Event types</UiLabel> في أسفل النافذة. يظهر مفتاح صغير بكل نوع ولونه.
+5. تنقّل بـ `>` و `<`. الأحداث تأتي كل 4 ثوانٍ تقريباً: `T1` أو `T2`، ثم `T0`، ثم `T1` أو `T2` من جديد.
+
+### 2. اقرأ قيم كل حدث
+
+1. افتح <MenuPath>Edit > Event values</MenuPath>.
+2. تعرض النافذة حدثاً واحداً في كل مرة. من حقوله `type` و <UiLabel>latency (sec)</UiLabel> و <UiLabel>duration (sec)</UiLabel>.
+3. الحدث الأول نوعه `T2`، وتوقيته `[4.1937]`، ومدته `4.1`.
+4. انتقل إلى الحدث التالي بزر `>`. الحدث الثاني `T0` عند `[8.2937]` ثانية.
+5. أغلق النافذة بزر <UiLabel>Cancel</UiLabel> حتى لا تغيّر شيئاً.
+
+هذه النافذة تعرض التوقيت والمدة **بالثواني**. أما داخل `EEG.event` فيُحفظان **بالعيّنات**. السكربت التالي يوضّح الفرق.
+
+## السكربت المقابل
+
+```matlab
+% Start EEGLAB and load the file from the previous lesson
+[ALLEEG, EEG, CURRENTSET, ALLCOM] = eeglab;
+dataFolder = 'C:\Users\me\Documents\eeg-course';   % change it
+EEG = pop_loadset('filename', 'S001R03.set', 'filepath', dataFolder);
+
+% Event types and how many of each
+eeg_eventtypes(EEG)          % T0 14, T1 8, T2 7
+numel(EEG.event)             % 29
+
+% Type and latency of the first four events (latency in samples)
+{EEG.event(1:4).type}        % 'T2' 'T0' 'T1' 'T0'
+[EEG.event(1:4).latency]     % 672 1328 2000 2656
+
+% The same latencies in seconds: (sample - 1) / sampling rate
+([EEG.event(1:4).latency] - 1) / EEG.srate   % 4.1937 8.2937 12.4938 16.5938
+
+% Duration is also stored in samples
+[EEG.event(1:2).duration] / EEG.srate        % 4.1 4.2
+
+% Scroll through the data with its events
+pop_eegplot(EEG, 1, 1, 1);
+```
+
+- **لماذا نطرح 1؟** في EEGLAB أول عيّنة رقمها 1 وتقع عند الزمن صفر. بمعدل عيّنات (<En>sampling rate</En>) 160 هرتز، الثانية الواحدة 160 عيّنة.
+- **لماذا 4.19 لا 4.2؟** الملف يضع أول حدث عند 4.2 ثانية، والاستيراد يجعله العيّنة 4.2 × 160 = 672. ومع طرح 1 يصبح 4.19375 ثانية، وتعرضه النافذة `[4.1937]`. الفرق عيّنة واحدة (حوالي 6 ميلي ثانية)، ولا يؤثر في هذا المسار.
+- **لماذا 29 حدثاً لا 30؟** في الملف 30 تعليقاً، أولها `T0` عند 0 ثانية. الاستيراد يعطيه التوقيت `0`، أي قبل أول عيّنة، فيحذفه EEGLAB ويطبع في الـ Command Window: `eeg_checkset warning: 1/30 events had out-of-bounds latencies and were removed`.
+
+## أي قيمة أختار؟
+
+لا توجد قيمة تختارها هنا. المهم أن تعرف ماذا تتوقع. هذه حقول الأحداث في هذا الملف:
+
+| الحقل | ماذا يحفظ | وحدة الحفظ | يظهر في Edit > Event values | مثال (الحدث الأول) |
+|---|---|---|---|---|
+| `type` | اسم الحدث | نص | نص | `T2` |
+| `latency` | متى حصل الحدث | عيّنات | ثوانٍ | `672` (4.19 ثانية) |
+| `duration` | كم استمر الحدث | عيّنات | ثوانٍ | `656` (4.1 ثانية) |
+| `urevent` | رقم الحدث في القائمة الأصلية | رقم | لا يظهر | `1` |
+
+وما تتوقعه في `S001R03.edf`:
+
+| الفحص | المتوقع |
+|---|---|
+| أنواع الأحداث | `T0` و `T1` و `T2` |
+| عدد الأحداث | 29: منها 14 `T0`، و 8 `T1`، و 7 `T2` (التعليق الأول عند 0 ثانية يُحذف) |
+| المسافة بينها | حوالي 4.1 إلى 4.2 ثانية |
+| آخر حدث | `T1` عند 120.4 ثانية تقريباً، قبل نهاية التسجيل عند 125 ثانية |
+
+**إذا كانت الأحداث ناقصة أو متأخرة.** في ملفات أخرى قد لا تأتي الأحداث مع الإشارة. استوردها من <MenuPath>File > Import event info</MenuPath>: من ملف نصي أو مصفوفة MATLAB، أو من قناة الـ trigger (<UiLabel>From data channel</UiLabel>)، أو من ملفات Presentation و E-Prime. وإذا كانت كل الأحداث متأخرة بقدر ثابت، مثل تأخر ظهور المثير على الشاشة، فحرّكها في السكربت بالقدر الذي قسته لجهازك:
+
+```matlab
+EEG = pop_adjustevents(EEG, 'addms', 20);   % move every event 20 ms later (use your own measured delay)
+```
+
+القائمة المقابلة <MenuPath>Edit > Adjust event latencies</MenuPath> مخفية افتراضياً في 2026.1. لتظهر، فعّل في <MenuPath>File > Preferences</MenuPath> الخانة التي تبدأ بـ <UiLabel>If set, show all menu items from previous EEGLAB versions.</UiLabel> ثم أعد تشغيل EEGLAB. هذا يغيّر شكل كل القوائم عن صور الدروس، فألغِ الخانة بعد الاستعمال.
+
+## أخطاء شائعة
+
+- **قراءة `latency` على أنه ثوانٍ.** في `EEG.event` هو بالعيّنات. حوّله بالمعادلة: (العيّنة − 1) ÷ معدل العيّنات.
+- **ظهور الأنواع أرقاماً (`1` و `2` و `3`) بدل `T0` و `T1` و `T2`.** لم تُقرأ أسماء التعليقات. أعد الاستيراد مع تفعيل خانة <UiLabel>Import EDF+ annotations (try also mexSLOAD below)</UiLabel>، كما في درس الاستيراد.
+- **لا أحداث أصلاً.** سطر <UiLabel>Events</UiLabel> في النافذة الرئيسية يعرض `none`. التعليقات لم تُستورد. أعد الاستيراد وتأكد من نفس الخانة.
+- **افتراض أن `T1` يعني دائماً نفس الحركة.** في هذه الداتاست معناه يعتمد على مهمة التسجيل. اقرأ صفحة الداتاست لكل ملف تستخدمه.
+- **تغيير حدث بالخطأ في Edit > Event values.** أي قيمة تكتبها تغيّر الحدث. أغلق النافذة بـ <UiLabel>Cancel</UiLabel> إلا إذا كنت تقصد التعديل.
+
+{/* صندوق "من التجربة": بانتظار قصة من صاحب المشروع. لا يُكتب قبل وصولها. */}
+
+## كيف تتأكد أن الخطوة نجحت؟
+
+1. سطر <UiLabel>Events</UiLabel> في النافذة الرئيسية يعرض `29`.
+2. `eeg_eventtypes(EEG)` يعرض `T0` 14، و `T1` 8، و `T2` 7.
+3. الحدث الأول في <MenuPath>Edit > Event values</MenuPath> هو `T2` عند `[4.1937]` ثانية، والثاني `T0` عند `[8.2937]` ثانية.
+4. نافذة التمرير تعرض خطوط أحداث كل 4 ثوانٍ تقريباً.
+
+هذا الدرس لا يغيّر البيانات، فلا شيء تحفظه.
+
+من المحطة القادمة نعمل على `eeglab_data.set` التي تأتي مع EEGLAB، لأنها صغيرة ومطابقة للتوثيق. ونفس الخطوات تنطبق على ملفك.

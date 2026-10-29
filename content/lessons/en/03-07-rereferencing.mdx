@@ -1,0 +1,159 @@
+---
+title: Re-referencing
+titleEn: Re-referencing
+description: How to re-reference EEG data to the average reference in EEGLAB with the eye channels excluded, and why the reference changes the shape of every channel.
+station: 3
+order: 7
+level: core
+status: approved
+objectives:
+  - Re-reference the data to the average reference from the GUI and from a script, with EOG channels excluded from it.
+  - Explain how the reference changes the shape of every channel, and choose the right reference for your analysis.
+  - Explain why the average reference reduces the data rank by one.
+prerequisites: [interpolation]
+references:
+  - title: EEGLAB Tutorial
+    url: https://eeglab.org/tutorials/05_Preprocess/rereferencing.html
+    section: "5. Preprocess data > b. Re-referencing"
+  - title: EEGLAB Tutorial
+    url: https://eeglab.org/tutorials/ConceptsGuide/rereferencing_background.html
+    section: "Concepts guide: Re-referencing"
+  - title: Luck, Applied Event-Related Potential Data Analysis (1st edition)
+    url: https://socialsci.libretexts.org/Bookshelves/Psychology/Biological_Psychology/Applied_Event-Related_Potential_Data_Analysis_(Luck)
+    section: "Chapter 5: Referencing and Other Channel Operations"
+  - title: "What is the best EEG reference?"
+    url: https://www.youtube.com/watch?v=ioIETUX4G4k
+    section: "Full video"
+    duration: "18:21"
+datasets: [D1]
+startingPoint:
+  dataset: D1
+  file: eeglab_data.set
+  applied: [filtering, line-noise, bad-channels, interpolation]
+  script: |
+    [ALLEEG, EEG, CURRENTSET, ALLCOM] = eeglab;
+    eeglabRoot = fileparts(which('eeglab'));
+    EEG = pop_loadset('eeglab_data.set', fullfile(eeglabRoot, 'sample_data'));
+    fullLocs = EEG.chanlocs;
+
+    % Main dataset: high-pass at 0.1 Hz, then 60 Hz line-noise removal
+    EEG = pop_eegfiltnew(EEG, 'locutoff', 0.1);
+    EEG = pop_eegfiltnew(EEG, 'locutoff', 58, 'hicutoff', 62, 'revfilt', 1);
+
+    % Bad channels you removed earlier, e.g. {'T7'}; leave empty if none
+    badChans = {};
+    if ~isempty(badChans)
+        EEG = pop_select(EEG, 'rmchannel', badChans);
+        EEG = pop_interp(EEG, fullLocs, 'spherical');
+    end
+    EEG.filename = ''; EEG.filepath = ''; EEG.datfile = ''; EEG.saved = 'no';
+    [ALLEEG, EEG, CURRENTSET] = pop_newset(ALLEEG, EEG, 0, 'setname', 'D1 interp', 'gui', 'off');
+    eeglab redraw;
+interactive: [RerefDemo]
+eeglabVersion: "2026.1"
+updated: 2026-10-27
+---
+
+## Why this step matters
+
+Voltage is not measured at a single point. Each channel measures the difference between its electrode and another electrode called the reference. So the reference shapes every channel.
+
+If you change the reference, all channels change together. A channel close to the old reference looks small, and after the change it may grow a lot. There is no "true" channel without a reference.
+
+Re-referencing computes the data as if they had been recorded with another reference. The two most common choices:
+
+- **Average reference:** the mean of all scalp channels at each moment. The official tutorial recommends it for source analysis, and it is the reference on our path before ICA.
+- **Linked mastoids:** the mean of two electrodes behind the ears. Common in ERP studies, such as Luck's book.
+
+<Callout type="note">
+**About D1:** it was recorded with a mastoid reference, as the official tutorial says, and the reference channel is not in the data. So you do not add it, and you cannot try linked mastoids on D1. Try it in the simulation below.
+</Callout>
+
+## Before and after
+
+<RerefDemo pipeline="average reference" />
+
+<BeforeAfter>
+<Figure src="rereferencing/rereferencing-scroll-before.png" alt="Five seconds of FPz, Cz, Pz, Oz and EOG1 with the original (mastoid) reference, scale 180 µV." caption="Before: original reference" source="D1" />
+<Figure src="rereferencing/rereferencing-scroll-after.png" alt="The same channels and seconds after the average reference, same scale: the scalp channels changed shape, while EOG1 did not because it was excluded." caption="After: average reference" source="D1" />
+</BeforeAfter>
+
+## Steps in the GUI
+
+Start with the main dataset after interpolation loaded, as in the Starting point. In D1 this is `D1 badch` from the bad channels lesson, because there was nothing to interpolate.
+
+1. First make sure the channel count is complete: <UiLabel>Channels per frame</UiLabel> is 32 in D1.
+2. Open <MenuPath>Tools > Re-reference the data</MenuPath>. A window titled <UiLabel>pop_reref - average reference or re-reference data</UiLabel> appears.
+3. The first line, <UiLabel>Current data reference state is:</UiLabel>, shows the current reference. In D1 it may show `unknown`, because the file does not store the reference name for each channel.
+4. Keep <UiLabel>Compute average reference</UiLabel> checked; it is the default.
+5. Leave <UiLabel>Huber average ref. with threshold</UiLabel> unchecked. The official tutorial says it should not be used before ICA.
+6. Next to <UiLabel>Exclude channel indices (EMG, EOG)</UiLabel>, press <UiLabel>...</UiLabel> and choose `EOG1` and `EOG2`. The field fills with their names.
+7. Leave <UiLabel>Add old ref. channel back to the data</UiLabel> empty, because the mastoid channel is not in D1.
+8. Press <UiLabel>OK</UiLabel>. The command window prints `Re-referencing data`.
+9. Name the new dataset `D1 main` and leave <UiLabel>Overwrite it in memory (set=yes; unset=create a new dataset)</UiLabel> unchecked.
+10. Save it with <MenuPath>File > Save current dataset as</MenuPath>. This is the "main dataset" that the ICA lessons start from.
+11. Compare the two datasets with <MenuPath>Plot > Channel data (scroll)</MenuPath>: all scalp channels changed, and `EOG1` and `EOG2` stayed the same.
+
+## The equivalent script
+
+```matlab
+% Keep a copy to compare before and after
+EEG_before = EEG;
+
+% Average reference, EOG channels excluded
+eogIdx = find(ismember({EEG.chanlocs.labels}, {'EOG1', 'EOG2'}));
+EEG = pop_reref(EEG, [], 'exclude', eogIdx);
+EEG.setname = 'D1 main';
+
+% Check: scalp channels now sum to (almost) zero at every time point
+scalpIdx = setdiff(1:EEG.nbchan, eogIdx);
+fprintf('Reference: %s\n', EEG.ref);
+fprintf('Largest sum over scalp channels: %g uV\n', max(abs(sum(EEG.data(scalpIdx, :), 1))));
+
+% Channel Oz over 5 seconds, before and after
+oz = find(strcmp({EEG.chanlocs.labels}, 'Oz'));
+t = 1:5*EEG.srate;
+figure;
+plot(t / EEG.srate, EEG_before.data(oz, t), t / EEG.srate, EEG.data(oz, t));
+legend('Original reference (mastoid)', 'Average reference');
+xlabel('Time (s)'); ylabel('Amplitude (uV)');
+
+EEG = pop_saveset(EEG, 'filename', 'D1_main.set', 'filepath', pwd);
+```
+
+This is the same `pop_reref` line as in the Starting point scripts of the ICA lessons. The number the check prints is very small but not exactly zero, because the data are stored in single precision.
+
+## Which value should I choose?
+
+| Setting | Value | Why |
+|---|---|---|
+| Reference for the ICA path and source analysis | Average reference | The official tutorial recommends it for source analysis, and ICA on our path runs on it. |
+| Reference for comparing with earlier ERP studies | The same reference as those studies, often linked mastoids | The reference changes the shape and size of the ERP, so a comparison needs the same reference. |
+| Excluded channels | EOG, ECG, and EMG channels | They are not scalp channels, so they do not belong in the scalp average. |
+| Adding the old reference channel back | Only if its location is defined in the channel editor | Not in D1, as the official tutorial says. |
+| Huber | Not before ICA | Official tutorial: it breaks the linearity ICA needs, and it belongs after ICA. |
+
+<Callout type="expert">
+**The REST "infinity" reference:** a method that computes the data as if the reference were at a distant point with constant potential. It is available as the REST extension from <MenuPath>File > Manage EEGLAB extensions</MenuPath>, as the official tutorial mentions. And **linked mastoids** for data that contain M1 and M2 channels takes two steps in EEGLAB: an average reference while keeping the original reference channel, then re-referencing to M1 and M2.
+</Callout>
+
+## Common mistakes
+
+- **Including EOG or ECG channels in the average reference.** These are non-brain channels, and their large signal enters every channel through the average. Exclude them in <UiLabel>Exclude channel indices (EMG, EOG)</UiLabel>.
+- **Forgetting that the average reference reduces the data rank by one.** After an average reference the scalp channels sum to zero, so any one of them equals minus the sum of the others. That is why in D1 the data rank becomes 31, not 32, and ICA gives 31 components.
+- **Re-referencing before interpolation.** An average over missing channels leans toward the side with more channels. Interpolate first.
+- **Changing the reference after ICA.** The weights are tied to the reference ICA was computed on. Re-reference before ICA and leave it afterward. EEGLAB warns you if you change it.
+- **Adding a reference channel that does not exist.** In D1 the mastoid channel is not in the data. Do not fill <UiLabel>Add old ref. channel back to the data</UiLabel> unless you defined it in the channel editor.
+
+{/* "From experience" box: waiting for the project owner's story. Do not write it before it arrives. */}
+
+## How to check it worked
+
+1. **Main window:** the <UiLabel>Reference</UiLabel> line shows `average`, and <UiLabel>Channels per frame</UiLabel> is still 32.
+2. **The script check:** `EEG.ref` is `average`, and the sum over scalp channels is a very small number close to zero.
+3. **The eye channels did not change:** in the scroll view, `EOG1` and `EOG2` look as they did before re-referencing.
+4. **The scalp channels changed:** `Oz`, for example, looks clearly different from its shape with the mastoid reference.
+
+<Methods>
+Data were re-referenced to the average of all scalp channels (pop_reref, EEGLAB 2026.1); EOG channels were excluded from the reference.
+</Methods>

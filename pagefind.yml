@@ -1,0 +1,17 @@
+# Interface text that should not show up in search results. Lesson prose and fold content stay indexed.
+exclude_selectors:
+  - ".meta-row"
+  - ".pos"
+  - ".sr"
+  - ".fh"
+  - ".fold-lead"
+  - ".done-box"
+  - ".cp"
+  - ".copy-btn"
+  - ".rt"
+  - ".ver"
+  - ".ph"
+  - ".fd-static"
+  - ".backnote"
+  - "noscript"
+  - "button"

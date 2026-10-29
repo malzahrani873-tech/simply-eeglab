@@ -1,0 +1,157 @@
+---
+title: الأمر eegh وسجل الأوامر
+titleEn: eegh & the command history
+description: كيف تستخرج بالأمر eegh سطر الكود المقابل لكل ضغطة في واجهة EEGLAB، وتحفظ سجلك كسكربت يعيد نفس النتيجة.
+station: 9
+order: 1
+level: core
+status: approved
+objectives:
+  - يعرض بالأمر eegh سطر الكود المقابل لكل خطوة نفّذها من الواجهة.
+  - يحفظ سجل الجلسة وسجل الداتاست في ملف .m ويميّز بينهما.
+  - ينظّف سكربت السجل من المسارات الثابتة والأسطر الزائدة، ويشغّله فيعطي نفس النتيجة.
+prerequisites: [extract-epochs]
+references:
+  - title: EEGLAB Tutorial
+    url: https://eeglab.org/tutorials/11_Scripting/Using_EEGLAB_history.html
+    section: "11. Write scripts > a. Using EEGLAB history"
+  - title: EEGLAB Tutorial
+    url: https://eeglab.org/tutorials/ConceptsGuide/EEGLAB_functions.html
+    section: "EEGLAB functions"
+datasets: [D1]
+startingPoint:
+  dataset: D1
+  file: eeglab_data.set
+  applied: []
+  script: |
+    % Start a fresh EEGLAB session so the history begins empty
+    clear
+    [ALLEEG, EEG, CURRENTSET, ALLCOM] = eeglab;
+eeglabVersion: "2026.1"
+updated: 2026-10-28
+---
+
+## لماذا هذه الخطوة مهمة؟
+
+كل ضغطة في واجهة EEGLAB تنفّذ في الخلفية سطراً من MATLAB. EEGLAB يحفظ هذه الأسطر بالترتيب في سجل الأوامر (<En>command history</En>)، والأمر `eegh` يعرضها لك.
+
+هذا السجل هو أول سكربت لك، ولم تكتب منه حرفاً. تحفظه في ملف، فتعيد نفس التحليل بضغطة واحدة، أو تطبّقه على مشارك آخر.
+
+والسجل أيضاً توثيق دقيق لما فعلته. بعد شهر لن تتذكر أي حد فلتر اخترت، لكن السجل يتذكر.
+
+## قبل وبعد
+
+<Figure src="eegh-history/S6-filter-dialog.png" alt="نافذة Filter the data -- pop_eegfiltnew() وفي خانة Lower edge of the frequency pass band (Hz) القيمة 0.1، وخانة Plot frequency response مفعّلة." caption="EEGLAB 2026.1" source="eeglab-ui" />
+
+بعد أن تضغط <UiLabel>Ok</UiLabel> في هذه النافذة، اكتب `eegh` في نافذة الأوامر. السطر المقابل هو:
+
+```matlab
+EEG = pop_eegfiltnew(EEG, 'locutoff',0.1,'plotfreqz',1);
+```
+
+كل خانة ملأتها في النافذة موجودة في السطر: `'locutoff',0.1` هو الحد الأدنى، و `'plotfreqz',1` هو خانة <UiLabel>Plot frequency response</UiLabel> المفعّلة.
+
+## الخطوات من الواجهة
+
+ابدأ بجلسة جديدة كما في "نقطة البداية": الأمر `clear` ثم `eeglab`. تشغيل `eeglab` يبدأ سجلاً جديداً فارغاً، فلا يختلط بأوامر جلسة سابقة.
+
+**أولاً: نفّذ بعض الخطوات من الواجهة**
+
+1. افتح <MenuPath>File > Load existing dataset</MenuPath>، واختر `eeglab_data.set` من مجلد `sample_data` داخل مجلد EEGLAB.
+2. افتح <MenuPath>Tools > Filter the data > Basic FIR filter (new, default)</MenuPath>. اكتب `0.1` في <UiLabel>Lower edge of the frequency pass band (Hz)</UiLabel>، واضغط <UiLabel>Ok</UiLabel>. أغلق نافذة استجابة الفلتر، وسمِّ الداتاست `D1 hp0.1`.
+3. افتح نفس القائمة مرة ثانية لإزالة ضوضاء الكهرباء عند 60 هرتز. اكتب `58` في <UiLabel>Lower edge of the frequency pass band (Hz)</UiLabel> و`62` في <UiLabel>Higher edge of the frequency pass band (Hz)</UiLabel>، وفعّل <UiLabel>Notch filter the data instead of pass band</UiLabel>. اضغط <UiLabel>Ok</UiLabel>، وسمِّ الداتاست `D1 hp0.1 notch60`.
+4. افتح <MenuPath>Plot > Channel data (scroll)</MenuPath>، ثم أغلق النافذة.
+
+**ثانياً: اعرض السجل**
+
+5. في نافذة أوامر MATLAB اكتب `eegh` واضغط <kbd>Enter</kbd>. يطبع EEGLAB كل أوامر الجلسة من الأقدم إلى الأحدث. ستشبه هذا (المسار عندك مختلف):
+
+```matlab
+[ALLEEG EEG CURRENTSET ALLCOM] = eeglab;
+EEG = pop_loadset('filename','eeglab_data.set','filepath','C:\eeglab2026.1\sample_data\');
+[ALLEEG, EEG, CURRENTSET] = eeg_store( ALLEEG, EEG, 0 );
+EEG = pop_eegfiltnew(EEG, 'locutoff',0.1,'plotfreqz',1);
+[ALLEEG EEG CURRENTSET] = pop_newset(ALLEEG, EEG, 1,'setname','D1 hp0.1','gui','off');
+EEG = pop_eegfiltnew(EEG, 'locutoff',58,'hicutoff',62,'revfilt',1,'plotfreqz',1);
+[ALLEEG EEG CURRENTSET] = pop_newset(ALLEEG, EEG, 2,'setname','D1 hp0.1 notch60','gui','off');
+pop_eegplot( EEG, 1, 1, 1);
+```
+
+6. طابق كل سطر بخطوته. لاحظ أن خانة <UiLabel>Notch filter the data instead of pass band</UiLabel> صارت `'revfilt',1`، وأن خانة <UiLabel>Plot frequency response</UiLabel> صارت `'plotfreqz',1`. هكذا تتعلّم اسم كل خيار في السكربت من الواجهة نفسها.
+
+**ثالثاً: احفظ السجل في ملف**
+
+7. افتح <MenuPath>File > History scripts > Save session history script</MenuPath>. الاسم المقترح `eeglabhist.m`. غيّره إلى `my_first_history.m` واحفظه في مجلد عملك.
+8. اكتب في نافذة الأوامر `EEG.history`. هذا **سجل الداتاست**: أوامر الداتاست الحالية فقط، بدون أوامر إدارة الداتاست. في أوله أسطر لم تكتبها أنت، بمسارات مثل `/Users/arno/...`: هذا تاريخ الملف عند من صنعه، لأن السجل يُحفظ داخل ملف `.set` وينتقل معه. بعدها سطر يسجّل إصدار EEGLAB، ثم سطرا الفلتر، وفي آخره سطر `pop_eegplot` لأنك فتحت نافذة العرض من القائمة.
+9. لحفظه في ملف، افتح <MenuPath>File > History scripts > Save dataset history script</MenuPath>.
+
+**رابعاً: شغّل السجل**
+
+10. أغلق EEGLAB، واكتب `clear` ثم `close all`.
+11. افتح `my_first_history.m` في محرر MATLAB واضغط <UiLabel>Run</UiLabel>. تتكرر الخطوات كلها وحدها، وتنفتح نافذة العرض في النهاية. يمكنك أيضاً تشغيله من <MenuPath>File > History scripts > Run script</MenuPath>.
+
+<Callout type="note">
+**سجل الجلسة أم سجل الداتاست؟** سجل الجلسة (`eegh`) يحفظ كل ما فعلته في الجلسة لكل الداتاست، ويضيع عند تشغيل `eeglab` من جديد إذا لم تحفظه. سجل الداتاست (`EEG.history`) يحفظ ما غيّر هذه الداتاست فقط، ويُحفظ داخل ملف `.set`، فتجده بعد سنة إذا فتحت الملف.
+</Callout>
+
+## السكربت المقابل
+
+سكربت السجل يعمل كما هو، لكنه مكتوب للآلة لا لك. نظّفه قبل أن تعتمد عليه. هذا نفس السجل بعد التنظيف:
+
+```matlab
+% Rebuilt from the EEGLAB session history (eegh)
+eeglab nogui
+eeglabRoot = fileparts(which('eeglab'));
+
+% Load the sample dataset (portable path, works on any computer)
+EEG = pop_loadset('filename', 'eeglab_data.set', 'filepath', fullfile(eeglabRoot, 'sample_data'));
+
+% High-pass: passband edge at 0.1 Hz
+[EEG, com] = pop_eegfiltnew(EEG, 'locutoff', 0.1);
+EEG = eeg_hist(EEG, com);
+
+% Line noise: notch between 58 and 62 Hz
+[EEG, com] = pop_eegfiltnew(EEG, 'locutoff', 58, 'hicutoff', 62, 'revfilt', 1);
+EEG = eeg_hist(EEG, com);
+EEG.setname = 'D1 hp0.1 notch60';
+EEG = eeg_checkset(EEG);
+
+% Save the dataset history to a file, for your records
+pop_saveh(EEG.history, 'D1_hp0.1_notch60_history.m', pwd);
+```
+
+ما تغيّر عن السجل الخام:
+
+- **المسار الثابت** صار `fullfile(eeglabRoot, 'sample_data')`، فيعمل السكربت على أي جهاز.
+- **`'plotfreqz',1`** حُذف، فلا تتوقف كل خطوة عند نافذة رسم.
+- **أسطر `eeg_store` و `pop_newset`** حُذفت، لأنها لإدارة الداتاست في الواجهة. السكربت يعمل على متغيّر `EEG` واحد، والاسم يُكتب في `EEG.setname`.
+- **`eeglab nogui`** بدل `eeglab`، فيحمّل EEGLAB دواله بدون فتح النافذة الرئيسية.
+- **التعليقات** أضفناها، لأن سطر الكود يقول ماذا يفعل، والتعليق يقول لماذا.
+- **`[EEG, com]` و `eeg_hist`** أضفناهما. دوال `pop_` تُرجع سطر أمرها في المخرج الثاني `com`، و`eeg_hist` يضيفه إلى `EEG.history`. بدونهما يبقى سجل الداتاست فارغاً من خطوات السكربت، لأن EEGLAB يكتب السجل تلقائياً للأوامر المنفّذة من القوائم فقط.
+
+<Callout type="note" title="pop_saveh من سكربت">
+`pop_saveh` هو نفس ما يفعله البند <UiLabel>Save dataset history script</UiLabel>. ولحفظ سجل الجلسة من سكربت اكتب `pop_saveh(ALLCOM, 'session_history.m', pwd)`.
+</Callout>
+
+## أي قيمة أختار؟
+
+| تريد أن | استخدم | لماذا |
+|---|---|---|
+| تعيد كل ما فعلته اليوم، بكل الداتاست | سجل الجلسة: `eegh` أو <UiLabel>Save session history script</UiLabel> | فيه أوامر التحميل والحفظ وإدارة الداتاست، فيعيد الجلسة كاملة. |
+| تعرف كيف صُنع ملف `.set` معيّن | سجل الداتاست: `EEG.history` | يُحفظ داخل الملف نفسه، فيبقى مع البيانات (توثيق EEGLAB الرسمي، قسم EEGLAB dataset history). |
+| تبني سكربتاً لمشاركين آخرين | سجل الداتاست بعد تنظيفه | أقصر، ولا يحوي أوامر الواجهة، فينقل بسهولة لحلقة على مشاركين (درس معالجة الدفعات). |
+
+## أخطاء شائعة
+
+- **تشغيل `eeglab` من جديد قبل حفظ سجل الجلسة.** `eeglab` يبدأ سجلاً فارغاً. احفظ السجل أولاً، أو اعتمد على `EEG.history` المحفوظ مع الداتاست.
+- **مشاركة السكربت بمسار ثابت.** سطر مثل `'filepath','C:\Users\...'` لا يعمل على جهاز زميلك. استبدله بـ `fullfile` كما في السكربت أعلاه.
+- **توقّع أن يُسجَّل ما نُفّذ خارج القوائم.** EEGLAB يكتب السجل للأوامر المنفّذة من القوائم فقط. ما تكتبه بيدك في نافذة الأوامر لا يظهر في `eegh`، وتشغيل `pop_eegfiltnew` من سكربت لا يغيّر `EEG.history`. إذا أردت أن يحمل الملف المحفوظ تاريخه، أضف `EEG = eeg_hist(EEG, com);` بعد كل خطوة كما في السكربت أعلاه.
+- **تشغيل سجل الداتاست كما هو.** في أوله أسطر قديمة من صانع الملف بمسارات من جهازه، فيتوقف عند أول سطر. انسخ منه أسطر المعالجة فقط، وابدأ سكربتك بأمر تحميل بمسار من جهازك.
+
+{/* صندوق "من التجربة": بانتظار قصة من صاحب المشروع. لا يُكتب قبل وصولها. */}
+
+## كيف تتأكد أن الخطوة نجحت؟
+
+1. **السكربت يعمل وحده.** شغّل السكربت النظيف في جلسة جديدة. يجب أن ينتهي بدون أي خطأ وبدون أن يطلب منك ضغطة.
+2. **نفس المعالجة.** بعد تشغيله اكتب `EEG.history`. يجب أن ترى سطري الفلتر بنفس الأرقام التي اخترتها في الواجهة: `0.1`، ثم `58` و`62` مع `'revfilt',1`.
+3. **ملف السجل موجود.** في مجلد عملك يجب أن تجد `D1_hp0.1_notch60_history.m`. افتحه، وستجد فيه نفس سطري الفلتر.

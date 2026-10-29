@@ -1,0 +1,41 @@
+---
+import { t } from '../../i18n';
+import { langOf } from '../../lib/lang';
+const lang = langOf(Astro.url);
+const html = await Astro.slots.render('default');
+// Placeholders (figures not made yet) are shown one after the other with their labels.
+const pending = html.includes('class="ph"');
+const id = `ba-${Math.random().toString(36).slice(2, 8)}`;
+---
+{pending ? (
+  <div class="ba ba-pending"><p class="ba-l">{t(lang, 'beforeAfter.before')} / {t(lang, 'beforeAfter.after')}</p><Fragment set:html={html} /></div>
+) : (
+  <div class="ba" data-ba>
+    <fieldset class="ba-tabs">
+      <legend class="sr">{t(lang, 'beforeAfter.choose')}</legend>
+      <label><input type="radio" name={id} value="before" />{t(lang, 'beforeAfter.before')}</label>
+      <label><input type="radio" name={id} value="after" checked />{t(lang, 'beforeAfter.after')}</label>
+    </fieldset>
+    <div class="ba-stage"><Fragment set:html={html} /></div>
+    <div class="ba-ctl" hidden>
+      <input type="range" min="0" max="100" value="50" aria-label={t(lang, 'beforeAfter.label')} data-valuetext={t(lang, 'beforeAfter.valuetext')} />
+      <p class="muted small">{t(lang, 'beforeAfter.hint')}</p>
+    </div>
+  </div>
+)}
+<script>
+  // Turn the radio pair into a drag slider; arrows move 1%, PageUp/PageDown 10% (native range behaviour).
+  for (const ba of document.querySelectorAll<HTMLElement>('[data-ba]')) {
+    const stage = ba.querySelector<HTMLElement>('.ba-stage')!;
+    const range = ba.querySelector<HTMLInputElement>('input[type=range]')!;
+    if (stage.children.length !== 2) continue;
+    ba.classList.add('ba-js');
+    ba.querySelector<HTMLElement>('.ba-ctl')!.hidden = false;
+    const set = () => {
+      stage.style.setProperty('--pos', range.value + '%');
+      range.setAttribute('aria-valuetext', (range.dataset.valuetext ?? '').replace('{n}', String(100 - Number(range.value))));
+    };
+    range.addEventListener('input', set);
+    set();
+  }
+</script>

@@ -1,0 +1,200 @@
+{
+  "v": 1,
+  "station": 5,
+  "lang": "en",
+  "passPercent": 80,
+  "questions": [
+    {
+      "id": "s05-q01",
+      "type": "single",
+      "lesson": "extract-epochs",
+      "objective": 2,
+      "prompt": "From the same epochs you want an ERP analysis and, later, a time-frequency analysis. Which window fits best?",
+      "options": [
+        {
+          "id": "a",
+          "text": "From 0 to 0.8 seconds"
+        },
+        {
+          "id": "b",
+          "text": "From -0.2 to 0.8 seconds"
+        },
+        {
+          "id": "c",
+          "text": "From -1 to 2 seconds"
+        },
+        {
+          "id": "d",
+          "text": "From -0.05 to 0.3 seconds"
+        }
+      ],
+      "answer": [
+        "c"
+      ],
+      "explanation": "Time-frequency analysis needs long epochs so that low frequencies below 10 Hz can be analyzed, and -1 to 2 seconds is enough for both. -0.2 to 0.8 works for the ERP only. A window that starts at zero has no pre-stimulus period for baseline correction."
+    },
+    {
+      "id": "s05-q02",
+      "type": "single",
+      "lesson": "baseline-correction",
+      "objective": 1,
+      "prompt": "In the `pop_rmbase` window you typed `-0.2 0` in `Baseline latency range ([min max] in ms)`. What is the problem?",
+      "options": [
+        {
+          "id": "a",
+          "text": "No problem, this is 200 milliseconds"
+        },
+        {
+          "id": "b",
+          "text": "The field is in milliseconds, so this is a 0.2-ms period, and the correction subtracts about one point"
+        },
+        {
+          "id": "c",
+          "text": "The field is in samples, so this is one sample"
+        },
+        {
+          "id": "d",
+          "text": "The period must start after zero"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "The epoch limits in the epoching lesson were in seconds, but the baseline field is in milliseconds. So you type `-200 0` here. With a 0.2-ms period only the zero point falls inside, so the \"correction\" subtracts a single point's value from the whole epoch."
+    },
+    {
+      "id": "s05-q03",
+      "type": "multiple",
+      "lesson": "baseline-correction",
+      "objective": 2,
+      "prompt": "Which statements about choosing the baseline period are true? (Select all that apply)",
+      "options": [
+        {
+          "id": "a",
+          "text": "-200 to 0 ms is a common value in ERP studies"
+        },
+        {
+          "id": "b",
+          "text": "A period of 100 ms or less gives a noisy mean, because it has few points"
+        },
+        {
+          "id": "c",
+          "text": "If another event falls inside the period, you subtract a real response from the whole epoch"
+        },
+        {
+          "id": "d",
+          "text": "You choose the period after seeing the waveform, so the difference looks clearer"
+        },
+        {
+          "id": "e",
+          "text": "Baseline correction lowers the number of epochs"
+        }
+      ],
+      "answer": [
+        "a",
+        "b",
+        "c"
+      ],
+      "explanation": "The period is chosen before you see the results and applied unchanged to every participant, because changing it after seeing the waveform changes your result. Correction subtracts a mean from each epoch and removes none, so the count stays the same."
+    },
+    {
+      "id": "s05-q04",
+      "type": "image",
+      "lesson": "baseline-correction",
+      "objective": 3,
+      "prompt": "The image has two panels of the same 20 epochs of channel Pz, with the period from -200 to 0 ms shaded. Which panel is after baseline correction?",
+      "image": {
+        "src": "/quiz/05/s05-q04.webp",
+        "w": 720,
+        "h": 360,
+        "status": "pending",
+        "alt": "Two side-by-side panels with the same axes, numbered 1 and 2, each with 20 grey lines from -1000 to 2000 ms and the -200 to 0 period shaded. In panel 1 the lines meet around zero inside the shaded period. In panel 2 the lines start at different levels above and below zero.",
+        "spec": "Script figure on D1 (source: script), the same data as the before/after images of the baseline-correction lesson, but in one figure with two panels: **panel 1 = after** pop_rmbase on -200 to 0, and **panel 2 = before** (D1 epochs). Same axes, scale (-40 to 40 µV) and shading in both. Above each panel only its number (1 or 2), with no before or after wording. Axis labels in English, so one version serves both languages."
+      },
+      "options": [
+        {
+          "id": "p1",
+          "text": "Panel 1"
+        },
+        {
+          "id": "p2",
+          "text": "Panel 2"
+        },
+        {
+          "id": "same",
+          "text": "There is no difference between the panels"
+        }
+      ],
+      "answer": [
+        "p1"
+      ],
+      "explanation": "After correction, the mean of each epoch in the baseline period is zero, so the lines meet around zero inside the shaded period. Before correction, each epoch starts at a different level because of leftover drift and changes in electrode contact."
+    },
+    {
+      "id": "s05-q05",
+      "type": "image",
+      "lesson": "epoch-rejection",
+      "objective": 1,
+      "prompt": "With a rejection threshold of ±100 µV on all channels, which of the four epochs is rejected?",
+      "image": {
+        "src": "/quiz/05/s05-q05.webp",
+        "w": 720,
+        "h": 420,
+        "status": "pending",
+        "alt": "Four consecutive epochs numbered 1 to 4, for frontal channels including FPz and EOG1, with two dashed horizontal lines at +100 and -100 µV. In epoch 3 a large peak in FPz and EOG1 crosses the dashed line. In the other epochs the signal stays between the lines.",
+        "spec": "Script figure (source: script) on D1 epochs **before ICA** (D1 hp0.1 notch60 epoched around square from -1 to 2 s, then baseline -200 to 0), because blinks before ICA exceed 100 µV. Pick 4 consecutive epochs where exactly one crosses the threshold, **and put it in position 3**. Channels FPz, EOG1, Fz and Cz on one scale, with dashed lines at ±100. Only the epoch number above each epoch. One version for both languages."
+      },
+      "options": [
+        {
+          "id": "e1",
+          "text": "Epoch 1"
+        },
+        {
+          "id": "e2",
+          "text": "Epoch 2"
+        },
+        {
+          "id": "e3",
+          "text": "Epoch 3"
+        },
+        {
+          "id": "e4",
+          "text": "Epoch 4"
+        }
+      ],
+      "answer": [
+        "e3"
+      ],
+      "explanation": "The threshold rejects any epoch where the amplitude goes beyond +100 or -100 µV in any channel. Epoch 3 holds a blink that crosses it. These data are before ICA on purpose: on this site's path ICA removes blinks first, so rejection is left for rare problems."
+    },
+    {
+      "id": "s05-q06",
+      "type": "single",
+      "lesson": "epoch-rejection",
+      "objective": 2,
+      "prompt": "You tried a strict ±30 µV threshold and many more epochs were rejected. What is the cost?",
+      "options": [
+        {
+          "id": "a",
+          "text": "No cost: the average always gets cleaner"
+        },
+        {
+          "id": "b",
+          "text": "Fewer trials in the average, so it gets noisier, and counts may differ between conditions"
+        },
+        {
+          "id": "c",
+          "text": "The sampling rate changes"
+        },
+        {
+          "id": "d",
+          "text": "Baseline correction is undone"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "A strict threshold rejects clean epochs because of normal noise and slow waves. Each rejected epoch is one trial less, and an average of fewer trials is noisier. The goal is to reject what actually harms the average, not the smallest possible number."
+    }
+  ]
+}

@@ -1,0 +1,34 @@
+---
+import { t } from '../../i18n';
+import { langOf } from '../../lib/lang';
+import { asset } from '../../lib/url';
+import Icon from '../Icon.astro';
+interface Props { id: string; title: string; duration: string; start?: number }
+const { id, title, duration, start } = Astro.props;
+const lang = langOf(Astro.url);
+const watch = `https://www.youtube.com/watch?v=${id}${start ? `&t=${start}s` : ''}`;
+---
+<div class="yt" data-yt={id} data-start={start ?? ''} data-title={title}>
+  <a class="yt-face" href={watch} target="_blank" rel="noopener">
+    <img src={asset(`yt/${id}.webp`)} alt="" width="480" height="270" loading="lazy" />
+    <span class="yt-play"><Icon name="play" /></span>
+    <span class="yt-meta"><b>{title}</b> <span>{duration}</span></span>
+    <span class="sr">{t(lang, 'video.play', { title, duration })} {t(lang, 'a11y.newTab')}</span>
+  </a>
+  <p class="muted small">{t(lang, 'video.source')}</p>
+</div>
+<script>
+  // Load the privacy-enhanced player only after a click.
+  for (const box of document.querySelectorAll<HTMLElement>('[data-yt]')) {
+    box.querySelector('a')!.addEventListener('click', (e) => {
+      e.preventDefault();
+      const f = document.createElement('iframe');
+      const s = box.dataset.start ? `&start=${box.dataset.start}` : '';
+      f.src = `https://www.youtube-nocookie.com/embed/${box.dataset.yt}?autoplay=1${s}`;
+      f.title = box.dataset.title ?? '';
+      f.allow = 'autoplay; encrypted-media; picture-in-picture';
+      f.allowFullscreen = true;
+      box.querySelector('a')!.replaceWith(f);
+    });
+  }
+</script>

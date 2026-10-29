@@ -1,0 +1,172 @@
+{
+  "v": 1,
+  "station": 9,
+  "lang": "ar",
+  "passPercent": 80,
+  "questions": [
+    {
+      "id": "s09-q01",
+      "type": "single",
+      "lesson": "eegh-history",
+      "objective": 1,
+      "prompt": "طبّقت فلتراً من الواجهة وتريد سطر الكود المقابل له بالضبط. ما أسرع طريقة؟",
+      "options": [
+        {
+          "id": "a",
+          "text": "اكتب `eegh` في نافذة الأوامر"
+        },
+        {
+          "id": "b",
+          "text": "اكتب `help pop_eegfiltnew` ثم خمّن القيم"
+        },
+        {
+          "id": "c",
+          "text": "افتح `Edit > Dataset info`"
+        },
+        {
+          "id": "d",
+          "text": "أعد تشغيل `eeglab` ثم اكتب `eegh`"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "`eegh` يطبع كل أوامر الجلسة بالترتيب، ومنها سطر الفلتر بقيمه، مثل `'revfilt',1` لخانة notch. أما تشغيل `eeglab` من جديد فيبدأ سجلاً فارغاً، فتفقد سجل الجلسة إذا لم تحفظه."
+    },
+    {
+      "id": "s09-q02",
+      "type": "single",
+      "lesson": "eegh-history",
+      "objective": 2,
+      "prompt": "وصلك ملف `.set` من زميل وتريد أن تعرف كيف صُنع. أين تنظر؟",
+      "options": [
+        {
+          "id": "a",
+          "text": "في `EEG.history`، لأنه محفوظ داخل الملف نفسه"
+        },
+        {
+          "id": "b",
+          "text": "في `eegh` على جهازك"
+        },
+        {
+          "id": "c",
+          "text": "في اسم الملف"
+        },
+        {
+          "id": "d",
+          "text": "في `EEG.event`"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "سجل الداتاست (`EEG.history`) يحفظ الأوامر التي غيّرت هذه الداتاست، ويسافر معها داخل ملف `.set`. أما `eegh` فسجل جلستك أنت. واسم الملف لا يكفي: ملفان باسم `clean` قد يكونان مرّا بفلاتر مختلفة."
+    },
+    {
+      "id": "s09-q03",
+      "type": "order",
+      "lesson": "single-subject-script",
+      "objective": 1,
+      "prompt": "رتّب هذه الأسطر كما تأتي في سكربت المشارك الواحد:",
+      "options": [
+        {
+          "id": "a",
+          "text": "`EEG = pop_reref(EEG, [], 'exclude', eogIdx);`"
+        },
+        {
+          "id": "b",
+          "text": "`EEG = pop_epoch(EEG, {'square'}, [-1 2], 'newname', 'D1 epochs', 'epochinfo', 'yes');`"
+        },
+        {
+          "id": "c",
+          "text": "`EEG = pop_loadset('filename', 'eeglab_data.set', 'filepath', dataDir);`"
+        },
+        {
+          "id": "d",
+          "text": "`EEG = pop_interp(EEG, fullLocs, 'spherical');`"
+        },
+        {
+          "id": "e",
+          "text": "`EEG_ica = pop_runica(EEG_ica, 'icatype', 'runica', 'extended', 1);`"
+        },
+        {
+          "id": "f",
+          "text": "`EEG = pop_eegfiltnew(EEG, 'locutoff', 0.1);`"
+        }
+      ],
+      "answer": [
+        "c",
+        "f",
+        "d",
+        "a",
+        "e",
+        "b"
+      ],
+      "explanation": "نفس ترتيب المحطات: التحميل، ثم الفلترة، ثم الاستيفاء قبل المرجع، ثم المرجع المتوسط قبل ICA، ثم ICA على نسخة 1 هرتز، وفي الآخر التقطيع. لا تنقل خطوة من مكانها بلا سبب، فكل ترتيب منها مشروح في درسه."
+    },
+    {
+      "id": "s09-q04",
+      "type": "single",
+      "lesson": "single-subject-script",
+      "objective": 3,
+      "prompt": "سكربتك يعمل اليوم، وتشكّ أنه يعتمد على متغيّر مثل `badChans` بقي من جلسة سابقة. كيف تتأكد؟",
+      "options": [
+        {
+          "id": "a",
+          "text": "شغّله مرة ثانية في نفس الجلسة"
+        },
+        {
+          "id": "b",
+          "text": "شغّله بعد `clear` من MATLAB جديد، دون أي ضغط على الواجهة أثناء التشغيل"
+        },
+        {
+          "id": "c",
+          "text": "احذف التعليقات منه"
+        },
+        {
+          "id": "d",
+          "text": "افتح `eegh` وانظر لآخر سطر"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "السكربت الذي يعمل فقط لأن `EEG` أو `badChans` موجود مسبقاً سيفشل غداً. شغّله دائماً بعد `clear`. وإذا فتح نافذة وانتظرك، فهناك سطر بلا معاملات كافية، فأصلحه."
+    },
+    {
+      "id": "s09-q05",
+      "type": "multiple",
+      "lesson": "single-subject-script",
+      "objective": 2,
+      "prompt": "أي التعديلات تجعل السكربت يعمل على حاسب آخر وبلا تدخّل منك؟ (اختر كل ما ينطبق)",
+      "options": [
+        {
+          "id": "a",
+          "text": "استبدال المسار الثابت بـ `fullfile(eeglabRoot, 'sample_data')`"
+        },
+        {
+          "id": "b",
+          "text": "وضع الإعدادات التي تتغيّر بين المشاريع في قسم `Settings` أعلى الملف"
+        },
+        {
+          "id": "c",
+          "text": "حذف سطور الرسم مثل `figure` و `pop_viewprops` من سكربت المعالجة"
+        },
+        {
+          "id": "d",
+          "text": "كتابة مسار مثل `C:\\Users\\me\\...` حتى يكون واضحاً"
+        },
+        {
+          "id": "e",
+          "text": "تحسين القيم أثناء نسخ الأسطر من الدروس"
+        }
+      ],
+      "answer": [
+        "a",
+        "b",
+        "c"
+      ],
+      "explanation": "المسار الثابت يعمل على حاسبك وحده. والإعدادات في أعلى الملف تعني أنك تغيّر رقماً واحداً بدل البحث في الكود. وسطور الرسم تفتح نوافذ وتبطئ التشغيل وتوقفه على عنقود حوسبة. وكل سطر يُنسخ من درسه كما هو، حتى تطابق النتيجة ما شرحه الدرس."
+    }
+  ]
+}

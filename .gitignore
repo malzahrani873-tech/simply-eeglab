@@ -1,0 +1,8 @@
+node_modules/
+dist/
+.astro/
+public/img/lessons/
+public/ica/
+*.log
+.DS_Store
+.lighthouseci/

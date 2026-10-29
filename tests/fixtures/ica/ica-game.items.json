@@ -1,0 +1,379 @@
+{
+ "v": 1,
+ "source": {
+  "dataset": "ds002680",
+  "license": "CC0",
+  "url": "https://openneuro.org/datasets/ds002680"
+ },
+ "classes": [
+  "brain",
+  "eye",
+  "muscle",
+  "heart",
+  "line",
+  "chan",
+  "other"
+ ],
+ "items": [
+  {
+   "id": "sub-002_IC03",
+   "img": "sub-002_IC03.webp",
+   "w": 720,
+   "h": 280,
+   "level": 1,
+   "answer": "brain",
+   "iclabel": {
+    "brain": 0.999,
+    "eye": 0.0,
+    "muscle": 0.0,
+    "heart": 0.0,
+    "line": 0.001,
+    "chan": 0.0,
+    "other": 0.0
+   },
+   "line_hz": 50.0
+  },
+  {
+   "id": "sub-002_IC12",
+   "img": "sub-002_IC12.webp",
+   "w": 720,
+   "h": 280,
+   "level": 2,
+   "answer": "heart",
+   "iclabel": {
+    "brain": 0.351,
+    "eye": 0.001,
+    "muscle": 0.0,
+    "heart": 0.617,
+    "line": 0.004,
+    "chan": 0.001,
+    "other": 0.027
+   },
+   "line_hz": null
+  },
+  {
+   "id": "sub-003_IC01",
+   "img": "sub-003_IC01.webp",
+   "w": 720,
+   "h": 280,
+   "level": 1,
+   "answer": "eye",
+   "iclabel": {
+    "brain": 0.0,
+    "eye": 0.999,
+    "muscle": 0.0,
+    "heart": 0.0,
+    "line": 0.0,
+    "chan": 0.0,
+    "other": 0.001
+   },
+   "line_hz": 50.0
+  },
+  {
+   "id": "sub-003_IC13",
+   "img": "sub-003_IC13.webp",
+   "w": 720,
+   "h": 280,
+   "level": 1,
+   "answer": "line",
+   "iclabel": {
+    "brain": 0.0,
+    "eye": 0.0,
+    "muscle": 0.0,
+    "heart": 0.0,
+    "line": 1.0,
+    "chan": 0.0,
+    "other": 0.0
+   },
+   "line_hz": 50.0
+  },
+  {
+   "id": "sub-004_IC02",
+   "img": "sub-004_IC02.webp",
+   "w": 720,
+   "h": 280,
+   "level": 1,
+   "answer": "line",
+   "iclabel": {
+    "brain": 0.0,
+    "eye": 0.0,
+    "muscle": 0.0,
+    "heart": 0.0,
+    "line": 1.0,
+    "chan": 0.0,
+    "other": 0.0
+   },
+   "line_hz": 50.0
+  },
+  {
+   "id": "sub-004_IC08",
+   "img": "sub-004_IC08.webp",
+   "w": 720,
+   "h": 280,
+   "level": 1,
+   "answer": "brain",
+   "iclabel": {
+    "brain": 1.0,
+    "eye": 0.0,
+    "muscle": 0.0,
+    "heart": 0.0,
+    "line": 0.0,
+    "chan": 0.0,
+    "other": 0.0
+   },
+   "line_hz": null
+  },
+  {
+   "id": "sub-005_IC01",
+   "img": "sub-005_IC01.webp",
+   "w": 720,
+   "h": 280,
+   "level": 1,
+   "answer": "eye",
+   "iclabel": {
+    "brain": 0.0,
+    "eye": 0.998,
+    "muscle": 0.0,
+    "heart": 0.0,
+    "line": 0.0,
+    "chan": 0.0,
+    "other": 0.001
+   },
+   "line_hz": 50.0
+  },
+  {
+   "id": "sub-005_IC07",
+   "img": "sub-005_IC07.webp",
+   "w": 720,
+   "h": 280,
+   "level": 1,
+   "answer": "brain",
+   "iclabel": {
+    "brain": 0.999,
+    "eye": 0.0,
+    "muscle": 0.0,
+    "heart": 0.0,
+    "line": 0.001,
+    "chan": 0.0,
+    "other": 0.0
+   },
+   "line_hz": 50.0
+  },
+  {
+   "id": "sub-006_IC15",
+   "img": "sub-006_IC15.webp",
+   "w": 720,
+   "h": 280,
+   "level": 1,
+   "answer": "muscle",
+   "iclabel": {
+    "brain": 0.0,
+    "eye": 0.001,
+    "muscle": 0.999,
+    "heart": 0.0,
+    "line": 0.0,
+    "chan": 0.0,
+    "other": 0.0
+   },
+   "line_hz": null
+  },
+  {
+   "id": "sub-006_IC18",
+   "img": "sub-006_IC18.webp",
+   "w": 720,
+   "h": 280,
+   "level": 1,
+   "answer": "brain",
+   "iclabel": {
+    "brain": 0.999,
+    "eye": 0.0,
+    "muscle": 0.0,
+    "heart": 0.0,
+    "line": 0.001,
+    "chan": 0.0,
+    "other": 0.0
+   },
+   "line_hz": null
+  },
+  {
+   "id": "sub-007_IC10",
+   "img": "sub-007_IC10.webp",
+   "w": 720,
+   "h": 280,
+   "level": 1,
+   "answer": "eye",
+   "iclabel": {
+    "brain": 0.0,
+    "eye": 0.999,
+    "muscle": 0.0,
+    "heart": 0.0,
+    "line": 0.0,
+    "chan": 0.0,
+    "other": 0.0
+   },
+   "line_hz": null
+  },
+  {
+   "id": "sub-008_IC35",
+   "img": "sub-008_IC35.webp",
+   "w": 720,
+   "h": 280,
+   "level": 1,
+   "answer": "muscle",
+   "iclabel": {
+    "brain": 0.0,
+    "eye": 0.0,
+    "muscle": 1.0,
+    "heart": 0.0,
+    "line": 0.0,
+    "chan": 0.0,
+    "other": 0.0
+   },
+   "line_hz": null
+  },
+  {
+   "id": "sub-009_IC12",
+   "img": "sub-009_IC12.webp",
+   "w": 720,
+   "h": 280,
+   "level": 1,
+   "answer": "eye",
+   "iclabel": {
+    "brain": 0.0,
+    "eye": 1.0,
+    "muscle": 0.0,
+    "heart": 0.0,
+    "line": 0.0,
+    "chan": 0.0,
+    "other": 0.0
+   },
+   "line_hz": null
+  },
+  {
+   "id": "sub-009_IC22",
+   "img": "sub-009_IC22.webp",
+   "w": 720,
+   "h": 280,
+   "level": 1,
+   "answer": "chan",
+   "iclabel": {
+    "brain": 0.003,
+    "eye": 0.002,
+    "muscle": 0.0,
+    "heart": 0.0,
+    "line": 0.002,
+    "chan": 0.984,
+    "other": 0.01
+   },
+   "line_hz": 50.0
+  },
+  {
+   "id": "sub-010_IC16",
+   "img": "sub-010_IC16.webp",
+   "w": 720,
+   "h": 280,
+   "level": 1,
+   "answer": "brain",
+   "iclabel": {
+    "brain": 1.0,
+    "eye": 0.0,
+    "muscle": 0.0,
+    "heart": 0.0,
+    "line": 0.0,
+    "chan": 0.0,
+    "other": 0.0
+   },
+   "line_hz": 50.0
+  },
+  {
+   "id": "sub-010_IC24",
+   "img": "sub-010_IC24.webp",
+   "w": 720,
+   "h": 280,
+   "level": 1,
+   "answer": "chan",
+   "iclabel": {
+    "brain": 0.002,
+    "eye": 0.004,
+    "muscle": 0.003,
+    "heart": 0.005,
+    "line": 0.011,
+    "chan": 0.971,
+    "other": 0.004
+   },
+   "line_hz": 50.0
+  },
+  {
+   "id": "sub-010_IC30",
+   "img": "sub-010_IC30.webp",
+   "w": 720,
+   "h": 280,
+   "level": 1,
+   "answer": "muscle",
+   "iclabel": {
+    "brain": 0.0,
+    "eye": 0.0,
+    "muscle": 0.999,
+    "heart": 0.0,
+    "line": 0.0,
+    "chan": 0.0,
+    "other": 0.0
+   },
+   "line_hz": null
+  },
+  {
+   "id": "sub-011_IC02",
+   "img": "sub-011_IC02.webp",
+   "w": 720,
+   "h": 280,
+   "level": 1,
+   "answer": "eye",
+   "iclabel": {
+    "brain": 0.0,
+    "eye": 0.999,
+    "muscle": 0.0,
+    "heart": 0.0,
+    "line": 0.0,
+    "chan": 0.0,
+    "other": 0.001
+   },
+   "line_hz": null
+  },
+  {
+   "id": "sub-011_IC11",
+   "img": "sub-011_IC11.webp",
+   "w": 720,
+   "h": 280,
+   "level": 1,
+   "answer": "brain",
+   "iclabel": {
+    "brain": 1.0,
+    "eye": 0.0,
+    "muscle": 0.0,
+    "heart": 0.0,
+    "line": 0.0,
+    "chan": 0.0,
+    "other": 0.0
+   },
+   "line_hz": 50.0
+  },
+  {
+   "id": "sub-011_IC26",
+   "img": "sub-011_IC26.webp",
+   "w": 720,
+   "h": 280,
+   "level": 1,
+   "answer": "muscle",
+   "iclabel": {
+    "brain": 0.001,
+    "eye": 0.0,
+    "muscle": 0.999,
+    "heart": 0.0,
+    "line": 0.0,
+    "chan": 0.0,
+    "other": 0.0
+   },
+   "line_hz": null
+  }
+ ]
+}

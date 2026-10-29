@@ -1,0 +1,162 @@
+---
+title: AMICA & Picard
+titleEn: AMICA & Picard
+description: How AMICA and Picard compare with runica in EEGLAB for time and results, and how to install one as an extension and run it with the right rank.
+station: 4
+order: 7
+level: optional
+status: approved
+objectives:
+  - Compare runica, AMICA, and Picard by speed and by what each one gives.
+  - Install one of them as an EEGLAB extension and run it on the 1 Hz copy with the right number of components.
+  - Explain why Picard and AMICA need the rank set by hand.
+prerequisites: [run-ica]
+references:
+  - title: EEGLAB plugin
+    url: https://eeglab.org/plugins/amica/
+    section: "AMICA"
+  - title: Picard
+    url: https://github.com/pierreablin/picard
+    section: "Picard"
+  - title: Makoto's preprocessing pipeline
+    url: https://eeglab.ucsd.edu/wiki/Makoto%27s_preprocessing_pipeline
+    section: "§13.7 Unofficial instruction to install and use AMICA; §18.8 What does AMICA do?"
+datasets: [D1]
+startingPoint:
+  dataset: D1
+  file: eeglab_data.set
+  applied: [filtering, line-noise, bad-channels, interpolation, rereferencing]
+  script: |
+    [ALLEEG, EEG, CURRENTSET, ALLCOM] = eeglab;
+    eeglabRoot = fileparts(which('eeglab'));
+    EEG = pop_loadset('eeglab_data.set', fullfile(eeglabRoot, 'sample_data'));
+    fullLocs = EEG.chanlocs;
+
+    % Main dataset: high-pass at 0.1 Hz, then 60 Hz line-noise removal
+    EEG = pop_eegfiltnew(EEG, 'locutoff', 0.1);
+    EEG = pop_eegfiltnew(EEG, 'locutoff', 58, 'hicutoff', 62, 'revfilt', 1);
+
+    % Bad channels you removed earlier, e.g. {'T7'}; leave empty if none
+    badChans = {};
+    if ~isempty(badChans)
+        EEG = pop_select(EEG, 'rmchannel', badChans);
+        EEG = pop_interp(EEG, fullLocs, 'spherical');
+    end
+
+    % Average reference, EOG channels excluded
+    eogIdx = find(ismember({EEG.chanlocs.labels}, {'EOG1', 'EOG2'}));
+    EEG = pop_reref(EEG, [], 'exclude', eogIdx);
+    EEG.filename = ''; EEG.filepath = ''; EEG.datfile = ''; EEG.saved = 'no';
+    [ALLEEG, EEG, CURRENTSET] = pop_newset(ALLEEG, EEG, 0, 'setname', 'D1 main', 'gui', 'off');
+    eeglab redraw;
+interactive: []
+eeglabVersion: "2026.1"
+updated: 2026-10-28
+---
+
+## Why this step matters
+
+`runica`, extended Infomax, is the default ICA in EEGLAB and the one on our path. It is not the only choice. Two other algorithms appear often in EEG papers:
+
+- **AMICA:** EEGLAB lists it in the ICA window as <UiLabel>AMICA (slowest; best)</UiLabel>. It can learn more than one ICA model for the same data.
+- **Picard:** a faster way to reach an Infomax or FastICA solution. Its Infomax mode is plain Infomax, not the extended Infomax that `runica` uses on our path. EEGLAB lists it as <UiLabel>Infomax picard.m</UiLabel> and <UiLabel>FastICA picard.m (fastest)</UiLabel>.
+
+Both are extensions. The ICA window shows an algorithm only when its function exists on your computer, so AMICA and Picard appear in the list only after you install them.
+
+This lesson is optional. Everything else in the roadmap works with `runica`.
+
+## Before and after
+
+<ImageSpec>
+Two rows of scalp maps from D1, the first 10 ICA components of the same 1 Hz copy: the top row from runica, the bottom row from Picard in Infomax mode. The eye component is visible in both rows, possibly at a different position or with flipped colours. Same colormap and scale in both rows. Source: the figures from this lesson's script.
+</ImageSpec>
+
+## Steps in the GUI
+
+Start with the main dataset `D1 main` loaded, as in the Starting point.
+
+**First: install an extension**
+
+1. Open <MenuPath>File > Manage EEGLAB extensions</MenuPath>.
+2. Search for `picard`, or for `AMICA`, select it, and install it. Restart EEGLAB if it asks you to.
+
+**Second: Picard from the ICA window**
+
+1. Make an ICA copy filtered at 1 Hz, as in the Running ICA lesson.
+2. Open <MenuPath>Tools > Decompose data by ICA</MenuPath>. In <UiLabel>ICA algorithm to use (click to select)</UiLabel>, choose <UiLabel>Infomax picard.m</UiLabel>. The <UiLabel>Commandline options (See help messages)</UiLabel> field shows `'maxiter', 500, 'mode', 'standard'`.
+3. Add the rank to the options yourself: `'maxiter', 500, 'mode', 'standard', 'pca', 31` in D1. With Picard, `pop_runica` does not check the rank for you.
+4. Press <UiLabel>OK</UiLabel>, then compare the maps from <MenuPath>Plot > Component maps > In 2-D</MenuPath> with those from `runica`.
+
+**Third (optional): AMICA**
+
+1. After installing AMICA, open <MenuPath>Tools > Run AMICA</MenuPath> on the ICA copy.
+2. Make sure the <UiLabel>In File:</UiLabel> field is empty. If it shows `eeglab_data.fdt`, clear it, or AMICA reads the original data from disk instead of the ICA copy. Set <UiLabel># PCA Dims.:</UiLabel> to the expected rank, 31 in D1, and choose an output folder you can find.
+3. AMICA takes much longer than `runica`. Leave it running and compare the maps when it finishes.
+
+Whichever algorithm you use, copy the weights to the main dataset the same way as in the 1-Hz filtering lesson.
+
+## The equivalent script
+
+```matlab
+% The same ICA copy, decomposed by runica and by Picard (Infomax mode)
+EEG_ica = pop_eegfiltnew(EEG, 'locutoff', 1);
+expectedRank = EEG_ica.nbchan - numel(badChans) - 1;
+
+tic;
+EEG_runica = pop_runica(EEG_ica, 'icatype', 'runica', 'extended', 1);
+tRunica = toc;
+
+% pop_runica does not reduce the rank for Picard, so pass 'pca' yourself
+tic;
+EEG_picard = pop_runica(EEG_ica, 'icatype', 'picard', 'maxiter', 500, ...
+    'mode', 'standard', 'pca', expectedRank);
+tPicard = toc;
+
+fprintf('runica: %.0f s, %d components\n', tRunica, size(EEG_runica.icaweights, 1));
+fprintf('Picard: %.0f s, %d components\n', tPicard, size(EEG_picard.icaweights, 1));
+
+% First 10 scalp maps of each, to compare by eye
+pop_topoplot(EEG_runica, 0, 1:10);
+pop_topoplot(EEG_picard, 0, 1:10);
+
+% AMICA, after installing the AMICA extension; it also needs the rank
+% EEG_ica.datfile = '';   % AMICA must use the filtered data in memory, not eeglab_data.fdt on disk
+% EEG_amica = pop_runamica(EEG_ica, 'pcakeep', expectedRank, 'outdir', fullfile(pwd, 'amicaout'));
+```
+
+The script times `runica` and Picard on the same copy and prints the number of components of each: 31 in D1 for both. The AMICA line is a comment, because it runs only after you install the extension.
+
+## Which value should I choose?
+
+| | runica (extended Infomax) | Picard | AMICA |
+|---|---|---|---|
+| Comes with EEGLAB | Yes, the default | No, an extension | No, an extension |
+| Speed, as EEGLAB labels it | The default | <UiLabel>FastICA picard.m (fastest)</UiLabel> | <UiLabel>AMICA (slowest; best)</UiLabel> |
+| What it gives | One ICA model | A plain Infomax (not extended) or FastICA solution, reached faster | One or more ICA models |
+| Rank | `pop_runica` tries to detect it | Pass `'pca'` yourself | Set the number of components to keep yourself |
+| When to choose it | Most studies, and everything on this roadmap | Many datasets, or many channels, when time matters | When you want the slowest, most careful decomposition and have the time |
+
+<Callout type="note">
+**Changing the algorithm does not change the rest of the path.** ICLabel, removing components, and copying the weights work the same way with any of the three.
+</Callout>
+
+## Common mistakes
+
+- **Looking for the algorithm before installing it.** The list in <MenuPath>Tools > Decompose data by ICA</MenuPath> hides any algorithm whose function is not installed.
+- **Forgetting the rank with Picard or AMICA.** The automatic rank check in `pop_runica` belongs to `runica`. With the other two, set the number of components yourself.
+- **Expecting identical components.** Different algorithms, and even two runs of `runica`, give components in a different order and sign. Compare them by shape.
+- **AMICA reading the file on disk.** If the dataset is linked to a `.fdt` file, AMICA reads that file, not the filtered data in memory. Empty <UiLabel>In File:</UiLabel>, or set `EEG.datfile = ''` in a script.
+- **Mixing algorithms within one study.** Use the same algorithm and settings for every participant, and write them in Methods.
+
+{/* "From experience" box: waiting for the project owner's story. Do not write it before it arrives. */}
+
+## How to check it worked
+
+1. **The algorithm appears** in <UiLabel>ICA algorithm to use (click to select)</UiLabel> after you install it.
+2. **The number of components** is the expected rank: 31 in D1 for each algorithm.
+3. **The maps are similar:** the eye component appears in both decompositions, possibly at another position.
+4. **You noted the time** of each algorithm on your computer, from the script.
+
+<Methods>
+Independent component analysis was computed with Picard (Infomax mode, maximum 500 iterations; picard plugin [version], EEGLAB 2026.1; [31] components after PCA reduction to the data rank) on a copy of the data high-pass filtered at 1 Hz, and the resulting weights were applied to the 0.1 Hz high-pass filtered data.
+</Methods>
