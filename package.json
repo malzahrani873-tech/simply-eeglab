@@ -33,7 +33,7 @@
     "@astrojs/mdx": "8.1.2",
     "@astrojs/sitemap": "3.7.4",
     "astro": "7.4.3",
-    "js-yaml": "5.4.3",
+    "js-yaml": "5.5.0",
     "pagefind": "1.5.2"
   },
   "devDependencies": {
