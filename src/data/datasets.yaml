@@ -4,7 +4,7 @@
 - code: D1
   name: EEGLAB sample data (eeglab_data.set)
   url: https://eeglab.org/tutorials/tutorial_data.html
-  license: No separate data licence (ships with EEGLAB)
+  license: No separate data license (ships with EEGLAB)
   licenseUrl: null
   shareAlike: false
   credit:

@@ -1,5 +1,5 @@
-// Site-wide: points the "continue" links at the last lesson, shows the one-time back-button
-// note on lessons, keeps the section hash when switching language, opens the "more" sheet.
+// Site-wide: points the "continue" links at the last lesson, keeps the section hash when switching
+// language, opens the "more" sheet.
 (function () {
   var me = document.currentScript, base = me.dataset.base || '/', lang = me.dataset.lang;
   var P = 'simplyeeglab:';
@@ -12,22 +12,6 @@
       var label = slug ? a.dataset.lCont : a.dataset.lStart, s = a.querySelector('span') || a;
       if (label) s.textContent = label;
     });
-  }
-  function backnote() {
-    var n = document.querySelector('[data-backnote]');
-    if (!n || !document.body.classList.contains('lesson-page')) return;
-    var t = get('tips.v1'), closed = (t && t.closed) || [];
-    if (closed.indexOf('back') >= 0) return;
-    n.hidden = false;
-    function close() {
-      n.hidden = true;
-      closed.push('back');
-      try { localStorage.setItem(P + 'tips.v1', JSON.stringify({ v: 1, closed: closed })); } catch (e) {}
-      removeEventListener('keydown', esc);
-    }
-    function esc(e) { var open = false; try { open = !!document.querySelector(':popover-open'); } catch (x) {} if (e.key === 'Escape' && !open) close(); }
-    n.querySelector('[data-backnote-close]').addEventListener('click', close);
-    addEventListener('keydown', esc);
   }
   function langHash() {
     document.querySelectorAll('[data-lang-link]').forEach(function (a) {
@@ -42,6 +26,6 @@
     b.addEventListener('click', function (e) { e.preventDefault(); s.togglePopover(); });
     s.addEventListener('toggle', function (e) { b.setAttribute('aria-expanded', String(e.newState === 'open')); });
   }
-  cont(); backnote(); langHash(); more();
+  cont(); langHash(); more();
   addEventListener('pageshow', cont);
 })();

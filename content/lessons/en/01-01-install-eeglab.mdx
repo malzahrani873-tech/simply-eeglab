@@ -34,25 +34,40 @@ eeglabVersion: "2026.1"
 updated: 2026-10-28
 ---
 
-## Why this step matters
+## The idea
 
 EEGLAB is a collection of functions written in MATLAB. So you need MATLAB first, then the EEGLAB folder itself.
 
 Once it is installed, you extend EEGLAB with plugins. A plugin is a small package that adds menus and functions, for example to read a file format EEGLAB cannot read on its own.
 
-Every lesson after this one assumes EEGLAB runs on your computer, and that the Biosig plugin is installed so you can import EDF files in the import lesson.
+Every later lesson assumes that EEGLAB runs on your computer and that the Biosig plugin is installed, so you can import EDF files in the [import lesson](/en/lesson/import-raw/). So how do you install it cleanly, once?
 
-## Before and after
+## What do I see when EEGLAB runs for the first time?
+
+This is where the steps end: you type one command in MATLAB, and the EEGLAB window opens with its seven menus.
 
 <ImageSpec>
 Two screenshots side by side. Left: the MATLAB window with eeglab typed in the Command Window before pressing Enter, and the Current Folder showing the unzipped EEGLAB folder (eeglab.m and the functions, plugins and sample_data folders are visible). Right: the EEGLAB main window after it starts, with no data loaded, and its seven menus in order: File, Edit, Tools, Plot, Study, Datasets, Help. Real screenshot from EEGLAB 2026.1 (source: eeglab-ui).
 </ImageSpec>
 
-## Steps in the GUI
+## Where do I get MATLAB?
 
-<Callout type="note" title="No MATLAB yet?">
-If you do not have MATLAB yet, read the "Which value should I choose?" table below first, then come back here.
+The options are listed from best to weakest for these lessons.
+
+| Option | Cost | Enough for these lessons? | Why |
+|---|---|---|---|
+| **University license** | Usually free for students | Yes, fully | Most universities provide a MATLAB license for their students. Ask your university IT department. The official documentation recommends the MATLAB version first. |
+| **MATLAB Online (basic)** | Free with a MathWorks account | For trying things out, with limits | 20 hours per month, 5 GB of MATLAB Drive storage, and a 15-minute limit on continuous compute time (MathWorks page). In principle you can upload the EEGLAB folder to MATLAB Drive and type `eeglab`, but we have not tested this on 2026.1 yet. |
+| **Compiled EEGLAB** | Free, no MATLAB | Mostly, but no new plugins | A ready-made version for Windows and macOS that does not need MATLAB. It ships with many plugins and runs simple scripts. But it has no <UiLabel>Manage EEGLAB extensions</UiLabel> menu, so you cannot add a new plugin to it. The documentation ranks it second after MATLAB. |
+| **GNU Octave** | Free and open source | Partly | An open alternative to MATLAB. The official documentation says it is less stable than MATLAB and ranks it as the third and last choice. We do not promise that every lesson works on it. |
+
+**MATLAB release:** the EEGLAB team recommends a recent, though not necessarily the newest, MATLAB release. If you have MATLAB 2016a or older, the download page points you to EEGLAB 2020.0, which this site does not cover.
+
+<Callout type="warning">
+MATLAB Online stops any continuous computation after 15 minutes. An ICA decomposition on large data may go over this limit.
 </Callout>
+
+## How do I install EEGLAB and the Biosig plugin from the GUI?
 
 ### 1. Download EEGLAB
 
@@ -99,9 +114,13 @@ The extension manager shows each plugin's star rating and download count, and so
 The extension manager window (Manage EEGLAB extensions) with Biosig selected in the list and the Install/Update button at the bottom. Screenshot from EEGLAB 2026.1 (source: eeglab-ui).
 </ImageSpec>
 
-## The equivalent script
+### Should I update EEGLAB?
 
-The same steps from the command line. Run it once after unzipping EEGLAB, in a new MATLAB session where you have not started EEGLAB yet.
+In the MATLAB version you will find <MenuPath>Help > Check for EEGLAB update</MenuPath>, and EEGLAB prints at startup whether you have the latest release. But these lessons are written for EEGLAB 2026.1, so do not update in the middle of the course. Menu names and numbers may change in a newer release.
+
+## How do I do all of this with one script?
+
+These are the same steps from the command line. Run the script once after unzipping EEGLAB, in a new MATLAB session where you have not started EEGLAB yet.
 
 ```matlab
 % Go to the EEGLAB folder (change the path to yours)
@@ -125,39 +144,20 @@ end
 - `sopen` is a Biosig function. If it exists, the plugin is installed and there is no need to install it again.
 - The third argument, `true`, installs the plugin without a confirmation dialog, so it works inside a script.
 
-## Which value should I choose?
+## How do I check the installation worked?
 
-The only decision here: where do you get MATLAB? The options go from best to weakest for these lessons.
+1. **The window:** the EEGLAB main window opened with its seven menus.
+2. **The path:** close MATLAB, open it again, and type `which eeglab`. It should print the path of `eeglab.m` inside your folder. Also, when you run `eeglab`, no red warning about subfolders should appear.
+3. **The version:** type `eeg_getversion`. It should print a version number starting with `2026.1`.
+4. **The plugin:** type `exist('sopen', 'file')`. A result of `2` means Biosig is installed. Its name also appears in bold in the extension manager.
+5. **Startup lines:** each time EEGLAB starts, it prints in the Command Window one line for each plugin it loads, starting with `EEGLAB: adding` followed by the plugin name and version. Look for Biosig.
 
-| Option | Cost | Enough for these lessons? | Why |
-|---|---|---|---|
-| **University license** | Usually free for students | Yes, fully | Most universities provide a MATLAB license for their students. Ask your university IT department. The official documentation recommends the MATLAB version first. |
-| **MATLAB Online (basic)** | Free with a MathWorks account | For trying things out, with limits | 20 hours per month, 5 GB of MATLAB Drive storage, and a 15-minute limit on continuous compute time (MathWorks page). In principle you can upload the EEGLAB folder to MATLAB Drive and type `eeglab`, but we have not tested this on 2026.1 yet. |
-| **Compiled EEGLAB** | Free, no MATLAB | Mostly, but no new plugins | A ready-made version for Windows and macOS that does not need MATLAB. It ships with many plugins and runs simple scripts. But it has no <UiLabel>Manage EEGLAB extensions</UiLabel> menu, so you cannot add a new plugin to it. The documentation ranks it second after MATLAB. |
-| **GNU Octave** | Free and open source | Partly | An open alternative to MATLAB. The official documentation says it is less stable than MATLAB and ranks it as the third and last choice. We do not promise that every lesson works on it. |
-
-**MATLAB release:** the EEGLAB team recommends a recent, though not necessarily the newest, MATLAB release. If you have MATLAB 2016a or older, the download page points you to EEGLAB 2020.0, which this site does not cover.
-
-**Updating:** in the MATLAB version you find <MenuPath>Help > Check for EEGLAB update</MenuPath>, and EEGLAB prints at startup whether you have the latest release. But these lessons are written for EEGLAB 2026.1, so do not update in the middle of the course. Menu names and numbers may change in a newer release.
-
-<Callout type="warning">
-MATLAB Online stops any continuous computation after 15 minutes. An ICA decomposition on large data may go over this limit.
-</Callout>
-
-## Common mistakes
+## Which mistakes break the installation?
 
 - **Downloading the ZIP from GitHub instead of the download page.** You miss essential plugins such as ICLabel, clean_rawdata and firfilt. Red warnings appear at startup for the first two, and EEGLAB asks to download firfilt the first time you filter.
 - **Saving the folder with all its subfolders.** This happens with the <UiLabel>Add with Subfolders</UiLabel> button, or by saving the path after running `eeglab` in the same session. The documentation advises saving the main folder only, and EEGLAB prints a red warning at startup if it finds its subfolders saved.
-- **Keeping an old EEGLAB release in the path.** If you install a new release, remove the old one in <UiLabel>Set Path</UiLabel> with the <UiLabel>Remove</UiLabel> button. Otherwise MATLAB may call outdated functions.
+- **Keeping an old EEGLAB release in the path.** If you install a new release, remove the old one in <UiLabel>Set Path</UiLabel> with the <UiLabel>Remove</UiLabel> button. Otherwise, MATLAB may call outdated functions.
 - **Looking for the extension manager in the compiled version.** The menu does not exist there at all. If you need a plugin it does not include, you need the MATLAB version.
-- **`savepath` or the <UiLabel>Save</UiLabel> button fails.** This usually happens when your account cannot write to the MATLAB folder. Run MATLAB as administrator once. Or create a file named `startup.m` in the folder printed by the `userpath` command, and write one line in it: `addpath` followed by the EEGLAB folder path in parentheses. MATLAB runs this file automatically at the start of every session, and it needs no special permissions.
+- **`savepath` or the <UiLabel>Save</UiLabel> button fails.** This usually happens when your account cannot write to the MATLAB folder. Run MATLAB as administrator once, or create a file named `startup.m` in the folder printed by the `userpath` command, and write one line in it: `addpath` followed by the EEGLAB folder path in parentheses. MATLAB runs this file automatically at the start of every session, and it needs no special permissions.
 
 {/* "From experience" box: waiting for a story from the project owner. Do not write it before it arrives. */}
-
-## How to check it worked
-
-1. **The window:** the EEGLAB main window opened with its seven menus.
-2. **The path:** close MATLAB, open it again, and type `which eeglab`. It should print the path of `eeglab.m` inside your folder. And when you run `eeglab`, no red warning about subfolders should appear.
-3. **The version:** type `eeg_getversion`. It should print a version number starting with `2026.1`.
-4. **The plugin:** type `exist('sopen', 'file')`. A result of `2` means Biosig is installed. Its name also appears in bold in the extension manager.
-5. **Startup lines:** each time EEGLAB starts, it prints one line per plugin it loads in the Command Window, starting with `EEGLAB: adding` followed by the plugin name and version. Look for Biosig.

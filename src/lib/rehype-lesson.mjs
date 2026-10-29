@@ -1,12 +1,10 @@
-// Shapes a lesson body into the fixed template: stable section ids, the first heading visually hidden,
-// secondary sections folded into <details> (each followed by a print-only copy), code blocks with a
-// copy button, and the completion button plus the Methods box right after "verify".
+// Shapes a lesson body: the first section is the idea (heading visually hidden), sections with a drawing or a
+// simulation stay open, the others fold into <details> (each followed by a print-only copy), code blocks get a
+// copy button, and the completion button plus the Methods box close the lesson.
 import { readFileSync } from 'node:fs';
 import { iconPath } from './icons.mjs';
-import { LESSON_LAYOUT } from '../lesson-layout.mjs';
+import { sectionsOfMarkdown, legacyTitle } from './lesson-sections.mjs';
 
-const SECTIONS = ['why', 'before-after', 'gui', 'script', 'values', 'mistakes', 'verify'];
-const FOLDED = { script: 'code', values: 'list', mistakes: 'warn' };
 const INTERACTIVE = new Set(['FilterDemo', 'RerefDemo', 'EpochRejectDemo', 'YouTube', 'BeforeAfter']);
 
 const copy = {};
@@ -15,13 +13,12 @@ for (const lang of ['ar', 'en']) {
   const extra = JSON.parse(readFileSync('src/i18n/pending.json', 'utf8'))[lang];
   copy[lang] = { ...extra, ...base };
 }
-const t = (lang, k, n) => (copy[lang][k] ?? '').replace('{n}', String(n));
-// H2 titles the template knows, per section, in both languages (lessons use these headings).
-const KNOWN_TITLES = Object.fromEntries(SECTIONS.map((id) => {
-  const key = { why: 'why', 'before-after': 'beforeAfter', gui: 'gui', script: 'script', values: 'values', mistakes: 'mistakes', verify: 'verify' }[id];
-  return [id, [copy.ar[`section.${key}`], copy.en[`section.${key}`]]];
-}));
-
+// Counted hints use the plural form of the language ("<key>.one", ".two", ".few", ".many"), else the base key.
+const t = (lang, k, n) => {
+  const form = n === undefined ? 'other' : new Intl.PluralRules(lang).select(n);
+  const key = form !== 'other' && `${k}.${form}` in copy[lang] ? `${k}.${form}` : k;
+  return (copy[lang][key] ?? '').replace('{n}', String(n));
+};
 export const icon = (name, cls = 'ico') => ({
   type: 'element',
   tagName: 'svg',
@@ -92,13 +89,17 @@ function wrapCode(tree, lang) {
   });
 }
 
-// Tables get the site style; on phones each row stacks, and every cell shows its column name (data-h).
+// Tables get the site style; on phones each row of a large table stacks, and every cell shows its column name (data-h).
 function styleTables(tree) {
   walk(tree, (n) => {
     if (!isEl(n, 'table')) return;
-    n.properties = { ...n.properties, className: [...(n.properties?.className ?? []), 'tbl'] };
     const rows = [];
     walk(n, (r) => { if (isEl(r, 'tr')) rows.push(r); });
+    // A small table (up to 3 short columns) stays a table on phones; others stack row by row.
+    const cells = rows.flatMap((r) => r.children.filter((c) => isEl(c, 'td') || isEl(c, 'th')));
+    const cols = Math.max(0, ...rows.map((r) => r.children.filter((c) => isEl(c, 'td') || isEl(c, 'th')).length));
+    const compact = cols <= 3 && cells.every((c) => textOf(c).trim().length <= 80);
+    n.properties = { ...n.properties, className: [...(n.properties?.className ?? []), 'tbl', ...(compact ? ['compact'] : [])] };
     const head = rows.find((r) => r.children.some((c) => isEl(c, 'th')));
     const names = head ? head.children.filter((c) => isEl(c, 'th')).map((c) => textOf(c).trim()) : [];
     for (const r of rows) {
@@ -132,22 +133,24 @@ function isolateLatin(n) {
 }
 
 const DEMOS = new Set(['FilterDemo', 'RerefDemo', 'EpochRejectDemo', 'BeforeAfter', 'Figure', 'ImageSpec', 'IcaGameTeaser', 'YouTube']);
-const FOLD_ICON = { why: 'idea', gui: 'steps', script: 'code', values: 'list', verify: 'check', mistakes: 'warn' };
+const FOLD_ICON = { topic: 'book', gui: 'steps', script: 'code', values: 'list', verify: 'check', mistakes: 'warn' };
 const countItems = (body) => body.filter((n) => isEl(n, 'ol') || isEl(n, 'ul')).reduce((a, l) => a + l.children.filter((c) => isEl(c, 'li')).length, 0);
+const isDemo = (n) => (n.type === 'mdxJsxFlowElement' && DEMOS.has(n.name)) || (isEl(n, 'p') && n.children.some((c) => c.type === 'mdxJsxTextElement' && DEMOS.has(c.name)));
+const hasContent = (body) => body.some((n) => n.type !== 'text' || n.value.trim());
 
-function hintFor(id, body, lang) {
+// The small line under a folded title: a count where one helps the student decide to open it.
+function hintFor(kind, body, lang) {
   let n = 0;
-  if (id === 'script') {
+  if (kind === 'script') {
     let pre = null;
     walk({ children: body }, (x) => { if (!pre && isEl(x, 'pre')) pre = x; });
     n = pre ? textOf(pre).split('\n').filter((l) => l.trim()).length : 0;
-  } else if (id === 'mistakes') {
+  } else if (kind === 'mistakes') {
     const h3s = body.filter((x) => isEl(x, 'h3')).length;
     for (const ul of body.filter((x) => isEl(x, 'ul') || isEl(x, 'ol'))) ul.properties = { ...ul.properties, className: ['mlist'] };
     n = h3s || countItems(body);
-  } else if (id === 'gui' || id === 'verify') n = countItems(body);
-  else return t(lang, `fold.${id}.hint`, 0);
-  return n ? t(lang, `fold.${id}.hint`, n) : '';
+  } else if (kind === 'gui' || kind === 'verify') n = countItems(body);
+  return n ? t(lang, `fold.${kind}.hint`, n) : '';
 }
 
 export default function rehypeLesson() {
@@ -160,78 +163,56 @@ export default function rehypeLesson() {
     styleTables(tree);
     if (lang === 'ar') isolateLatin(tree);
 
-    // Split the top level into chunks that start at each H2.
+    // Split the top level into chunks that start at each H2; the source says what each section is.
     const chunks = [{ h2: null, body: [] }];
     for (const node of tree.children) {
       if (isEl(node, 'h2')) chunks.push({ h2: node, body: [] });
       else chunks.at(-1).body.push(node);
     }
-    if (chunks.length - 1 !== SECTIONS.length) file.message(`expected ${SECTIONS.length} sections, found ${chunks.length - 1}`);
+    const src = String(file.value ?? '').replace(/^---\n[\s\S]*?\n---\n/, '');
+    const kinds = sectionsOfMarkdown(src).map((s) => s.kind);
+    if (kinds.length !== chunks.length - 1) file.message(`found ${chunks.length - 1} sections, the source has ${kinds.length}`);
 
     // The Methods box sits after the completion button, folded, whatever its place in the source.
     const methods = [];
     for (const c of chunks) c.body = c.body.filter((n) => (isJsx('Methods')(n) ? (methods.push(n), false) : true));
-    const sec = {};
-    chunks.slice(1).forEach((c, i) => {
-      const id = SECTIONS[i] ?? `section-${i + 1}`;
-      const known = KNOWN_TITLES[id];
-      if (known && !known.includes(textOf(c.h2).trim())) file.message(`section "${textOf(c.h2).trim()}" has an unknown title`);
-      sec[id] = c;
-    });
     const out = [...chunks[0].body];
-    const tail = () => {
-      out.push({ type: 'mdxJsxFlowElement', name: 'LessonComplete', attributes: [{ type: 'mdxJsxAttribute', name: 'slug', value: slug }], children: [] });
-      if (methods.length) {
-        const title = LESSON_LAYOUT === 'questions' ? copy[lang]['fold.methods.title'] : copy[lang]['methods.title'];
-        out.push(...fold('methods', 'file', el('h2', {}, [text(title)]), t(lang, 'fold.methods.hint'), methods, 'methods', lang));
-      }
-    };
+    const [first, ...rest] = chunks.slice(1);
 
-    if (LESSON_LAYOUT === 'questions') {
-      // 1. The idea: the first paragraph of "why", always in full (DESIGN.md §6.4); the rest stays in the fold.
-      const why = sec.why?.body ?? [];
-      const first = why.findIndex((n) => isEl(n, 'p'));
-      const cut = first < 0 ? 0 : first + 1;
-      out.push(el('h2', { id: 'idea', className: ['sr'] }, [text(copy[lang]['section.idea.sr'])]), ...why.slice(0, cut));
-      // 2. The exercise: instructions and the first demo stay open; what follows folds as notes.
-      if (sec['before-after']) {
-        const b = sec['before-after'];
-        b.h2.properties = { ...b.h2.properties, id: 'before-after' };
-        const k = b.body.findIndex((n) => (n.type === 'mdxJsxFlowElement' && DEMOS.has(n.name)) || (isEl(n, 'p') && n.children.some((c) => c.type === 'mdxJsxTextElement' && DEMOS.has(c.name))));
-        const head = k < 0 ? b.body : b.body.slice(0, k + 1);
-        const rest = k < 0 ? [] : b.body.slice(k + 1).filter((n) => n.type !== 'text' || n.value.trim());
-        out.push(b.h2, ...head, ...(rest.length ? inlineFold(copy[lang]['fold.demo.notes'], rest, lang) : []));
+    // 1. The idea: the first section, open, under a heading only screen readers hear.
+    if (first) out.push(el('h2', { id: 'idea', className: ['sr'] }, [text(copy[lang]['section.idea.sr'])]), ...first.body);
+
+    // 2. An explanation with a drawing or a simulation stays open; every other section is a question that folds
+    //    (steps, script, checks and mistakes fold even when they hold a demo).
+    const used = new Set();
+    let lead = false;
+    rest.forEach((c, i) => {
+      const kind = kinds[i + 1] ?? 'topic';
+      if (!hasContent(c.body)) return;
+      const id = kind !== 'topic' && !used.has(kind) ? kind : `s${i + 2}`;
+      used.add(kind);
+      const old = legacyTitle(textOf(c.h2));
+      const title = old && old.kind !== 'before-after' && old.kind !== 'why' ? copy[lang][`fold.${old.kind}.title`] : textOf(c.h2).trim();
+      if ((kind === 'topic' || kind === 'values') && c.body.some(isDemo)) {
+        out.push(el('h2', { id }, [text(title)]), ...foldSimulationNotes(c.body, lang));
+        return;
       }
-      // 3. Every other section is a question.
-      out.push(el('div', { className: ['fold-lead'] }, [
-        el('p', {}, [text(copy[lang]['fold.lead'])]),
-        el('button', { type: 'button', className: ['btn', 'small', 'sec'], hidden: true, dataOpenAll: '', dataOpen: copy[lang]['fold.openAll'], dataClose: copy[lang]['fold.closeAll'] }, [text(copy[lang]['fold.openAll'])]),
-      ]));
-      const restWhy = why.slice(cut);
-      const order = [['why', restWhy], ['gui'], ['script'], ['values'], ['verify'], ['mistakes']];
-      for (const [id, body0] of order) {
-        const body = body0 ?? sec[id]?.body;
-        if (!body || !body.some((n) => n.type !== 'text' || n.value.trim())) continue;
-        const hint = hintFor(id, body, lang);
-        out.push(...fold(id, FOLD_ICON[id], el('h2', {}, [text(copy[lang][`fold.${id}.title`])]), hint, body, id === 'mistakes' ? 'mist' : '', lang));
+      if (!lead) {
+        lead = true;
+        out.push(el('div', { className: ['fold-lead'] }, [
+          el('p', {}, [text(copy[lang]['fold.lead'])]),
+          el('button', { type: 'button', className: ['btn', 'small', 'sec'], hidden: true, dataOpenAll: '', dataOpen: copy[lang]['fold.openAll'], dataClose: copy[lang]['fold.closeAll'] }, [text(copy[lang]['fold.openAll'])]),
+        ]));
       }
-      tail();
-    } else {
-      chunks.slice(1).forEach((c, i) => {
-        const id = SECTIONS[i] ?? `section-${i + 1}`;
-        const h2 = c.h2;
-        h2.properties = { ...h2.properties };
-        if (FOLDED[id]) {
-          delete h2.properties.id;
-          out.push(...fold(id, FOLDED[id], h2, hintFor(id, c.body, lang), c.body, id === 'mistakes' ? 'mist' : '', lang));
-        } else {
-          h2.properties.id = id;
-          if (id === 'why') h2.properties.className = ['sr'];
-          out.push(h2, ...(id === 'before-after' ? foldSimulationNotes(c.body, lang) : c.body));
-        }
-        if (id === 'verify') tail();
-      });
-    }
+      out.push(...fold(id, FOLD_ICON[kind], el('h2', {}, [text(title)]), hintFor(kind, c.body, lang), c.body, kind === 'mistakes' ? 'mist' : '', lang));
+    });
+
+    // 3. The completion button (its reminder links only to sections this lesson has), then Methods.
+    out.push({ type: 'mdxJsxFlowElement', name: 'LessonComplete', attributes: [
+      { type: 'mdxJsxAttribute', name: 'slug', value: slug },
+      ...['gui', 'verify'].filter((k) => used.has(k)).map((k) => ({ type: 'mdxJsxAttribute', name: k, value: null })),
+    ], children: [] });
+    if (methods.length) out.push(...fold('methods', 'file', el('h2', {}, [text(copy[lang]['fold.methods.title'])]), t(lang, 'fold.methods.hint'), methods, 'methods', lang));
     tree.children = out;
   };
 }

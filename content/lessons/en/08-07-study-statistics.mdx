@@ -1,7 +1,7 @@
 ---
 title: Statistics & multiple comparisons
 titleEn: Statistics & multiple comparisons
-description: "How to test condition differences across participants in EEGLAB, correct for many time points or channels, fix the window in advance, and mixed-design limits."
+description: "How to test condition differences across participants in EEGLAB, correct for many time points or channels, fix the window in advance, and know the limits of mixed designs."
 station: 8
 order: 7
 level: core
@@ -122,27 +122,39 @@ eeglabVersion: "2026.1"
 updated: 2026-10-28
 ---
 
-## Why this step matters
+## The idea
 
-In the last lesson you saw two curves separate at Pz. But two group averages are never exactly equal, even if the pictures had no effect at all. The test answers one question: **is the difference consistent enough across the 14 participants that chance alone is unlikely to explain it?**
+In the lesson on plotting group results you saw two curves separate at Pz. But two averages are never exactly equal, even if the pictures had no effect at all.
 
-There is a second problem. EEGLAB tests every time point on its own, and an epoch holds hundreds of time points. At a threshold of 0.05, if you test 100 independent time points where there is no real difference, you expect about 5 of them to come out "significant" by chance. This is the **multiple comparisons** problem. A correction such as FDR raises the bar so that these chance points mostly disappear.
+The test answers one question: **is the difference consistent enough across the 14 participants that chance alone is unlikely to explain it?**
 
-The third problem is in your hands, not in EEGLAB: **choosing the window after looking at the difference.** If you look at the plot, find where the curves separate most, and then test that window, the test will almost always "succeed", even in random data. The window comes from your question or from earlier studies, before the plot.
+So how do you run this test in EEGLAB without being fooled by chance points?
 
-## Before and after
+## How does a significant result appear on the plot?
 
 <ImageSpec>
 An image from the lesson script on the run day, not a hand drawing. Left: the group ERP at Pz for design 3, the two curves animal and distractor on one panel, with dark bars along the bottom of the panel at the times that pass the FDR correction. Right: the 150 to 250 ms scalp maps for animal and distractor, with the p-value map next to them. Axis text and titles come from EEGLAB in English, so one version serves both languages.
 </ImageSpec>
 
-## Steps in the GUI
+## Why correct for multiple comparisons, and how do FDR and clusters differ?
 
-**About the data (D6):** `animal_mine.study` with its three designs and the measures from the precompute lesson. We start with design 3, `image only`: one within-subject variable (animal and distractor), so the test is **paired** across the 14 participants.
+EEGLAB tests every time point on its own, and an epoch holds hundreds of time points. At a threshold of 0.05, if you test 100 independent time points where there is no real difference, about 5 of them will come out "significant" by chance. This is the **multiple comparisons** problem. A correction such as FDR raises the bar, so most of these chance points disappear.
+
+Cluster correction does not judge each time point alone. It looks for runs of neighboring significant points, and asks whether a run this long is rare under permutation. So it is often better than FDR at detecting an effect that lasts tens of milliseconds. In EEGLAB it comes from the Fieldtrip-lite plugin, which is not part of the base install.
+
+## Why choose the time window before looking at the plot?
+
+EEGLAB cannot solve this problem for you, because it comes from how you choose. If you look at the plot, find where the curves separate most, and then test that window, the test will almost always "succeed", even in random data. So the window comes from your question or from earlier studies, before the plot.
+
+In this task, the animal pictures are the go trials (the participant lifts a finger), and the distractors are the no-go trials (the participant keeps pressing the button), as the dataset description states. Thorpe and colleagues (1996) reported that the difference between the two trial types in this task appears as a negativity over frontal sites on no-go trials, starting at about 150 ms. So we took the start of the window (150 ms) from an earlier study, not from our plot. The end (250 ms) is a choice for this lesson.
+
+## How do I test the difference from the menus?
+
+**About the data (D6):** `animal_mine.study` with its three designs and the measures from [the precompute lesson](/en/lesson/study-precompute/). We start with design 3, `image only`: one within-subject variable (animal and distractor), so the test is **paired** across the 14 participants.
 
 **1. Prepare the plot**
 
-1. Run the "Starting point" script.
+1. Start with `animal_mine.study` open and its measures computed. If you don't have it, open "Script to reach this state" under "Starts from" at the top of the lesson.
 2. Open <MenuPath>Study > Plot channel measures</MenuPath>. In <UiLabel>Select design:</UiLabel> choose `image only`, then choose `Pz` in the left list.
 3. Press <UiLabel>Params</UiLabel> next to <UiLabel>Plot ERPs</UiLabel>. Tick <UiLabel>Plot first variable on the same panel</UiLabel>, leave <UiLabel>Time range (ms) [low high]</UiLabel> empty, and make sure <UiLabel>Multiple channels selection</UiLabel> is on <UiLabel>Plot channels individually</UiLabel>. Press <UiLabel>Ok</UiLabel>.
 
@@ -156,7 +168,7 @@ An image from the lesson script on the run day, not a hand drawing. Left: the gr
 6. Press <UiLabel>Plot ERPs</UiLabel>. The two curves appear on one panel, and dark bars along the bottom of the panel mark the times where the difference passes the corrected threshold.
 
 <Callout type="note" title="The MATLAB statistics toolbox">
-The parametric test needs the `fcdf` function from the MATLAB Statistics and Machine Learning Toolbox. Without this toolbox, EEGLAB writes in the command window a message that starts with `statcond(): parametric testing requires fcdf()` and runs a permutation test instead. The result is still valid, but it is slower and can change slightly from one run to the next.
+The parametric test needs the `fcdf` function from the MATLAB Statistics and Machine Learning Toolbox. Without this toolbox, EEGLAB prints a message in the command window that starts with `statcond(): parametric testing requires fcdf()` and runs a permutation test instead. The result is still valid, but it is slower and can change slightly from one run to the next.
 </Callout>
 
 **3. See what the correction does**
@@ -167,19 +179,17 @@ The parametric test needs the `fcdf` function from the MATLAB Statistics and Mac
 
 **4. Test a window chosen in advance**
 
-In this task, the animal pictures are the go trials (the participant lifts a finger), and the distractors are the no-go trials (the participant keeps pressing the button), as the dataset description states. Thorpe and colleagues (1996) reported that the difference between go and no-go trials in this task appears as a negativity over frontal sites on no-go trials, starting at about 150 ms. So the start of the window (150 ms) comes from an earlier study, not from our plot. The end (250 ms) is a choice for this lesson.
+The window is 150 to 250 ms. The section "Why choose the time window before looking at the plot?" above explains why.
 
 1. Press <UiLabel>Sel. all</UiLabel> to select every channel.
 2. Press <UiLabel>Params</UiLabel> next to <UiLabel>Plot ERPs</UiLabel>. Type `150 250` in <UiLabel>Time range (ms) [low high]</UiLabel> first, then choose <UiLabel>Plot averaged topography over time range</UiLabel> in <UiLabel>Multiple channels selection</UiLabel>. Press <UiLabel>Ok</UiLabel>.
-3. Press <UiLabel>Plot ERPs</UiLabel>. Two scalp maps appear, one per picture, with a third map of the test at each channel. Here FDR corrects across all the channels, because each channel is now one test. The paper describes the effect over frontal sites, while the test in step 2 is at Pz. That is a separate analysis, not a contradiction, so look at the test map to see where the difference appears.
+3. Press <UiLabel>Plot ERPs</UiLabel>. Two scalp maps appear, one per picture, with a third map of the test at each channel. Here FDR corrects across all the channels, because each channel is now one test. Note that Thorpe and colleagues described the effect over frontal sites, while in part 2 you tested Pz alone. This is not a contradiction: they are two separate analyses. The test map shows you where the difference actually appears.
 4. Afterwards set <UiLabel>Multiple channels selection</UiLabel> back to <UiLabel>Plot channels individually</UiLabel> and clear <UiLabel>Time range (ms) [low high]</UiLabel>.
 
 **5. Cluster correction (requires Fieldtrip-lite)**
 
-Cluster correction does not judge each time point alone. It looks for runs of neighboring significant points, and asks whether a run this long is rare under permutation. It is often stronger than FDR for an effect that lasts tens of milliseconds. In EEGLAB it comes from the Fieldtrip-lite plugin, which is not part of the base install.
-
 1. **Check whether it is installed.** Open <UiLabel>STATS</UiLabel>. If the line reads <UiLabel>Use Fieldtrip statistics (to use install "Fieldtrip-lite" using File > Manage EEGLAB extensions)</UiLabel> and cannot be ticked, the plugin is missing. You can also type `exist('ft_freqstatistics', 'file')` in the command window: `2` means installed, `0` means missing.
-2. **To install it:** open <MenuPath>File > Manage EEGLAB extensions</MenuPath>. In <UiLabel>List of plugins (bolded means installed)</UiLabel> click `Fieldtrip-lite`, then press <UiLabel>Install/Update</UiLabel>. Open <UiLabel>STATS</UiLabel> again: the line should now read <UiLabel>Use Fieldtrip statistics</UiLabel>. If it is still grey, restart EEGLAB and run the "Starting point" script again.
+2. **To install it:** open <MenuPath>File > Manage EEGLAB extensions</MenuPath>. In <UiLabel>List of plugins (bolded means installed)</UiLabel> click `Fieldtrip-lite`, then press <UiLabel>Install/Update</UiLabel>. Open <UiLabel>STATS</UiLabel> again: the line should now read <UiLabel>Use Fieldtrip statistics</UiLabel>. If it is still grey, restart EEGLAB, then run "Script to reach this state" under "Starts from" at the top of the lesson again.
 3. **To run it:** select `Pz` alone, open <UiLabel>STATS</UiLabel>, make sure only the first variable is ticked, tick <UiLabel>Use Fieldtrip statistics</UiLabel>, choose <UiLabel>Use montecarlo/permutation statistics</UiLabel> and <UiLabel>Use cluster correction (CC)</UiLabel>, and type `0.05` as the threshold. Press <UiLabel>Ok</UiLabel>, then <UiLabel>Plot ERPs</UiLabel>.
 4. Tick <UiLabel>Use EEGLAB statistics</UiLabel> again afterwards, for the next step.
 
@@ -190,11 +200,9 @@ Cluster correction does not judge each time point alone. It looks for runs of ne
 3. Press <UiLabel>Plot ERPs</UiLabel>. The command window shows `Warning: cannot plot condition/group on the same panel while using a fixed`, and EEGLAB draws each cell on its own panel, with extra panels for the picture effect, the gender effect and their interaction.
 4. Untick <UiLabel>Compute 2nd independent variable statistics if any</UiLabel> when you are done.
 
-<Callout type="warning">
-**A limit you should know.** For the two-way test, EEGLAB passes one pairing setting to the test, and when one variable is unpaired it uses the unpaired version (in `std_stat.m` the pairing list is sorted so that `off` comes first). In our mixed design, this means the interaction is tested as if picture type were between participants as well, which loses power. Use the two-way result here for exploring. For a real mixed ANOVA, export the values (next lesson) to a statistics program, or use LIMO (the lesson after next). With 7 participants per group, any gender result is for learning only.
-</Callout>
+Before you interpret the interaction panel, read the section "Can I trust EEGLAB's test for the 2×2 mixed design?" below.
 
-## The matching script
+## How do I run the same tests with a script?
 
 ```matlab
 % STUDY and ALLEEG come from the starting point script
@@ -242,7 +250,15 @@ fprintf('Interaction time points after FDR: %d\n', nnz(pinter{3}));
 STUDY = pop_statparams(STUDY, 'groupstats', 'off');
 ```
 
-## Which value should I choose?
+## Can I trust EEGLAB's test for the 2×2 mixed design?
+
+For the two-way test, EEGLAB gives the test one pairing setting for both variables. So when one of them is unpaired, as gender is here, it uses the unpaired version for the whole test (in `std_stat.m` the pairing list is sorted so that `off` comes first).
+
+The result in our mixed design: the interaction is tested as if picture type were also between participants, although every participant saw both types. This loses statistical power.
+
+So use the two-way result here for exploring only. For a real mixed ANOVA, export the values to a statistics program ([the export lesson](/en/lesson/study-export-results/)), or use LIMO (the LIMO lesson at the end of this station). With 7 participants per group, any gender result is for learning only.
+
+## Which test and correction should I choose?
 
 | Option | In this lesson | When to change it |
 |---|---|---|
@@ -250,30 +266,30 @@ STUDY = pop_statparams(STUDY, 'groupstats', 'off');
 | <UiLabel>Use parametric statistics</UiLabel> | Yes | <UiLabel>Use permutation statistics</UiLabel> for final results, or when the data are far from normal. Leave <UiLabel>Randomization (n)</UiLabel> on `auto` or type 2000 or more: a permutation test cannot give a p-value below 1 divided by this number, and a correction needs small p-values. |
 | <UiLabel>Use bootstrap statistics</UiLabel> | No | Kept for older analyses only. EEGLAB itself warns that it overestimates significance for paired data. Use permutation instead. |
 | Threshold | 0.05 | `exact` (empty) shows p-values instead of bars, useful for exploring. |
-| Correction | FDR | Bonferroni and Holm are stricter and lose more true effects. Cluster correction (Fieldtrip-lite) for effects that last over time or across channels. Never none for a final result. |
+| Correction | FDR | Bonferroni and Holm are stricter and lose more true effects. Cluster correction (Fieldtrip-lite) for effects that last over time or across channels. Never report a final result without correction. |
 | <UiLabel>Plot marginal statistics (unckeck to plot main effect)</UiLabel> | Unticked (main effect) | Tick it to test the picture within each gender separately. |
 | <UiLabel>Use single trials for statistics (not recommended if more than 1 subject in the study)</UiLabel> | Unticked | Only for a STUDY with one participant. With many participants it changes the question from people to trials. |
 | Time window | 150 to 250 ms: the start from Thorpe et al. (1996), the end a choice for this lesson | From your question or earlier studies, written down before the analysis. |
 
-## Common mistakes
-
-- **Choosing the window from the plot, then testing it.** The test is then almost guaranteed to succeed. Write the window down before you open the plot.
-- **Reporting the uncorrected bars.** With hundreds of time points, some bars are chance. Report the corrected result, and say which correction you used.
-- **Trusting an isolated short bar.** One or two significant points in the baseline, or far from any expected effect, are more likely chance than a finding.
-- **Leaving the second variable ticked when switching to Fieldtrip.** Fieldtrip-lite cannot run a two-way test. A warning window shows `Switching to EEGLAB statistics since Fieldtrip cannot perform 2-way statistics`, and the window goes back to EEGLAB statistics.
-- **"Not significant" read as "no difference".** With 14 participants, a real but small effect can fail the test. Absence of a bar is not proof of absence.
-
-{/* "From experience" box: waiting for a story from the project owner. Not written before it arrives. */}
-
-## How do you know it worked?
+## How do I check that the test worked?
 
 - **The Pz plot** for design 3 shows two curves on one panel and dark bars along its bottom at the significant times.
 - **The script prints** `Significant time points at Pz:` with two numbers, and the number after FDR is less than or equal to the uncorrected one.
 - **The window test** shows three maps (animal, distractor and the p-value map), and the script prints the list of significant channels (the list can be empty).
 - **Fieldtrip-lite:** the script prints either the number of points after cluster correction, or the line `Fieldtrip-lite is not installed`.
 
+## Common mistakes in group statistics
+
+- **Choosing the window from the plot, then testing it.** The test is then almost guaranteed to succeed. Write the window down before you open the plot.
+- **Reporting the uncorrected bars.** With hundreds of time points, some bars are chance. Report the corrected result, and say which correction you used.
+- **Trusting an isolated short bar.** One or two significant points in the baseline, or far from any expected effect, are more likely chance than a finding.
+- **Leaving the second variable ticked when switching to Fieldtrip.** Fieldtrip-lite cannot run a two-way test. A warning window shows `Switching to EEGLAB statistics since Fieldtrip cannot perform 2-way statistics`, and the window goes back to EEGLAB statistics.
+- **Reading "not significant" as "no difference".** With 14 participants, a real but small effect can fail the test. Absence of a bar is not proof of absence.
+
+{/* "From experience" box: waiting for a story from the project owner. Not written before it arrives. */}
+
 <Methods>
-Animal and distractor ERPs were compared at [Pz] with paired t-tests at each time point across [14] participants (std_stat, EEGLAB 2026.1), with false discovery rate (FDR) correction across time points at q = 0.05. Mean amplitude from [150] to [250] ms, a window chosen a priori [Thorpe et al., 1996], was compared at every channel with FDR correction across channels.
+Animal and distractor ERPs were compared at [Pz] with [paired t-tests] at each time point across [14] participants (std_stat, EEGLAB 2026.1), with false discovery rate (FDR) correction across time points at q = 0.05. Mean amplitude from [150] to [250] ms, a window chosen a priori (Thorpe et al., 1996), was compared at every channel with FDR correction across channels.
 </Methods>
 
 <Callout type="note" title="About the data">

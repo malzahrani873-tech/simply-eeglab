@@ -85,63 +85,23 @@ eeglabVersion: "2026.1"
 updated: 2026-10-28
 ---
 
-## Why this step matters
+## The idea
 
-ICA removed most blinks, but a few epochs may still have a problem: a sudden movement, an electrode that shifted for a moment, or a large blink that ICA did not fully remove. One epoch with a peak of hundreds of microvolts is enough to distort the whole average.
+ICA removed most blinks, but a few epochs may still have a problem: a sudden movement, an electrode that shifted, or a blink ICA did not fully remove. One epoch with a peak of hundreds of microvolts can distort the whole average.
 
-The simple fix: reject any epoch in which the amplitude crosses a set limit in any channel.
+The simple fix: reject any epoch in which the amplitude crosses a set limit in any channel. But every rejected epoch is one fewer trial, and the average gets noisier.
 
-But rejection has a cost. Every epoch you reject is one trial less in the average, and an average of fewer trials is noisier. So the goal is not to reject everything that looks odd, but to reject what actually harms the average.
+So which limit rejects what really harms the average, without throwing away good data?
 
-## Before and after
+## Try it: how does the threshold change the average?
 
-Try different thresholds and watch the number of rejected epochs and the shape of the average.
+Pick a threshold with the buttons and watch two things: how many epochs are rejected, and how the shape of the average changes.
 
 <EpochRejectDemo />
 
-## Steps in the GUI
+## How do I reject extreme epochs with a script?
 
-Start with the dataset `D1 epochs bl` open, as in "Starting point".
-
-<Callout type="note" title="Why legacy?">
-EEGLAB calls these menus legacy, because it prefers cleaning the continuous data before epoching (for example with `clean_rawdata`). But rejecting epochs with an amplitude threshold after ICA is still a common step in ERP analysis, and it is the one Luck's book teaches.
-</Callout>
-
-**First: mark the extreme epochs and reject them with the script**
-
-The epoch rejection menu is hidden by default in EEGLAB 2026.1, so we start with the script.
-
-1. Copy the whole block from "The equivalent script" below into the command window.
-2. The command window prints the number of marked epochs, for example `Marked 1 of 80 epochs`. The script removes the marked epochs, names the dataset `D1 epochs clean`, saves it as `D1_epochs_clean.set`, and adds it to the <MenuPath>Datasets</MenuPath> menu. The lessons in stations 6 and 7 start from it.
-3. If it prints `Marked 0 of 80 epochs`, there is nothing to reject. The new dataset is a copy of the previous one with the new name, and that is correct.
-
-**Second (optional): the same step from the menu**
-
-This is an alternative to the script, not an extra step. The menu is <MenuPath>Tools > Reject data epochs > Reject extreme values</MenuPath>, but it is hidden by default: under the <MenuPath>Tools</MenuPath> menu you will see a gray line that reads <UiLabel>(Expand tool choices via "File > Preferences")</UiLabel>. To show it:
-
-1. Select `D1 epochs bl` from the <MenuPath>Datasets</MenuPath> menu, and save it with <MenuPath>File > Save current dataset as</MenuPath>, as `D1_epochs_bl.set`.
-2. Open <MenuPath>File > Preferences</MenuPath>, check <UiLabel>If set, show all menu items from previous EEGLAB versions. You must restart EEGLAB for this to take effect.</UiLabel>, then press <UiLabel>Ok</UiLabel>.
-3. Restart EEGLAB: type `eeglab` in the command window, then open the file with <MenuPath>File > Load existing dataset</MenuPath>.
-
-This option stays saved, and it changes how all the menus look compared with the pictures in these lessons, so turn it off after this step. Once the menu shows:
-
-1. Open <MenuPath>Tools > Reject data epochs > Reject extreme values</MenuPath>.
-2. The <UiLabel>Rejection abnormal elec. values -- pop_eegthresh()</UiLabel> window opens. Keep <UiLabel>Electrode (indices(s), Ex: 2 4 5):</UiLabel> at `1:32`, that is, all channels.
-3. In <UiLabel>Minimum rejection threshold(s) (uV, Ex:-20 -10 -15):</UiLabel>, type `-100` instead of the default `-10`.
-4. In <UiLabel>Maximum rejection threshold(s) (uV, Ex: 20 10 15):</UiLabel>, type `100` instead of the default `10`.
-5. Keep <UiLabel>Start time limit(s) (seconds, Ex -0.1 0.3):</UiLabel> and <UiLabel>End time limit(s) (seconds, Ex 0.2):</UiLabel> at their values, that is, the whole epoch.
-6. Check <UiLabel>Reject marked trial(s)</UiLabel> and press <UiLabel>Ok</UiLabel>.
-7. A window showing the epochs opens, with the marked epochs highlighted. Review them by eye: you can click an epoch to unmark or mark it.
-   - **If the command window prints `0/80 trials marked for rejection`**, there is nothing to reject, and the <UiLabel>REJECT</UiLabel> button will do nothing. Close the viewing window, open <MenuPath>Edit > Dataset info</MenuPath>, type `D1 epochs clean` in <UiLabel>Dataset name</UiLabel>, press <UiLabel>Ok</UiLabel>, and go to step 10.
-8. Press <UiLabel>REJECT</UiLabel>, then confirm with <UiLabel>YES</UiLabel>.
-9. In the new-dataset window, type `D1 epochs clean` in <UiLabel>Name it:</UiLabel>, then press <UiLabel>Ok</UiLabel>.
-10. Save it with <MenuPath>File > Save current dataset as</MenuPath>, as `D1_epochs_clean.set`. The lessons in stations 6 and 7 start from it.
-
-<Callout type="note" title="The default limits">
-The default limits in the window (-10 to 10 µV) are examples of the format, not a recommendation. With them, almost every epoch would be rejected.
-</Callout>
-
-## The equivalent script
+The epoch rejection menu is hidden by default in EEGLAB 2026.1, so the script is the main route here. Start with the dataset `D1 epochs bl` open (if you don't have it, open "Script to reach this state" at the top of the lesson), then copy this whole script into the command window.
 
 ```matlab
 % Mark epochs where any channel goes beyond +/-100 uV anywhere in the epoch
@@ -162,9 +122,43 @@ EEG = pop_saveset(EEG, 'filename', 'D1_epochs_clean.set', 'filepath', pwd);
 eeglab redraw
 ```
 
-The last argument of `pop_eegthresh` is `0`, meaning "mark only, do not reject". The rejection happens on the next lines, so you can print the count first.
+The command window prints the number of marked epochs, for example `Marked 1 of 80 epochs`. The script then removes the marked epochs, names the dataset `D1 epochs clean`, saves it as `D1_epochs_clean.set`, and adds it to the <MenuPath>Datasets</MenuPath> menu. The lessons in stations 6 and 7 start from this file.
 
-## Which value should I choose?
+If it prints `Marked 0 of 80 epochs`, there is nothing to reject, and the new dataset is a copy of the previous one with the new name. That is correct.
+
+Why two steps instead of one? The last argument of `pop_eegthresh` is `0`, meaning "mark only, do not reject", so the count is printed first and the rejection happens on the next lines.
+
+## How do I reject them from the menu instead?
+
+This is an alternative to the script, not an extra step. The menu is <MenuPath>Tools > Reject data epochs > Reject extreme values</MenuPath>, but it is hidden by default: under the <MenuPath>Tools</MenuPath> menu you will see a gray line that reads <UiLabel>(Expand tool choices via "File > Preferences")</UiLabel>.
+
+<Callout type="note" title="Why legacy?">
+EEGLAB calls these menus legacy, because it prefers cleaning the continuous data before epoching (for example with `clean_rawdata`). But rejecting epochs with an amplitude threshold after ICA is still a common step in ERP analysis, and it is the one Luck's book teaches.
+</Callout>
+
+To show the menu:
+
+1. Select `D1 epochs bl` from the <MenuPath>Datasets</MenuPath> menu, and save it with <MenuPath>File > Save current dataset as</MenuPath>, as `D1_epochs_bl.set`.
+2. Open <MenuPath>File > Preferences</MenuPath>, check <UiLabel>If set, show all menu items from previous EEGLAB versions. You must restart EEGLAB for this to take effect.</UiLabel>, then press <UiLabel>Ok</UiLabel>.
+3. Restart EEGLAB: type `eeglab` in the command window, then open the file with <MenuPath>File > Load existing dataset</MenuPath>.
+
+This option stays saved until you turn it off, and it makes all the menus differ from the pictures in these lessons. So turn it off once you finish the rejection.
+
+Now reject the epochs from the menu:
+
+1. Open <MenuPath>Tools > Reject data epochs > Reject extreme values</MenuPath>.
+2. The <UiLabel>Rejection abnormal elec. values -- pop_eegthresh()</UiLabel> window opens. Keep <UiLabel>Electrode (indices(s), Ex: 2 4 5):</UiLabel> at `1:32`, that is, all channels.
+3. In <UiLabel>Minimum rejection threshold(s) (uV, Ex:-20 -10 -15):</UiLabel>, type `-100` instead of the default `-10`. The default limits in the window (-10 to 10 µV) are examples of the format, not a recommendation: with them, almost every epoch would be rejected.
+4. In <UiLabel>Maximum rejection threshold(s) (uV, Ex: 20 10 15):</UiLabel>, type `100` instead of the default `10`.
+5. Keep <UiLabel>Start time limit(s) (seconds, Ex -0.1 0.3):</UiLabel> and <UiLabel>End time limit(s) (seconds, Ex 0.2):</UiLabel> at their values, that is, the whole epoch.
+6. Check <UiLabel>Reject marked trial(s)</UiLabel> and press <UiLabel>Ok</UiLabel>.
+7. A window showing the epochs opens, with the marked epochs highlighted. Review them by eye: you can click an epoch to unmark or mark it.
+   - **If the command window prints `0/80 trials marked for rejection`**, there is nothing to reject, and the <UiLabel>REJECT</UiLabel> button will do nothing. Close the viewing window, open <MenuPath>Edit > Dataset info</MenuPath>, type `D1 epochs clean` in <UiLabel>Dataset name</UiLabel>, press <UiLabel>Ok</UiLabel>, and go to step 10.
+8. Press <UiLabel>REJECT</UiLabel>, then confirm with <UiLabel>YES</UiLabel>.
+9. In the new-dataset window, type `D1 epochs clean` in <UiLabel>Name it:</UiLabel>, then press <UiLabel>Ok</UiLabel>.
+10. Save it with <MenuPath>File > Save current dataset as</MenuPath>, as `D1_epochs_clean.set`. The lessons in stations 6 and 7 start from it.
+
+## Which amplitude threshold should I choose?
 
 | Setting | Value | Why |
 |---|---|---|
@@ -176,22 +170,22 @@ The last argument of `pop_eegthresh` is `0`, meaning "mark only, do not reject".
 
 **Rule:** the same threshold for every participant and every condition, decided before you see the results. Report the number of rejected epochs per condition in your paper.
 
-## Common mistakes
+## How do I check that the rejection worked?
+
+- The command window prints the number of marked epochs, such as `1/80 trials marked for rejection`. In D1 after ICA cleaning, expect a small number, about 0 to 3. It varies slightly from run to run because the ICA result varies.
+- <UiLabel>Epochs</UiLabel> in the main window equals 80 minus the number rejected.
+- `max(abs(EEG.data(:)))` is below 100.
+- The file `D1_epochs_clean.set` is in your working folder.
+
+## What are the common mistakes in rejecting epochs?
 
 - **A threshold that is too strict.** It throws away good data, so the average comes from few trials and is noisier. The best threshold is not the smallest possible number.
 - **Rejecting before baseline correction.** An epoch shifted away from zero as a whole may cross the limit with no artifact. Correct the baseline first, as in our path.
-- **Rejecting instead of using ICA.** If you reject every epoch with a blink without ICA, you may lose a large part of your data, as the interactive demo shows at ±50. ICA fixes blinks; rejection is for rare problems.
+- **Rejecting instead of using ICA.** If you reject every epoch with a blink without ICA, you may lose a large part of your data, as the exercise above shows at ±50. ICA fixes blinks; rejection is for rare problems.
 - **Very different counts between conditions.** If 40% of one condition and 5% of another are rejected, the comparison is not fair. Check the count for each condition.
 - **Forgetting to save after rejection.** In the GUI, rejection creates a new dataset in memory only. Save it before you close EEGLAB.
 
 {/* "From experience" box: waiting for the project owner's story. Do not write it before it arrives. */}
-
-## How to check it worked
-
-- The command window prints the number marked, such as `1/80 trials marked for rejection`. In D1 after ICA cleaning, expect a small number, about 0 to 3. It varies slightly from run to run because the ICA result varies.
-- <UiLabel>Epochs</UiLabel> in the main window equals 80 minus the number rejected.
-- `max(abs(EEG.data(:)))` is below 100.
-- The file `D1_epochs_clean.set` is in your working folder.
 
 <Methods>
 Epochs in which the voltage at any channel exceeded ±100 µV were rejected (pop_eegthresh, EEGLAB 2026.1), leaving [N] of 80 epochs.

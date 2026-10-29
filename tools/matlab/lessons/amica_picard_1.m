@@ -1,6 +1,8 @@
 % Copied from lessons/en/04-07-amica-picard.md. The lesson is the reference.
 % The same ICA copy, decomposed by runica and by Picard (Infomax mode)
 EEG_ica = pop_eegfiltnew(EEG, 'locutoff', 1);
+% badChans: channels you interpolated (set in the starting script; {} if none)
+if ~exist('badChans', 'var'), badChans = {}; end
 expectedRank = EEG_ica.nbchan - numel(badChans) - 1;
 
 tic;

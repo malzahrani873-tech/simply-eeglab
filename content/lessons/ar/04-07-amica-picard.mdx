@@ -1,7 +1,7 @@
 ---
 title: AMICA و Picard
 titleEn: AMICA & Picard
-description: كيف تقارن AMICA و Picard بـ runica في EEGLAB من حيث الوقت والنتيجة، وكيف تثبّت واحدة منهما كإضافة وتشغّلها بالرتبة الصحيحة.
+description: كيف تقارن AMICA و Picard بـ runica في EEGLAB من حيث الوقت والنتيجة، وكيف تثبّت إحداهما كإضافة وتشغّلها بالرتبة الصحيحة.
 station: 4
 order: 7
 level: optional
@@ -9,7 +9,7 @@ status: approved
 objectives:
   - يقارن بين runica و AMICA و Picard من حيث السرعة وما تعطيه كل واحدة.
   - يثبّت واحدة منها كإضافة في EEGLAB ويشغّلها على نسخة 1 هرتز بعدد المكوّنات الصحيح.
-  - يشرح لماذا تحتاج Picard و AMICA تحديد الرتبة يدوياً.
+  - يشرح لماذا تحتاج Picard و AMICA إلى تحديد الرتبة يدوياً.
 prerequisites: [run-ica]
 references:
   - title: EEGLAB plugin
@@ -54,26 +54,30 @@ eeglabVersion: "2026.1"
 updated: 2026-10-28
 ---
 
-## لماذا هذه الخطوة مهمة؟
+## الفكرة
 
-`runica`، أي Extended Infomax، هو ICA الافتراضي في EEGLAB، وهو الذي في مسارنا. لكنه ليس الخيار الوحيد. خوارزميتان أخريان تظهران كثيراً في أبحاث EEG:
+`runica`، أي Extended Infomax، هو ICA الافتراضي في EEGLAB، وهو المستخدم في مسارنا. لكنه ليس الخيار الوحيد: خوارزميتا AMICA و Picard تظهران كثيراً في أبحاث EEG.
+
+هذا الدرس اختياري، وكل دروس الخريطة الباقية تعمل بـ `runica`.
+
+فماذا تقدّم كل خوارزمية، ومتى تستحق أن تختارها بدل `runica`؟
+
+## بماذا تختلف AMICA و Picard عن runica؟
 
 - **AMICA:** يعرضها EEGLAB في نافذة ICA باسم <UiLabel>AMICA (slowest; best)</UiLabel>. تستطيع أن تتعلّم أكثر من نموذج ICA لنفس البيانات.
 - **Picard:** طريقة أسرع للوصول إلى حل Infomax أو FastICA. وضع Infomax فيه هو Infomax العادي، لا Extended Infomax الذي يستخدمه `runica` في مسارنا. يعرضها EEGLAB باسمين: <UiLabel>Infomax picard.m</UiLabel> و <UiLabel>FastICA picard.m (fastest)</UiLabel>.
 
-الاثنتان إضافات. نافذة ICA تعرض الخوارزمية فقط إذا كانت دالتها موجودة في جهازك، فلا تظهر AMICA و Picard في القائمة إلا بعد تثبيتهما.
+كلتاهما إضافة. لا تعرض نافذة ICA الخوارزمية إلا إذا كانت دالتها موجودة في جهازك، لذلك لا تظهر AMICA و Picard في القائمة إلا بعد تثبيتهما.
 
-هذا الدرس اختياري. كل باقي الخريطة يعمل بـ `runica`.
-
-## قبل وبعد
+## كيف تختلف خرائط runica عن خرائط Picard؟
 
 <ImageSpec>
 صفّان من خرائط الرأس من D1، لأول 10 مكوّنات ICA من نفس نسخة 1 هرتز: الصف الأعلى من runica، والصف الأسفل من Picard بوضع Infomax. مكوّن العين ظاهر في الصفين، وقد يكون في موضع مختلف أو بألوان مقلوبة. نفس خريطة الألوان ونفس المقياس في الصفين. المصدر: الأشكال التي يرسمها سكربت هذا الدرس.
 </ImageSpec>
 
-## الخطوات من الواجهة
+## كيف أثبّت Picard أو AMICA وأشغّلهما من القوائم؟
 
-ابدأ والنسخة الرئيسية `D1 main` مفتوحة كما في "نقطة البداية".
+ابدأ والنسخة الرئيسية `D1 main` مفتوحة. إن لم تكن عندك، فافتح «سكربت للوصول إلى هذه الحالة» تحت «تبدأ من» أعلى الدرس.
 
 **أولاً: ثبّت إضافة**
 
@@ -82,24 +86,26 @@ updated: 2026-10-28
 
 **ثانياً: Picard من نافذة ICA**
 
-1. اصنع نسخة ICA مفلترة عند 1 هرتز، كما في درس تشغيل ICA.
+1. اصنع نسخة ICA مفلترة عند 1 هرتز، كما في [درس تشغيل ICA](/lesson/run-ica/).
 2. افتح <MenuPath>Tools > Decompose data by ICA</MenuPath>. في <UiLabel>ICA algorithm to use (click to select)</UiLabel> اختر <UiLabel>Infomax picard.m</UiLabel>. خانة <UiLabel>Commandline options (See help messages)</UiLabel> تُظهر `'maxiter', 500, 'mode', 'standard'`.
-3. أضف الرتبة إلى الخيارات بنفسك: `'maxiter', 500, 'mode', 'standard', 'pca', 31` في D1. مع Picard لا يفحص `pop_runica` الرتبة عنك.
+3. أضف الرتبة إلى الخيارات بنفسك: `'maxiter', 500, 'mode', 'standard', 'pca', 31` في D1. مع Picard لا يفحص `pop_runica` الرتبة نيابة عنك.
 4. اضغط <UiLabel>OK</UiLabel>، ثم قارن الخرائط من <MenuPath>Plot > Component maps > In 2-D</MenuPath> بخرائط `runica`.
 
 **ثالثاً (اختياري): AMICA**
 
 1. بعد تثبيت AMICA، افتح <MenuPath>Tools > Run AMICA</MenuPath> على نسخة ICA.
-2. تأكد أن خانة <UiLabel>In File:</UiLabel> فارغة. إذا ظهر فيها `eeglab_data.fdt` فامسحها، وإلا قرأ AMICA البيانات الأصلية من القرص بدل نسخة ICA. واجعل <UiLabel># PCA Dims.:</UiLabel> مساوياً للرتبة المتوقّعة، 31 في D1، واختر مجلد مخرجات تعرف مكانه.
+2. تأكد من أن خانة <UiLabel>In File:</UiLabel> فارغة. إذا ظهر فيها `eeglab_data.fdt` فامسحها، وإلا قرأ AMICA البيانات الأصلية من القرص بدل نسخة ICA. واجعل <UiLabel># PCA Dims.:</UiLabel> مساوياً للرتبة المتوقّعة، 31 في D1، واختر مجلد مخرجات تعرف مكانه.
 3. AMICA يستغرق وقتاً أطول بكثير من `runica`. اتركه يعمل، وقارن الخرائط عندما ينتهي.
 
-أياً كانت الخوارزمية، انسخ الأوزان إلى النسخة الرئيسية بنفس طريقة درس فلتر 1 هرتز.
+أياً كانت الخوارزمية، انسخ الأوزان إلى النسخة الرئيسية بنفس طريقة [درس فلتر 1 هرتز ونسخ الأوزان](/lesson/ica-1hz-copy-weights/).
 
-## السكربت المقابل
+## كيف أقارن runica و Picard بسكربت؟
 
 ```matlab
 % The same ICA copy, decomposed by runica and by Picard (Infomax mode)
 EEG_ica = pop_eegfiltnew(EEG, 'locutoff', 1);
+% badChans: channels you interpolated (set in the starting script; {} if none)
+if ~exist('badChans', 'var'), badChans = {}; end
 expectedRank = EEG_ica.nbchan - numel(badChans) - 1;
 
 tic;
@@ -124,9 +130,9 @@ pop_topoplot(EEG_picard, 0, 1:10);
 % EEG_amica = pop_runamica(EEG_ica, 'pcakeep', expectedRank, 'outdir', fullfile(pwd, 'amicaout'));
 ```
 
-السكربت يقيس وقت `runica` و Picard على نفس النسخة، ويطبع عدد مكوّنات كل منهما: 31 في D1 للاثنين. سطر AMICA تعليق، لأنه لا يعمل إلا بعد تثبيت الإضافة.
+السكربت يقيس وقت `runica` و Picard على نفس النسخة، ويطبع عدد مكوّنات كل منهما: 31 في D1 للاثنين. أسطر AMICA معلّقة، لأنها لا تعمل إلا بعد تثبيت الإضافة.
 
-## أي قيمة أختار؟
+## أي خوارزمية أختار؟
 
 | | runica (Extended Infomax) | Picard | AMICA |
 |---|---|---|---|
@@ -140,17 +146,7 @@ pop_topoplot(EEG_picard, 0, 1:10);
 **تغيير الخوارزمية لا يغيّر باقي المسار.** ICLabel وحذف المكوّنات ونسخ الأوزان تعمل بنفس الطريقة مع أي من الثلاث.
 </Callout>
 
-## أخطاء شائعة
-
-- **البحث عن الخوارزمية قبل تثبيتها.** القائمة في <MenuPath>Tools > Decompose data by ICA</MenuPath> تخفي أي خوارزمية دالتها غير مثبّتة.
-- **نسيان الرتبة مع Picard أو AMICA.** فحص الرتبة التلقائي في `pop_runica` خاص بـ `runica`. مع الاثنتين الأخريين حدّد عدد المكوّنات بنفسك.
-- **انتظار مكوّنات متطابقة.** الخوارزميات المختلفة، بل حتى تشغيلان لـ `runica`، تعطي المكوّنات بترتيب وإشارة مختلفين. قارنها بالشكل.
-- **قراءة AMICA للملف على القرص.** إذا كانت الداتاست مرتبطة بملف `.fdt`، يقرأ AMICA ذلك الملف لا البيانات المفلترة في الذاكرة. امسح <UiLabel>In File:</UiLabel>، أو اكتب `EEG.datfile = ''` في السكربت.
-- **خلط الخوارزميات في دراسة واحدة.** استخدم نفس الخوارزمية والإعدادات لكل المشاركين، واكتبها في Methods.
-
-{/* صندوق "من التجربة": بانتظار قصة من صاحب المشروع. لا يُكتب قبل وصولها. */}
-
-## كيف تتأكد أن الخطوة نجحت؟
+## كيف أتأكد أن الخوارزمية البديلة عملت؟
 
 1. **تظهر الخوارزمية** في <UiLabel>ICA algorithm to use (click to select)</UiLabel> بعد تثبيتها.
 2. **عدد المكوّنات** يساوي الرتبة المتوقّعة: 31 في D1 لكل خوارزمية.
@@ -160,3 +156,13 @@ pop_topoplot(EEG_picard, 0, 1:10);
 <Methods>
 Independent component analysis was computed with Picard (Infomax mode, maximum 500 iterations; picard plugin [version], EEGLAB 2026.1; [31] components after PCA reduction to the data rank) on a copy of the data high-pass filtered at 1 Hz, and the resulting weights were applied to the 0.1 Hz high-pass filtered data.
 </Methods>
+
+## ما الأخطاء الشائعة مع AMICA و Picard؟
+
+- **البحث عن الخوارزمية قبل تثبيتها.** القائمة في <MenuPath>Tools > Decompose data by ICA</MenuPath> تخفي أي خوارزمية دالتها غير مثبّتة.
+- **نسيان الرتبة مع Picard أو AMICA.** فحص الرتبة التلقائي في `pop_runica` خاص بـ `runica`. مع الاثنتين الأخريين حدّد عدد المكوّنات بنفسك.
+- **انتظار مكوّنات متطابقة.** الخوارزميات المختلفة، بل حتى تشغيلان لـ `runica`، تعطي المكوّنات بترتيب وإشارة مختلفين. قارنها بالشكل.
+- **قراءة AMICA للملف على القرص.** إذا كانت الداتاست مرتبطة بملف `.fdt`، يقرأ AMICA ذلك الملف لا البيانات المفلترة في الذاكرة. امسح <UiLabel>In File:</UiLabel>، أو اكتب `EEG.datfile = ''` في السكربت.
+- **خلط الخوارزميات في دراسة واحدة.** استخدم نفس الخوارزمية والإعدادات لكل المشاركين، واكتبها في Methods.
+
+{/* صندوق "من التجربة": بانتظار قصة من صاحب المشروع. لا يُكتب قبل وصولها. */}

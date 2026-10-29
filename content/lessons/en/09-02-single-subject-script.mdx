@@ -36,19 +36,21 @@ eeglabVersion: "2026.1"
 updated: 2026-10-28
 ---
 
-## Why this step matters
+## The idea
 
-In stations 1 to 5 you built the pipeline step by step: loading, then filtering, then line noise, then bad channels, then the reference, then ICA, then ICLabel, then epoching, baseline and rejection. Each lesson had a script for its own step only.
+In stations 1 to 5 you built the pipeline step by step, with one script per step. Now you gather them into one file.
 
-Now you gather them into one file. This file is your real project: if all processed files are lost, it rebuilds them. If a reviewer asks "how did you clean the data?", the answer is this file. If you want to change one threshold, you change a number and rerun, instead of repeating twenty clicks.
+This file is your real project. It rebuilds lost processed files. It answers a reviewer who asks "how did you clean the data?". And changing a threshold takes one number, not twenty clicks.
 
-The key idea: every line in the script is the same line you learned in its lesson, unchanged. Nothing is new in the processing; what is new is the order and the organization.
+Every line is taken unchanged from its lesson. Only the order and organization are new. So how do you arrange them into one script that runs from start to end without a click?
 
-## Before and after
+## Which lesson does each section of the script come from?
 
 <Figure src="single-subject-script/script-sections-map.svg" alt="The sections of the single-subject script in the MATLAB editor, each starting with a %% line, with an arrow from each section to its lesson on the map: Load to .set and .fdt files in station 1, filtering, bad channels and reference to station 3 lessons, ICA and ICLabel to station 4, and epoching to station 5." source="original" />
 
-## Steps in the GUI
+Each section starts with a `%%` line, and its title names the station it comes from.
+
+## How do I build the file and run it from scratch?
 
 **First: open a new file with sections**
 
@@ -58,8 +60,8 @@ The key idea: every line in the script is the same line you learned in its lesso
 **Second: fill the sections from your lessons**
 
 3. The first section is for settings: the data folder, the output folder, and the line frequency. Everything that changes between projects goes here, not in the middle of the code.
-4. For each step, copy the line from the "The equivalent script" section of its lesson, or from `eegh` after running it in the GUI, as in the command history lesson. Do not copy plotting and exercise lines, only processing lines.
-5. Save only two versions: the clean continuous version and the clean epochs. As in the file organization lesson, the rest is recomputed.
+4. For each step, copy the line from the script section of its lesson, or from `eegh` after running it in the GUI, as in [the command history lesson](/en/lesson/eegh-history/). Do not copy plotting and exercise lines, only processing lines.
+5. Save only two versions: the clean continuous version and the clean epochs. The rest is recomputed; [the file organization lesson](/en/lesson/file-organization/), later in this station, explains why.
 6. At the end, add a section that prints a summary: how many bad channels, how many components were removed, and how many epochs remain.
 
 **Third: run it from scratch**
@@ -68,7 +70,7 @@ The key idea: every line in the script is the same line you learned in its lesso
 8. Do not click anything while it runs. If a window opens and waits for you, there is a line without enough arguments: fix it.
 9. Compare the output with what you made in the GUI in station 5: the same number of channels, and about the same number of epochs.
 
-## The equivalent script
+## What does the full script look like, from raw data to clean epochs?
 
 ```matlab
 %% D1 single-subject pipeline: raw data to clean epochs
@@ -79,7 +81,7 @@ eeglab nogui
 eeglabRoot = fileparts(which('eeglab'));
 dataDir    = fullfile(eeglabRoot, 'sample_data');
 outDir     = pwd;
-lineFreq   = 60;   % 60 Hz in Saudi Arabia and the Americas, 50 Hz in Europe
+lineFreq   = 60;   % 60 Hz in Saudi Arabia and the US, 50 Hz in Europe
 
 %% Load (station 1)
 EEG = pop_loadset('filename', 'eeglab_data.set', 'filepath', dataDir);
@@ -196,33 +198,33 @@ fprintf('Epochs kept:               %d of %d\n', EEG.trials, nEpochsAll);
 fprintf('Saved: D1_main_clean_lp30.set and D1_epochs_clean.set in %s\n', outDir);
 ```
 
-## Which value should I choose?
+## Why is the script organized this way?
 
 | Decision | Choice in this lesson | Why |
 |---|---|---|
 | Settings | In the `Settings` section at the top of the file | What changes between projects (folders, line frequency) is in one place. No number hidden in the middle of the code. |
 | Splitting the file | One `%%` section per station | You run one section alone when testing, and the title tells you which lesson to review if an error appears. |
-| What is saved | Two versions: clean continuous and clean epochs | The first is enough for any new epoching, and the second goes into averaging and statistics (file organization lesson). |
-| Bad channels | Automatic detection, with a line to add what you found by eye | The script does not see what you see. Review the data once in the GUI and write what you found in `badChans` (bad channels lesson). |
-| Repeating ICA | Differs slightly on every run | `runica` starts from a random state taken from the clock (`runica.m`). For an identical rerun, add `'reset_randomseed', 'no'` to `pop_runica`. |
+| What is saved | Two versions: clean continuous and clean epochs | The first is enough for any new epoching, and the second goes into averaging and statistics ([the file organization lesson](/en/lesson/file-organization/)). |
+| Bad channels | Automatic detection, with a line to add what you found by eye | The script does not see what you see. Review the data once in the GUI and write what you found in `badChans` ([the bad channels lesson](/en/lesson/bad-channels/)). |
+| Repeating ICA | Differs slightly on every run | `runica` starts from a random state taken from the clock (`runica.m`). For an identical rerun, add `'rndreset', 'no'` to `pop_runica`. |
 
-## Common mistakes
-
-- **Changing lines while copying.** Every line here is taken as it is from its lesson. If you "improve" a value while copying, the result will not match what the lesson explained.
-- **Relying on variables from an earlier session.** A script that works only because `EEG` or `badChans` already exists will fail tomorrow. Always run it after `clear`.
-- **Keeping plotting lines.** `pop_viewprops`, `figure` and the like open windows, slow the run, and stop the script on a computing cluster. The script is for processing; plotting goes in a separate script.
-- **Wrong order.** The low-pass comes after ICA, epoching after ICA, and the reference after interpolation. This order is explained in its lessons; do not move a step without a reason.
-- **Fixed paths from your computer.** `fullfile(eeglabRoot, 'sample_data')` works on any computer. `C:\Users\...` works on yours only.
-
-{/* "From experience" box: waiting for the project owner's story. Do not write it before it arrives. */}
-
-## How to check it worked
+## How do I verify that the script runs on its own?
 
 - After `clear`, the script runs from start to end with no window waiting for you.
 - The summary prints the number of bad channels, removed components, and epochs remaining out of 80.
 - The working folder holds two files: `D1_main_clean_lp30.set` and `D1_epochs_clean.set`.
-- `size(EEG.data)` at the end is 32 × 384 × the number of remaining epochs, as in the epoch rejection lesson.
+- `size(EEG.data)` at the end is 32 × 384 × the number of remaining epochs, as in [the epoch rejection lesson](/en/lesson/epoch-rejection/).
+
+## Common mistakes when assembling the script
+
+- **Changing lines while copying.** Every line here is taken as it is from its lesson. If you "improve" a value while copying, the result will not match what the lesson explained.
+- **Relying on variables from an earlier session.** A script that works only because `EEG` or `badChans` already exists will fail tomorrow. Always run it after `clear`.
+- **Keeping plotting lines.** `pop_viewprops`, `figure` and the like open windows, slow the run, and stop the script on a computer without a display, such as the cluster in [the HPC lesson](/en/lesson/hpc/). The script is for processing; plotting goes in a separate script.
+- **Wrong order.** The low-pass comes after ICA, epoching after ICA, and the reference after interpolation. Each of these is explained in its lesson, so do not move a step without a reason.
+- **Fixed paths from your computer.** `fullfile(eeglabRoot, 'sample_data')` works on any computer. `C:\Users\...` works on yours only.
+
+{/* "From experience" box: waiting for the project owner's story. Do not write it before it arrives. */}
 
 <Methods>
-Data were high-pass filtered (passband edge 0.1 Hz; firfilt plugin 2.8, EEGLAB 2026.1), and line noise was attenuated with a band-stop filter (passband edges 58 and 62 Hz). Bad channels were identified with clean_rawdata (clean_rawdata plugin 2.11; flatline 5 s, channel correlation 0.8) and interpolated ([n] channels), then data were average-referenced, EOG excluded. Independent component analysis (extended Infomax; Lee et al., 1999) was computed on a 1 Hz high-passed copy, and components labelled Eye or Muscle with probability ≥ 0.9 (ICLabel 1.7; Pion-Tonachini et al., 2019) were removed ([n] components). After low-pass filtering (passband edge 30 Hz), epochs from −1 to 2 s were baseline-corrected (−200 to 0 ms), and epochs beyond ±100 µV were rejected ([n] of 80).
+Data were high-pass filtered (passband edge 0.1 Hz; firfilt plugin 2.8, EEGLAB 2026.1), and line noise was attenuated with a band-stop filter (passband edges 58 and 62 Hz). Bad channels were identified with clean_rawdata (clean_rawdata plugin 2.11; flatline 5 s, channel correlation 0.8) and interpolated ([n] channels), then data were average-referenced, EOG excluded. Independent component analysis (extended Infomax; Lee et al., 1999) was computed on a 1 Hz high-passed copy, and components labeled Eye or Muscle with probability ≥ 0.9 (ICLabel 1.7; Pion-Tonachini et al., 2019) were removed ([n] components). After low-pass filtering (passband edge 30 Hz), epochs from −1 to 2 s were baseline-corrected (−200 to 0 ms), and epochs beyond ±100 µV were rejected ([n] of 80).
 </Methods>

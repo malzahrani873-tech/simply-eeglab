@@ -136,38 +136,46 @@ eeglabVersion: "2026.1"
 updated: 2026-10-29
 ---
 
-## Why this step matters
+## The idea
 
-In the statistics lesson, EEGLAB first averaged the trials of each participant, then compared the averages. LIMO works in **two levels**:
+In the statistics and multiple comparisons lesson, EEGLAB first averaged the trials of each participant, then compared the averages. LIMO works in **two levels**: a linear model on the single trials within each participant, then a robust test across participants, with a correction over all channels and time points together.
+
+So how do you build the simple LIMO model for the two D6 picture types, and read its result?
+
+## How does LIMO work in two levels?
+
+<Figure src="limo/limo-two-levels.svg" alt="Two levels in LIMO. At the top, 14 small boxes, one per participant from cba to wpa, each labeled 1st level, with many thin trial curves turning into two short bars, beta animal and beta distractor. Arrows lead down to one wide box, 2nd level: paired test across participants, which ends in a small channels by time image with a few colored patches marked significant clusters. Illustrative, no data." caption="Illustration, no data" source="original" />
 
 1. **First level, within each participant:** a linear model is fitted to every single trial, at every channel and time point. Its results are "betas": one estimated ERP per condition for this person.
 2. **Second level, across participants:** the betas of all participants are tested, with robust methods (trimmed means and bootstrap) and a correction over all channels and time points together.
 
-With one categorical variable and the simplest estimation method, the first level alone adds little here: for each participant, the difference between the two betas equals the difference between the two averages. The gain comes from what LIMO allows next: weighting noisy trials, adding a continuous variable per trial (for example reaction time), and a group test that does not depend on the data being normal. This lesson builds the simple model, so that you know the path before you add to it.
+## What does LIMO add to the EEGLAB test?
 
-## Before and after
+With one categorical variable and the simplest estimation method, the first level alone adds little here: for each participant, the difference between the two betas equals the difference between the two averages.
 
-<Figure src="limo/limo-two-levels.svg" alt="Two levels in LIMO. At the top, 14 small boxes, one per participant from cba to wpa, each labelled 1st level, with many thin trial curves turning into two short bars, beta animal and beta distractor. Arrows lead down to one wide box, 2nd level: paired test across participants, which ends in a small channels by time image with a few coloured patches marked significant clusters. Illustrative, no data." caption="Illustration, no data" source="original" />
+The gain comes from what LIMO allows next: weighting noisy trials, adding a continuous variable per trial (for example reaction time), and a group test that does not depend on the data being normal. In this lesson you build the simple model, so that you know the path before you add to it.
 
-## Steps in the GUI
+## Why do I need a new STUDY for LIMO?
 
-**About the data (D6):** LIMO needs **one dataset per participant**. In `animal_mine.study` each participant has two files, one per picture type, and LIMO stops with `Cannot estimate the model because there is more than 1 dataset per session per subject. Merge datasets for each subject and try again.` So the "Starting point" script builds a second STUDY, `animal_limo.study`, in its own folder `limo` next to `animal_mine.study`:
+**About the data (D6):** LIMO needs **one dataset per participant**. In `animal_mine.study` each participant has two files, one per picture type, and LIMO stops with `Cannot estimate the model because there is more than 1 dataset per session per subject. Merge datasets for each subject and try again.` So "Script to reach this state" under "Starts from" at the top of the lesson builds a second STUDY, `animal_limo.study`, in its own folder `limo` next to `animal_mine.study`:
 
 - For each participant it marks every trial with its picture type (a new event field `image`), then merges the two files into one (for example `cba_merged.set`). The merge drops the ICA, which LIMO does not need for ERPs.
 - Gender stays in `group`. The single design, `image`, has one categorical variable at the level of the trial, with the values `animal` and `distractor`.
-- It computes the single-trial ERPs at every channel (`savetrials` on), as in the precompute lesson. LIMO cannot work without them.
+- It computes the single-trial ERPs at every channel (`savetrials` on), as in [the precompute lesson](/en/lesson/study-precompute/). LIMO cannot work without them.
 
-The first run takes some minutes and adds about 1 GB to the course folder (estimate). `animal_limo.study` is a copy for this lesson only: it does not touch the downloaded `animal.study` or your `animal_mine.study`, and the other lessons keep using `animal_mine.study`.
+The first run takes several minutes and adds about 1 GB to the course folder (estimate). `animal_limo.study` is a copy for this lesson only: it does not touch the downloaded `animal.study` or your `animal_mine.study`, and the other lessons keep using `animal_mine.study`.
+
+## How do I run LIMO from the menus?
 
 **1. Install LIMO**
 
 1. LIMO is not part of the base EEGLAB install. Open <MenuPath>File > Manage EEGLAB extensions</MenuPath>, click `LIMO` in <UiLabel>List of plugins (bolded means installed)</UiLabel>, then press <UiLabel>Install/Update</UiLabel>.
-2. LIMO also needs Fieldtrip-lite to build the channel neighbours used by the cluster correction. Install it the same way if the statistics lesson did not.
+2. LIMO also needs Fieldtrip-lite to build the channel neighbors used by the cluster correction. Install it the same way if you did not install it in the statistics lesson.
 3. After installing, the <MenuPath>Study</MenuPath> menu has a new item <UiLabel>LInear MOdeling of EEG Data</UiLabel>, and the <MenuPath>Tools</MenuPath> menu has a LIMO item named after its version.
 
 **2. First level: one model per participant**
 
-1. Run the "Starting point" script.
+1. Start with `animal_limo.study` open. If you don't have it, open "Script to reach this state" under "Starts from" at the top of the lesson.
 2. Check that the STUDY shown in the EEGLAB window is `Go-nogo animal (LIMO)`, with 14 datasets. Its only design, `image`, is the current one.
 3. Open <MenuPath>Study > LInear MOdeling of EEG Data > Estimate Model Parameters (channel)</MenuPath>.
 4. A warning says that your STUDY has groups of subjects, and that groups are ignored at the first level. This is expected: gender is between participants, so it belongs to the second level. Press <UiLabel>OK</UiLabel>.
@@ -180,7 +188,7 @@ The first run takes some minutes and adds about 1 GB to the course folder (estim
 2. Press <UiLabel>Working Directory</UiLabel> and create or choose an empty folder for this test, for example `paired_animal_distractor` inside `LIMO_animal_limo`. LIMO writes its results in this folder.
 3. Press <UiLabel>Load expected chan / neighbours</UiLabel> and choose `limo_gp_level_chanlocs.mat` in the `derivatives` folder.
 4. Keep the bootstrap on with `1000` (part <UiLabel>Precompute bootstrap (FWE correction)</UiLabel>). The bootstrap is what makes the cluster correction possible.
-5. Press <UiLabel>Paired t-test</UiLabel>. When LIMO asks for files, choose the `Beta_files_` file. When it asks for parameters, enter `1 2`: beta 1 is `animal` and beta 2 is `distractor`. LIMO runs a Yuen t-test on 20% trimmed means at every channel and time point, then the bootstrap. This takes some minutes.
+5. Press <UiLabel>Paired t-test</UiLabel>. When LIMO asks for files, choose the `Beta_files_` file. When it asks for parameters, enter `1 2`: beta 1 is `animal` and beta 2 is `distractor`. LIMO runs a Yuen t-test on 20% trimmed means at every channel and time point, then the bootstrap. This takes several minutes.
 
 **4. Read the result**
 
@@ -189,11 +197,7 @@ The first run takes some minutes and adds about 1 GB to the course folder (estim
 3. Press <UiLabel>Image all</UiLabel> and choose `Paired_Samples_Ttest_parameter_1_2.mat` in your result folder. An image appears: channels on one axis, time on the other, and color only where a cluster survives the correction.
 4. Click a point of interest, or press <UiLabel>Course plot</UiLabel>, to see the two conditions at one channel over time.
 
-<Callout type="note">
-**Why OLS here?** The LIMO window offers `WLS` first, which gives less weight to unusual trials and is usually the better choice. But the LIMO documentation notes that WLS needs more trials than time points in each participant. Our epochs have 750 time points (3 s at 250 Hz). Each original file has 87 to 192 trials, so even after merging a participant has at most 384 trials, fewer than the time points. So we use `OLS`, which has no such limit. In your own data, try `WLS` with a shorter window (the <UiLabel>Options</UiLabel> box accepts for example `'timelim', [-100 600]`).
-</Callout>
-
-## The matching script
+## How do I run both levels with a script?
 
 ```matlab
 % STUDY and ALLEEG come from the starting point script
@@ -238,7 +242,15 @@ fprintf('Significant channel x time points after cluster correction: %d\n', nnz(
 fprintf('Channels inside a significant cluster: %s\n', strjoin(chanNames(any(mask, 2)), ' '));
 ```
 
-## Which value should I choose?
+## Why use OLS rather than WLS?
+
+The LIMO window offers `WLS` first, which gives less weight to unusual trials and is usually the better choice. But the LIMO documentation notes that WLS needs more trials than time points in each participant.
+
+Our epochs have 750 time points (3 s at 250 Hz). Each original file has 87 to 192 trials, so even after merging, a participant has at most 384 trials, fewer than the time points. So we use `OLS`, which has no such limit.
+
+In your own data, try `WLS` with a shorter window (the <UiLabel>Options</UiLabel> box accepts for example `'timelim', [-100 600]`).
+
+## Which values should I choose in LIMO?
 
 | Option | In this lesson | When to change it |
 |---|---|---|
@@ -249,23 +261,23 @@ fprintf('Channels inside a significant cluster: %s\n', strjoin(chanNames(any(mas
 | Bootstrap | 1000 | Keep 1000 or more for cluster correction. Fewer makes the corrected p-values unstable. |
 | <UiLabel>MC Correction</UiLabel> | `Clustering` | `TFCE` is also available in LIMO (it needs <UiLabel>Apply TFCE</UiLabel> before the test). `Max` is stricter. `None` only for exploring. |
 
-## Common mistakes
-
-- **Two datasets per participant.** LIMO stops with `Merge datasets for each subject and try again.` Merge the files of each participant first, after marking each trial with its condition in an event field, as the "Starting point" script does.
-- **No single trials.** LIMO reads the trials saved by `savetrials` in the precompute lesson. Without them it stops with `Measures must be computed first`.
-- **Working directory not set.** LIMO writes second-level files in the current folder. Choose an empty folder for each test, or results from different tests get mixed.
-- **Wrong parameter numbers.** The order of the betas follows the values of the design variable. Check it with <UiLabel>See GLM variables</UiLabel> in the first-level window before you enter `1 2`.
-- **Expecting a different effect from the averages with OLS and one variable.** In this simple case the difference between the betas is the difference between the averages. What changes is the robust second level, and later the richer first-level models.
-- **Leaving out the neighbour file.** Without `limo_gp_level_chanlocs.mat`, LIMO cannot form clusters across channels.
-
-{/* "From experience" box: waiting for a story from the project owner. Not written before it arrives. */}
-
-## How do you know it worked?
+## How do I check that LIMO worked?
 
 - **The command window** prints `1st level done: 14 participants listed in` followed by the path of the `Beta_files_` file.
 - **The result folder** contains `LIMO.mat`, `Paired_Samples_Ttest_parameter_1_2.mat` and an `H0` folder with the bootstrap.
 - **The script prints** the number of significant channel × time points after cluster correction, and the channels inside a cluster (the list can be empty).
 - **The result image** opened with <UiLabel>Image all</UiLabel> shows channels against time, with color only inside the corrected clusters.
+
+## Common mistakes with LIMO
+
+- **Two datasets per participant.** LIMO stops with `Merge datasets for each subject and try again.` Merge the files of each participant first, after marking each trial with its condition in an event field, as in "Starts from" at the top of the lesson.
+- **No single trials.** LIMO reads the trials saved by `savetrials` in the precompute lesson. Without them it stops with `Measures must be computed first`.
+- **Working directory not set.** LIMO writes second-level files in the current folder. Choose an empty folder for each test, or results from different tests get mixed.
+- **Wrong parameter numbers.** The order of the betas follows the values of the design variable. Check it with <UiLabel>See GLM variables</UiLabel> in the first-level window before you enter `1 2`.
+- **Expecting a different effect from the averages with OLS and one variable.** In this simple case the difference between the betas is the difference between the averages. What changes is the robust second level, and later the richer first-level models.
+- **Leaving out the neighbor file.** Without `limo_gp_level_chanlocs.mat`, LIMO cannot form clusters across channels.
+
+{/* "From experience" box: waiting for a story from the project owner. Not written before it arrives. */}
 
 <Methods>
 A two-level hierarchical linear model was estimated with LIMO EEG [version] (Pernet et al., 2011) in EEGLAB 2026.1. At the first level, the animal and distractor epochs of each participant were merged into one dataset, and the single-trial ERPs were modeled at every channel and time point with image category as a categorical regressor (ordinary least squares). At the second level, the animal and distractor parameter estimates were compared across [14] participants with a paired Yuen t-test on 20% trimmed means, with spatio-temporal cluster correction based on [1000] bootstrap samples at a threshold of 0.05.

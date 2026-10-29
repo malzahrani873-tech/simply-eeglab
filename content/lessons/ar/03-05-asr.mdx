@@ -1,15 +1,15 @@
 ---
 title: clean_rawdata و ASR
 titleEn: clean_rawdata & ASR
-description: كيف تجد دفعات الآرتفاكت القصيرة الكبيرة وتحذفها في EEGLAB بـ ASR من إضافة clean_rawdata، وماذا تفعل أحداث boundary التي يتركها بالـ epochs.
+description: كيف تجد دفعات الآرتفاكت القصيرة الكبيرة وتحذفها في EEGLAB بـ ASR من إضافة clean_rawdata، وكيف تؤثّر أحداث boundary التي يتركها في الـ epochs.
 station: 3
 order: 5
 level: recommended
 status: approved
 objectives:
-  - يشغّل ASR من clean_rawdata بإعدادات محافظة على نسخة من البيانات، من الواجهة ومن السكربت.
-  - يقارن البيانات قبل ASR وبعده، ويعدّ أحداث boundary والـ epochs المفقودة.
-  - يقرّر متى يستخدم ASR ومتى يتجنّبه.
+  - تشغّل ASR من clean_rawdata بإعدادات محافظة على نسخة من البيانات، من الواجهة ومن السكربت.
+  - تقارن البيانات قبل ASR وبعده، وتعدّ أحداث boundary والـ epochs المفقودة.
+  - تقرّر متى تستخدم ASR ومتى تتجنّبه.
 prerequisites: [bad-channels]
 references:
   - title: EEGLAB Tutorial
@@ -46,48 +46,56 @@ eeglabVersion: "2026.1"
 updated: 2026-10-29
 ---
 
-## لماذا هذه الخطوة مهمة؟
+## الفكرة
 
-بعض الآرتفاكتس قصيرة وضخمة: سلك انسحب، أو المشارك تحرّك، أو قفزة مفاجئة في كل القنوات. هذه لا تشبه الرمش الذي يتكرّر بنفس الشكل ويعزله ICA جيداً. الدفعة التي لا تتكرّر تربك ICA بدل ذلك. في مسارنا تجرّب ASR على D1 للمقارنة فقط، ولا تحفظ النتيجة.
+بعض الآرتفاكتس قصيرة وضخمة: سلك انسحب، أو المشارك تحرّك، أو قفزة مفاجئة في كل القنوات. هذه لا تشبه الرمش الذي يتكرّر بنفس الشكل ويعزله ICA جيداً. أما الدفعة التي لا تتكرّر فتربك ICA.
 
-طريقة ASR (<En>Artifact Subspace Reconstruction</En>) تجد هذه الدفعات تلقائياً. هي جزء من إضافة clean_rawdata التي تأتي مع EEGLAB. وكما يشرح التوتوريال الرسمي، تعمل على مرحلتين:
+طريقة ASR (<En>Artifact Subspace Reconstruction</En>) تجد هذه الدفعات تلقائياً، وهي جزء من إضافة clean_rawdata التي تأتي مع EEGLAB. و D1 نظيفة، فتجرّبه هنا على نسخة لا تدخل المسار.
 
-1. تجد أجزاء نظيفة من التسجيل، اسمها بيانات المعايرة، وتتعلّم منها حجم النشاط الطبيعي.
-2. تعلّم كل نافذة قصيرة نشاطها أكبر بأضعاف كثيرة من بيانات المعايرة. القيمة الافتراضية 20 انحرافاً معيارياً.
+فكيف يجد ASR هذه الدفعات، وكم تكلّفك إزالتها من بياناتك؟
 
-في البيانات المسجّلة ينصح التوتوريال الرسمي بحذف الأجزاء المعلَّمة بدل تصحيحها. التصحيح صُمّم للاستخدام اللحظي، وأثره على التحليل بعد التسجيل غير مفهوم بوضوح.
+## كيف يبدو ما يحذفه ASR؟
 
-<Callout type="warning">
-**للحذف ثمن: أحداث boundary.** كل جزء يُحذف يترك حدث boundary مكان القطع. ولاحقاً عند تقطيع الـ epochs، يحذف EEGLAB كل epoch فيه حدث boundary. لذلك قد يكلّفك ASR بعض الـ epochs، ويجب أن تعدّها.
-</Callout>
-
-<Callout type="warning">
-**هذا الدرس خارج المسار الأساسي.** تجرّب ASR على نسخة من D1 وتقيس ما يحذفه، دون أن تحفظ النتيجة. المسار يكمل من `D1 hp0.1 notch60`.
-</Callout>
-
-## قبل وبعد
+تظهر البيانات الأصلية والمنظّفة فوق بعضهما بلونين مختلفين. الأجزاء المعلَّمة هي ما حذفه ASR.
 
 <ImageSpec>
 النافذة التي تظهر بعد clean_rawdata، من vis_artifacts، على D1: البيانات الأصلية والمنظّفة فوق بعضهما بلونين، والأجزاء المحذوفة معلَّمة. اختر مقطعاً فيه جزء محذوف. إذا لم يكن في D1 جزء محذوف واضح بهذه الإعدادات، فاستخدم مشاركاً واحداً من D3 بعد high-pass عند 0.1 هرتز، بنفس الإعدادات ما عدا القنوات المستبعدة: اكتب أسماء قنوات العين من قائمة قنوات ذلك الملف بدل `EOG1 EOG2`. واذكر ذلك تحت الصورة. المصدر: لقطة من EEGLAB.
 </ImageSpec>
 
-## الخطوات من الواجهة
+## كيف يعمل ASR، ولماذا نحذف بدل أن نصحّح؟
 
-ابدأ و `D1 hp0.1 notch60` مفتوحة كما في "نقطة البداية". هي مفلترة بـ <En>high-pass</En> من قبل.
+كما يشرح التوتوريال الرسمي، يعمل ASR على مرحلتين:
+
+1. يجد أجزاء نظيفة من التسجيل، اسمها بيانات المعايرة، ويتعلّم منها حجم النشاط الطبيعي.
+2. يعلّم كل نافذة قصيرة نشاطها أكبر بأضعاف كثيرة من نشاط بيانات المعايرة. القيمة الافتراضية 20 انحرافاً معيارياً.
+
+في البيانات المسجّلة ينصح التوتوريال الرسمي بحذف الأجزاء المعلَّمة بدل تصحيحها. التصحيح صُمّم للاستخدام اللحظي، وأثره في التحليل بعد التسجيل غير مفهوم بوضوح.
+
+<Callout type="warning">
+**للحذف ثمن: أحداث boundary.** كل جزء يُحذف يترك حدث boundary مكان القطع. ولاحقاً عند تقطيع الـ epochs، يحذف EEGLAB كل epoch فيه حدث boundary. لذلك قد يكلّفك ASR بعض الـ epochs، ويجب أن تعدّها.
+</Callout>
+
+## كيف أجرّب ASR من القوائم؟
+
+<Callout type="warning">
+**هذا الدرس خارج المسار الأساسي.** تجرّب ASR على نسخة من D1 وتقيس ما يحذفه، دون أن تحفظ النتيجة. المسار يكمل من `D1 hp0.1 notch60`.
+</Callout>
+
+ابدأ و `D1 hp0.1 notch60` مفتوحة. إن لم تكن عندك، فافتح «سكربت للوصول إلى هذه الحالة» تحت «تبدأ من» أعلى الدرس. وهي مفلترة مسبقاً بـ <En>high-pass</En>.
 
 1. افتح <MenuPath>Tools > Reject data using Clean Rawdata and ASR</MenuPath>.
 2. اترك <UiLabel>Remove channel drift (data not already high-pass filtered)</UiLabel> بدون تفعيل، لأن البيانات مفلترة عند 0.1 هرتز.
 3. أبقِ <UiLabel>Process/remove channels</UiLabel> مفعّلاً، وفعّل <UiLabel>Ignore these channels (ECG, EMG, ...)</UiLabel>، واكتب بجانبه `EOG1 EOG2`.
-4. ألغِ معايير القنوات الثلاثة: <UiLabel>Remove channel if it is flat for more than (seconds)</UiLabel> و <UiLabel>Max acceptable high-frequency noise std dev</UiLabel> و <UiLabel>Min acceptable correlation with nearby chans [0-1]</UiLabel>. القنوات السيئة لها درسها.
+4. ألغِ معايير القنوات الثلاثة: <UiLabel>Remove channel if it is flat for more than (seconds)</UiLabel> و <UiLabel>Max acceptable high-frequency noise std dev</UiLabel> و <UiLabel>Min acceptable correlation with nearby chans [0-1]</UiLabel>. فالقنوات السيئة لها درس خاص.
 5. أبقِ <UiLabel>Perform Artifact Subspace Reconstruction bad burst correction/rejection</UiLabel> مفعّلاً، و `20` في <UiLabel>Max acceptable 0.5 second window std dev</UiLabel>.
 6. أبقِ <UiLabel>Remove bad data periods (when uncheck, correct using ASR)</UiLabel> مفعّلاً، واترك <UiLabel>Use Riemanian distance metric (not Euclidean) - beta</UiLabel> بدون تفعيل.
 7. أبقِ <UiLabel>Additional removal of bad data periods</UiLabel> مفعّلاً، و `-Inf 7` في <UiLabel>Acceptable [min max] channel RMS range (+/- std dev)</UiLabel>، و `25` في <UiLabel>Maximum out-of-bound channels (%)</UiLabel>.
 8. أبقِ <UiLabel>Pop up scrolling data window with rejected data highlighted</UiLabel> مفعّلاً، واضغط <UiLabel>OK</UiLabel>.
-9. تظهر نافذة عرض متتابع فيها البيانات الأصلية والمنظّفة معاً. مرّر فيها وانظر ما حُذف.
+9. تظهر نافذة عرض متتابع فيها البيانات الأصلية والمنظّفة معاً. مرّر فيها وانظر إلى ما حُذف.
 10. سمِّ الداتاست الجديدة `D1 asr`. في النافذة الرئيسية قارن <UiLabel>Frames per epoch</UiLabel> و <UiLabel>Events</UiLabel> مع `D1 hp0.1 notch60`. الأحداث الزائدة هي أحداث boundary.
 11. لا تحفظ `D1 asr`. المسار الأساسي يكمل من `D1 hp0.1 notch60`.
 
-## السكربت المقابل
+## كيف أجرّبه بسكربت وأعدّ ما حُذف؟
 
 ```matlab
 % ASR on a copy: no channel criteria (bad channels lesson), EOG channels ignored
@@ -111,20 +119,20 @@ fprintf('Epochs around square: %d before ASR, %d after\n', epBefore.trials, epAf
 vis_artifacts(EEG_asr, EEG);
 ```
 
-السكربت يطبع عدد الثواني الباقية، وعدد أحداث boundary المضافة، وعدد الـ epochs حول `square` التي بقيت. `pop_epoch` من المحطة 5، وهنا تعدّ الـ epochs المفقودة فقط.
+السكربت يطبع عدد الثواني الباقية، وعدد أحداث boundary المضافة، وعدد الـ epochs حول `square` التي بقيت. ستتعلّم `pop_epoch` في المحطة 5، وهنا تستخدمه فقط لتعدّ الـ epochs المفقودة.
 
-## أي قيمة أختار؟
+## أي عتبة أختار؟
 
 | الإعداد | القيمة | لماذا |
 |---|---|---|
 | عتبة ASR (<UiLabel>Max acceptable 0.5 second window std dev</UiLabel>) | 20 | الافتراضية، ومحافظة جداً حسب صفحة الإضافة. |
-| عتبة أشد | 5 | الإضافة تسمّي 5 محافظة بشكل معقول، لكنها تنبّه أن بعض دفعات EEG الشديدة، مثل مغازل النوم، قد تتجاوز حتى 5. |
-| أشد قيمة | 3 | الإضافة تقول إنها أشد قيمة يمكن استخدامها دون خسارة كثير من EEG. |
+| عتبة أشد | 5 | الإضافة تسمّي 5 محافظة إلى حد معقول، لكنها تنبّه إلى أن بعض دفعات EEG الشديدة، مثل مغازل النوم، قد تتجاوز حتى 5. |
+| أشد قيمة | 3 | الإضافة تقول إنها أشد قيمة يمكن استخدامها دون أن تخسر كثيراً من إشارة EEG. |
 | حذف أو تصحيح | حذف | التوتوريال الرسمي: التصحيح صُمّم للاستخدام اللحظي. |
-| <UiLabel>Remove channel drift (data not already high-pass filtered)</UiLabel> | بدون تفعيل إذا فلترت من قبل | وإلا تُفلتر البيانات مرتين. |
-| القنوات غير الدماغية (EOG و ECG) | مستبعدة | إشارتها الكبيرة ليست خللاً، ودرس القنوات السيئة يستبعدها لنفس السبب. |
+| <UiLabel>Remove channel drift (data not already high-pass filtered)</UiLabel> | بدون تفعيل إذا كنت قد فلترت البيانات من قبل | وإلا فُلترت البيانات مرتين. |
+| القنوات غير الدماغية (EOG و ECG) | مستبعدة | إشارتها الكبيرة ليست خللاً، و[درس القنوات السيئة](/lesson/bad-channels/) يستبعدها لنفس السبب. |
 
-**متى تستخدم ASR ومتى تتجنّبه؟**
+## متى أستخدم ASR ومتى أتجنّبه؟
 
 | استخدمه | تجنّبه |
 |---|---|
@@ -133,26 +141,26 @@ vis_artifacts(EEG_asr, EEG);
 | بعتبة محافظة مثل 20 | بعتبة منخفضة تحذف الرمش الذي يستطيع ICA تصحيحه |
 
 <Callout type="expert">
-**طريقة النسختين:** التوتوريال الرسمي ينبّه أن التنظيف القوي قبل ICA قد يحذف بيانات كان ICA سيصحّحها، مثل الرمش. أحد الحلول، كما في درس فلتر 1 هرتز، أن تشغّل ASR على نسخة ICA فقط، وتحسب ICA، ثم تنسخ الأوزان إلى النسخة الرئيسية التي تحتفظ بكل بياناتها.
+**طريقة النسختين:** التوتوريال الرسمي ينبّه إلى أن التنظيف القوي قبل ICA قد يحذف بيانات كان ICA سيصحّحها، مثل الرمش. أحد الحلول، كما في [درس فلتر 1 هرتز](/lesson/ica-1hz-copy-weights/)، أن تشغّل ASR على نسخة ICA فقط، وتحسب ICA، ثم تنسخ الأوزان إلى النسخة الرئيسية التي تحتفظ بكل بياناتها.
 </Callout>
 
-## أخطاء شائعة
-
-- **استخدام التصحيح بدل الحذف في البيانات المسجّلة.** أبقِ <UiLabel>Remove bad data periods (when uncheck, correct using ASR)</UiLabel> مفعّلاً.
-- **عتبة منخفضة جداً.** عند 3 أو 5 قد يحذف ASR الرمش ونشاطاً دماغياً كبيراً لكنه طبيعي. ابدأ بـ 20، وانظر ما حُذف، ثم قرّر.
-- **نسيان أحداث boundary.** كل جزء محذوف يصير حدث boundary، وكل epoch فيه حدث منها يُحذف. عدّ الـ epochs قبل وبعد.
-- **تشغيل ASR على بيانات فيها انجراف بطيء.** ASR يحتاج بيانات مفلترة بـ <En>high-pass</En>، كما تقول صفحة الإضافة. فلتر أولاً، أو فعّل <UiLabel>Remove channel drift (data not already high-pass filtered)</UiLabel>.
-- **عدم النظر إلى النتيجة.** صفحة الإضافة الرسمية تنصح المستخدم الجديد بمقارنة البيانات الأصلية والمنظّفة بالعين. نافذة العرض المتتابع موجودة لهذا.
-
-{/* صندوق "من التجربة": بانتظار قصة من صاحب المشروع. لا يُكتب قبل وصولها. */}
-
-## كيف تتأكد أن الخطوة نجحت؟
+## كيف أتأكد أن التجربة نجحت؟
 
 1. **نافذة العرض المتتابع** أظهرت البيانات الأصلية والمنظّفة، ورأيت ما حُذف.
-2. **تحقق السكربت:** يطبع الثواني الباقية، وعدد أحداث boundary، والـ epochs قبل وبعد.
+2. **تحقق السكربت:** يطبع الثواني الباقية، وعدد أحداث boundary، والـ epochs قبل ASR وبعده.
 3. **زادت الأحداث** في النافذة الرئيسية بعدد أحداث boundary.
 4. **المسار لم يتغيّر:** `D1 asr` غير محفوظة، والدرس التالي يبدأ من `D1 hp0.1 notch60`.
 
 <Methods>
 High-amplitude bursts were identified with Artifact Subspace Reconstruction (burst criterion 20 SD; clean_rawdata plugin 2.11, EEGLAB 2026.1), and the affected periods were removed together with windows in which more than 25% of channels exceeded 7 SD ([N] s, [P]% of the data); EOG channels were excluded.
 </Methods>
+
+## ما الأخطاء الشائعة مع ASR؟
+
+- **استخدام التصحيح بدل الحذف في البيانات المسجّلة.** أبقِ <UiLabel>Remove bad data periods (when uncheck, correct using ASR)</UiLabel> مفعّلاً.
+- **عتبة منخفضة جداً.** عند 3 أو 5 قد يحذف ASR الرمش ونشاطاً دماغياً كبيراً لكنه طبيعي. ابدأ بـ 20، وانظر إلى ما حُذف، ثم قرّر.
+- **نسيان أحداث boundary.** كل جزء محذوف يصير حدث boundary، وكل epoch فيه أحدها يُحذف. عدّ الـ epochs قبل ASR وبعده.
+- **تشغيل ASR على بيانات فيها انجراف بطيء.** ASR يحتاج بيانات مفلترة بـ <En>high-pass</En>، كما تقول صفحة الإضافة. طبّق الفلتر أولاً، أو فعّل <UiLabel>Remove channel drift (data not already high-pass filtered)</UiLabel>.
+- **عدم النظر إلى النتيجة.** صفحة الإضافة الرسمية تنصح المستخدم الجديد بمقارنة البيانات الأصلية والمنظّفة بالعين. نافذة العرض المتتابع موجودة لهذا.
+
+{/* صندوق "من التجربة": بانتظار قصة من صاحب المشروع. لا يُكتب قبل وصولها. */}

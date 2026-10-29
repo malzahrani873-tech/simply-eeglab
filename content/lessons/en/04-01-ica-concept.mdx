@@ -31,13 +31,21 @@ eeglabVersion: "2026.1"
 updated: 2026-10-28
 ---
 
-## Why this step matters
+## The idea
 
-Imagine a party with three people talking at the same time, and three microphones in different places in the room. Each microphone records a mix of the three voices. The microphone close to one person hears that person louder, but it hears the others too.
+Imagine a party with three people talking at the same time, and three microphones in different places in the room. Each microphone records a mix of the three voices. The microphone closest to a person hears that person loudest, but it also hears the others.
 
-The question: from the three recordings alone, can you extract each person's voice on its own? This is what independent component analysis (ICA) does.
+EEG channels are like these microphones: each channel records a mix of brain activity, blinks, and muscle activity.
 
-EEG has exactly the same problem:
+So how does independent component analysis (ICA) pull each source out of that mix on its own?
+
+## How does ICA separate mixed sources?
+
+<Figure src="ica-concept/ica-concept-stages.svg" alt="Three stages. Sources: brain with a regular 10 Hz wave, blink with large slow peaks, muscle with fast activity. What the channels record: frontal, central and temporal electrodes, each a mix of the three, the frontal one with a strong blink. After ICA: three components that look like the sources, in a different order, with the blink sign flipped." source="original" />
+
+Notice two things in the last stage. First, the order of the components does not match the order of the sources. Second, a component may be flipped or have a different size. ICA finds the shape of each source in time, but it does not know its name, its true size, or its order. Naming the components is your job, or later ICLabel's.
+
+## What plays the people and the microphones in EEG?
 
 - **The people** are the sources: activity in brain areas, eye blinks, muscles, the heart, and line noise.
 - **The microphones** are the channels on the head.
@@ -47,25 +55,26 @@ So every channel is a mix. Channel `FPz` at the front of the head, for example, 
 
 ICA looks for a way to recombine the channels that gives signals as independent of each other in time as possible. Each of these signals is called an ICA component (independent component).
 
-## Before and after
+## Where do I find ICA components in EEGLAB?
 
-<Figure src="ica-concept/ica-concept-stages.svg" alt="Three stages. Sources: brain with a regular 10 Hz wave, blink with large slow peaks, muscle with fast activity. What the channels record: frontal, central and temporal electrodes, each a mix of the three, the frontal one with a strong blink. After ICA: three components that look like the sources, in a different order, with the blink sign flipped." source="original" />
+Each ICA component has two parts: a scalp map and a time course. The table links the idea to what you will see in EEGLAB.
 
-Notice two things in the last stage. First, the order of the components does not match the order of the sources. Second, a component may be flipped or have a different size. ICA finds the shape of each source in time, but it does not know its name, its true size, or its order. Naming the components is your job, or ICLabel's later.
+| In the idea | In EEGLAB | What it means |
+|---|---|---|
+| The way to recombine the channels | `EEG.icaweights` and `EEG.icasphere` | What ICA learns. Multiplying them by the data gives the components. |
+| The shape of a component in time | `EEG.icaact` | The time course of each ICA component. |
+| Where a component is on the head | `EEG.icawinv` | Each column is the scalp map of an ICA component: how much it contributes to each channel. |
+| Number of components | Equal to the data rank, which is never more than the number of channels | In D1 after average reference and with no interpolated channel: 31 components from 32 channels. Each interpolated channel removes one (see [the Running ICA lesson](/en/lesson/run-ica/)). |
 
-## Steps in the GUI
-
-There are no EEGLAB steps in this lesson, because it explains the idea before you run ICA.
-
-You will meet the idea in the GUI in the next lessons:
+You will meet these ideas in the menus in the next lessons:
 
 - **Running ICA:** from <MenuPath>Tools > Decompose data by ICA</MenuPath>. Afterward, <UiLabel>ICA weights</UiLabel> shows <UiLabel>Yes</UiLabel> in the main window.
 - **Scalp maps:** from <MenuPath>Plot > Component maps > In 2-D</MenuPath>. Each map shows where a component appears on the head.
 - **Removing a component:** from <MenuPath>Tools > Remove components from data</MenuPath>. This is a separate step you decide on after reviewing.
 
-## The equivalent script
+## Can I try the party myself?
 
-This script is optional. Run it after installing EEGLAB if you want to see the party for yourself. It makes three artificial sources, mixes them into three "channels", then separates them with the EEGLAB function `runica`.
+This script is optional. It makes three artificial sources, mixes them into three "channels", then separates them with the EEGLAB function `runica`.
 
 ```matlab
 eeglab nogui;   % puts runica on the MATLAB path
@@ -101,29 +110,18 @@ end
 
 In the left column you see the three channels, all mixed. In the right column you see the components: a regular rhythm, blink peaks, and random activity, each in its own row.
 
-## Which value should I choose?
+## Test yourself: how do you check you understood ICA?
 
-There are no values to choose in this lesson. The table links the idea to what you will see in EEGLAB.
+1. **You can explain the party** in two sentences: the channels are microphones that hear a mix, and ICA extracts each voice on its own.
+2. **You know the two parts of an ICA component:** a scalp map (`EEG.icawinv`) and a time course (`EEG.icaact`).
+3. **If you ran the script**, you see three separate components in the right column, each resembling one of the three sources, possibly in a different order or with a flipped sign.
 
-| In the idea | In EEGLAB | What it means |
-|---|---|---|
-| The way to recombine the channels | `EEG.icaweights` and `EEG.icasphere` | What ICA learns. Multiplying them by the data gives the components. |
-| The shape of a component in time | `EEG.icaact` | The time course of each ICA component. |
-| Where a component is on the head | `EEG.icawinv` | Each column is the scalp map of an ICA component: how much it contributes to each channel. |
-| Number of components | Equal to the data rank, which is never more than the number of channels | In D1 after average reference and with no interpolated channel: 31 components from 32 channels. Each interpolated channel removes one (see Running ICA). |
+## What are the common mistakes in understanding ICA?
 
-## Common mistakes
-
-- **Thinking ICA deletes something.** ICA alone does not change your data. It gives you another way to see the same data. Removal is a separate decision in the ICLabel lesson.
+- **Thinking ICA deletes something.** ICA alone does not change your data. It gives you another way to see the same data. Removal is a separate decision in [the ICLabel lesson](/en/lesson/iclabel/).
 - **Confusing a channel with an ICA component.** A channel is what one electrode records. An ICA component is a source computed from all channels together, and it has a map over the whole head.
 - **Confusing an ICA component with an ERP component.** An ERP component such as P3 is a peak in the average of the epochs. An ICA component is an independent source computed from all time points of the recording, not from the average. Always say "ICA component" or "ERP component".
 - **Expecting the same order every time.** The order, sign, and size of components may differ between runs. Find a component by its shape, not its number.
 - **Expecting more sources than channels.** ICA cannot find more components than the data rank. With 32 channels you do not get 50 sources.
 
 {/* "From experience" box: waiting for the project owner's story. Do not write it before it arrives. */}
-
-## How to check it worked
-
-1. **You can explain the party** in two sentences: the channels are microphones that hear a mix, and ICA extracts each voice on its own.
-2. **You know the two parts of an ICA component:** a scalp map (`EEG.icawinv`) and a time course (`EEG.icaact`).
-3. **If you ran the script**, you see three separate components in the right column, each resembling one of the three sources, possibly in a different order or with a flipped sign.

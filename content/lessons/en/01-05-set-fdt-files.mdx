@@ -30,19 +30,21 @@ eeglabVersion: "2026.1"
 updated: 2026-10-28
 ---
 
-## Why this step matters
+## The idea
 
 An EEGLAB dataset has two parts: the description (channel names and positions, events, sampling rate, processing history) and the signal itself (the numbers in `EEG.data`).
 
-In EEGLAB 2026.1, saving writes the two parts to two files with the same name by default: a `.set` file with the description and a `.fdt` file with the signal. The sample `eeglab_data.set` that ships with EEGLAB is saved the same way. You can also ask for one file that holds both parts.
+By default, EEGLAB 2026.1 saves them as two files with the same name: a `.set` file with the description and a `.fdt` file with the signal. The sample `eeglab_data.set` is saved the same way.
 
-A `.set` without its `.fdt` has no signal. If you copy or send the `.set` file alone, the person who tries to open it gets an error. This lesson shows how to tell the two cases apart and how to keep the two files together.
+A `.set` without its `.fdt` has no signal, and opening it gives an error. So how do you tell how a dataset was saved, and keep its files together?
 
-## Before and after
+## What do the two files look like in a folder?
 
 <Figure src="set-fdt-files/set-fdt-files.svg" alt="On the left, the sample_data folder holds two files with the same name: eeglab_data.set (about 0.35 MB) with the description and eeglab_data.fdt (about 3.9 MB) with the 32 × 30504 signal. On the right, your lessons folder holds the same pair, D1_copy.set (about 0.35 MB) and D1_copy.fdt (about 3.9 MB), with the label: same name, same folder, and below them the line: this is how EEGLAB 2026.1 saves." source="original" />
 
-## Steps in the GUI
+Only two things tie the files together: the same name and the same folder. If they are separated, EEGLAB cannot find the signal.
+
+## How do I see the two files and save a copy from the GUI?
 
 ### 1. See the two files of the sample
 
@@ -64,7 +66,7 @@ A `.set` without its `.fdt` has no signal. If you copy or send the `.set` file a
 
 You may find the checkbox unticked, even though EEGLAB just saved two files. The window reads its value from one settings file, while saving follows another one, until you click <UiLabel>OK</UiLabel> in this window for the first time. After that, saving follows the checkbox.
 
-## The equivalent script
+## How do I save as two files or one file in a script?
 
 ```matlab
 % Start EEGLAB and load the sample dataset
@@ -90,11 +92,11 @@ dir(fullfile(myFolder, 'D1_onefile.*'))        % D1_onefile.set only, about 4 MB
 - `EEG.datfile` holds the name of the `.fdt` file. When it is empty, the signal is inside the `.set` file.
 - `'savemode', 'onefile'` forces one file for this save only, whatever the preference says. `'savemode', 'twofiles'` forces two files.
 
-## Which value should I choose?
+## When do I save two files and when one?
 
 | Choice | When | What you get |
 |---|---|---|
-| Two files (the default in 2026.1) | Almost always, and with a STUDY in station 8, because EEGLAB reads the description alone quickly. | `name.set` and `name.fdt`, always together |
+| Two files (the default in 2026.1) | Almost always, and with a STUDY in station 8, because EEGLAB can quickly read the description alone. | `name.set` and `name.fdt`, always together |
 | One file (untick the option in <MenuPath>File > Preferences</MenuPath> and click <UiLabel>OK</UiLabel>, or `'savemode', 'onefile'`) | You want to email one dataset or copy it without forgetting a file. | `name.set` only |
 
 **Resaving keeps the format on disk.** <MenuPath>File > Resave current dataset(s)</MenuPath> on a two-file dataset writes two files again, even if your preference is one file. In that case the Command Window prints a note starting with `Note that your memory options for saving datasets does not correspond`. This is normal.
@@ -103,18 +105,7 @@ dir(fullfile(myFolder, 'D1_onefile.*'))        % D1_onefile.set only, about 4 MB
 Some pages of the EEGLAB documentation say that EEGLAB saves one file by default since 2021, and the <MenuPath>File > Preferences</MenuPath> window says so too. But the settings file that ships with EEGLAB 2026.1 turns the two-file option on, so saving writes two files. Trust what you see in your folder.
 </Callout>
 
-## Common mistakes
-
-- **Copying or emailing the `.set` file alone.** Always move both files, with the same name, into the same folder.
-- **Renaming one of the two files in the file explorer.** The `.set` file remembers the name of its `.fdt`. To rename a dataset, open it in EEGLAB and use <MenuPath>File > Save current dataset as</MenuPath> with the new name.
-- **Opening the `.fdt` file.** Always open the `.set`. EEGLAB reads the `.fdt` with it.
-- **An error that starts with `file` and ends with `you must also rename/move the associated data file.`** The `.fdt` file is not next to the `.set` file, so the dataset does not open. Find it and put it in the same folder. The sample `eeglab_data.set` is an exception: EEGLAB puts the `sample_data` folder on the MATLAB path, so MATLAB finds `eeglab_data.fdt` there even if you copy the `.set` alone. Your own files are not treated this way.
-- **Clicking <UiLabel>OK</UiLabel> in <MenuPath>File > Preferences</MenuPath> by accident.** If the two-files checkbox is unticked, saving then writes one file. That is fine, but do not be surprised when your files change.
-- **Being surprised that the old `.fdt` disappeared.** If you save a two-file dataset as one file with the same name in the same folder, EEGLAB deletes the old `.fdt`, because the signal is now inside the `.set` file. It prints `Old .fdt file detected on disk, deleting file since the Matlab file now contains all the data`. This is why you save your copies in your own folder, never over the sample.
-
-{/* "From experience" box: waiting for a story from the project owner. Do not write it before it arrives. */}
-
-## How to check it worked
+## How do I check the save worked?
 
 1. `sample_data` has `eeglab_data.set` and `eeglab_data.fdt`, and `EEG.datfile` gives `'eeglab_data.fdt'` after loading the sample.
 2. Your folder has `D1_copy.set` (about 0.35 MB) and `D1_copy.fdt` (about 3.9 MB).
@@ -122,3 +113,14 @@ Some pages of the EEGLAB documentation say that EEGLAB saves one file by default
 4. `D1_copy.set` opens with <MenuPath>File > Load existing dataset</MenuPath> and shows 32 channels and 154 events.
 
 You can delete `D1_copy.*` and `D1_onefile.set` after the lesson. The next lessons do not use them.
+
+## Why will my dataset not open? Common mistakes with .set and .fdt files
+
+- **Copying or emailing the `.set` file alone.** Always move both files, with the same name, into the same folder.
+- **Renaming one of the two files in the file explorer.** The `.set` file remembers the name of its `.fdt`. To rename a dataset, open it in EEGLAB and use <MenuPath>File > Save current dataset as</MenuPath> with the new name.
+- **Opening the `.fdt` file.** Always open the `.set`. EEGLAB reads the `.fdt` with it.
+- **An error that starts with `file` and ends with `you must also rename/move the associated data file.`** The `.fdt` file is not next to the `.set` file, so the dataset does not open. Find it and put it in the same folder. The sample `eeglab_data.set` is an exception: EEGLAB puts the `sample_data` folder on the MATLAB path, so MATLAB finds `eeglab_data.fdt` there even if you copy the `.set` alone. Your own files are not treated this way.
+- **Clicking <UiLabel>OK</UiLabel> in <MenuPath>File > Preferences</MenuPath> by accident.** If the two-files checkbox is unticked, saving then writes one file. That is fine, but do not be surprised when your files change.
+- **Being surprised that the old `.fdt` disappeared.** If you save a two-file dataset as one file with the same name in the same folder, EEGLAB deletes the old `.fdt`, because the signal is now inside the `.set` file. It prints `Old .fdt file detected on disk, deleting file since the Matlab file now contains all the data`. This is why you should save your copies in your own folder, never over the sample.
+
+{/* "From experience" box: waiting for a story from the project owner. Do not write it before it arrives. */}

@@ -1,7 +1,7 @@
 ---
 title: Channel interpolation
 titleEn: Channel interpolation
-description: How to rebuild removed channels in EEGLAB with spherical interpolation, and check the channel count is complete before re-referencing.
+description: How to rebuild removed channels in EEGLAB with spherical interpolation, and check that the channel count is complete before re-referencing.
 station: 3
 order: 6
 level: core
@@ -51,60 +51,68 @@ eeglabVersion: "2026.1"
 updated: 2026-10-29
 ---
 
-## Why this step matters
+## The idea
 
-In the previous lesson you removed the bad channels. Now you rebuild them by interpolation: EEGLAB computes each removed channel from the channels around it, based on the electrode locations on the head. D1 has no bad channel, so you practice on a temporary copy that you do not save.
+In [the bad channels lesson](/en/lesson/bad-channels/) you removed the bad channels. Now you rebuild them by interpolation: EEGLAB computes each removed channel from the channels around it, based on the electrode locations on the head.
 
-Why not carry on without them? For three reasons:
+But an interpolated channel is not a real recording, and it has a price you pay later. So why rebuild a channel you removed, and how far can you trust the new one?
+
+## How does the channel come back on the scalp map?
+
+In the exercise you remove the good channel `C3`, then rebuild it. Compare the two maps: after interpolation, the `C3` point is back, and the pattern is very close to the original.
+
+<BeforeAfter>
+<Figure src="interpolation/interpolation-map-noC3.png" alt="Scalp map after removing channel C3: no dot at the C3 position, and the colors around it come from the plot smoothing." caption="Before: D1 noC3" source="D1" />
+<Figure src="interpolation/interpolation-map-C3-back.png" alt="The same map after interpolation, same time point and color limits: the C3 dot is back and the pattern is very close to the original." caption="After: D1 C3 back" source="D1" />
+</BeforeAfter>
+
+## Why not carry on without the removed channels?
+
+For three reasons:
 
 1. **The average reference** needs channels spread over the whole head. A missing channel on one side tilts the average toward the other side.
 2. **Comparing participants** needs the same channels for everyone.
 3. **Scalp maps** draw a gap where a channel is missing.
 
-But interpolation has a price. An interpolated channel is a mix of the other channels, so it adds no new information. That is why each interpolated channel reduces the data rank by one. You will need this in the ICA lessons.
+## What does interpolation cost?
+
+An interpolated channel is a mix of the other channels, so it adds no new information. That is why each interpolated channel reduces the data rank by one. You will need this in the ICA lessons.
+
+On our path, we interpolate before ICA on purpose, because the average reference needs all channels. But ICA needs to know the reduced rank, and `pop_runica` tries to detect it on its own, which can fail. So if you interpolated channels in your data, compute the expected rank yourself: the number of channels, minus the interpolated channels, minus 1 for the average reference. For example, 32 channels with 2 interpolated give rank 29. You will compare this number with what `pop_runica` prints in [the Running ICA lesson](/en/lesson/run-ica/). In D1, nothing was interpolated, so the rank is 31.
+
+There is another valid approach: run ICA without the removed channels, interpolate them after removing components, then re-reference to the average again.
+
+## How do I interpolate from the menus?
 
 <Callout type="warning">
 **About D1:** we found no bad channel in it, so there is nothing to interpolate on the path. You will practice on a temporary copy: remove a good channel, `C3`, then rebuild it and compare it with the original. This way you see for yourself how accurate interpolation is. Do not save the exercise copies; the path continues from `D1 badch`.
 </Callout>
 
-## Before and after
-
-<BeforeAfter>
-<Figure src="interpolation/interpolation-map-noC3.png" alt="Scalp map after removing channel C3: no dot at the C3 position, and the colours around it come from the plot smoothing." caption="Before: D1 noC3" source="D1" />
-<Figure src="interpolation/interpolation-map-C3-back.png" alt="The same map after interpolation, same time point and colour limits: the C3 dot is back and the pattern is very close to the original." caption="After: D1 C3 back" source="D1" />
-</BeforeAfter>
-
-## Steps in the GUI
-
-Start with the Starting point. Its script puts the dataset from before channel removal, `D1 hp0.1 notch60`, in dataset 1, and the main dataset `D1 badch` in dataset 2. You will need the number of dataset 1 for your own data, because it holds the locations of all channels.
+Run "Script to reach this state" under "Starts from" at the top of the lesson. It puts the dataset from before channel removal, `D1 hp0.1 notch60`, in dataset 1, and the main dataset `D1 badch` in dataset 2. You will need the number of dataset 1 for your own data, because it holds the locations of all channels.
 
 **First: practice on a good channel**
 
 1. With `D1 badch` current, open <MenuPath>Edit > Select data</MenuPath>. Type `C3` in <UiLabel>Channel(s)</UiLabel>, check the box under <UiLabel>on->remove these</UiLabel>, then press <UiLabel>OK</UiLabel>.
 2. Name the new dataset `D1 noC3`. In the main window, <UiLabel>Channels per frame</UiLabel> is now 31.
 3. Open <MenuPath>Tools > Interpolate electrodes</MenuPath>. A window titled <UiLabel>Interpolate channel(s) -- pop_interp()</UiLabel> appears.
-4. Press <UiLabel>Use all channels from other dataset</UiLabel>, type `2`, the number of the `D1 badch` dataset, in <UiLabel>Dataset index</UiLabel>, then <UiLabel>OK</UiLabel>. The name `C3` appears under <UiLabel>What channel(s) do you want to interpolate</UiLabel>.
+4. Press <UiLabel>Use all channels from other dataset</UiLabel>, type `2`, the number of the `D1 badch` dataset, in <UiLabel>Dataset index</UiLabel>, then press <UiLabel>OK</UiLabel>. The name `C3` appears under <UiLabel>What channel(s) do you want to interpolate</UiLabel>.
 5. In <UiLabel>Interpolation method</UiLabel>, keep <UiLabel>Spherical</UiLabel>, leave <UiLabel>Time range [min max] (s)</UiLabel> empty, then press <UiLabel>OK</UiLabel>.
-6. The command window prints `Interpolating 1 channels...`. Name the dataset `D1 C3 back`. The channel count is 32 again.
+6. The Command Window prints `Interpolating 1 channels...`. Name the dataset `D1 C3 back`. The channel count is 32 again.
 7. Compare `C3` in `D1 badch` and in `D1 C3 back` with <MenuPath>Plot > Channel data (scroll)</MenuPath>. The two signals are very similar.
 8. These are exercise copies, so do not save them. Go back to `D1 badch`.
 
 **Second: interpolation on your own data**
 
-1. With the dataset you removed bad channels from as current, open <MenuPath>Tools > Interpolate electrodes</MenuPath>.
+1. Make the dataset you removed bad channels from the current one, then open <MenuPath>Tools > Interpolate electrodes</MenuPath>.
 2. Press <UiLabel>Use all channels from other dataset</UiLabel> and type the number of the dataset from before the removal. The names of the removed channels appear.
 3. Keep <UiLabel>Spherical</UiLabel> and press <UiLabel>OK</UiLabel>. Name the result `D1 interp` and save it.
-4. In D1 no channel was removed, so if you try, EEGLAB says `No new channels selected`. The main dataset stays `D1 badch`, and the re-referencing lesson starts from it.
+4. In D1, no channel was removed, so if you try, EEGLAB says `No new channels selected`. The main dataset stays `D1 badch`, and [the re-referencing lesson](/en/lesson/rereferencing/) starts from it.
 
 <Callout type="warning">
-**A warning you will see when you open the dialog:** when you open the interpolation window from the menu, EEGLAB prints `Warning: do not interpolate channels before running ICA` in the command window. A script that calls `pop_interp` does not print it. Around the warning, EEGLAB prints two hints for another way: define the missing channels in the channel editor as non-data channels and interpolate later, or interpolate on the fly in a STUDY. So the warning is about the data rank, not a sign that interpolation is wrong.
-
-On our path we interpolate before ICA on purpose, because the average reference needs all channels. The cost: `pop_runica` tries to detect the reduced rank, but its estimate can fail. So if your data has bad channels, compute the expected rank yourself: the number of channels, minus the interpolated channels, minus 1 for the average reference. For example, 32 channels with 2 interpolated give rank 29. You will compare this number with what `pop_runica` prints in the Running ICA lesson. In D1 nothing was interpolated, so the rank is 31.
-
-The other valid approach in one sentence: run ICA without the removed channels, interpolate them after removing components, then re-reference to the average again.
+**A warning you will see when you open the dialog:** when you open the interpolation window from the menu, EEGLAB prints `Warning: do not interpolate channels before running ICA` in the Command Window. A script that calls `pop_interp` does not print it. Around the warning, EEGLAB prints two hints for another way: define the missing channels in the channel editor as non-data channels and interpolate later, or interpolate on the fly in a STUDY. So the warning is about the data rank, not a sign that interpolation is wrong.
 </Callout>
 
-## The equivalent script
+## How do I interpolate with a script?
 
 ```matlab
 % Rebuild the removed channels from the full channel list (fullLocs)
@@ -125,9 +133,9 @@ r = corrcoef(double(EEG.data(iOrig, :)), double(EEG_back.data(iBack, :)));
 fprintf('Correlation between original and interpolated %s: %.2f\n', testChan, r(1, 2));
 ```
 
-The variable `fullLocs` comes from the Starting point script: a copy of all channel locations before any removal. Always keep it at the start of processing.
+The variable `fullLocs` comes from the "Script to reach this state" at the top of the lesson: a copy of all channel locations before any removal. Always keep it at the start of processing.
 
-## Which value should I choose?
+## Which interpolation settings do I choose?
 
 | Setting | Value | Why |
 |---|---|---|
@@ -137,7 +145,18 @@ The variable `fullLocs` comes from the Starting point script: a copy of all chan
 | Number of interpolated channels | Few | Each interpolated channel reduces the data rank by one and adds no new information. |
 | <UiLabel>Interpolate removed channel(s)</UiLabel> in the re-referencing window | Not on our path | It interpolates and re-references in one step. We do the two steps separately so you can check each one. |
 
-## Common mistakes
+## How do I check the interpolation worked?
+
+1. **The channel count is complete:** <UiLabel>Channels per frame</UiLabel> in the main window equals the original number. In D1 it is 32.
+2. **Same order:** in <MenuPath>Plot > Channel locations > By name</MenuPath>, the interpolated channels appear in their places.
+3. **The exercise:** the script prints a correlation close to 0.98 between the original and the interpolated `C3`.
+4. **The signal makes sense:** in <MenuPath>Plot > Channel data (scroll)</MenuPath>, the interpolated channel looks like its neighbors, with no flat line and no jumps.
+
+<Methods>
+Removed channels were interpolated using spherical spline interpolation (pop_interp, EEGLAB 2026.1).
+</Methods>
+
+## Common interpolation mistakes
 
 - **Re-referencing before interpolating.** An average reference over missing channels leans toward the side with more channels. Interpolate first, then re-reference.
 - **Losing the original locations.** Once a channel is removed, EEGLAB only knows where it was from an earlier dataset or from `fullLocs`. Keep the locations before any removal.
@@ -145,14 +164,3 @@ The variable `fullLocs` comes from the Starting point script: a copy of all chan
 - **Trusting edge channels too much.** A channel at the edge of the cap, such as `T7`, has neighbors on one side only, so its interpolation is less accurate than for a central channel such as `C3`.
 
 {/* "From experience" box: waiting for the project owner's story. Do not write it before it arrives. */}
-
-## How to check it worked
-
-1. **The channel count is complete:** <UiLabel>Channels per frame</UiLabel> in the main window equals the original number. In D1 it is 32.
-2. **Same order:** in <MenuPath>Plot > Channel locations > By name</MenuPath> the interpolated channels appear in their places.
-3. **The exercise:** the script prints a correlation close to 0.98 between the original and the interpolated `C3`.
-4. **The signal makes sense:** in <MenuPath>Plot > Channel data (scroll)</MenuPath> the interpolated channel looks like its neighbors, with no flat line and no jumps.
-
-<Methods>
-Removed channels were interpolated using spherical spline interpolation (pop_interp, EEGLAB 2026.1).
-</Methods>

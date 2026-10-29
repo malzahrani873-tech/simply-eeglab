@@ -18,6 +18,9 @@ references:
   - title: Luck, Applied Event-Related Potential Data Analysis (1st edition)
     url: https://socialsci.libretexts.org/Bookshelves/Psychology/Biological_Psychology/Applied_Event-Related_Potential_Data_Analysis_(Luck)/12%3A_Appendix_1%3A_A_Very_Brief_Introduction_to_EEG_and_ERPs
     section: "Appendix 1: A Very Brief Introduction to EEG and ERPs > The EEG"
+  - title: "Buzsáki, Anastassiou & Koch (2012). The origin of extracellular fields and currents: EEG, ECoG, LFP and spikes. Nature Reviews Neuroscience 13, 407–420"
+    url: https://pmc.ncbi.nlm.nih.gov/articles/PMC3459239/
+    section: "Full article"
   - title: "EEGLAB introduction part 2: The origin of the EEG signal"
     url: https://www.youtube.com/watch?v=KhEKRHw0qFg
     section: "Full video"
@@ -29,31 +32,49 @@ eeglabVersion: "2026.1"
 updated: 2026-10-27
 ---
 
-## Why this step matters
+## The idea
 
 Electroencephalography (EEG) records very small differences in electrical voltage between electrodes on the scalp. These differences are measured in microvolts (µV), millionths of a volt.
 
-Every decision you make later in EEGLAB depends on knowing where this signal comes from: why you pick a certain reference, why ICA can separate blinks from brain activity, and why electrode Cz does not tell you exactly what happens right under it.
+An electrode does not pick up one cell. It picks up the sum of millions of cells active at the same time, plus any other electrical signal from the body or the room.
 
-The idea in two lines: an electrode does not hear one cell. It hears the sum of millions of cells working together at the same time, plus any other electrical signal from the body or the room.
+This explains many things you will see later, such as why a blink looks bigger than brain activity. So what exactly reaches the electrode, and why?
 
-## Before and after
+## How do cell signals add up until an electrode can see them?
 
 <Figure src="eeg-origin/eeg-origin-cells.svg" alt="Three panels: one pyramidal cell with current along its dendrite, a row of parallel cells under the meninges, skull and scalp, and a scalp electrode that picks up a tiny wave when the cells' timing is random and a large wave when they are synchronized." source="original" />
 
-Notice in the third panel that the number of cells did not change between the two traces. Only the timing changed. When cells work together their signals add up; when each works at a different time they cancel each other out.
+Compare the two traces in the third panel. The number of cells is the same in both; only the timing changed. When cells are active together, their signals add up; when each is active at a different time, they cancel each other out.
 
-## Steps in the GUI
+## Which brain activity reaches the electrode?
 
-There are no EEGLAB steps in this lesson, because it explains what the signal measures before you open it.
+Not all brain activity gets through. What reaches the scalp lasts long enough and comes from many cells lined up in the same direction.
 
-You will meet this idea in the GUI later in three places: when you first scroll through the signal in microvolts in the GUI lesson, when you choose a reference in the re-referencing lesson, and when you read ICA components that separate brain activity from blinks and muscle.
+| Activity | Does it show up in EEG? | Why |
+|---|---|---|
+| Postsynaptic potentials in cortical pyramidal cells | **Yes, this is the main brain signal** | They last tens of milliseconds, so they overlap across many cells. Pyramidal cells are parallel and point toward the surface, so their currents add up instead of canceling (Luck, Appendix 1; Buzsáki et al. 2012). |
+| Action potentials | **Almost never** | Very short (about 1 ms), so they rarely line up across many cells precisely enough. Luck notes that we cannot ordinarily pick them up from the scalp. |
+| A single cell | **No** | Its signal is far too small to be seen from outside the skull. A huge number of cells must be active together. |
+| Deep brain structures | **Very weak** | The large distance weakens the signal a lot, and many of them do not arrange their cells in a way that lets their currents add up. |
 
-## The equivalent script
+## What other signals get mixed into the recording?
 
-This script is optional. Run it after the MATLAB basics lesson if you want to see the idea in numbers. It does not need EEGLAB.
+The electrode cannot tell brain from anything else, so it picks up every voltage that reaches it. Any non-brain signal in the recording is called an artifact.
 
-The script adds up 1000 small sources, each oscillating at 10 Hz. The first time, each source starts at a random time. The second time, they all start together.
+| Source | Does it show up in EEG? | What it looks like |
+|---|---|---|
+| Eye blinks and eye movements | **Yes, strongly** | The eye carries an electrical charge, and moving it creates a signal much larger than brain activity at frontal electrodes. |
+| Muscles (jaw, neck, forehead) | **Yes** | They appear as fast, high-frequency noise. |
+| Heart | **Sometimes** | A regular beat that shows up in some channels. |
+| Power line | **Yes** | A steady peak at 60 Hz in Saudi Arabia and the US, and at 50 Hz in Europe and most other Arab countries. |
+
+Stations 3 and 4 are about removing these signals. You will first see the raw signal in microvolts in the [EEGLAB window lesson](/en/lesson/eeglab-gui/), and you will learn to separate blinks and muscle from brain activity in the [artifact components lesson](/en/lesson/ic-artifacts/).
+
+## Can I see the effect of synchrony in numbers?
+
+This script is optional and does not need EEGLAB. Run it after the [MATLAB basics lesson](/en/lesson/matlab-basics/) if you want to see the idea in numbers.
+
+The script adds up 1000 small sources, each oscillating at 10 Hz. The first time, each source starts at a random time; the second time, they all start together.
 
 ```matlab
 % Sum of many small sources: random timing vs. synchronized timing
@@ -79,42 +100,25 @@ xlabel('Time (s)'); ylabel('Summed amplitude (a.u.)');
 legend('Synchronized', 'Random timing');
 ```
 
-- The peak of the synchronized sum is 1000, exactly the number of sources.
-- The peak of the random-timing sum is much smaller, usually between 10 and 50, about 28 on average. The number changes on every run because the phases are random, but it stays close to the square root of the number of sources, not the number itself.
-- **Simplification:** real cells do not oscillate as pure sine waves, and the skull weakens and spreads the signal. But the rule "synchrony makes the signal bigger" holds.
+- The synchronized sum peaks at 1000, exactly the number of sources.
+- The random-timing sum peaks much lower, usually between 10 and 50, about 28 on average. The number changes on every run because the phases are random, but it stays near the square root of the number of sources, not the number itself.
+- **Simplification:** real cells do not oscillate as pure sine waves, and the skull weakens and spreads the signal. But the rule holds: synchrony makes the signal bigger.
 
-## Which value should I choose?
-
-There is no value to choose in this lesson. Instead, this table sums up what reaches the electrode and what does not. Come back to it when you first look at the signal.
-
-| Source | Does it show up in EEG? | Why |
-|---|---|---|
-| Postsynaptic potentials in cortical pyramidal cells | **Yes, this is the main brain signal** | They last tens of milliseconds, so they overlap across many cells. Pyramidal cells are parallel and point toward the surface, so their currents add up instead of canceling (Luck, Appendix 1; Buzsáki et al. 2012). |
-| Action potentials | **Almost never** | Very short (about 1 ms), so they rarely line up across many cells precisely enough. Luck notes that we cannot ordinarily pick them up from the scalp. |
-| A single cell | **No** | Its signal is far too small to be seen from outside the skull. A huge number of cells must be active together. |
-| Deep brain structures | **Very weak** | The large distance weakens the signal a lot, and many of them do not arrange their cells in a way that adds up currents. |
-| Eye blinks and eye movements | **Yes, strongly** | The eye carries an electrical charge, and moving it creates a signal much larger than brain activity at frontal electrodes. |
-| Muscles (jaw, neck, forehead) | **Yes** | They appear as fast, high-frequency noise. |
-| Heart | **Sometimes** | A regular beat that shows up in some channels. |
-| Power line | **Yes** | A steady peak at 60 Hz in Saudi Arabia and the US, and at 50 Hz in Europe and most other Arab countries. |
-
-Everything in the table that is not brain activity is called an artifact: a non-brain signal mixed into the recording. Stations 3 and 4 are about removing it.
-
-## Common mistakes
+## Common mistakes: does an electrode measure only the brain under it?
 
 - **Thinking EEG records neurons "firing".** What reaches the scalp is mainly postsynaptic potentials, not action potentials. So EEG does not directly measure how often cells fire.
-- **Thinking each electrode measures only the brain under it.** Current spreads through the brain, fluids and skull before it reaches the scalp. So an electrode can pick up activity from a distant region (Luck, Appendix 1). Electrode Oz does not mean "visual cortex only".
-- **Thinking everything you see is brain activity.** Blinks, muscles and power lines appear in the recording, and are sometimes much larger than the brain signal.
-- **Thinking the voltage at an electrode is absolute.** Every channel is the voltage difference between an electrode and a reference electrode. There is no place on the body with zero voltage, so the reference affects every channel (Luck, Appendix 1). This is the topic of the re-referencing lesson.
+- **Thinking each electrode measures only the brain under it.** Current spreads through the brain, fluids and skull before it reaches the scalp, so an electrode can pick up activity from a distant area (Luck, Appendix 1). Oz does not mean "visual cortex only".
+- **Thinking everything you see is brain signal.** Blinks, muscles and the power line all show up in the recording, sometimes much larger than the brain signal.
+- **Thinking the amplitude at an electrode is absolute.** Each channel is the voltage difference between an electrode and a reference electrode. No point on the body has zero voltage, so the reference affects every channel (Luck, Appendix 1). This is the topic of the [re-referencing lesson](/en/lesson/rereferencing/).
 - **Thinking a bigger signal means more activity.** Amplitude also depends on synchrony. The same number of cells can give a large signal when synchronized and a small one when not (Cohen 2017).
 
 {/* "From experience" box: waiting for a story from the project owner. Not written before it arrives. */}
 
-## How to check it worked
+## Test yourself: where did this signal come from?
 
-Answer each question in your own words before reading the answer after it.
+Answer each question in your own words before reading the answer.
 
-- **Why does EEG not usually pick up action potentials?** Answer: they are very short, so they do not line up across many cells precisely enough for their sum to reach the scalp.
-- **What two conditions make pyramidal cell signals add up?** Answer: the cells must be parallel and point the same way, and they must be active at the same time.
-- **A very large wave lasting about half a second appears at Fp1. Is it most likely from the brain?** Answer: no. Fp1 is above the left eye, and a large, short wave there is a typical sign of an eye blink. You will learn to identify it in station 4.
-- **Does electrode Oz measure the visual cortex alone?** Answer: no. Current spreads before it reaches the scalp, so the electrode can pick up activity from distant regions.
+- **Why does EEG not usually pick up action potentials?** Answer: they are very short, so they do not line up across enough cells for their sum to reach the scalp.
+- **What two conditions make pyramidal cell signals add up?** Answer: the cells are parallel, pointing the same way, and they are active at the same time.
+- **A very large wave lasting about half a second appears at Fp1. Is it most likely brain activity?** Answer: no. Fp1 sits above the left eye, and a large, short wave there is the typical sign of a blink. You will learn to tell them apart in station 4.
+- **A recording made in Riyadh shows a sharp spectral peak at 60 Hz. Where does it come from?** Answer: the power line, not the brain.

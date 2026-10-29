@@ -17,7 +17,7 @@ for (const scheme of ['light', 'dark']) {
       await page.goto(url + path, { waitUntil: 'networkidle' });
       // The sticky tab bar covers whatever sits at the bottom of the viewport; in use the page scrolls
       // past it. Pin it in the flow so target-size measures the controls themselves (the bar is still checked).
-      await page.addStyleTag({ content: '.tabs,.backnote{position:static!important}' });
+      await page.addStyleTag({ content: '.tabs{position:static!important}' });
       const { violations } = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21aa', 'wcag22aa']).analyze();
       const serious = violations.filter((v) => v.impact === 'serious' || v.impact === 'critical');
       for (const v of serious) {

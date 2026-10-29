@@ -106,7 +106,7 @@
       "type": "image",
       "lesson": "channel-locations",
       "objective": 3,
-      "prompt": "After looking up the locations you plotted `Plot > Channel locations > By name`. Some electrodes, such as T9, T10 and Iz, sit on or outside the circle. What do you conclude?",
+      "prompt": "After looking up the locations, you plotted `Plot > Channel locations > By name`. Some electrodes, such as T9, T10 and Iz, sit on or outside the circle. What do you conclude?",
       "image": {
         "src": "/quiz/02/s02-q04.webp",
         "w": 640,
@@ -172,7 +172,7 @@
       "type": "order",
       "lesson": "events",
       "objective": 2,
-      "prompt": "Put the steps for working on `S001R03.edf` in the order of station 2:",
+      "prompt": "Put the steps for working on `S001R03.edf` in the order used in station 2:",
       "options": [
         {
           "id": "a",

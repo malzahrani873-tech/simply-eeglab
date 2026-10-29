@@ -35,26 +35,34 @@ eeglabVersion: "2026.1"
 updated: 2026-10-28
 ---
 
-## Why this step matters
+## The idea
 
-Almost every menu in EEGLAB comes from a <En>plugin</En>: DIPFIT, ICLabel and firfilt are all plugins. If you write a tool you use in every project, turning it into a plugin makes it a menu item like any official tool, and lets your colleagues use it the same way.
+Almost every menu in EEGLAB comes from a <En>plugin</En>: DIPFIT, ICLabel and firfilt are all plugins. If you write a tool you use in every project, turning it into a plugin makes it a menu item like any official tool, and your colleagues can use it the same way.
 
-A plugin is simpler than you might expect. It is a folder inside the EEGLAB `plugins` folder, holding two files:
+A plugin is simpler than you might expect: a folder with two files.
 
-- A file whose name starts with `eegplugin_`. EEGLAB runs it at every startup, and its only job is to add the item to the menu.
-- A function whose name starts with `pop_`. This is the tool itself: it opens a window when arguments are missing, and it returns the command string that reproduces the same result, so it appears in the command history.
+So how do you write these two files, so that your tool appears in the menu and is recorded in the command history?
 
-The second rule is what makes your tool part of your script. Every click on your item appears in `eegh` as a line of code, as you learned in the command history lesson.
-
-In this lesson we write a plugin called `chanvar`: it plots the standard deviation of each channel and colors in red the channels far from the rest. A quick check tool, before or after the bad channels lesson.
-
-## Before and after
+## What does a plugin look like on disk and in the menu?
 
 <ImageSpec>
 Two screenshots side by side. Left: the `plugins` folder inside the EEGLAB folder, holding the `chanvar1.0` folder with the two files `eegplugin_chanvar.m` and `pop_chanvar.m`. Right: the EEGLAB Plot menu open, ending with the new Channel variance item below a separator line. Source: screenshot from EEGLAB 2026.1 on the project owner's computer.
 </ImageSpec>
 
-## Steps in the GUI
+Left: the plugin folder and its two files. Right: the item one of them adds to the Plot menu.
+
+## What are the two files, and what does each one do?
+
+A plugin is a folder inside the EEGLAB `plugins` folder, holding two files:
+
+- A file whose name starts with `eegplugin_`. EEGLAB runs it at every startup, and its only job is to add the item to the menu.
+- A function whose name starts with `pop_`. This is the tool itself: it opens a window when arguments are missing, and it returns the command string that reproduces the same result, so it appears in the command history.
+
+Returning the command string is what makes your tool part of your script: every click on your item appears in `eegh` as a line of code, as you learned in [the command history lesson](/en/lesson/eegh-history/).
+
+## How do I write the chanvar plugin and try it?
+
+Here we write a plugin called `chanvar`: it plots the standard deviation of each channel and colors red the channels far from the rest. It is a quick check to use before or after the [bad channels](/en/lesson/bad-channels/) step.
 
 **First: create the plugin folder**
 
@@ -154,11 +162,11 @@ uimenu(plotmenu, 'Label', 'Channel variance', 'CallBack', cmd, 'Separator', 'on'
 **Fourth: try the plugin**
 
 4. Close the EEGLAB window and type `eeglab` again, because EEGLAB looks for plugins only at startup. The command window prints a line containing `adding "chanvar" v1.0`.
-5. Load D1 as in "Starting point", but from the GUI: <MenuPath>File > Load existing dataset</MenuPath>.
+5. Load D1 (the file `eeglab_data.set`, as in "Starts from" at the top of the lesson), but from the GUI: <MenuPath>File > Load existing dataset</MenuPath>.
 6. Open <MenuPath>Plot > Channel variance</MenuPath>. Your window appears with `3` in it. Click <UiLabel>Ok</UiLabel>. The plot appears.
 7. Type `eegh`. The last line is `pop_chanvar(EEG, 3);`. Your tool is now part of the command history like any official tool.
 
-## The equivalent script
+## How do I test the plugin from a script?
 
 The `pop_` function also works from a script, without the menu. This test checks the basic rule: the string the function returns reproduces the same result.
 
@@ -178,7 +186,7 @@ disp(com);   % pop_chanvar(EEG, 3);
 eval(com);
 ```
 
-## Which value should I choose?
+## Where does the folder go, and which name and checks do I use?
 
 | Setting | Value in this lesson | Why |
 |---|---|---|
@@ -188,7 +196,14 @@ eval(com);
 | History | `catchstrs.add_to_hist` | Adds `LASTCOM` to the history and stores the dataset in `ALLEEG`. If the command starts with `EEG =`, EEGLAB creates a new dataset automatically. |
 | Highlight threshold | z = 3 | A common starting value for outliers. The tool is for visual checking, not for removing channels automatically. |
 
-## Common mistakes
+## How do I verify that the plugin works?
+
+- When you start `eeglab`, the command window prints a line containing `adding "chanvar" v1.0`.
+- The <MenuPath>Plot > Channel variance</MenuPath> item exists and opens a window with the threshold box.
+- After clicking <UiLabel>Ok</UiLabel>, a bar plot appears with one bar per channel (32 in D1).
+- `eegh` shows `pop_chanvar(EEG, 3);`, and the script above runs without error.
+
+## Common mistakes when writing plugins
 
 - **Putting the two files outside the `plugins` folder.** EEGLAB does not look anywhere else, so the item does not appear.
 - **A `pop_` function that returns nothing.** Without `com`, nothing is recorded in `eegh`, so your click cannot be repeated in your script.
@@ -197,10 +212,3 @@ eval(com);
 - **Testing the plugin from the menu only.** EEGLAB catches errors coming from menus. To trace an error, type `dbstop if error` and call the function from the command window (advice from the official documentation).
 
 {/* "From experience" box: waiting for the project owner's story. Do not write it before it arrives. */}
-
-## How to check it worked
-
-- When you start `eeglab`, the command window prints a line containing `adding "chanvar" v1.0`.
-- The <MenuPath>Plot > Channel variance</MenuPath> item exists and opens a window with the threshold box.
-- After clicking <UiLabel>Ok</UiLabel>, a bar plot appears with one bar per channel (32 in D1).
-- `eegh` shows `pop_chanvar(EEG, 3);`, and the script above runs without error.

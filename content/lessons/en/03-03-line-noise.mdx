@@ -1,7 +1,7 @@
 ---
 title: Removing line noise (50/60 Hz)
 titleEn: Removing line noise (50/60 Hz)
-description: How to spot the line-noise peak at 50 or 60 Hz in an EEG spectrum, remove it in EEGLAB with a narrow notch filter, and check it is gone.
+description: How to spot the line-noise peak at 50 or 60 Hz in an EEG spectrum, remove it in EEGLAB with a narrow notch filter, and check that it is gone.
 station: 3
 order: 3
 level: core
@@ -43,39 +43,45 @@ eeglabVersion: "2026.1"
 updated: 2026-10-28
 ---
 
-## Why this step matters
+## The idea
 
-You need this step if your analysis keeps frequencies above the line frequency, as in ICA, spectral analysis, and time-frequency analysis. In an ERP analysis with a 30 Hz low-pass, you usually do not need it.
+Power lines near the recording add a regular, fixed-frequency wave to every channel. It shows in the spectrum as a sharp, narrow peak, and it can be stronger than brain activity in the same range. This wave is called line noise.
 
-On our path we keep the high frequencies until after ICA, so we remove line noise here.
+You need to remove it if your analysis keeps frequencies above the line frequency, as in ICA, spectral and time-frequency analysis. In an ERP analysis with a 30 Hz low-pass, you usually do not.
 
-Power lines around the recording setup add a regular wave at a fixed frequency to every channel. It shows in the spectrum as a sharp, narrow peak, and it can be stronger than brain activity in the same range.
+So how do you remove this peak without touching the frequencies around it?
 
-The line frequency depends on the country of recording: 60 Hz in Saudi Arabia and the Americas, and 50 Hz in Europe and most other Arab countries. Check the spectrum before you assume.
+## What changes in the spectrum after the notch filter?
 
-In D1 the peak is at 60 Hz, about 20 dB above the neighboring frequencies in most channels.
-
-<Callout type="note">
-**The method on our path:** we use a narrow notch from EEGLAB's basic filter, because it is in every copy of EEGLAB 2026.1 without installing any extension. It removes only a narrow band around 60 Hz and leaves what is below and above it. More precise alternatives are at the end of the lesson.
-</Callout>
-
-## Before and after
+Before the filter there is a sharp peak at 60 Hz. After it, the peak is gone, a narrow dip is left in its place, and the rest of the spectrum is unchanged.
 
 <BeforeAfter>
 <Figure src="line-noise/line-noise-spectra-before.png" alt="Spectrum of all channels from 1 to 64 Hz before the notch filter: an alpha peak near 10 Hz and a sharp, narrow peak at 60 Hz." caption="Before: D1 hp0.1" source="D1" />
 <Figure src="line-noise/line-noise-spectra-after.png" alt="The same spectrum after the notch filter: the 60 Hz peak is gone, a narrow dip is in its place, and the rest is unchanged." caption="After: D1 hp0.1 notch60" source="D1" />
 </BeforeAfter>
 
-## Steps in the GUI
+## What is the line frequency in my data, and why remove it here?
 
-Start with the main dataset `D1 hp0.1` loaded, as in the Starting point.
+The line frequency depends on the country of recording: 60 Hz in Saudi Arabia and the US, and 50 Hz in Europe and most other Arab countries. Check the spectrum instead of assuming.
+
+In D1 the peak is at 60 Hz, about 20 dB above the neighboring frequencies in most channels.
+
+On our path, we keep the high frequencies until after ICA, so we remove line noise here.
+
+<Callout type="note">
+**The method on our path:** we use a narrow notch from EEGLAB's basic filter, because it is in every copy of EEGLAB 2026.1 without installing any extension. It removes only a narrow band around 60 Hz and leaves what is below and above it. More precise alternatives are under "What are the more precise alternatives to a notch?".
+</Callout>
+
+## How do I find the peak and remove it from the menus?
+
+Start with the main dataset `D1 hp0.1` open, the result of [the filtering lesson](/en/lesson/filtering/). If you don't have it, open "Script to reach this state" under "Starts from" at the top of the lesson.
 
 **First: find the peak in the spectrum**
 
 1. Open <MenuPath>Plot > Channel spectra and maps</MenuPath>.
 2. Change <UiLabel>Plotting frequency range [lo_Hz hi_Hz]:</UiLabel> from `2 25` to `1 64`. The default range stops at 25 Hz, so it never shows the line-noise peak.
 3. In <UiLabel>Frequencies to plot as scalp maps (Hz):</UiLabel>, type `10 60`. Leave the other fields as they are and press <UiLabel>OK</UiLabel>.
-4. Look at the spectrum: a sharp, narrow peak at 60 Hz. The scalp map at 60 shows which channels carry the most noise.
+4. Look at the spectrum: a sharp, narrow peak at 60 Hz. The scalp map at 60 Hz shows which channels carry the most noise.
 
 **Second: apply the notch filter**
 
@@ -84,16 +90,16 @@ Start with the main dataset `D1 hp0.1` loaded, as in the Starting point.
 3. In <UiLabel>Higher edge of the frequency pass band (Hz)</UiLabel>, type `62`.
 4. Check <UiLabel>Notch filter the data instead of pass band</UiLabel>. Without this option, the filter keeps only 58 to 62 Hz and removes everything else.
 5. Leave the other fields as they are and press <UiLabel>OK</UiLabel>. The filter response window appears, because <UiLabel>Plot frequency response</UiLabel> is checked by default: a dip at 60 Hz only.
-6. The command window prints a line that starts with `pop_eegfiltnew() - performing` and gives the filter length in points and the filter type.
+6. The Command Window prints a line that starts with `pop_eegfiltnew() - performing` and gives the filter length in points and the filter type.
 7. Name the new dataset `D1 hp0.1 notch60` and leave <UiLabel>Overwrite it in memory (set=yes; unset=create a new dataset)</UiLabel> unchecked.
-8. Save it with <MenuPath>File > Save current dataset as</MenuPath>. The bad channels lesson starts from it.
+8. Save it with <MenuPath>File > Save current dataset as</MenuPath>. [The bad channels lesson](/en/lesson/bad-channels/) starts from it.
 
 **Third: compare the spectrum** as in the first part, on the new dataset.
 
-## The equivalent script
+## How do I remove it with a script?
 
 ```matlab
-% Line frequency: 60 Hz in Saudi Arabia and the Americas, 50 Hz in Europe
+% Line frequency: 60 Hz in Saudi Arabia and the US, 50 Hz in Europe
 lineFreq = 60;
 
 % Spectrum before, with scalp maps at 10 Hz and at the line frequency
@@ -109,18 +115,18 @@ figure; pop_spectopo(EEG, 1, [], 'EEG', 'freqrange', [1 64], 'freq', [10 lineFre
 EEG = pop_saveset(EEG, 'filename', 'D1_hp0.1_notch60.set', 'filepath', pwd);
 ```
 
-The line that enters the path is the filter line itself, and it appears in the Starting point scripts of all the following lessons: `pop_eegfiltnew(EEG, 'locutoff', 58, 'hicutoff', 62, 'revfilt', 1)`.
+The line that enters the path is the filter line itself, and it appears in the "Script to reach this state" of every following lesson: `pop_eegfiltnew(EEG, 'locutoff', 58, 'hicutoff', 62, 'revfilt', 1)`.
 
-## Which value should I choose?
+## Which edges do I choose for the filter?
 
 | Setting | Value | Why |
 |---|---|---|
-| Line frequency | 60 Hz in D1 and in Saudi Arabia, 50 in Europe and most other Arab countries | Set by the country of recording. Always check the spectrum. |
-| Notch edges | Line frequency ± 2 Hz: 58 to 62, or 48 to 52 | Narrow enough to keep neighboring frequencies. The transition band here is about 2 Hz, and the official tutorial suggests 1 to 5 Hz for a line-noise filter. At 128 Hz the filter is 213 points long, removal is complete at 60, and half the amplitude is removed at about 59 and 61. |
+| Line frequency | 60 Hz in D1 and in Saudi Arabia, 50 Hz in Europe and most other Arab countries | Set by the country of recording. Always check the spectrum. |
+| Notch edges | Line frequency ± 2 Hz: 58 to 62, or 48 to 52 | Narrow enough to keep neighboring frequencies. The transition band here is about 2 Hz, and the official tutorial suggests 1 to 5 Hz for a line-noise filter. At 128 Hz the filter is 213 points long, removal is complete at 60 Hz, and half the amplitude is removed at about 59 and 61 Hz. |
 | Filter order | Leave it empty (automatic) | EEGLAB computes it from the edges and the sampling rate. |
 | Harmonics (120, 180 Hz…) | Not needed in D1 | The highest frequency in D1 is 64 Hz. With data at 500 Hz or more, check for peaks at multiples of the line frequency, and remove each peak you see the same way. |
 
-**Three ways to remove line noise, and when to use each:**
+## What are the more precise alternatives to a notch?
 
 | Method | When to use it | Ships with EEGLAB 2026.1? |
 |---|---|---|
@@ -128,23 +134,23 @@ The line that enters the path is the filter line itself, and it appears in the S
 | CleanLine | Spectral analysis where you want to keep the frequencies around 50 or 60 Hz. It estimates the line-noise wave and subtracts it instead of removing a whole band. The official tutorial says its result can be spectacular when it works, and that it does not always work | No, install it from <MenuPath>File > Manage EEGLAB extensions</MenuPath> |
 | Zapline-plus | Spectral or time-frequency analysis above 40 Hz, or strong line noise with many harmonics. It finds the noise and removes it automatically | No, install it from the same menu |
 
-## Common mistakes
-
-- **Assuming 50 Hz because it is "the usual one".** Saudi Arabia and the Americas use 60 Hz. A 50 Hz filter on Saudi data removes nothing useful and cuts a clean band.
-- **Checking the spectrum with the default range.** The spectrum window plots 2 to 25 Hz by default, so you miss the peak and think the data are clean. Always widen the range to include 50 or 60.
-- **Forgetting the notch option.** Without <UiLabel>Notch filter the data instead of pass band</UiLabel> the filter becomes a 58 to 62 Hz band-pass and removes all brain activity.
-- **A notch that is too wide.** Removing 45 to 75 Hz, for example, takes real brain and muscle activity with it. Stay within ± 2 Hz.
-- **Using a low-pass instead of a notch when your analysis needs high frequencies.** A 30 Hz low-pass removes line noise, but it also removes everything above 30. That is fine for ERPs at the end of processing, not before ICA.
-
-{/* "From experience" box: waiting for the project owner's story. Do not write it before it arrives. */}
-
-## How to check it worked
+## How do I verify that the line noise is gone?
 
 1. **Compare the spectrum** before and after with the range `1 64`. The peak at 60 Hz is gone, and a narrow dip is in its place.
 2. **Neighboring frequencies did not change:** power at 55 Hz and below, and at the alpha peak near 10 Hz, is as it was before the filter.
 3. **The scalp map at 60 Hz** no longer highlights particular channels.
-4. **In the command window** you find a line that starts with `pop_eegfiltnew() - performing` and gives the filter length, and a line that starts with `pop_eegfiltnew() - passband edge(s):` and gives the edges 58 and 62.
+4. **In the Command Window**, you find a line that starts with `pop_eegfiltnew() - performing` and gives the filter length, and a line that starts with `pop_eegfiltnew() - passband edge(s):` and gives the edges 58 and 62.
 
 <Methods>
 Line noise was attenuated with a zero-phase Hamming-windowed sinc FIR band-stop (notch) filter (passband edges 58 and 62 Hz, −6 dB cutoffs [59] and [61] Hz, filter length [213] points; pop_eegfiltnew with 'revfilt', firfilt plugin 2.8, EEGLAB 2026.1).
 </Methods>
+
+## Common line-noise mistakes
+
+- **Assuming 50 Hz because it is "the usual one".** Saudi Arabia and the US use 60 Hz. A 50 Hz filter on data recorded on a 60 Hz grid removes nothing useful and cuts a clean band.
+- **Checking the spectrum with the default range.** The spectrum window plots 2 to 25 Hz by default, so you miss the peak and think the data are clean. Always widen the range to include 50 or 60 Hz.
+- **Forgetting the notch option.** Without <UiLabel>Notch filter the data instead of pass band</UiLabel>, the filter becomes a 58 to 62 Hz band-pass and removes all brain activity.
+- **A notch that is too wide.** Removing 45 to 75 Hz, for example, takes real brain and muscle activity with it. Stay within ± 2 Hz.
+- **Using a low-pass instead of a notch when your analysis needs high frequencies.** A 30 Hz low-pass removes line noise, but it also removes everything above 30 Hz. That is fine for ERPs at the end of processing, but not before ICA.
+
+{/* "From experience" box: waiting for the project owner's story. Do not write it before it arrives. */}

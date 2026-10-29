@@ -54,22 +54,17 @@ eeglabVersion: "2026.1"
 updated: 2026-10-27
 ---
 
-## Why this step matters
+## The idea
 
 Voltage is not measured at a single point. Each channel measures the difference between its electrode and another electrode called the reference. So the reference shapes every channel.
 
 If you change the reference, all channels change together. A channel close to the old reference looks small, and after the change it may grow a lot. There is no "true" channel without a reference.
 
-Re-referencing computes the data as if they had been recorded with another reference. The two most common choices:
+Re-referencing computes the data as if they had been recorded with another reference. So which reference do you choose, and how do you switch to it?
 
-- **Average reference:** the mean of all scalp channels at each moment. The official tutorial recommends it for source analysis, and it is the reference on our path before ICA.
-- **Linked mastoids:** the mean of two electrodes behind the ears. Common in ERP studies, such as Luck's book.
+## How do the channels change when you change the reference?
 
-<Callout type="note">
-**About D1:** it was recorded with a mastoid reference, as the official tutorial says, and the reference channel is not in the data. So you do not add it, and you cannot try linked mastoids on D1. Try it in the simulation below.
-</Callout>
-
-## Before and after
+Try the references in the simulation, then compare real D1 channels before and after the average reference. The scalp channels change shape, and `EOG1` stays the same because it is excluded.
 
 <RerefDemo pipeline="average reference" />
 
@@ -78,23 +73,32 @@ Re-referencing computes the data as if they had been recorded with another refer
 <Figure src="rereferencing/rereferencing-scroll-after.png" alt="The same channels and seconds after the average reference, same scale: the scalp channels changed shape, while EOG1 did not because it was excluded." caption="After: average reference" source="D1" />
 </BeforeAfter>
 
-## Steps in the GUI
+## What is the difference between the average reference and linked mastoids?
 
-Start with the main dataset after interpolation loaded, as in the Starting point. In D1 this is `D1 badch` from the bad channels lesson, because there was nothing to interpolate.
+- **Average reference:** the mean of all scalp channels at each moment. The official tutorial recommends it for source analysis, and it is the reference on our path before ICA.
+- **Linked mastoids:** the mean of two electrodes behind the ears. Common in ERP studies, and used in Luck's book.
 
-1. First make sure the channel count is complete: <UiLabel>Channels per frame</UiLabel> is 32 in D1.
+<Callout type="note">
+**About D1:** it was recorded with a mastoid reference, as the official tutorial says, and the reference channel is not in the data. So you do not add it, and you cannot try linked mastoids on D1. Try it in the simulation above.
+</Callout>
+
+## How do I apply the average reference from the menus?
+
+Start with the main dataset after interpolation open. If you don't have it, open "Script to reach this state" under "Starts from" at the top of the lesson. In D1, this is `D1 badch` from [the bad channels lesson](/en/lesson/bad-channels/), because there was nothing to interpolate.
+
+1. First, make sure the channel count is complete: <UiLabel>Channels per frame</UiLabel> is 32 in D1.
 2. Open <MenuPath>Tools > Re-reference the data</MenuPath>. A window titled <UiLabel>pop_reref - average reference or re-reference data</UiLabel> appears.
-3. The first line, <UiLabel>Current data reference state is:</UiLabel>, shows the current reference. In D1 it may show `unknown`, because the file does not store the reference name for each channel.
+3. The first line, <UiLabel>Current data reference state is:</UiLabel>, shows the current reference. In D1, it may show `unknown`, because the file does not store the reference name for each channel.
 4. Keep <UiLabel>Compute average reference</UiLabel> checked; it is the default.
 5. Leave <UiLabel>Huber average ref. with threshold</UiLabel> unchecked. The official tutorial says it should not be used before ICA.
 6. Next to <UiLabel>Exclude channel indices (EMG, EOG)</UiLabel>, press <UiLabel>...</UiLabel> and choose `EOG1` and `EOG2`. The field fills with their names.
 7. Leave <UiLabel>Add old ref. channel back to the data</UiLabel> empty, because the mastoid channel is not in D1.
-8. Press <UiLabel>OK</UiLabel>. The command window prints `Re-referencing data`.
+8. Press <UiLabel>OK</UiLabel>. The Command Window prints `Re-referencing data`.
 9. Name the new dataset `D1 main` and leave <UiLabel>Overwrite it in memory (set=yes; unset=create a new dataset)</UiLabel> unchecked.
-10. Save it with <MenuPath>File > Save current dataset as</MenuPath>. This is the "main dataset" that the ICA lessons start from.
+10. Save it with <MenuPath>File > Save current dataset as</MenuPath>. This is the "main dataset" that [the ICA lessons](/en/lesson/ica-concept/) start from.
 11. Compare the two datasets with <MenuPath>Plot > Channel data (scroll)</MenuPath>: all scalp channels changed, and `EOG1` and `EOG2` stayed the same.
 
-## The equivalent script
+## How do I apply it with a script?
 
 ```matlab
 % Keep a copy to compare before and after
@@ -121,9 +125,9 @@ xlabel('Time (s)'); ylabel('Amplitude (uV)');
 EEG = pop_saveset(EEG, 'filename', 'D1_main.set', 'filepath', pwd);
 ```
 
-This is the same `pop_reref` line as in the Starting point scripts of the ICA lessons. The number the check prints is very small but not exactly zero, because the data are stored in single precision.
+This is the same `pop_reref` line as in the "Script to reach this state" of the ICA lessons. The number the check prints is very small but not exactly zero, because the data are stored in single precision.
 
-## Which value should I choose?
+## Which reference do I choose for my analysis?
 
 | Setting | Value | Why |
 |---|---|---|
@@ -134,20 +138,10 @@ This is the same `pop_reref` line as in the Starting point scripts of the ICA le
 | Huber | Not before ICA | Official tutorial: it breaks the linearity ICA needs, and it belongs after ICA. |
 
 <Callout type="expert">
-**The REST "infinity" reference:** a method that computes the data as if the reference were at a distant point with constant potential. It is available as the REST extension from <MenuPath>File > Manage EEGLAB extensions</MenuPath>, as the official tutorial mentions. And **linked mastoids** for data that contain M1 and M2 channels takes two steps in EEGLAB: an average reference while keeping the original reference channel, then re-referencing to M1 and M2.
+**The REST "infinity" reference:** a method that computes the data as if the reference were at a distant point with constant potential. It is available as the REST extension from <MenuPath>File > Manage EEGLAB extensions</MenuPath>, as the official tutorial mentions. For data that contain M1 and M2 channels, **linked mastoids** take two steps in EEGLAB: an average reference while keeping the original reference channel, then re-referencing to M1 and M2.
 </Callout>
 
-## Common mistakes
-
-- **Including EOG or ECG channels in the average reference.** These are non-brain channels, and their large signal enters every channel through the average. Exclude them in <UiLabel>Exclude channel indices (EMG, EOG)</UiLabel>.
-- **Forgetting that the average reference reduces the data rank by one.** After an average reference the scalp channels sum to zero, so any one of them equals minus the sum of the others. That is why in D1 the data rank becomes 31, not 32, and ICA gives 31 components.
-- **Re-referencing before interpolation.** An average over missing channels leans toward the side with more channels. Interpolate first.
-- **Changing the reference after ICA.** The weights are tied to the reference ICA was computed on. Re-reference before ICA and leave it afterward. EEGLAB warns you if you change it.
-- **Adding a reference channel that does not exist.** In D1 the mastoid channel is not in the data. Do not fill <UiLabel>Add old ref. channel back to the data</UiLabel> unless you defined it in the channel editor.
-
-{/* "From experience" box: waiting for the project owner's story. Do not write it before it arrives. */}
-
-## How to check it worked
+## How do I verify that the reference changed?
 
 1. **Main window:** the <UiLabel>Reference</UiLabel> line shows `average`, and <UiLabel>Channels per frame</UiLabel> is still 32.
 2. **The script check:** `EEG.ref` is `average`, and the sum over scalp channels is a very small number close to zero.
@@ -157,3 +151,13 @@ This is the same `pop_reref` line as in the Starting point scripts of the ICA le
 <Methods>
 Data were re-referenced to the average of all scalp channels (pop_reref, EEGLAB 2026.1); EOG channels were excluded from the reference.
 </Methods>
+
+## Common re-referencing mistakes
+
+- **Including EOG or ECG channels in the average reference.** These are non-brain channels, and their large signal enters every channel through the average. Exclude them in <UiLabel>Exclude channel indices (EMG, EOG)</UiLabel>.
+- **Forgetting that the average reference reduces the data rank by one.** After an average reference, the scalp channels sum to zero, so any one of them equals minus the sum of the others. That is why the data rank in D1 becomes 31, not 32, and ICA gives 31 components.
+- **Re-referencing before interpolation.** An average over missing channels leans toward the side with more channels. Interpolate first.
+- **Changing the reference after ICA.** The weights are tied to the reference ICA was computed on. Re-reference before ICA and do not change it afterward. EEGLAB warns you if you change it.
+- **Adding a reference channel that does not exist.** In D1, the mastoid channel is not in the data. Do not fill <UiLabel>Add old ref. channel back to the data</UiLabel> unless you defined it in the channel editor.
+
+{/* "From experience" box: waiting for the project owner's story. Do not write it before it arrives. */}

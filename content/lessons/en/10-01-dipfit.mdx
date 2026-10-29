@@ -70,40 +70,50 @@ eeglabVersion: "2026.1"
 updated: 2026-10-28
 ---
 
-## Why this step matters
+## The idea
 
-Every ICA component has a fixed scalp map. The natural next question is: where in the brain could this map come from?
+Every ICA component has a fixed scalp map. So the next question is: where in the brain does this map come from?
 
-The DIPFIT plugin answers with a simple model: one small source inside the head, called a <En>dipole</En>, like a tiny battery with a position and an orientation. DIPFIT searches for the position that produces a map as close as possible to the component's map.
+The DIPFIT plugin answers with a simple model: one small source inside the head, called a <En>dipole</En>, like a tiny battery with a position and a direction. DIPFIT searches for the position whose map best matches the component's map. The part of the map the fit cannot explain is the <En>residual variance</En>.
 
-What the fit cannot explain is the <En>residual variance</En>. The lower it is, the closer the component is to a single source in the brain. This helps you recognize brain components, and you will need it later when clustering ICA components across participants.
+How do you fit a dipole to each component and read its residual variance?
 
-<Callout type="warning">
-This lesson uses a template head model and template electrode positions, not the participant's real head. The resulting position is an approximate estimate, not a precise anatomical address.
-</Callout>
-
-If you have an MRI scan for each participant, the NFT plugin builds a head model for that person instead of the template. You will find it in the extension manager.
-
-## Before and after
+## What does DIPFIT give you for each component?
 
 <Figure src="dipfit/dipfit-maps-12.png" alt="Maps of the first 12 ICA components after the dipole fit: above each map the component number and its residual variance, and on each map the projection of its dipole." source="D1" />
 
 <Figure src="dipfit/dipfit-dipplot.png" alt="The dipplot window: a template MRI head in three views (top, back and side) with the numbered dipoles of the components." source="D1" />
 
-## Steps in the GUI
+Above each map are the component number and its residual variance. The lower it is, the closer the component is to a single source in the brain, and the usual acceptance limit is 15%. The model works because a brain component usually comes from a small patch of cortex whose pyramidal cells are active together and point the same way, so their currents add up like one source, as in [the EEG origin lesson](/en/lesson/eeg-origin/). This helps you recognize brain components, and you will need it later when clustering ICA components across participants. The second figure places all dipoles on a template MRI in three views.
 
-Start from the main dataset with its ICA weights, as in "Starting point". Step 4 changes the channel locations of the open dataset, so at the end of the lesson save the result to a new file, not over your main dataset.
+The second figure places all dipoles on a template MRI in three views, so you see where each source sits.
+
+## Can I trust the dipole position as an anatomical address?
+
+<Callout type="warning">
+This lesson uses a template head model and template electrode positions, not the participant's real head. The resulting position is an approximate estimate, not a precise anatomical address.
+</Callout>
+
+The position error can reach centimeters. So in your results, write that a source is "near" a region, not "in" a specific gyrus.
+
+If you have an MRI scan for each participant, the NFT plugin builds a head model for that person instead of the template. You will find it in the extension manager.
+
+## How do I fit a dipole to each component from the menus?
+
+Start with the main dataset open, with its ICA weights. If you don't have it, open "Script to reach this state" under "Starts from" at the top of the lesson.
+
+Step 4 changes the channel locations of the open dataset, so in step 17 you save the result to a new file, not over your main dataset.
 
 **First: check that Fieldtrip-lite is installed**
 
-1. DIPFIT computes the fit with functions from FieldTrip. They are not inside EEGLAB itself; they come in a separate plugin called Fieldtrip-lite. To check, type in the command window:
+1. DIPFIT computes the fit with functions from FieldTrip. They are not part of EEGLAB; they come in a separate plugin called Fieldtrip-lite. To see whether it is installed, type in the command window:
 
 ```matlab
 exist('ft_dipolefitting', 'file')
 ```
 
-   If it prints `2`, Fieldtrip-lite is installed, so go to step 3. If it prints `0`, it is not installed.
-2. To install it, open <MenuPath>File > Manage EEGLAB extensions</MenuPath>, search for Fieldtrip-lite, install it, then restart `eeglab`. If you skip this step, EEGLAB asks you when you open the DIPFIT settings in step 6: `Fieldtrip-lite extension is not installed. Do you want to download it now?`. Click <UiLabel>Yes</UiLabel>. The IC clustering lesson in station 8 also needs this plugin.
+   If it prints `2`, Fieldtrip-lite is installed and you can go to step 3. If it prints `0`, it is not installed.
+2. To install it, open <MenuPath>File > Manage EEGLAB extensions</MenuPath>, search for Fieldtrip-lite, install it, then restart `eeglab`. If you skip this step, EEGLAB asks you when you open the DIPFIT settings in step 6: `Fieldtrip-lite extension is not installed. Do you want to download it now?`. Click <UiLabel>Yes</UiLabel>.
 
 **Second: match the channel names with the head model's electrode file**
 
@@ -115,7 +125,7 @@ exist('ft_dipolefitting', 'file')
 
 6. Open <MenuPath>Tools > Source localization using DIPFIT > Head model and settings</MenuPath>.
 7. Under <UiLabel>Select a head model</UiLabel>, keep the default <UiLabel>Template Boundary Element Model (MNI)</UiLabel>.
-8. Look at the <UiLabel>Matrix to align chan. locs. with head model</UiLabel> box. It must be filled, mostly zeros and ones with the number `-1.5708`, a 90-degree rotation between the nose direction in EEGLAB and in the model. If it is empty, go back to step 4.
+8. Look at the <UiLabel>Matrix to align chan. locs. with head model</UiLabel> box. It must not be empty: most values are zeros and ones, together with the number `-1.5708`, a 90-degree rotation between the nose direction in EEGLAB and in the model. If it is empty, go back to step 4.
 9. Click <UiLabel>Ok</UiLabel>. The command window prints `Warning: 2 channels without coordinates removed from dipole fitting`, which are the same two eye channels.
 
 **Fourth: automatic fit for all components**
@@ -128,12 +138,11 @@ exist('ft_dipolefitting', 'file')
 **Fifth: read the result**
 
 14. Open <MenuPath>Plot > Component maps > In 2-D</MenuPath>, type `1:12` for the component numbers, and check <UiLabel>Plot associated dipole(s) (if present)</UiLabel>.
-15. Open <MenuPath>Tools > Source localization using DIPFIT > Component dipole plot</MenuPath>, check <UiLabel>Plot summary mode</UiLabel>, and click <UiLabel>Ok</UiLabel>. One window shows all the dipoles from three views (top, back and side), with the list of components and their residual variance.
-16. For each component: is the dipole inside the brain? What is its residual variance? Compare the blink component you identified in the ICLabel lesson with a brain component such as a posterior alpha component.
+15. Open <MenuPath>Tools > Source localization using DIPFIT > Component dipole plot</MenuPath>, check <UiLabel>Plot summary mode</UiLabel>, and click <UiLabel>Ok</UiLabel>. One window shows all the dipoles in three views (top, back and side), with the list of components and their residual variance.
+16. For each component: is the dipole inside the brain? What is its residual variance? Compare the blink component you identified in [the ICLabel lesson](/en/lesson/iclabel/) with a brain component such as the posterior alpha component.
 17. Save with <MenuPath>File > Save current dataset as</MenuPath> as `D1_dipfit.set`.
 
-## The equivalent script
-
+## How do I run DIPFIT from a script?
 
 ```matlab
 % DIPFIT needs the Fieldtrip-lite plugin: install it once if missing
@@ -171,32 +180,31 @@ pop_dipplot(EEG, 1:numel(EEG.dipfit.model), 'normlen', 'on', 'summary', 'on', 'n
 EEG = pop_saveset(EEG, 'filename', 'D1_dipfit.set', 'filepath', pwd);
 ```
 
-## Which value should I choose?
+## Which head model, and which residual variance limit?
 
 | Setting | Value | Why |
 |---|---|---|
-| Head model | <UiLabel>Template Boundary Element Model (MNI)</UiLabel> | The official documentation: the spherical model (BESA) is kept for backward compatibility and is not meant for publication; the BEM model is closer to a real head shape (Head model page). |
-| Dipole acceptance limit | Residual variance below 15% | The default EEGLAB limit for selecting components before clustering, with a paper that justifies it on the same page (STUDY ICA clusters). A starting rule, not a law. |
+| Head model | <UiLabel>Template Boundary Element Model (MNI)</UiLabel> | The official documentation says the spherical model (BESA) is kept for backward compatibility and is not meant for publication; the BEM model is closer to a real head shape (Head model page). |
+| Dipole acceptance limit | Residual variance below 15% | The default EEGLAB limit for selecting components before clustering, justified by a paper cited on the same page (STUDY ICA clusters). A starting rule, not a law. |
 | Rejection threshold during the fit | 100% while learning | You keep every dipole and read it. In a project script you can set it to 15, so the rest are flagged automatically. |
 | Number of dipoles | One; two symmetric dipoles only when the map is symmetric across hemispheres | The <UiLabel>Fit bilateral dipoles (check)</UiLabel> option is made for this case (DIPFIT page, Fitting symmetrical dipoles). |
 
-## Common mistakes
-
-- **Leaving the alignment matrix empty.** Without alignment between electrode positions and the head model, dipoles land in the wrong places. Make sure it is filled before fitting.
-- **Changing channel locations after setting up the model.** If you edit the locations, open <UiLabel>Head model and settings</UiLabel> again so the alignment is recomputed.
-- **Reading the position as a precise anatomical address.** The model and electrodes are templates, so the error can reach centimeters. Write "near" a region, not "in" a specific gyrus.
-- **Taking a low residual variance as proof of a brain source.** A blink component can fit well with low residual variance, yet its position is at the front of the head near the eyes. Read the position, the map and the spectrum together, as in the ICLabel lesson.
-- **Including eye channels in the fit.** The head model is weak near the eyes, and the official documentation advises leaving them out. In this lesson they were excluded automatically because they had no location after step 2.
-
-{/* "From experience" box: waiting for a story from the project owner. Not written before it arrives. */}
-
-## How to check it worked
+## How do I verify that the fit worked?
 
 - `exist('ft_dipolefitting', 'file')` prints `2`.
 - `EEG.dipfit.coord_transform` is not empty and contains `-1.5708`.
 - `numel(EEG.dipfit.model)` equals your number of ICA components.
 - The blink component sits at the front of the head, and the posterior alpha component sits in the back of the brain.
 - The script prints the number of components below 15%. Note it: you will need it for ICA component clustering.
+
+## Common mistakes with DIPFIT
+
+- **Leaving the alignment matrix empty.** Without alignment between electrode positions and the head model, dipoles land in the wrong places. Make sure it is not empty before fitting.
+- **Changing channel locations after setting up the model.** If you edit the locations, open <UiLabel>Head model and settings</UiLabel> again so the alignment is recomputed.
+- **Taking a low residual variance as proof of a brain source.** A blink component can fit well with low residual variance, yet its position is at the front of the head near the eyes. Read the position, the map and the spectrum together, as in [the ICLabel lesson](/en/lesson/iclabel/).
+- **Including eye channels in the fit.** The head model is weak near the eyes, and the official documentation advises leaving them out. In this lesson they were excluded automatically because they had no location after step 4.
+
+{/* "From experience" box: waiting for a story from the project owner. Not written before it arrives. */}
 
 <Methods>
 Equivalent current dipoles were fitted to each independent component (pop_multifit, dipfit plugin 5.6, EEGLAB 2026.1) using the template boundary element head model (MNI) and template electrode positions (standard_1005); components with residual variance above 15% were considered non-dipolar.

@@ -85,28 +85,41 @@ eeglabVersion: "2026.1"
 updated: 2026-10-28
 ---
 
-## Why this step matters
+## The idea
 
-An ERP waveform answers "when": at what time the signal rises or falls. A scalp map answers "where": how the voltage is spread over the scalp at one moment.
+An ERP waveform answers "when" the signal rises or falls. A scalp map answers "where": how the voltage spreads over the scalp at one moment.
 
-Each ERP component has a roughly known distribution. So a map helps you tell apart two components that occur at the same time, and spot a bad channel that shows up as a lone, odd-looking spot.
+Each ERP component has a roughly known distribution. So a map helps you tell apart two components that occur at the same time, and spot a bad channel as a lone, odd spot.
 
-Maps are also easy to misread: a different color scale on two maps can create a difference that does not exist. This lesson teaches plotting and reading together.
+But maps mislead easily: different color scales can create a difference that does not exist. So how do you plot a scalp map in EEGLAB, and read it without being fooled?
 
-## Before and after
+## Why should maps share one color scale?
 
 <BeforeAfter>
-<Figure src="topoplot/topoplot-scales-before.png" alt="Six scalp maps at 0, 100, 200, 300, 400 and 500 ms, each with its own colour scale. The 0 ms map looks strong although its amplitude is small." caption="Before: a separate scale for each map" source="D1" />
-<Figure src="topoplot/topoplot-scales-after.png" alt="The same six maps on one shared colour scale from -15.5 to 15.5 µV: the 0 ms map is close to neutral and the 300 and 400 ms maps stand out." caption="After: one shared scale" source="D1" />
+<Figure src="topoplot/topoplot-scales-before.png" alt="Six scalp maps at 0, 100, 200, 300, 400 and 500 ms, each with its own color scale. The 0 ms map looks strong although its amplitude is small." caption="Before: a separate scale for each map" source="D1" />
+<Figure src="topoplot/topoplot-scales-after.png" alt="The same six maps on one shared color scale from -15.5 to 15.5 µV: the 0 ms map is close to neutral and the 300 and 400 ms maps stand out." caption="After: one shared scale" source="D1" />
 </BeforeAfter>
 
-## Steps in the GUI
+Watch the 0 ms map: on its own scale it looks strong, but on the shared scale it is close to neutral. The amplitude did not change; only the scale did.
 
-Start with the dataset `D1 epochs clean` open, as in "Starting point". It has 32 channels with locations, epoched around the `square` event.
+## How do I read a scalp map?
+
+- **The small triangle at the top:** the nose. The map is seen from above the head, with the ears at the sides.
+- **The left side of the map:** the left half of the head. Scientific plots are never mirrored.
+- **The black dots:** electrode positions. Values between them are interpolated, not measured.
+- **The color bar:** amplitude in microvolts (µV). In a map series, the upper and lower limits have the same size and opposite signs, so the middle color is zero.
+- **Warm and cool colors:** with turbo, red is positive and blue is negative.
+- **A small sharp spot around one electrode:** usually a bad channel, not brain activity.
+
+## How do I plot the maps from the menus?
+
+Start with the dataset `D1 epochs clean` open. If you don't have it, open "Script to reach this state" at the top of the lesson. It has 32 channels with locations, epoched around the `square` event.
 
 **0. Keep the scalp channels only**
 
-EOG1 and EOG2 were left out of the average reference in the rereferencing lesson, so they are still on the original reference. They also have locations in D1, so EEGLAB would draw them on the map and could take its color limits from them. Make a copy without them first.
+A map fills the space between electrodes by interpolating from neighboring channels, so every channel on it must use the same reference. But EOG1 and EOG2 were left out of the average reference in [the re-referencing lesson](/en/lesson/rereferencing/), so they are still on the original reference. They also have locations in D1, so EEGLAB would draw them on the map, and their values can set the shared color scale for all six maps.
+
+So first make a copy without them; its maps show 30 average-referenced scalp channels.
 
 1. Open <MenuPath>Edit > Select data</MenuPath>.
 2. In the <UiLabel>Channel(s)</UiLabel> row, type `EOG1 EOG2`, and tick the box in the <UiLabel>on->remove these</UiLabel> column of that row. Press <UiLabel>Ok</UiLabel>.
@@ -117,7 +130,7 @@ Use this dataset for every map in this lesson.
 **1. The waveforms and their maps together**
 
 1. Open <MenuPath>Plot > Channel ERPs > With scalp maps</MenuPath>.
-2. In <UiLabel>Plotting time range (ms):</UiLabel> type `-200 800`.
+2. In <UiLabel>Plotting time range (ms):</UiLabel>, type `-200 800`.
 3. Leave <UiLabel>Scalp map latencies (ms, NaN -> max-RMS)</UiLabel> at `NaN`. EEGLAB then picks the time at which the ERP is strongest across channels.
 4. Leave <UiLabel>Window size at latencies in ms</UiLabel> at `0`. Press <UiLabel>Ok</UiLabel>.
 5. The waveforms of all 30 channels appear on top of each other, with a map above them at the chosen time and a line linking it to the time axis. Click any point on the waveforms to draw the map at that time.
@@ -126,28 +139,13 @@ Use this dataset for every map in this lesson.
 **2. A map series on one scale**
 
 1. Open <MenuPath>Plot > ERP map series > In 2-D</MenuPath>.
-2. In <UiLabel>Plotting ERP scalp maps at these latencies</UiLabel> type `0:100:500`. The box accepts any MATLAB expression, so this means 0, 100, 200, 300, 400 and 500 ms.
-3. In <UiLabel>Plot title</UiLabel> keep the dataset name.
-4. In <UiLabel>Plot geometry (rows,col.); [] -> near square</UiLabel> type `[2 3]`.
+2. In <UiLabel>Plotting ERP scalp maps at these latencies</UiLabel>, type `0:100:500`. The box accepts any MATLAB expression, so this means 0, 100, 200, 300, 400 and 500 ms.
+3. In <UiLabel>Plot title</UiLabel>, keep the dataset name.
+4. In <UiLabel>Plot geometry (rows,col.); [] -> near square</UiLabel>, type `[2 3]`.
 5. Leave the extra options box at `'electrodes', 'on'` so the electrode dots are shown. Press <UiLabel>Ok</UiLabel>.
 6. Six maps appear on one color scale with one color bar. Click any map to enlarge it in its own window.
 
-**3. Read the map**
-
-| What you see | What it means |
-|---|---|
-| The small triangle at the top | The nose. The map is seen from above the head, with the ears at the sides. |
-| The left side of the map | The left half of the head. Scientific plots are never mirrored. |
-| The black dots | Electrode positions. Values between them are interpolated, not measured. |
-| The color bar | Amplitude in microvolts (µV). In a map series the upper and lower limits have the same size and opposite signs, so the middle color is zero. |
-| Warm and cool colors | With turbo, red is positive and blue is negative. |
-| A small sharp spot around one electrode | Usually a bad channel, not brain activity. |
-
-<Callout type="note" title="Why step 0?">
-Why step 0? A map mixes channels by interpolation, so every channel on it must use the same reference. EOG1 and EOG2 do not, and in a map series their values can also set the shared color scale for all six maps. Removing them gives a map of 30 average-referenced scalp channels.
-</Callout>
-
-## The equivalent script
+## How do I plot the map series and a window map in a script?
 
 ```matlab
 EEG = pop_loadset('D1_epochs_clean.set', pwd);
@@ -176,28 +174,18 @@ cb = colorbar; ylabel(cb, '\muV');
 title('300 to 500 ms');
 ```
 
-## Which value should I choose?
+## Should I map a window or one latency, and on which color scale?
 
 | Setting | Value | Why |
 |---|---|---|
-| One latency or a window? | A window for a sustained component (e.g. 300 to 500 ms); a single latency for exploring | A window mean is more stable than one point, because the noise in a single sample is larger. It is the same logic as "mean amplitude" in the ERPLAB lesson. |
+| One latency or a window? | A window for a sustained component (e.g. 300 to 500 ms); a single latency for exploring | A window mean is more stable than one point, because the noise in a single sample is larger. It is the same logic as "mean amplitude" in the "ERPLAB: measuring amplitude & latency" lesson. |
 | Color scale | One scale shared by all maps you compare | A different scale for each map makes a weak map look strong. <MenuPath>Plot > ERP map series > In 2-D</MenuPath> does this for you. |
 | Scale limits | Symmetric around zero (`[-lim lim]`) | The middle color stays at zero, so you can compare positive and negative by eye. This is the `topoplot` default (`'absmax'`). |
 | `'electrodes'` | `'on'` up to 64 channels | Shows where the real measurements are. Above 64 channels the dots crowd the map, and EEGLAB suggests `'off'` automatically. |
 | Colormap | The EEGLAB default | EEGLAB 2026.1 uses `turbo` on MATLAB R2023b and later, and `jet` before that (`icadefs.m`). Do not switch to colors that hide where zero is. |
 | 2-D or 3-D map | 2-D (<MenuPath>Plot > ERP map series > In 2-D</MenuPath>) | <MenuPath>Plot > ERP map series > In 3-D</MenuPath> needs a spline file made for your montage and a match between your electrodes and a head mesh, and each view shows only part of the head. A 2-D map shows the whole scalp at once and is what papers use, so this path uses 2-D maps only. |
 
-## Common mistakes
-
-- **Comparing maps on different scales.** Read the numbers on the color bar before the colors. Two maps with similar colors can differ tenfold in amplitude.
-- **Trusting the <UiLabel>Window size at latencies in ms</UiLabel> box.** The value is half the window width, so 50 at 100 ms means 50 to 150 ms. In EEGLAB 2026.1 the first maps carry that "50 to 150 ms" label, but they are drawn from a single sample. The real window average only happens when you click the waveforms. For a reliable window map, use the script above.
-- **Reading the map as the source location.** A red spot over Pz does not mean the source is under Pz. Conduction through the skull spreads the voltage, and the source orientation moves the peak. Source localization is the topic of the DIPFIT lesson.
-- **A map without correct electrode locations.** If locations are missing or wrong, the whole map is wrong. Check them as in the channel locations lesson.
-- **Forgetting the reference.** The map changes completely with the reference. Our maps use the average reference of 30 scalp channels, so say so under every figure.
-
-{/* Experience box: waiting for a story from the project owner. Do not write it before it arrives. */}
-
-## How to check it worked
+## How do I check that the maps are right?
 
 - **Nose up**, with Fz at the front and Oz at the back when you use `'electrodes', 'labels'`.
 - **One color bar** for the series of six maps, with limits of equal size.
@@ -208,3 +196,13 @@ title('300 to 500 ms');
 <Methods>
 Scalp topographies of the ERP at 30 average-referenced scalp channels (EOG channels excluded) were plotted at 0 to 500 ms in 100-ms steps and as the mean amplitude from 300 to 500 ms, using a symmetric color scale (pop_topoplot, topoplot, EEGLAB 2026.1).
 </Methods>
+
+## Which mistakes make a map misleading?
+
+- **Comparing maps on different scales.** Read the numbers on the color bar before the colors. Two maps with similar colors can differ tenfold in amplitude.
+- **Trusting the <UiLabel>Window size at latencies in ms</UiLabel> box.** The value is half the window width, so 50 at 100 ms means 50 to 150 ms. In EEGLAB 2026.1 the first maps carry that "50 to 150 ms" label, but they are drawn from a single sample, and the real window average is computed only when you click the waveforms. For a reliable window map, use the script above.
+- **Reading the map as the source location.** A red spot over Pz does not mean the source is under Pz. Conduction through the skull spreads the voltage, and the source orientation moves the peak. Source localization is the topic of [the DIPFIT lesson](/en/lesson/dipfit/) in station 10.
+- **A map without correct electrode locations.** If locations are missing or wrong, the whole map is wrong. Check them as in [the channel locations lesson](/en/lesson/channel-locations/).
+- **Forgetting the reference.** The map changes completely with the reference. Our maps use the average reference of 30 scalp channels, so say so under every figure.
+
+{/* Experience box: waiting for a story from the project owner. Do not write it before it arrives. */}

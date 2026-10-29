@@ -1,5 +1,5 @@
 // Reference card content, taken from a lesson's MDX source at build time (DESIGN.md §7.18).
-const ORDER = ['why', 'before-after', 'gui', 'script', 'values', 'mistakes', 'verify'] as const;
+import { sectionsOfMarkdown } from './lesson-sections.mjs';
 
 export interface CardData {
   steps: { path: string[][]; labels: string[]; values: string[] }[];
@@ -18,8 +18,10 @@ const SCRIPT_MAX_LINES = 18;
 const strip = (s: string) => s.replace(/<\/?[A-Z][A-Za-z]*\b[^>]*>/g, '').replace(/\[([^\]]+)\]\([^)]+\)/g, '$1');
 
 export function cardFrom(body: string): CardData {
-  const parts = body.split(/^## .*$/m).slice(1);
-  const sec = Object.fromEntries(ORDER.map((id, i) => [id, parts[i] ?? ''])) as Record<(typeof ORDER)[number], string>;
+  // Each kind joins the sections of that kind (a lesson has only the sections it needs, in its own order).
+  const all = sectionsOfMarkdown(body);
+  const of = (kind: string) => all.filter((x) => x.kind === kind).map((x) => x.body).join('\n');
+  const sec = { gui: of('gui'), script: of('script'), values: all.find((x) => x.kind === 'values')?.body ?? '', verify: of('verify') };
   // 1. Steps: every list item in the GUI section that names a menu or a field, with the values typed there.
   const raw = sec.gui.split('\n').filter((l) => /^\s*\d+\.\s/.test(l) && /<(MenuPath|UiLabel)>/.test(l)).map((l) => ({
     path: [...l.matchAll(/<MenuPath>([\s\S]*?)<\/MenuPath>/g)].map((m) => m[1].split('>').map((x) => x.trim())),

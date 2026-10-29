@@ -18,7 +18,7 @@ const edges = new Map();
 for (const [r, f] of pages) {
   const html = readFileSync(f, 'utf8');
   const sheetAt = html.indexOf('id="more-sheet"');
-  const sheetEnd = sheetAt < 0 ? -1 : html.indexOf('data-backnote', sheetAt); // the sheet is followed by the back-button note
+  const sheetEnd = sheetAt < 0 ? -1 : html.indexOf('popovertargetaction="hide"', sheetAt); // the sheet ends with its close button
   const out = new Map();
   for (const m of html.matchAll(/<a\b[^>]*\bhref="([^"#?]*)[^"]*"/g)) {
     let href = m[1];

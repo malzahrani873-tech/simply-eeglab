@@ -41,30 +41,43 @@ eeglabVersion: "2026.1"
 updated: 2026-10-28
 ---
 
-## Why this step matters
+## The idea
 
 An event is a marker in the recording that says "something happened here": a stimulus appeared, the participant pressed a button, or a task started. Each event has a type (its name) and a latency (when it happened).
 
-Almost every later analysis depends on events. Epoching cuts the data around them, and ERPs are averaged over them. If the events are missing, have the wrong names, or sit at the wrong time, every result after them is wrong, even if the signal is clean.
+Almost every later analysis depends on events. Epoching cuts the data around them, and ERPs are averaged over them. If events are missing, misnamed or mistimed, every later result is wrong, even with a clean signal.
 
-So right after import, check three things: are the event types the ones you expect, is their number right, and is their timing right.
+So how do you check, right after import, that their types, count and timing are right?
+
+## What do events look like on the signal?
+
+Each vertical line is an event, with its name written above it. Each type has its own color.
+
+<ImageSpec>
+The Channel data (scroll) window for S001R03 after channel locations: a few channels with their names on the left, and colored vertical event lines with their names above them (T2, then T0, then T1, then T0), about 4 seconds apart. The Event types button at the bottom is marked with an arrow. Real screenshot from EEGLAB 2026.1 (source: eeglab-ui).
+</ImageSpec>
+
+## Which events are in this file, and what does each one store?
 
 In `S001R03.edf` the events come from the EDF+ annotations. The dataset page defines three codes:
 
 - `T0`: rest.
 - `T1` and `T2`: the start of two different movements, real or imagined. Which movement each code means depends on the task of the run. The dataset page explains it.
 
-## Before and after
+Each event in `EEG.event` has these fields:
 
-<ImageSpec>
-The Channel data (scroll) window for S001R03 after channel locations: a few channels with their names on the left, and colored vertical event lines with their names above them (T2, then T0, then T1, then T0), about 4 seconds apart. The Event types button at the bottom is marked with an arrow. Real screenshot from EEGLAB 2026.1 (source: eeglab-ui).
-</ImageSpec>
+| Field | What it stores | Stored unit | Shown in Edit > Event values as | Example (first event) |
+|---|---|---|---|---|
+| `type` | Event name | text | text | `T2` |
+| `latency` | When the event happened | samples | seconds | `672` (4.19 s) |
+| `duration` | How long the event lasted | samples | seconds | `656` (4.1 s) |
+| `urevent` | The event's number in the original list | number | not shown | `1` |
 
-## Steps in the GUI
+## How do I see the events and read their values from the menus?
 
 ### 1. See the events on the signal
 
-1. Open `S001R03.set`, which now has channel locations.
+1. Open `S001R03.set`, which now has channel locations from [the channel locations lesson](/en/lesson/channel-locations/).
 2. Open <MenuPath>Plot > Channel data (scroll)</MenuPath>.
 3. The vertical lines are the events, with each event's type written above it. Each type has its own color.
 4. Click <UiLabel>Event types</UiLabel> at the bottom of the window. A small legend shows each type with its color.
@@ -78,9 +91,9 @@ The Channel data (scroll) window for S001R03 after channel locations: a few chan
 4. Move to the next event with the `>` button. The second event is `T0` at `[8.2937]` seconds.
 5. Close the window with <UiLabel>Cancel</UiLabel> so you do not change anything.
 
-This window shows latency and duration **in seconds**. Inside `EEG.event` they are stored **in samples**. The script below shows the difference.
+This window shows latency and duration **in seconds**. Inside `EEG.event` they are stored **in samples**. The script in the next section shows the difference.
 
-## The equivalent script
+## How do I read the events with a script, and why do the numbers differ?
 
 ```matlab
 % Start EEGLAB and load the file from the previous lesson
@@ -110,18 +123,21 @@ pop_eegplot(EEG, 1, 1, 1);
 - **Why 4.19 and not 4.2?** The file puts the first event at 4.2 seconds, and the import makes it sample 4.2 × 160 = 672. After subtracting 1, that is 4.19375 seconds, which the window shows as `[4.1937]`. The difference is one sample (about 6 ms) and does not matter in this course.
 - **Why 29 events and not 30?** The file has 30 annotations, and the first is `T0` at 0 seconds. The import gives it latency `0`, before the first sample, so EEGLAB removes it and prints in the Command Window: `eeg_checkset warning: 1/30 events had out-of-bounds latencies and were removed`.
 
-## Which value should I choose?
+## What if the events are missing or late?
 
-There is no value to choose here. What matters is knowing what to expect. These are the event fields in this file:
+In other files the events may not come with the signal. Import them with <MenuPath>File > Import event info</MenuPath>: from a text file or MATLAB array, from the trigger channel (<UiLabel>From data channel</UiLabel>), or from Presentation and E-Prime files.
 
-| Field | What it stores | Stored unit | Shown in Edit > Event values as | Example (first event) |
-|---|---|---|---|---|
-| `type` | Event name | text | text | `T2` |
-| `latency` | When the event happened | samples | seconds | `672` (4.19 s) |
-| `duration` | How long the event lasted | samples | seconds | `656` (4.1 s) |
-| `urevent` | The event's number in the original list | number | not shown | `1` |
+If all events are late by a fixed amount, such as the delay before the stimulus appears on the screen, shift them in a script by the delay you measured on your setup:
 
-And what to expect in `S001R03.edf`:
+```matlab
+EEG = pop_adjustevents(EEG, 'addms', 20);   % move every event 20 ms later (use your own measured delay)
+```
+
+The matching menu, <MenuPath>Edit > Adjust event latencies</MenuPath>, is hidden by default in 2026.1. To show it, tick the checkbox that starts with <UiLabel>If set, show all menu items from previous EEGLAB versions.</UiLabel> in <MenuPath>File > Preferences</MenuPath> and restart EEGLAB. This makes every menu look different from the lesson images, so untick it when you are done.
+
+## How do I verify that the events in this file are right?
+
+Compare what you see with this table:
 
 | Check | Expected |
 |---|---|
@@ -130,26 +146,6 @@ And what to expect in `S001R03.edf`:
 | Spacing | about 4.1 to 4.2 seconds between events |
 | Last event | `T1` at about 120.4 seconds, before the end of the recording at 125 seconds |
 
-**If events are missing or late.** In other files the events may not come with the signal. Import them with <MenuPath>File > Import event info</MenuPath>: from a text file or MATLAB array, from the trigger channel (<UiLabel>From data channel</UiLabel>), or from Presentation and E-Prime files. If all events are late by a fixed amount, such as the delay before the stimulus appears on the screen, shift them in a script by the delay you measured on your setup:
-
-```matlab
-EEG = pop_adjustevents(EEG, 'addms', 20);   % move every event 20 ms later (use your own measured delay)
-```
-
-The matching menu, <MenuPath>Edit > Adjust event latencies</MenuPath>, is hidden by default in 2026.1. To show it, tick the checkbox that starts with <UiLabel>If set, show all menu items from previous EEGLAB versions.</UiLabel> in <MenuPath>File > Preferences</MenuPath> and restart EEGLAB. This changes how every menu looks compared with the lesson images, so untick it when you are done.
-
-## Common mistakes
-
-- **Reading `latency` as seconds.** In `EEG.event` it is in samples. Convert it with (sample − 1) ÷ sampling rate.
-- **Types appear as numbers (`1`, `2`, `3`) instead of `T0`, `T1`, `T2`.** The annotation names were not read. Import again with <UiLabel>Import EDF+ annotations (try also mexSLOAD below)</UiLabel> ticked, as in the import lesson.
-- **No events at all.** The <UiLabel>Events</UiLabel> line in the main window shows `none`. The annotations were not imported. Import again and check the same field.
-- **Assuming T1 always means the same movement.** In this dataset its meaning depends on the run's task. Read the dataset page for each file you use.
-- **Changing an event by mistake in Edit > Event values.** Any value you type changes the event. Close with <UiLabel>Cancel</UiLabel> unless you mean to edit it.
-
-{/* "From experience" box: waiting for a story from the project owner. Do not write it before it arrives. */}
-
-## How to check it worked
-
 1. The <UiLabel>Events</UiLabel> line in the main window shows `29`.
 2. `eeg_eventtypes(EEG)` lists `T0` 14, `T1` 8 and `T2` 7.
 3. The first event in <MenuPath>Edit > Event values</MenuPath> is `T2` at `[4.1937]` seconds, and the second is `T0` at `[8.2937]` seconds.
@@ -157,4 +153,12 @@ The matching menu, <MenuPath>Edit > Adjust event latencies</MenuPath>, is hidden
 
 This lesson does not change the data, so there is nothing to save.
 
-From the next station we work on `eeglab_data.set`, which ships with EEGLAB, because it is small and matches the documentation. The same steps apply to your own file.
+## Why do events show up as numbers, or not at all? Common mistakes with events
+
+- **Reading `latency` as seconds.** In `EEG.event` it is in samples. Convert it with (sample − 1) ÷ sampling rate.
+- **Types appear as numbers (`1`, `2`, `3`) instead of `T0`, `T1`, `T2`.** The annotation names were not read. Import again with <UiLabel>Import EDF+ annotations (try also mexSLOAD below)</UiLabel> ticked, as in [the import lesson](/en/lesson/import-raw/).
+- **No events at all.** The <UiLabel>Events</UiLabel> line in the main window shows `none`. The annotations were not imported. Import again and check the same field.
+- **Assuming T1 always means the same movement.** In this dataset its meaning depends on the run's task. Read the dataset page for each file you use.
+- **Changing an event by mistake in Edit > Event values.** Any value you type changes the event. Close with <UiLabel>Cancel</UiLabel> unless you mean to edit it.
+
+{/* "From experience" box: waiting for a story from the project owner. Do not write it before it arrives. */}

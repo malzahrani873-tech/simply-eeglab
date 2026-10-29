@@ -9,7 +9,7 @@ status: approved
 objectives:
   - Run a command in the Command Window and read the value of a struct field from the Workspace.
   - Extract one channel and specific samples from a signal matrix by indexing.
-  - Save a script to a file and run it, and use which to check where a function is on the path.
+  - Save a script to a file and run it, and use the which command to check where a function is on the path.
 prerequisites: []
 references:
   - title: EEGLAB Tutorial
@@ -28,29 +28,31 @@ eeglabVersion: "2026.1"
 updated: 2026-10-27
 ---
 
-## Why this step matters
+## The idea
 
-EEGLAB is written in MATLAB and runs inside it. Every click in EEGLAB's menus becomes a line of MATLAB behind the scenes, and in station 9 you will learn to collect these lines into a script that processes every participant.
+EEGLAB is written in MATLAB and runs inside it. Every menu click becomes a line of MATLAB, and in station 9 you will collect these lines into a script for all participants.
 
-The data itself lives in MATLAB as a variable called `EEG`. To read the number of channels or the sampling rate from it, you need only four ideas: the variable, the matrix, the struct and the path.
+The data itself lives in MATLAB as a variable called `EEG`. To read from it, you need four ideas: the variable, the matrix, the struct and the path.
 
-This lesson is not a MATLAB course. It is the minimum you need to follow the path. If you want more, the official EEGLAB documentation recommends the free MATLAB Onramp course from MathWorks.
+This lesson is not a MATLAB course; it covers only the minimum you need. So how do you type your first commands and read data like `EEG`?
 
-## Before and after
+## Where are the three parts of the MATLAB window?
 
 <Figure src="matlab-basics/matlab-window.svg" alt="Schematic of the MATLAB window: Current Folder on the left with the files of the current folder, Command Window in the middle with the line demo.srate = 128 and its output, and Workspace on the right with the variable demo of type 1x1 struct." source="original" />
 
-Your layout may differ, because MATLAB lets you move the parts around. What matters is finding all three by name.
+- <UiLabel>Command Window</UiLabel>: where you type commands and see their results.
+- <UiLabel>Workspace</UiLabel>: the variables currently in memory.
+- <UiLabel>Current Folder</UiLabel>: the folder MATLAB is working in, and the first place it looks for your files.
 
-## Steps in the GUI
+Your layout may differ because MATLAB lets you move the parts around, so look for them by name.
 
-Here the "GUI" is the MATLAB window itself, not EEGLAB.
+## How do I type a first command and run a script?
 
-1. Open MATLAB and find the three parts: <UiLabel>Command Window</UiLabel>, <UiLabel>Workspace</UiLabel> and <UiLabel>Current Folder</UiLabel>.
+1. Open MATLAB.
 2. In the Command Window type `x = 5` and press <kbd>Enter</kbd>. MATLAB prints the result, and the variable `x` appears in the Workspace.
 3. Type `y = 7;` with a semicolon at the end. Nothing is printed, but `y` appears in the Workspace. The semicolon only stops the printing.
 4. Double-click `x` in the Workspace. The Variables editor opens and shows its value.
-5. Open a new script with the <UiLabel>New Script</UiLabel> button in the <UiLabel>Home</UiLabel> tab. Paste the script from the next section into it.
+5. Open a new script with the <UiLabel>New Script</UiLabel> button in the <UiLabel>Home</UiLabel> tab. Paste the script from the next section, "How do I build a small recording and read from it?", into it.
 6. Save it as `demo_basics.m` in the folder shown in the Current Folder.
 7. Run it with the <UiLabel>Run</UiLabel> button in the <UiLabel>Editor</UiLabel> tab, or type its name without `.m` in the Command Window: `demo_basics`.
 
@@ -58,9 +60,9 @@ Here the "GUI" is the MATLAB window itself, not EEGLAB.
 A script file name starts with a letter and contains only English letters, digits and underscores, with no spaces. Do not give it the name of an existing function such as `plot` or `eeglab`.
 </Callout>
 
-## The equivalent script
+## How do I build a small recording and read from it?
 
-The script builds a small recording by hand: 3 channels for 10 seconds at 128 samples per second, with random numbers instead of a real signal. It is called `demo` so it does not get mixed up with the real `EEG` variable you will meet in station 1.
+The script builds a small recording by hand: 3 channels for 10 seconds at 128 samples per second, with random numbers instead of a real signal. It is called `demo` so it does not get mixed up with the real `EEG` variable you will meet in the [EEG structure lesson](/en/lesson/eeg-struct/).
 
 ```matlab
 % A toy recording: 3 channels, 10 seconds at 128 Hz
@@ -95,15 +97,15 @@ which plot                                      % location of a function on the 
 
 **What each part does:**
 
-- **struct:** the variable `demo` is a box with fields, each with a name. You reach a field with a dot: `demo.srate`. The `EEG` variable in EEGLAB is a struct with the same idea, just more fields.
+- **struct:** the variable `demo` is a box with fields, each with a name. You reach a field with a dot: `demo.srate`. The `EEG` variable in EEGLAB is a struct with the same idea, only with more fields.
 - **Matrix:** `demo.data` is a table of numbers. Each row is a channel and each column is a time sample. This is the same order as `EEG.data` in EEGLAB: channels first, then samples.
-- **Indexing:** `demo.data(2, 1:5)` means row 2, columns 1 to 5. A colon alone `:` means "all columns". Numbering in MATLAB starts at 1, not 0.
-- **Time:** the first sample is at time zero, so we divide 0 to (number of samples minus 1) by the sampling rate. The last sample is at 9.9922 seconds, not 10.
-- **Path:** MATLAB finds functions and scripts in the current folder and in a list of folders called the path. The `which` command tells you where any name will come from. The `addpath` command adds a folder to the path for this session only. You will use it in the installation lesson in station 1 to add the EEGLAB folder and save it.
+- **Indexing:** `demo.data(2, 1:5)` means row 2, columns 1 to 5. A colon alone (`:`) means "all columns". Numbering in MATLAB starts at 1, not 0.
+- **Time:** the first sample is at time zero, so we divide the numbers 0 to (number of samples minus 1) by the sampling rate. The last sample is at 9.9922 seconds, not 10.
+- **Path:** MATLAB finds functions and scripts in the current folder and in a list of folders called the path. The `which` command tells you where any name will come from. The `addpath` command adds a folder to the path for this session only. You will use it in the [installation lesson](/en/lesson/install-eeglab/) to add the EEGLAB folder and save the path.
 
-## Which value should I choose?
+## What do the symbols in every script mean?
 
-There is no value to choose here, but some similar-looking symbols mean different things. This table is enough to read any line in the EEGLAB lessons.
+Some similar-looking symbols mean different things. This table is enough to read any line in the EEGLAB lessons.
 
 | You type | Meaning | Example from the lessons |
 |---|---|---|
@@ -116,7 +118,17 @@ There is no value to choose here, but some similar-looking symbols mean differen
 | `%` | Everything after it on the line is a comment and is not run | `% high-pass` |
 | `help name` | Help for a function in the Command Window | `help pop_eegfiltnew` |
 
-## Common mistakes
+If you want more than this minimum, the official EEGLAB documentation recommends the free MATLAB Onramp course from MathWorks.
+
+## How do I check the script worked? Compare its output with this
+
+- `size(demo.data)` prints `3` then `1280`.
+- `demo.srate` prints `128`, and `demo.labels{2}` prints `'Cz'`.
+- `t(end)` prints `9.9922`.
+- A figure window shows a line wiggling around zero for 10 seconds, titled `Channel Cz`.
+- `which plot` prints a path inside the MATLAB installation folder, not inside your own folder.
+
+## Where do MATLAB beginners usually go wrong?
 
 - **Counting from zero.** The first element in MATLAB is number 1. Typing `demo.data(0, 1)` gives an error.
 - **Forgetting the semicolon with a large matrix.** A line such as `x = EEG.data` without a semicolon prints millions of numbers and freezes the Command Window. If this happens, press <kbd>Ctrl+C</kbd> to stop it.
@@ -125,11 +137,3 @@ There is no value to choose here, but some similar-looking symbols mean differen
 - **A script file named after an existing function.** If you name your script `plot.m` or `eeglab.m`, MATLAB runs your file instead of the original function. Check with `which` if a function behaves strangely.
 
 {/* "From experience" box: waiting for a story from the project owner. Not written before it arrives. */}
-
-## How to check it worked
-
-- `size(demo.data)` prints `3` then `1280`.
-- `demo.srate` prints `128`, and `demo.labels{2}` prints `'Cz'`.
-- `t(end)` prints `9.9922`.
-- A figure window shows a line wiggling around zero for 10 seconds, titled `Channel Cz`.
-- `which plot` prints a path inside the MATLAB installation folder, not inside your own folder.

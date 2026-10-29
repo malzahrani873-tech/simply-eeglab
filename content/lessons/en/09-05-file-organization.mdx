@@ -45,28 +45,30 @@ eeglabVersion: "2026.1"
 updated: 2026-10-28
 ---
 
-## Why this step matters
+## The idea
 
-With one participant, one folder for everything is enough. With twenty participants and five processing stages, you have a hundred files or more. Two months later you will not remember which file you cleaned, with which settings, or which version you used for the figure.
+For one participant, one folder is enough. Twenty participants and five processing stages make a hundred files or more. Two months later you will not remember which file you cleaned, or how.
 
-And storage grows faster than you expect. Every continuous copy you save of a participant takes about the same size as the raw file. In D4 the raw file of each participant is about 234 MB, and there are 18 participants, so about 4.2 GB for the raw data alone. If you save five stages per participant, you reach about 21 GB before any epoch or figure.
+Storage grows faster than you expect. In D4 each raw file is about 234 MB, and there are 18 participants: about 4.2 GB of raw data alone. Save five stages per participant, and you reach about 21 GB before any epoch.
 
-This lesson gives you three rules before you start any project: a fixed folder structure, fixed file names, and a storage estimate with a decision in advance about what you save.
+So how do you arrange your folders and file names, and decide in advance what to save?
 
-## Before and after
+## What does an organized project folder look like?
 
-<Figure src="file-organization/project-tree.svg" alt="Folder tree of faces_project: rawdata for raw data with a lock because it is read only, derivatives/eeglab with sub-002/eeg holding the desc-clean and desc-epochs files, code for the scripts, figures for the figures and logs for error files." source="original" />
+<Figure src="file-organization/project-tree.svg" alt="Folder tree of faces_project: rawdata for raw data with a lock because it is read-only, derivatives/eeglab with sub-002/eeg holding the desc-clean and desc-epochs files, code for the scripts, figures for the figures and logs for error files." source="original" />
 
-## Steps in the GUI
+The lock on `rawdata` means it is read-only. Everything processing produces goes to `derivatives/eeglab`, with one folder per participant.
+
+## How do I set up the folders and names, and decide what to save?
 
 **First: the structure**
 
 1. Create a project folder with only five folders in it:
    - `rawdata`: the raw data as you downloaded them. Never write anything here.
    - `derivatives/eeglab`: everything processing produces, with one folder per participant.
-   - `code`: the scripts. They are what reproduces everything else.
+   - `code`: the scripts. They reproduce everything else.
    - `figures`: the final figures.
-   - `logs`: the error files written by the batch script from the previous lesson.
+   - `logs`: the error files written by the batch script from [the previous lesson](/en/lesson/batch-processing/).
 
 This is the same logic as BIDS: raw data in one place, <En>derivatives</En> in another, with the same participant names.
 
@@ -77,23 +79,23 @@ This is the same logic as BIDS: raw data in one place, <En>derivatives</En> in a
 
 **Third: storage**
 
-4. Open the `rawdata` folder in your file explorer and look at the size of one participant's `.set` file. Multiply it by the number of participants, then by the number of continuous stages you plan to save.
+4. Open the `rawdata` folder in your file explorer and look at the size of one participant's `.set` file. Multiply it by the number of participants, then by the number of continuous stages you plan to save, because every continuous copy you save takes about the size of the raw file.
 5. Decide what to save before you run. A practical rule:
    - **Save** what is slow or depends on your judgment: ICA weights, the list of bad channels, and the numbers of the components you removed.
    - **Recompute** what is fast and automatic: filters, reference, epoching, baseline.
    - **Always save** the final version that goes into statistics.
 
-**Fourth: convert your data to BIDS**
+## How do I convert my data to BIDS, or share a file with another program?
 
-6. If your raw data are not in BIDS format, the EEG-BIDS plugin bundled with EEGLAB converts them. Open <MenuPath>File > BIDS tools > BIDS export wizard (from raw EEG to BIDS)</MenuPath> and follow the steps: files, then task, then participants, then events.
-7. If you already have a STUDY, use <MenuPath>File > BIDS tools > Export STUDY to BIDS folder</MenuPath>.
-8. Check the result with <MenuPath>File > BIDS tools > Validate BIDS dataset</MenuPath>. It opens the official validator page in your browser.
+1. If your raw data are not in BIDS format, the EEG-BIDS plugin bundled with EEGLAB converts them. Open <MenuPath>File > BIDS tools > BIDS export wizard (from raw EEG to BIDS)</MenuPath> and follow the steps: files, then task, then participants, then events.
+2. If you already have a STUDY, use <MenuPath>File > BIDS tools > Export STUDY to BIDS folder</MenuPath>.
+3. Check the result with <MenuPath>File > BIDS tools > Validate BIDS dataset</MenuPath>. It opens the official validator page in your browser.
 
-D4 itself is an example of a ready BIDS dataset: open its folder and look at `dataset_description.json`, `README`, `task-FaceRecognition_events.json`, and the `sub-002` folders and after.
+D4 itself is an example of a ready BIDS dataset: open its folder and look at `dataset_description.json`, `README`, `task-FaceRecognition_events.json`, and the participant folders from `sub-002` on.
 
-To share one dataset with someone who uses another program, <MenuPath>File > Export > Data to EDF/BDF/GDF file</MenuPath> writes it in a standard format that most EEG programs read (it needs the Biosig plugin from the install lesson). Use it for sharing only; inside your project, keep the `.set` files and the BIDS folder.
+To share one dataset with someone who uses another program, <MenuPath>File > Export > Data to EDF/BDF/GDF file</MenuPath> writes it in a standard format that most EEG programs read (it needs the Biosig plugin from [the install lesson](/en/lesson/install-eeglab/)). Use it for sharing only; inside your project, keep the `.set` files and the BIDS folder.
 
-## The equivalent script
+## How do I build the folders, estimate storage and export to BIDS with a script?
 
 ```matlab
 [ALLEEG, EEG, CURRENTSET, ALLCOM] = eeglab;
@@ -140,18 +142,25 @@ bids_export(data, 'targetdir', fullfile(projectRoot, 'd1_bids'), ...
     'tInfo', struct('TaskName', 'attention', 'PowerLineFrequency', 60));
 ```
 
-## Which value should I choose?
+## Where does everything go, and in which format?
 
 | Decision | Choice in this lesson | Why |
 |---|---|---|
-| Location of raw data | `rawdata`, read only | If you damage a raw file by mistake, it cannot be fixed. Everything after it is rebuilt from the script. |
+| Location of raw data | `rawdata`, read-only | If you damage a raw file by mistake, it cannot be fixed. Everything after it is rebuilt from the script. |
 | Location of results | `derivatives/eeglab/sub-XXX/eeg` | The same logic as the BIDS specification for derivatives, so any researcher understands it and BIDS tools can read it. |
 | Number of saved stages | Two: the clean continuous version, then the epochs | Enough to redo any later analysis without running ICA again. |
 | Saved separately | ICA weights, bad channels, removed components | Very small, and they are the result of hours of computation or of decisions made by eye. |
 | One or two files per dataset | Two files, `.set` and `.fdt` (the EEGLAB 2026.1 default) | Data load faster in a STUDY. Always copy or move the two files together. A single `.set` file is an option in <MenuPath>File > Preferences</MenuPath>. |
-| Number format | single (EEGLAB default) | double doubles the size with no benefit for EEG data. |
+| Number format | single (EEGLAB default) | Double precision doubles the size with no benefit for EEG data. |
 
-## Common mistakes
+## How do I verify that my project is organized?
+
+- The project folder holds the five folders, and no file in `rawdata` has changed since you downloaded it.
+- The script prints the number of participants, the size of their raw data, and the total estimate.
+- Every file in `derivatives` has a name that starts with `sub-` and contains `desc-` with its stage name.
+- The `d1_bids` folder holds `dataset_description.json` and a `sub-001` folder.
+
+## Common mistakes in organizing files
 
 - **Saving over the raw file.** <MenuPath>File > Resave current dataset(s)</MenuPath> writes over the open file. Always use <MenuPath>File > Save current dataset as</MenuPath> with the stage name.
 - **Saving every stage "just in case".** Five stages for 18 participants means more than 20 GB from D4 alone, and most of it is recomputed in minutes.
@@ -159,10 +168,3 @@ bids_export(data, 'targetdir', fullfile(projectRoot, 'd1_bids'), ...
 - **Separating the script from the results.** A result without the script that produced it cannot be reproduced. Save the script with every run, or use a version control system such as git for the `code` folder.
 
 {/* "From experience" box: the place for the project owner's 160 GB story. Waiting for its details. Do not write it before it arrives. */}
-
-## How to check it worked
-
-- The project folder holds the five folders, and no file in `rawdata` has changed since you downloaded it.
-- The script prints the number of participants, the size of their raw data, and the total estimate.
-- Every file in `derivatives` has a name that starts with `sub-` and contains `desc-` with its stage name.
-- The `d1_bids` folder holds `dataset_description.json` and a `sub-001` folder.

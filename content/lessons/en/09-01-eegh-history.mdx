@@ -31,15 +31,15 @@ eeglabVersion: "2026.1"
 updated: 2026-10-28
 ---
 
-## Why this step matters
+## The idea
 
-Every click in the EEGLAB window runs a line of MATLAB behind the scenes. EEGLAB keeps these lines, in order, in the command history, and the `eegh` command shows them to you.
+Every click in EEGLAB runs a line of MATLAB behind the scenes. EEGLAB keeps these lines, in order, in the command history, and `eegh` shows them.
 
-This history is your first script, and you did not type a single character of it. Save it to a file, and you can repeat the same analysis in one click, or apply it to another participant.
+This history is your first script, written without typing a word. Save it to repeat the analysis in one click or run it on another participant. It is also an exact record: next month you will forget your filter edge; the history will not.
 
-The history is also an exact record of what you did. A month from now you will not remember which filter edge you chose. The history will.
+So how do you show it, save it, and turn it into a script that runs anywhere?
 
-## Before and after
+## What does EEGLAB write when you click Ok?
 
 <Figure src="eegh-history/S6-filter-dialog.png" alt="The Filter the data -- pop_eegfiltnew() window with 0.1 in Lower edge of the frequency pass band (Hz) and Plot frequency response checked." caption="EEGLAB 2026.1" source="eeglab-ui" />
 
@@ -51,15 +51,15 @@ EEG = pop_eegfiltnew(EEG, 'locutoff',0.1,'plotfreqz',1);
 
 Each field you filled in the window is in the line: `'locutoff',0.1` is the lower edge, and `'plotfreqz',1` is the ticked <UiLabel>Plot frequency response</UiLabel> box.
 
-## Steps in the GUI
+## How do I show, save and run the history from the menus?
 
-Start a fresh session as in "Starting point": `clear`, then `eeglab`. Running `eeglab` starts a new, empty history, so it does not mix with commands from an earlier session.
+Start a fresh session: `clear`, then `eeglab`. If you have not done it yet, open "Script to reach this state" under "Starts from" at the top of the lesson. Running `eeglab` starts a new, empty history, so it does not mix with commands from an earlier session.
 
 **First: run a few steps from the GUI**
 
 1. Open <MenuPath>File > Load existing dataset</MenuPath> and choose `eeglab_data.set` from the `sample_data` folder inside the EEGLAB folder.
-2. Open <MenuPath>Tools > Filter the data > Basic FIR filter (new, default)</MenuPath>. Type `0.1` in <UiLabel>Lower edge of the frequency pass band (Hz)</UiLabel> and press <UiLabel>Ok</UiLabel>. Close the filter response window and name the dataset `D1 hp0.1`.
-3. Open the same menu again to remove 60 Hz line noise. Type `58` in <UiLabel>Lower edge of the frequency pass band (Hz)</UiLabel> and `62` in <UiLabel>Higher edge of the frequency pass band (Hz)</UiLabel>, and check <UiLabel>Notch filter the data instead of pass band</UiLabel>. Press <UiLabel>Ok</UiLabel> and name the dataset `D1 hp0.1 notch60`.
+2. Open <MenuPath>Tools > Filter the data > Basic FIR filter (new, default)</MenuPath>. Type `0.1` in <UiLabel>Lower edge of the frequency pass band (Hz)</UiLabel> and press <UiLabel>Ok</UiLabel>. Close the filter response window, then name the new dataset `D1 hp0.1` in the window that follows.
+3. Open the same menu again to remove 60 Hz line noise. Type `58` in <UiLabel>Lower edge of the frequency pass band (Hz)</UiLabel> and `62` in <UiLabel>Higher edge of the frequency pass band (Hz)</UiLabel>, and check <UiLabel>Notch filter the data instead of pass band</UiLabel>. Press <UiLabel>Ok</UiLabel> and name the new dataset `D1 hp0.1 notch60`.
 4. Open <MenuPath>Plot > Channel data (scroll)</MenuPath>, then close the window.
 
 **Second: show the history**
@@ -82,7 +82,7 @@ pop_eegplot( EEG, 1, 1, 1);
 **Third: save the history to a file**
 
 7. Open <MenuPath>File > History scripts > Save session history script</MenuPath>. The suggested name is `eeglabhist.m`. Change it to `my_first_history.m` and save it in your working folder.
-8. Type `EEG.history` in the command window. This is the **dataset history**: the commands for the current dataset only, without the dataset management commands. It starts with lines you did not write, with paths like `/Users/arno/...`: this is the file's history on the computers of the people who made it, because the history is saved inside the `.set` file and travels with it. Then comes a line that records the EEGLAB version, then the two filter lines, and at the end a `pop_eegplot` line, because you opened the scroll window from the menu.
+8. Type `EEG.history` in the command window. This is the **dataset history**: the commands for the current dataset only, without the dataset management commands. It starts with lines you did not write, with paths like `/Users/arno/...`. They are the file's history on the computer of whoever made it, because the history is saved inside the `.set` file and travels with it. Then comes a line that records the EEGLAB version, then the two filter lines, and at the end a `pop_eegplot` line, because you opened the scroll window from the menu.
 9. To save it to a file, open <MenuPath>File > History scripts > Save dataset history script</MenuPath>.
 
 **Fourth: run the history**
@@ -90,11 +90,7 @@ pop_eegplot( EEG, 1, 1, 1);
 10. Close EEGLAB, then type `clear` and `close all`.
 11. Open `my_first_history.m` in the MATLAB editor and press <UiLabel>Run</UiLabel>. All the steps repeat on their own, and the scroll window opens at the end. You can also run it from <MenuPath>File > History scripts > Run script</MenuPath>.
 
-<Callout type="note">
-**Session history or dataset history?** The session history (`eegh`) keeps everything you did in the session, for all datasets, and it is lost when you run `eeglab` again if you did not save it. The dataset history (`EEG.history`) keeps what changed this dataset only, and it is saved inside the `.set` file, so you will still find it a year later when you open the file.
-</Callout>
-
-## The equivalent script
+## How do I clean the history script?
 
 The history script works as is, but it is written for the machine, not for you. Clean it before you rely on it. Here is the same history after cleaning:
 
@@ -133,25 +129,27 @@ What changed from the raw history:
 `pop_saveh` does the same as the <UiLabel>Save dataset history script</UiLabel> menu item. To save the session history from a script, type `pop_saveh(ALLCOM, 'session_history.m', pwd)`.
 </Callout>
 
-## Which value should I choose?
+## Session history or dataset history: which one do I use?
+
+The session history (`eegh`) keeps everything you did in the session, for all datasets, and it is lost when you run `eeglab` again if you did not save it. The dataset history (`EEG.history`) keeps what changed this dataset only, and it is saved inside the `.set` file, so you will still find it a year later when you open the file.
 
 | You want to | Use | Why |
 |---|---|---|
 | Repeat everything you did today, across all datasets | Session history: `eegh` or <UiLabel>Save session history script</UiLabel> | It includes the load, save and dataset management commands, so it replays the whole session. |
 | Know how a specific `.set` file was made | Dataset history: `EEG.history` | It is saved inside the file itself, so it stays with the data (official EEGLAB tutorial, section EEGLAB dataset history). |
-| Build a script for other participants | The dataset history, cleaned | It is shorter and has no GUI commands, so it moves easily into a loop over participants (the batch processing lesson). |
+| Build a script for other participants | The dataset history, cleaned | It is shorter and has no GUI commands, so it moves easily into a loop over participants ([the batch processing lesson](/en/lesson/batch-processing/)). |
 
-## Common mistakes
+## How do I verify that the history script gives the same result?
+
+1. **The script runs on its own.** Run the clean script in a fresh session. It should finish without any error and without asking you to click anything.
+2. **Same processing.** After it runs, type `EEG.history`. You should see the two filter lines with the same numbers you chose in the GUI: `0.1`, then `58` and `62` with `'revfilt',1`.
+3. **The history file exists.** In your working folder you should find `D1_hp0.1_notch60_history.m`. Open it: it holds the same two filter lines.
+
+## Common mistakes with the history
 
 - **Running `eeglab` again before saving the session history.** `eeglab` starts an empty history. Save the history first, or rely on the `EEG.history` saved with the dataset.
-- **Sharing a script with a fixed path.** A line like `'filepath','C:\Users\...'` will not work on your colleague's computer. Replace it with `fullfile` as in the script above.
+- **Sharing a script that contains a fixed path.** A line like `'filepath','C:\Users\...'` will not work on your colleague's computer. Replace it with `fullfile` as in the script above.
 - **Expecting steps run outside the menus to be recorded.** EEGLAB writes the history for commands run from the menus only. What you type yourself in the command window does not appear in `eegh`, and running `pop_eegfiltnew` from a script does not change `EEG.history`. If you want the saved file to carry its history, add `EEG = eeg_hist(EEG, com);` after each step, as in the script above.
 - **Running the dataset history as is.** It starts with old lines from the file's creator, with paths from their computer, so it stops at the first line. Copy only the processing lines from it, and start your script with a load command that uses a path from your own computer.
 
 {/* "From experience" box: waiting for the project owner's story. Do not write it before it arrives. */}
-
-## How to check it worked
-
-1. **The script runs on its own.** Run the clean script in a fresh session. It should finish without any error and without asking you to click anything.
-2. **Same processing.** After it runs, type `EEG.history`. You should see the two filter lines with the same numbers you chose in the GUI: `0.1`, then `58` and `62` with `'revfilt',1`.
-3. **The history file exists.** In your working folder you should find `D1_hp0.1_notch60_history.m`. Open it, and you will find the same two filter lines.

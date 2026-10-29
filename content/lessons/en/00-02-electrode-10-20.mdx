@@ -28,27 +28,68 @@ eeglabVersion: "2026.1"
 updated: 2026-10-27
 ---
 
-## Why this step matters
+## The idea
 
-Every channel in your data has a name such as Fz, C3 or PO7. The name is not a random code. It is an address that tells you where the electrode sat on the head.
+Every channel in your data has a name such as Fz, C3 or PO7. The name is an address: it tells you where the electrode sat on the head. The channel is the signal recorded from that electrode.
 
-When you read that the ERP component P3 is largest at Pz, or that blinks show up strongly at Fp1 and Fp2, you need to know where these electrodes are right away.
+You will often read sentences like "blinks are strong at Fp1" or "the P3 component is largest at Pz". So how do you find an electrode from its name alone?
 
-Two words you will see often mean different things: the **electrode** is the metal piece on the head, and the **channel** is the signal recorded from it. EEGLAB calls each signal a "channel".
-
-## Before and after
+## How do I read an electrode name?
 
 <Figure src="electrode-10-20/electrode-10-20.svg" alt="The 10-20 system. Left: side view with the arc from nasion to inion split into 10%, four times 20%, then 10%, carrying Fpz, Fz, Cz, Pz and Oz. Right: top view with the 21 electrodes; odd numbers on the left of the head, even on the right, z on the midline." source="original" />
 
-## Steps in the GUI
+Every name has two parts: **letters for the region, then a number or z for the side.**
 
-There are no EEGLAB steps in this lesson. You will work with electrode locations in the GUI later, in the channel locations lesson, from the <MenuPath>Edit > Channel locations</MenuPath> menu.
+| Letter | Region | Example |
+|---|---|---|
+| Fp | Front of the forehead, above the eyes (frontopolar) | Fp1, Fp2 |
+| F | Frontal lobe | F3, Fz |
+| C | Central area around the central sulcus, not a separate lobe | C3, Cz |
+| T | Temporal lobe | T7, T8 |
+| P | Parietal lobe | P3, Pz |
+| O | Occipital lobe at the back of the head | O1, O2 |
 
-Once you have a dataset with locations, you can see the electrode map with names from <MenuPath>Plot > Channel locations > By name</MenuPath>.
+- **Odd number = left**, **even number = right**. Left means the participant's left, not yours as you face them.
+- **z = the midline** from nose to the back of the head (from "zero"). It is a lowercase z, not the number 2: Cz is exactly in the middle, and C2 is just right of it.
+- **The larger the number, the farther from the midline:** C5 is farther out than C3, and C3 farther than C1.
+- **Two letters = an electrode between two regions:** FC5 between F and C, PO7 between P and O.
 
-## The equivalent script
+Example: P4 sits over the parietal lobe (P), in the right half (even number).
 
-This script is optional. Run it after installing EEGLAB in station 1 to see the electrode map of the dataset that will follow you through most of the path (`eeglab_data.set`). It does not need to open the dataset itself, only the location file that comes with it.
+## Why is it called 10-20?
+
+Because electrodes are not placed in millimeters but as proportions of each participant's head. The line is measured from the nasion (top of the nose) to the inion (the bump at the back of the head). Fpz sits at 10% of its length, then Fz, Cz, Pz and Oz each 20% further, leaving 10% to the inion. The same applies along the line between the ears: T7, then C3, then Cz, then C4, then T8.
+
+So an electrode's actual location differs a little between heads and caps, but its name stays the same.
+
+The original system has only 21 electrodes. Modern systems add electrodes between these positions:
+
+| System | Step between electrodes | Where you see it |
+|---|---|---|
+| 10-20 | 10% or 20%, 21 electrodes | Routine clinical recording |
+| 10-10 | 10%, with extra electrodes halfway along each distance | `eeglab_data.set` (32 channels), and the PhysioNet file in station 2 (64 channels) |
+| 10-5 | 5%, for high-density systems (Oostenveld and Praamstra 2001) | Systems with 128 channels or more |
+
+## An old paper says T3 or T5. Where are they?
+
+The 10-10 system changed four old names because they did not follow the rule (ACNS guideline, 2016):
+
+| Old name | Modern name |
+|---|---|
+| T3 and T4 | T7 and T8 |
+| T5 and T6 | P7 and P8 |
+
+The old names still appear in many books, papers and devices. If you read T5, it means P7.
+
+## Why do some channels not follow these names?
+
+Because they are not on the scalp at all. In `eeglab_data.set` the channels `EOG1` and `EOG2` record eye movement. In other data you will find M1 and M2 on the mastoid bones behind the ears, or A1 and A2 on the earlobes, often used as the reference.
+
+## Where do I see my data's electrodes in EEGLAB?
+
+When you have a dataset with electrode locations, open <MenuPath>Plot > Channel locations > By name</MenuPath>. You see the head from above with the nose up, and each electrode name in its place. The left of the plot is the participant's left. You will learn to add locations from <MenuPath>Edit > Channel locations</MenuPath> in the [channel locations lesson](/en/lesson/channel-locations/).
+
+To see the electrodes of the dataset you will use through most of the path right now, run this script after the [installation lesson](/en/lesson/install-eeglab/). It reads only the location file and does not open the dataset itself.
 
 ```matlab
 % Plot the 32-channel montage of the EEGLAB sample dataset with labels
@@ -63,61 +104,15 @@ title('eeglab\_data.set montage');
 disp({locs.labels});                                  % list all channel names
 ```
 
-- `readlocs` reads the location file, and `topoplot` draws the head from above with the nose up.
-- `'style', 'blank'` draws only the electrodes without a color map, and `'electrodes', 'labelpoint'` writes each electrode name next to its dot.
-- You will see 32 names. Thirty are 10-10 names, and two are not: `EOG1` and `EOG2`.
-
-## Which value should I choose?
-
-There is no value to choose here. But this table is all you need to read any name.
-
-**First: the letter tells you the region**
-
-| Letter | Region | Example |
-|---|---|---|
-| Fp | Front of the forehead, above the eyes (frontopolar) | Fp1, Fp2 |
-| F | Frontal lobe | F3, Fz |
-| C | Central area around the central sulcus. Not a separate lobe | C3, Cz |
-| T | Temporal lobe | T7, T8 |
-| P | Parietal lobe | P3, Pz |
-| O | Occipital lobe at the back of the head | O1, O2 |
-| Two letters | An electrode between two regions | FC5 between F and C, PO7 between P and O |
-
-**Second: the number or z tells you the side**
-
-| Mark | Meaning | Example |
-|---|---|---|
-| Odd number | **Left** half of the head | C3, O1 |
-| Even number | **Right** half of the head | C4, O2 |
-| z | The midline from nose to back of the head (from "zero") | Fz, Cz, Pz |
-| Larger number | Farther from the midline | C5 is farther out than C3, and C3 farther than C1 |
-
-**Third: the system tells you the electrode density**
-
-| System | Idea | Where you see it |
-|---|---|---|
-| 10-20 | 21 electrodes. Neighboring electrodes are 10% or 20% of the head length between fixed landmarks apart | Routine clinical recording |
-| 10-10 | Same idea, with extra electrodes halfway along each distance, so the step is 10% | `eeglab_data.set` (32 channels), and the PhysioNet file in station 2 (64 channels) |
-| 10-5 | 5% steps, for high-density systems (Oostenveld and Praamstra 2001) | Systems with 128 channels or more |
-
-**How the 10-20 proportions work:** on the midline from nasion to inion, Fpz sits at 10% of the length, then Fz, Cz, Pz and Oz each 20% further, leaving 10% to the inion. The same way along the line between the ears: T7, then C3, then Cz, then C4, then T8.
-
-## Common mistakes
-
-- **Swapping the sides.** Odd is left and even is right, from the participant's point of view, not yours as you face them. In EEGLAB plots the head is drawn from above with the nose up, so the left of the plot is the participant's left.
-- **Mixing old and new names.** The 10-10 system replaced T3 and T4 with T7 and T8, and T5 and T6 with P7 and P8, because the old names did not follow the rule (ACNS guideline, 2016). The old names still appear in many books, papers and devices. If you read T5, it means P7.
-- **Reading z as the number 2.** The lowercase z means the midline. Cz is exactly in the middle of the head, while C2 is an electrode right of the middle.
-- **Thinking a name marks a fixed point in millimeters.** Names are proportions of each participant's head, so the actual location differs a little between heads and caps.
-- **Looking for a 10-10 name for every channel.** Some channels are not on the scalp at all. In `eeglab_data.set` the channels `EOG1` and `EOG2` record eye movement, and EEGLAB plots them farthest outside the head circle because they are below the head's mid-plane (EEGLAB tutorial). In other data you will find M1 and M2 on the mastoid bones behind the ears, or A1 and A2 on the earlobes, often used as reference.
+You will see 32 labeled dots, with Cz exactly in the center. Thirty are 10-10 names and two are not: `EOG1` and `EOG2`, the two dots farthest outside the head circle. Edge channels such as `T7`, `O1` and `Oz` sit just outside the circle, because they are below the head's mid-plane (EEGLAB tutorial).
 
 {/* "From experience" box: waiting for a story from the project owner. Not written before it arrives. */}
 
-## How to check it worked
+## Test yourself: can you read the names?
 
-Find each electrode on the drawing in "Before and after" without looking at the tables, then read the answer.
+Answer before you read the answer, without looking at the table.
 
-- **Where is P4?** Answer: over the parietal lobe, in the right half of the head (even number).
 - **Where is FC5?** Answer: between the frontal lobe and the central area, in the left half, fairly far from the midline.
-- **An old paper reports a peak at T6. What is its modern name?** Answer: P8.
 - **Which is closer to the midline: F3 or F7?** Answer: F3, because its number is smaller.
-- **If you run the script after installing EEGLAB:** the plot shows 32 dots and Cz is exactly in the center. The two dots farthest outside the circle are `EOG1` and `EOG2`, and edge channels such as `T7`, `O1` and `Oz` sit just outside it, because they are below the head's mid-line (EEGLAB tutorial).
+- **Is C2 the same as Cz?** Answer: no. Cz is exactly in the middle, and C2 is just right of it.
+- **An old paper reports a peak at T6. What is its modern name?** Answer: P8.

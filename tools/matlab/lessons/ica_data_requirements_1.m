@@ -1,5 +1,7 @@
 % Copied from lessons/en/04-02-ica-data-requirements.md. The lesson is the reference.
 % How much data ICA has in the current dataset
+% badChans: channels you interpolated (set in the starting script; {} if none)
+if ~exist('badChans', 'var'), badChans = {}; end
 nComp   = EEG.nbchan - numel(badChans) - 1;   % expected rank after average reference
 nPoints = EEG.pnts * EEG.trials;
 fprintf('Data points per channel: %d\n', nPoints);

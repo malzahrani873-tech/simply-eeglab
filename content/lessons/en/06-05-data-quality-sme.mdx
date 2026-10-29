@@ -41,43 +41,51 @@ eeglabVersion: "2026.1"
 updated: 2026-10-28
 ---
 
-## Why this step matters
+## The idea
 
-We start this lesson from ready-made ERPsets from Luck's book (chapter 10). Building an ERPset from your own data is explained in chapters 2 and 6 of the book.
+The number of trials is not enough to describe a participant's data quality. A participant with 100 noisy trials is worse than one with 60 clean trials.
 
-The number of trials is not enough to describe a participant's data quality. A participant with 100 noisy trials is worse than one with 60 clean trials. What you need is a number that says: how much could my score change if I repeated the experiment with the same participant?
+You need a number that says: how much could my score change if I repeated the experiment with the same participant? That number is the <En>SME</En>: how precisely a participant's ERP is measured, in microvolts like the score itself. Smaller is better.
 
-That number is the <En>SME</En>: a measure of how precisely a participant's ERP is measured; smaller is better. Its unit is microvolts, like the score itself. ERPLAB computes its analytic version (<En>aSME</En>) automatically during averaging, for mean amplitude in 100-ms windows around zero (such as 0 to 100 and 100 to 200 ms). Peak amplitude and latency need another version based on bootstrapping, which Luck explains in chapter 10.
+So how do you read SME values in ERPLAB, and spot the participant whose data are weaker than the rest?
 
-<Callout type="note" title="Why C3 at 200 to 300 ms?">
-The ready-made windows in these files are 100 ms wide and computed for each channel, not for the difference wave. So here we use C3 in the 200 to 300 ms window, inside the LRP window, as a general indicator of a participant's data quality. It is not the precision of the score you learned in the previous lesson (150 to 400 ms on the difference wave); that needs bSME, and its script `LRP_bSME.m` comes with the chapter 10 files.
-</Callout>
-
-The practical idea: compare SME across participants. A participant whose SME is much larger than the others adds noise to the whole analysis, and deserves a look before entering the statistics.
-
-## Before and after
+## How does a weak participant stand out?
 
 <ImageSpec>
-Dot plot: participants 1 to 40 on the horizontal axis, aSME in µV at C3 in the 200 to 300 ms window, bin 1, on the vertical axis. A horizontal line at the median, and a dashed line at twice the median. Most dots sit near the median, and dots above the dashed line are in a different color with the participant number. Source: script on the chapter 10 data from Luck's book. Data: ERP CORE, image licence CC BY-SA 4.0.
+Dot plot: participants 1 to 40 on the horizontal axis, aSME in µV at C3 in the 200 to 300 ms window, bin 1, on the vertical axis. A horizontal line at the median, and a dashed line at twice the median. Most dots sit near the median, and dots above the dashed line are in a different color with the participant number. Source: script on the chapter 10 data from Luck's book. Data: ERP CORE, image license CC BY-SA 4.0.
 </ImageSpec>
 
-## Steps in the GUI
+Compare SME across participants. A participant whose SME is much larger than the others adds noise to the whole analysis, and deserves a look before their data enter the statistics.
 
-Start with the forty ERPsets from `Chapter_10/Data/ERPsets` loaded, as in "Starting point". ERPLAB is installed from the previous lesson.
+## Where do the SME values in the files come from?
+
+ERPLAB computes the analytic version (<En>aSME</En>) automatically during averaging. It computes it for mean amplitude in consecutive 100-ms windows that start at zero and go both ways (such as -100 to 0, 0 to 100 and 100 to 200 ms). Peak amplitude and latency need another version based on bootstrapping, which Luck explains in chapter 10.
+
+Here we start from ready-made ERPsets from Luck's book (chapter 10). Building an ERPset from your own data is explained in chapters 2 and 6 of the book.
+
+## Why C3 at 200 to 300 ms?
+
+The ready-made windows in these files are 100 ms wide and computed for each channel, not for the difference wave. So here we use C3 in the 200 to 300 ms window, inside the LRP window, as a general indicator of a participant's data quality.
+
+It is not the precision of the score you learned in the "ERPLAB: measuring amplitude & latency" lesson (150 to 400 ms on the difference wave). That needs bSME, and its script `LRP_bSME.m` comes with the chapter 10 files.
+
+## How do I see one participant's quality values from the menus?
+
+Start with the forty ERPsets from `Chapter_10/Data/ERPsets` loaded. If you don't have it, open "Script to reach this state" at the top of the lesson. You installed ERPLAB in the "ERPLAB: measuring amplitude & latency" lesson.
 
 1. From the <MenuPath>ERPsets</MenuPath> menu, choose the first ERPset.
 2. Open <MenuPath>ERPLAB > Data Quality viewing (ERPs only) > Summarize Data Quality (min, median, max)</MenuPath>. The command window prints the smallest, median, and largest aSME values, and where each one is (channel, window, and bin).
 3. Open <MenuPath>ERPLAB > Data Quality viewing (ERPs only) > Show Data Quality measures in table</MenuPath>.
 4. In <UiLabel>Selected DQ Measure:</UiLabel>, choose `aSME`, and in <UiLabel>Selected BIN:</UiLabel>, choose bin 1.
 5. The table has one row per channel and one column per time window in <UiLabel>Time-windows</UiLabel>. Check <UiLabel>Color heatmap</UiLabel> to color the large values.
-6. Check <UiLabel>Outliers</UiLabel>, and keep <UiLabel>Std from mean</UiLabel> at its value. Channels whose SME is far from the channel mean are marked, often a bad channel for this participant.
+6. Check <UiLabel>Outliers</UiLabel>, and keep <UiLabel>Std from mean</UiLabel> at its value. Channels whose SME is far from the channel mean are marked; such a channel is often bad for this participant.
 7. To compare participants, press <UiLabel>Select ERPset</UiLabel> and choose another participant. To compare all forty at once, use the script.
 
 <Callout type="note" title="Do the files hold quality values?">
-To find out whether the files contain quality values, open <MenuPath>ERPLAB > Data Quality viewing (ERPs only) > Show which Data Quality measures are in each loaded ERPSET</MenuPath>. If `aSME` does not appear, the file was built without computing quality. The fix is to redo the averaging with <MenuPath>ERPLAB > Compute averaged ERPs</MenuPath> with data quality turned on, as in chapter 6 of Luck's book.
+To find out whether the files contain quality values, open <MenuPath>ERPLAB > Data Quality viewing (ERPs only) > Show which Data Quality measures are in each loaded ERPSET</MenuPath>. If `aSME` does not appear, the file was built without computing quality. The fix is to redo the averaging using <MenuPath>ERPLAB > Compute averaged ERPs</MenuPath> with data quality turned on, as in chapter 6 of Luck's book.
 </Callout>
 
-## The equivalent script
+## How do I compare all forty participants in a script?
 
 ```matlab
 % aSME at C3, 200-300 ms window, bin 1, for every participant
@@ -107,7 +115,7 @@ fprintf('Participants to inspect: %s\n', mat2str(outliers'));
 dq_summary(ALLERP(1));
 ```
 
-## Which value should I choose?
+## Which window, channel, and cutoff should I use?
 
 | Setting | Value | Why |
 |---|---|---|
@@ -116,16 +124,7 @@ dq_summary(ALLERP(1));
 | "Outlier participant" threshold | No general number. Twice the median here is only an example for inspection, not a published criterion | Decide before you see the results, and report it in your paper. An outlier is inspected first, not removed automatically. |
 | Combining participants | RMS instead of the mean | The ERPLAB wiki recommends RMS because it relates more closely to how noise affects statistical power. |
 
-## Common mistakes
-
-- **Judging by the number of trials only.** The number of trials is part of SME, but the noise in each trial is another part. Look at SME.
-- **Using aSME for peak amplitude.** aSME describes mean amplitude only. For peaks and latencies you need bootstrapping (bSME), and its script comes with the chapter 10 files of Luck's book.
-- **Comparing SME from different windows or channels.** Values naturally differ between channels and windows. Compare the same channel and the same window across participants.
-- **Removing a participant after seeing that they "spoil" the result.** The exclusion rule is set before the analysis. Otherwise it becomes choosing the result you want.
-
-{/* "From experience" box: waiting for the project owner's story. Do not write it before it arrives. */}
-
-## How to check it worked
+## How do I check that the values are right?
 
 - `numel(ALLERP)` is 40, and the `has no aSME values` message does not appear.
 - `sme` holds 40 positive values, all in µV, most of them close to the median.
@@ -135,3 +134,12 @@ dq_summary(ALLERP(1));
 <Methods>
 Data quality was quantified for each participant with the analytic standardized measurement error (aSME) of mean amplitude from 200 to 300 ms at C3 (ERPLAB 13.10; Luck et al., 2021).
 </Methods>
+
+## Which mistakes are common when judging quality?
+
+- **Judging by the number of trials only.** The number of trials is part of SME, but the noise in each trial is another part. Look at SME.
+- **Using aSME for peak amplitude.** aSME describes mean amplitude only. For peaks and latencies you need bootstrapping (bSME), and its script comes with the chapter 10 files of Luck's book.
+- **Comparing SME from different windows or channels.** Values naturally differ between channels and windows. Compare the same channel and the same window across participants.
+- **Removing a participant after seeing that they "spoil" the result.** The exclusion rule is set before the analysis. Otherwise, you are choosing the result you want.
+
+{/* "From experience" box: waiting for the project owner's story. Do not write it before it arrives. */}

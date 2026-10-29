@@ -7,7 +7,7 @@ order: 4
 level: core
 status: approved
 objectives:
-  - Copy ICA weights from the 1 Hz copy to the 0.1 Hz main dataset, from the GUI and from a script, and check they match.
+  - Copy ICA weights from the 1 Hz copy to the 0.1 Hz main dataset, from the GUI and from a script, and check that they match.
   - Explain why 1 Hz improves ICA, why it harms slow ERP components such as P3, and why copying the weights is valid.
   - Decide when to use 2 Hz instead of 1 Hz for the ICA copy.
 prerequisites: [run-ica]
@@ -68,29 +68,39 @@ eeglabVersion: "2026.1"
 updated: 2026-10-29
 ---
 
-## Why this step matters
+## The idea
 
-In the Running ICA lesson you followed one rule: ICA is computed on a copy filtered at 1 Hz, not on the ERP data filtered at 0.1 Hz. This lesson explains why the rule works, and how to check that the weights moved correctly.
+In [the Running ICA lesson](/en/lesson/run-ica/) you computed ICA on a copy filtered at 1 Hz, then copied the weights to the main dataset filtered at 0.1 Hz.
+
+A 1 Hz filter improves ICA, but it shrinks slow ERP components such as P3. That is why you need both copies.
+
+So why is it valid to compute the weights on one copy and apply them to another, and how do you check that they moved correctly?
+
+## Why does a 1 Hz filter help ICA but harm the ERP?
 
 **Why 1 Hz helps ICA.** Slow drift is large, and it changes over the whole recording. ICA then spends part of its effort on it, and the components become less clear. The official tutorial says ICA decompositions are notably higher quality, with less ambiguous components, when the data are high-pass filtered above 1 Hz, sometimes even 2 Hz.
 
-**Why 1 Hz harms the ERP.** Slow ERP components such as P3 contain low frequencies. A 1 Hz filter removes part of them, so P3 becomes smaller. You will measure this yourself in this lesson's script.
+**Why 1 Hz harms the ERP.** Slow ERP components such as P3 contain low frequencies. A 1 Hz filter removes part of them, so P3 becomes smaller. The next figure shows by how much.
 
-**Why copying is valid.** ICA does not learn a signal. It learns a fixed way to combine the channels, which the official tutorial calls a spatial filter. The two copies have the same channels and the same mixing in the head; only their frequencies differ. So the same weights separate the same sources in both copies.
-
-<Callout type="note">
-**The only limit**, as the official tutorial says: an artifact that lives only below 1 Hz is not learned by ICA, so ICA does not remove it. In practice the tutorial has not found this to be a problem, because artifacts below 2 Hz usually appear above 2 Hz too.
-</Callout>
-
-## Before and after
-
-<Figure src="ica-1hz-copy-weights/ica-copy-weights.svg" alt="Two copies of the same data: the main dataset with a 0.1 Hz high-pass and the ICA copy with a 1 Hz high-pass. ICA runs on the copy, then the weights are copied back to the main dataset, which continues to ICLabel and the ERP; the copy is used only to compute ICA." source="original" />
+## How much smaller is P3 in the 1 Hz copy?
 
 <Figure src="ica-1hz-copy-weights/ica-1hz-erp-pz.png" alt="The Pz ERP from -200 to 800 ms with two curves: the main data (0.1 Hz) in blue and the 1 Hz ICA copy in red. The positive wave between 300 and 600 ms is lower in the 1 Hz copy." source="D1" />
 
-## Steps in the GUI
+Blue is the main dataset at 0.1 Hz, red is the ICA copy at 1 Hz. In D1 the mean at Pz between 300 and 600 ms is about 4.3 µV in the main dataset, and about 3.1 µV in the 1 Hz copy. If you continued on the ICA copy, you would lose about 30% of the P3.
 
-Start with the two copies from the Starting point. Its script puts the main dataset in dataset 1 and the ICA copy in dataset 2.
+## Why is it valid to copy weights from one copy to another?
+
+<Figure src="ica-1hz-copy-weights/ica-copy-weights.svg" alt="Two copies of the same data: the main dataset with a 0.1 Hz high-pass and the ICA copy with a 1 Hz high-pass. ICA runs on the copy, then the weights are copied back to the main dataset, which continues to ICLabel and the ERP; the copy is used only to compute ICA." source="original" />
+
+ICA does not learn a signal. It learns a fixed way to combine the channels, which the official tutorial calls a spatial filter. The two copies have the same channels and the same mixing in the head; only their frequencies differ. So the same weights separate the same sources in both copies.
+
+<Callout type="note">
+**The only limit**, as the official tutorial says: an artifact that lives only in the low frequencies removed by the filter is not learned by ICA, so ICA does not remove it. In practice the tutorial has not found this to be a problem, because artifacts that contaminate the data below 2 Hz usually contaminate it above 2 Hz too.
+</Callout>
+
+## How do I copy the weights and compare the maps from the menus?
+
+Start with the two copies: run "Script to reach this state" under "Starts from" at the top of the lesson. It puts the main dataset in dataset 1 and the ICA copy in dataset 2.
 
 **First: check the two copies**
 
@@ -100,6 +110,8 @@ Start with the two copies from the Starting point. Its script puts the main data
 
 **Second: copy the weights**
 
+This is the same step as in the Running ICA lesson. You repeat it here because the starting script gives you dataset 1 without weights.
+
 1. With dataset 1 current, open <MenuPath>Edit > Dataset info</MenuPath>.
 2. Next to <UiLabel>ICA weights array or text/binary file (if any):</UiLabel>, press <UiLabel>from other dataset</UiLabel>, type `2`, then <UiLabel>OK</UiLabel>. Three fields fill in automatically: `ALLEEG(2).icaweights`, `ALLEEG(2).icasphere`, and `ALLEEG(2).icachansind`.
 3. Press <UiLabel>OK</UiLabel> to close the window. <UiLabel>ICA weights</UiLabel> now shows <UiLabel>Yes</UiLabel> for dataset 1.
@@ -108,13 +120,9 @@ Start with the two copies from the Starting point. Its script puts the main data
 
 1. With dataset 1 current, open <MenuPath>Plot > Component maps > In 2-D</MenuPath>.
 2. Choose dataset 2 and open the same window. The maps are identical, in the same order. The blink component is in the same place in both.
-3. Save dataset 1, the 0.1 Hz main copy and not the 1 Hz ICA copy, with <MenuPath>File > Save current dataset as</MenuPath> as `D1_main_ica.set`. The ICLabel lesson starts from it.
+3. Save dataset 1 (the 0.1 Hz main dataset, not the 1 Hz ICA copy) with <MenuPath>File > Save current dataset as</MenuPath> as `D1_main_ica.set`. [The ICLabel lesson](/en/lesson/iclabel/) starts from it.
 
-**When to use 2 Hz instead of 1**
-
-If many components stay ambiguous, with mixed or scattered maps, start again from dataset 1: filter a new copy at `2` Hz, run ICA on it, and copy its weights the same way. Dataset 1 stays at 0.1 Hz every time.
-
-## The equivalent script
+## How do I copy the weights and measure the difference with a script?
 
 ```matlab
 % EEG_main: main dataset (0.1 Hz); EEG_ica: ICA copy (1 Hz) with weights
@@ -148,41 +156,43 @@ xlabel('Time (ms)'); ylabel('Amplitude (uV)');
 EEG = pop_saveset(EEG, 'filename', 'D1_main_ica.set', 'filepath', pwd);
 ```
 
-The first block is the same weight-copy lines as in the Running ICA lesson. The check prints `Same weights: 1`, a scalp map difference close to zero, and 31 components in D1.
+The first block repeats the weight-copy lines from the Running ICA lesson. The check prints `Same weights: 1`, a scalp map difference close to zero, and 31 components in D1.
 
-The ERP block uses `pop_epoch`, which you will learn in station 5. Here it only shows the difference: in D1 the mean at Pz between 300 and 600 ms is about 4.3 µV in the main dataset, and about 3.1 µV in the 1 Hz copy. That is about 30% of the P3 lost if you continued on the ICA copy.
+The ERP block uses `pop_epoch`, which you will learn in station 5, in [the Extracting epochs lesson](/en/lesson/extract-epochs/). Here it only shows the difference: it prints the two numbers from the figure above, about 4.3 and 3.1 µV in D1.
 
-## Which value should I choose?
+## Which filter for each copy, and what do I copy?
 
 | Setting | Value | Why |
 |---|---|---|
 | High-pass for the ICA copy | 1 Hz | Official tutorial: ICA quality is notably higher above 1 Hz. |
 | If components stay ambiguous | 2 Hz | The official tutorial mentions 2 Hz as well. It costs nothing, because the ERP stays on the main dataset. |
-| High-pass for the main dataset | 0.1 Hz, unchanged | It keeps slow ERP components such as P3 (the filtering lesson). |
+| High-pass for the main dataset | 0.1 Hz, unchanged | It keeps slow ERP components such as P3 ([the filtering lesson](/en/lesson/filtering/)). |
 | What you copy | `icaweights`, `icasphere`, and `icachansind` | These three define the decomposition. `icawinv` and `icaact` are recomputed from the main data. |
 | Channels in the two copies | Exactly the same, in the same order | The weights are tied to the channels. |
+
+**When to use 2 Hz instead of 1.** If many components stay ambiguous, with mixed or scattered maps, start again from dataset 1: filter a new copy at `2` Hz, run ICA on it, and copy its weights the same way. Dataset 1 stays at 0.1 Hz every time.
 
 <Callout type="expert">
 **The same idea with aggressive cleaning:** the official tutorial applies the same two-copy method to cleaning. You may remove noisy segments from the ICA copy only, compute ICA, then copy the weights to the complete main dataset. The limit: less data can give a weaker decomposition.
 </Callout>
 
-## Common mistakes
-
-- **Continuing the ERP on the 1 Hz copy.** P3 shrinks, as the script shows. The ICA copy is only for computing the weights; the analysis continues on the main dataset.
-- **Copying only two of the three fields.** The official tutorial mentions `icaweights` and `icasphere`. Copy `icachansind` too, or EEGLAB does not know which channels the weights belong to. The <UiLabel>from other dataset</UiLabel> button copies all three.
-- **Different channels in the two copies.** If you remove or interpolate a channel in one copy only, the weights no longer match. Do every channel step before you make the copy.
-- **Copying `icaact` from the ICA copy.** Those are the time courses of the 1 Hz data. Leave `icawinv` and `icaact` empty and let `eeg_checkset` recompute them from the main dataset.
-- **Choosing a dataset number by guess.** In <UiLabel>from other dataset</UiLabel> type the number of the ICA copy as shown in the <MenuPath>Datasets</MenuPath> menu. A wrong number copies other weights without an error.
-
-{/* "From experience" box: waiting for the project owner's story. Do not write it before it arrives. */}
-
-## How to check it worked
+## How do I verify that the weights moved correctly?
 
 1. **Main window:** with dataset 1 current, <UiLabel>ICA weights</UiLabel> shows <UiLabel>Yes</UiLabel>.
 2. **Same maps:** the component maps of dataset 1 and dataset 2 are identical and in the same order.
 3. **The script check:** it prints `Same weights: 1` and `ICA components: 31` in D1.
-4. **The ERP stays whole:** the mean at Pz between 300 and 600 ms is larger in the main dataset than in the 1 Hz copy, about 4.3 against 3.1 µV in D1.
+4. **The ERP stays whole:** the mean at Pz between 300 and 600 ms is larger in the main dataset than in the 1 Hz copy, about 4.3 versus 3.1 µV in D1.
 
 <Methods>
 Independent component analysis (extended Infomax; Lee et al., 1999) was computed with runica ([31] components after PCA reduction to the data rank) on a copy of the data high-pass filtered at 1 Hz, and the resulting weights were applied to the 0.1 Hz high-pass filtered data.
 </Methods>
+
+## What are the common mistakes when copying weights?
+
+- **Continuing the ERP analysis on the 1 Hz copy.** P3 shrinks, as the script shows. The ICA copy is only for computing the weights; the analysis continues on the main dataset.
+- **Copying only two of the three fields.** The official tutorial mentions `icaweights` and `icasphere`. Copy `icachansind` too, or EEGLAB does not know which channels the weights belong to. The <UiLabel>from other dataset</UiLabel> button copies all three.
+- **Different channels in the two copies.** If you remove or interpolate a channel in one copy only, the weights no longer match. Do every channel step before you make the copy.
+- **Copying `icaact` from the ICA copy.** Those are the time courses of the 1 Hz data. Leave `icawinv` and `icaact` empty and let `eeg_checkset` recompute them from the main dataset.
+- **Guessing the dataset number.** In <UiLabel>from other dataset</UiLabel>, type the number of the ICA copy as shown in the <MenuPath>Datasets</MenuPath> menu. A wrong number copies other weights without an error.
+
+{/* "From experience" box: waiting for the project owner's story. Do not write it before it arrives. */}

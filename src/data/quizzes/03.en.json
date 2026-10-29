@@ -39,7 +39,7 @@
         "c",
         "a"
       ],
-      "explanation": "Filtering of the continuous data comes first, then bad channels. The average reference comes last, because it needs all channels spread over the head: a bad channel left in spreads its noise into every channel, and a missing one tilts the average toward the other side. So interpolation comes before it."
+      "explanation": "Filtering of the continuous data comes first, then removing bad channels. The average reference comes last, because it needs all channels spread over the head: a bad channel left in spreads its noise into every channel, and a missing one tilts the average toward the other side. So interpolation comes before it."
     },
     {
       "id": "s03-q02",
@@ -236,7 +236,7 @@
       "answer": [
         "d"
       ],
-      "explanation": "The rule: the new rate should be at least 2.5 times the highest frequency of interest, 100 Hz here. 80 Hz is only twice, with no margin, because the EEGLAB anti-aliasing filter fully keeps frequencies only up to 80% of the new Nyquist. 250 Hz is the common choice for ERP data."
+      "explanation": "The rule: the new rate should be at least 2.5 times the highest frequency of interest, 100 Hz here. 80 Hz is only twice 40 Hz, which leaves no margin: the EEGLAB anti-aliasing filter keeps frequencies intact only up to 80% of the new Nyquist. 250 Hz is the common choice for ERP data."
     },
     {
       "id": "s03-q08",

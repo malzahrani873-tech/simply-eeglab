@@ -48,7 +48,9 @@ try
     % ICA on a 1-Hz high-passed copy (the slow step worth a cluster)
     EEG_ica = pop_eegfiltnew(EEG, 'locutoff', 1);
     tic;
-    EEG_ica = pop_runica(EEG_ica, 'icatype', 'runica', 'extended', 1);
+    % No one watches the job, so give the rank: channels - interpolated - 1 (average reference)
+    expectedRank = EEG_ica.nbchan - numel(badChans) - 1;
+    EEG_ica = pop_runica(EEG_ica, 'icatype', 'runica', 'extended', 1, 'pca', expectedRank);
     fprintf('ICA finished in %.1f min\n', toc / 60);
 
     % Save only the small result: the ICA weights and the bad channel list

@@ -29,25 +29,44 @@ eeglabVersion: "2026.1"
 updated: 2026-10-27
 ---
 
-## Why this step matters
+## The idea
 
-No processing step in EEGLAB can fix a badly designed experiment. If the stimulus timing was not recorded, you cannot cut the data around it. If there are too few trials, the ERP stays buried in noise no matter how well you clean it.
+EEGLAB processing cannot fix a badly designed experiment. If the stimulus timing was not recorded, you cannot cut the data around it. If there are too few trials, the ERP stays buried in noise no matter how well you clean it.
 
-This lesson is optional, because the path works on data that has already been recorded. But it matters a lot if you will record your own data, or want to judge an open dataset before choosing it.
+This lesson is optional, because the path works on data that has already been recorded. But you need it if you plan to record your own data or want to judge an open dataset before choosing it. So what must you decide before the first recording?
 
-## Before and after
+## What separates a well-designed trial from a weak one?
 
 <Figure src="experiment-design/trial-timelines.svg" alt="Two timelines of two consecutive trials. Weak design: fixation, stimulus, press, fixed gap, no event marks, timing saved in the presentation software only. Good design: the same sequence with a square mark at the stimulus and an rt mark at the press, a random-length gap, and a photodiode on the screen corner." source="original" />
 
-## Steps in the GUI
+Compare the two lines. The good design adds three things the weak one lacks:
 
-There are no EEGLAB steps in this lesson, because design happens before recording.
+- **A mark for each event in the EEG file itself:** `square` at the stimulus and `rt` at the press. Without them you cannot cut the data around the stimulus.
+- **A random-length gap** between trials, so the participant cannot predict the next stimulus.
+- **A photodiode on the screen corner** that measures when the stimulus actually appeared, not when the software asked for it.
 
-After recording, you will check the result of the design in EEGLAB in the events lesson: you list the events, their types and timing from <MenuPath>Edit > Event values</MenuPath>, and see them as vertical lines over the signal in <MenuPath>Plot > Channel data (scroll)</MenuPath>.
+The weak design leaves the timing in the presentation software only.
 
-## The equivalent script
+## What should I review in any design before recording?
 
-This script does not need EEGLAB. It simulates the most important design decision: the number of trials. Each trial contains the same wave (like a P3 component of 5 microvolts) plus random noise much larger than it. Then it averages different numbers of trials.
+
+| Item | What you do | Why |
+|---|---|---|
+| Trials per condition | Start from the number used in published studies of the same component, and add a margin for trials that will be rejected | Noise shrinks only with the square root of the number of trials (see the next section), and small components need more trials |
+| Event recording | Send a code for each event (stimulus and response) directly to the EEG system | The presentation software log alone is not enough to cut the data. The EEGLAB tutorial advises relying only on event signals sent directly to the EEG system |
+| Timing accuracy | Measure the delay between the event code and the stimulus appearing on screen with a photodiode | Ordinary screens can delay the display or draw it in parts. In reaction-time research a 10-millisecond difference is considered large (EEGLAB tutorial). The tutorial also recommends a sampling rate of at least 1000 Hz for event-related recordings so that event timing is precise |
+| Comparison condition | Two conditions that differ in one factor only | If the conditions differ in both brightness and meaning, you cannot tell which one caused the ERP difference |
+| Trial order | Randomize the conditions, and vary the gap between trials slightly | So the participant cannot predict the next stimulus, and activity from one trial does not overlap the next in a fixed pattern |
+| Eye channels | Record EOG channels above, below and beside the eyes | To detect blinks and eye movements later (Luck, Appendix 1) |
+| Recording environment | Keep screens and power sources away from the participant, and check electrode impedance before starting | Screens and lights are the main sources of power-line noise, and a bad reference electrode spoils every channel (EEGLAB tutorial) |
+
+**An example from the path:** `eeglab_data.set` has two events: `square` when the stimulus appears, and `rt` at the button press. The participant presses only when the stimulus appears at the attended location (EEGLAB tutorial, dataset description). This is what makes cutting epochs around `square` possible in the [epoch extraction lesson](/en/lesson/extract-epochs/).
+
+After recording, you check the result of the design in the [events lesson](/en/lesson/events/): you list the events with their types and timing from <MenuPath>Edit > Event values</MenuPath>, and see them as vertical lines on the signal in <MenuPath>Plot > Channel data (scroll)</MenuPath>.
+
+## How many trials do I need for the ERP to rise above the noise?
+
+The most important design decision is the number of trials, and this optional script simulates it without EEGLAB. Each trial contains the same wave (similar to a 5-microvolt P3 component) plus random noise much larger than the wave. Then the script averages different numbers of trials.
 
 ```matlab
 % How the number of trials changes the noise left in an average
@@ -75,38 +94,23 @@ legend([labels, {'True wave'}]);
 
 - A single trial does not show the wave, because the noise (20 microvolts) is four times larger than it.
 - When you average, the constant wave stays and the random noise cancels out (Luck, Appendix 1).
-- The remaining noise shrinks with the square root of the number of trials. Four times more trials only halves the noise.
+- The remaining noise shrinks with the square root of the number of trials. Four times as many trials only halve the noise.
 - **Simplification:** real noise is not fully random, and the wave varies a little between trials.
 
-## Which value should I choose?
 
-This is a checklist for any design, with the reason and source for each item.
-
-| Item | What you do | Why |
-|---|---|---|
-| Trials per condition | Start from the number used in published studies of the same component, and add a margin for trials that will be rejected | Noise shrinks only with the square root of the number (script above), and small components need more trials |
-| Event recording | Send a code for each event (stimulus and response) directly to the EEG system | The presentation software log alone is not enough to cut the data. The EEGLAB tutorial advises relying only on event signals sent directly to the EEG system |
-| Timing accuracy | Measure the delay between the event code and the stimulus appearing on screen with a photodiode | Ordinary screens can delay the display or draw it in parts. In reaction-time research a 10-millisecond difference is considered large (EEGLAB tutorial). The tutorial also recommends a sampling rate of at least 1000 Hz for event-related recordings so event timing is precise |
-| Comparison condition | Two conditions that differ in one factor only | If the conditions differ in both brightness and meaning, you cannot tell which one caused the ERP difference |
-| Trial order | Randomize the conditions, and vary the gap between trials slightly | So the participant cannot predict the next stimulus, and activity from one trial does not overlap the next in a fixed pattern |
-| Eye channels | Record EOG channels above, below and beside the eyes | To detect blinks and eye movements later (Luck, Appendix 1) |
-| Recording environment | Keep screens and power sources away from the participant, and check electrode impedance before starting | Screens and lights are the main sources of power-line noise, and a bad reference electrode spoils every channel (EEGLAB tutorial) |
-
-**An example from the path:** `eeglab_data.set` has two events: `square` when the stimulus appears, and `rt` at the button press. The participant presses only when the stimulus appears at the attended location (EEGLAB tutorial, dataset description). This is what makes cutting epochs around `square` possible in station 5.
-
-## Common mistakes
-
-- **Events saved only in the presentation software.** After recording you find that the EEG file has no events, or events that do not match the timing. Test sending codes before the first participant.
-- **Not measuring screen delay.** Every component will appear late by the same unknown amount, and the delay may vary between trials.
-- **Two conditions that differ in more than one factor.** The ERP difference cannot be attributed to a single factor.
-- **A trial count with no margin.** After rejecting bad trials in station 5, fewer trials than needed may remain.
-- **Recording without EOG channels.** Telling blinks and eye movements apart becomes harder in station 4.
-
-{/* "From experience" box: waiting for a story from the project owner. Not written before it arrives. */}
-
-## How to check it worked
+## Test yourself: can you judge a design?
 
 - The script prints three numbers for the remaining noise, each about half of the one before (close to 6.3, 3.2 and 1.6).
 - In the plot, the 160-trial curve is the closest to the black true wave.
 - You can name two checklist items that cannot be fixed after recording: event recording and event timing.
 - Given a design with two conditions, you can say whether they differ in one factor or more.
+
+## Which design mistakes can EEGLAB not fix after recording?
+
+- **Events saved only in the presentation software.** After recording, you find that the EEG file has no events, or events that do not match the timing. Test sending codes before the first participant.
+- **Not measuring screen delay.** Every component will appear late by the same unknown amount, and the delay may vary between trials.
+- **Two conditions that differ in more than one factor.** The ERP difference cannot be attributed to a single factor.
+- **A trial count with no margin.** After rejecting bad trials in station 5, fewer trials than needed may remain.
+- **Recording without EOG channels.** Identifying blinks and eye movements becomes harder in station 4.
+
+{/* "From experience" box: waiting for a story from the project owner. Not written before it arrives. */}

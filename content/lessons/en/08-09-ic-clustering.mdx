@@ -167,36 +167,48 @@ eeglabVersion: "2026.1"
 updated: 2026-10-28
 ---
 
-## Why this step matters
+## The idea
 
-Channel Pz in one person and Pz in another do not record the same brain sources. The skull, the folding of the cortex and the reference all differ. ICA offers another route: each component is one source estimated from the data of one participant. But components have no shared names across people. Component 5 in one participant has nothing to do with component 5 in another.
+Channel Pz in one person and Pz in another do not record the same brain sources. ICA offers another route: each component is one source estimated from the data of one participant. But components have no shared names across people. Component 5 in one participant has nothing to do with component 5 in another.
 
-Clustering solves this. It groups components from different participants that look like the same source: similar scalp maps and nearby dipoles. Each cluster can then be treated like a "virtual channel" in the group plots and statistics.
+So how do you group the participants' components that stand for the same source, and how do you judge the result before you trust it?
 
-Clustering has no single correct answer. Change the measures or the number of clusters, and the clusters change. So this lesson teaches you to build clusters, and also to judge them before you trust them.
-
-## Before and after
+## What does one component cluster look like?
 
 <ImageSpec>
 An image from the lesson script on the run day, not a hand drawing. Left: the scalp maps of the components in the cluster with the most participants, each titled with its participant and component (for example `cba IC6`), with the cluster mean map first. Right: the dipoles of the same cluster in the template head, blue for members and red for the cluster mean. Map and dipole text come from EEGLAB in English, so one version serves both languages.
 </ImageSpec>
 
-## Steps in the GUI
+## When are two components from two people "the same source"?
 
-**About the data (D6):** `animal_mine.study` with its designs and channel measures. Clustering needs ICA, ICLabel and a dipole for each component in every file. The ready files already hold the authors' ICA (31 components per participant, 29 for `cba`), so we do not compute it again. They also hold a dipole for each component, fitted by the authors with the spherical BESA head model (`standard_BESA.mat`, which comes with the dipfit plugin), so we keep them too. There are no ICLabel results, so the "Starting point" script runs ICLabel. It fits dipoles only if they are missing or their head model file cannot be found.
+The same channel does not record the same sources in two people, because the skull, the folding of the cortex and the reference all differ from person to person.
+
+Clustering groups components from different participants that look like the same source: similar scalp maps and nearby dipoles. You can then treat each resulting cluster like a "virtual channel" in the group plots and statistics.
+
+Clustering has no single correct answer. Change the measures or the number of clusters, and the clusters change. So you build the clusters first, then judge them.
+
+## What do the files need before clustering?
+
+**About the data (D6):** `animal_mine.study` with its designs and channel measures. Clustering needs three things for each component in every file:
+
+- **ICA:** the ready files already hold the authors' ICA (31 components per participant, 29 for `cba`), so we do not compute it again.
+- **A dipole:** also present, fitted by the authors with the spherical BESA head model (`standard_BESA.mat`, which comes with the dipfit plugin), so we keep it. "Script to reach this state" under "Starts from" at the top of the lesson fits dipoles only if they are missing or their head model file cannot be found.
+- **ICLabel:** there are no results yet, so that script runs it.
 
 <Callout type="warning">
-**Before you start: what the starting point does, and one requirement.**
+**Before you start: what the script does, and one requirement.**
 
-- **Fieldtrip-lite must be installed**, because keeping only in-brain dipoles uses it, and so would dipole fitting (see the statistics lesson for how to check and install it). If dipoles must be fitted, the script stops with `Install Fieldtrip-lite first` when it is missing.
-- **The starting point runs ICLabel for every participant**: a few minutes for the 14 participants. {/* ICLabel time: measured in the combined run */} If the dipoles were missing, it would also fit them, which takes about 25 minutes. The script prints each participant as it finishes, and the total time at the end. Run it once: the results are saved in the dataset files, and the next run skips this step.
-- **The ICA is not computed again.** It comes with the data, so your components are the same as in the lesson images. In your own data, run ICA on the continuous data with a 1 Hz high-pass copy, as in station 4.
+- **Fieldtrip-lite must be installed**, because keeping only in-brain dipoles needs it, and so does dipole fitting (the statistics lesson shows how to check and install it). If dipoles must be fitted, the script stops with `Install Fieldtrip-lite first` when it is missing.
+- **The script runs ICLabel for every participant**: a few minutes for the 14 participants. {/* ICLabel time: measured in the combined run */} If the dipoles were missing, it would also fit them, which takes about 25 minutes. The script prints each participant as it finishes, and the total time at the end. Run it once: the results are saved in the dataset files, and the next run skips this step.
+- **The ICA is not computed again.** It comes with the data, so your components are the same as in the lesson images. In your own data, run ICA on the continuous data with a 1 Hz high-pass copy, as in [the lesson on 1-Hz filtering for ICA](/en/lesson/ica-1hz-copy-weights/).
 </Callout>
 
-**1. Run the starting point and check the result**
+## How do I cluster components from the menus?
 
-1. Run the "Starting point" script, and wait for it to finish.
-2. Both files of a participant should hold **the same ICA**. EEGLAB recognizes them as one decomposition only if their weights are identical. The script checks this: when the weights match, it fits the dipoles once and copies them to the second file, and otherwise it fits each file.
+**1. Prepare the files and check them**
+
+1. Start with `animal_mine.study` open, with ICLabel and dipoles. If you don't have it, open "Script to reach this state" under "Starts from" at the top of the lesson, run it and wait for it to finish.
+2. Both files of each participant should hold **the same ICA**, because EEGLAB recognizes them as one decomposition only if their weights are identical. The script checks this: when the weights match, it fits the dipoles once and copies them to the second file, and otherwise it fits each file separately.
 
 **2. Choose the components to cluster**
 
@@ -212,7 +224,7 @@ An image from the lesson script on the run day, not a hand drawing. Left: the sc
 
 **4. Build the preclustering array**
 
-1. In <MenuPath>Study > Select/Edit study design(s)</MenuPath> make `image only` the current design. EEGLAB clusters only with a design that holds every dataset. Designs 2 and 3 both do; we use `image only` because clustering ignores the groups.
+1. In <MenuPath>Study > Select/Edit study design(s)</MenuPath> make `image only` the current design. EEGLAB clusters only with a design that holds every dataset. Designs 2 and 3 both do; we use `image only` because clustering does not use gender.
 2. Open <MenuPath>Study > PCA clustering (original) > Build preclustering array</MenuPath>. The <UiLabel>Select and compute component measures for later clustering -- pop_preclust()</UiLabel> window opens.
 3. In the location-based part of the window, tick `dipole locations` and type `10` in its weight box.
 4. Tick `scalp maps`, keep `3` in its PCA box and `1` as its weight, keep <UiLabel>Use channel values</UiLabel>, and keep <UiLabel>Absolute values</UiLabel> ticked.
@@ -227,7 +239,7 @@ The window itself warns: <UiLabel>Mixing time-based and location-based measures 
 3. Keep the value EEGLAB proposes in <UiLabel>Number of clusters to compute:</UiLabel>. It equals the average number of selected components per dataset, so each cluster holds about one component per participant on average.
 4. Tick <UiLabel>Separate outliers (enter std.)</UiLabel> and keep `3`. Press <UiLabel>Ok</UiLabel>.
 
-**6. Look at the clusters and judge them**
+## How do I judge a cluster before trusting it?
 
 1. Open <MenuPath>Study > Edit/plot component clusters</MenuPath>. The <UiLabel>View and edit current component clusters -- pop_clustedit()</UiLabel> window opens. The left list shows each cluster with its number of components, for example `Cls 3 (12 ICs)`.
 2. Choose a cluster, then press <UiLabel>Plot scalp maps</UiLabel> on the left: the mean map of the cluster. In the right list choose all its components, then <UiLabel>Plot scalp map(s)</UiLabel>: one map per member.
@@ -235,11 +247,11 @@ The window itself warns: <UiLabel>Mixing time-based and location-based measures 
 4. Judge the cluster with four questions:
    - Do the member maps look alike, or is one clearly different?
    - Are the dipoles close together, or spread across the head?
-   - How many **different participants** does it hold? A cluster from 4 of 14 people says little about the group.
+   - How many **different participants** does it hold? A cluster with 4 of 14 people says little about all the participants.
    - Does ICLabel mostly call its members "Brain"? The script prints the median brain probability for each cluster.
 5. If one member is clearly different, choose it and press <UiLabel>Remove selected outlier comps.</UiLabel>. Press <UiLabel>Ok</UiLabel> to keep your changes, then save with <MenuPath>File > Save current study</MenuPath>.
 
-## The matching script
+## How do I cluster components with a script?
 
 ```matlab
 % STUDY and ALLEEG come from the starting point script (ICA, dipoles and ICLabel present)
@@ -292,7 +304,7 @@ STUDY = std_dipplot(STUDY, ALLEEG, 'clusters', best);
 STUDY = pop_savestudy(STUDY, ALLEEG, 'savemode', 'resave');
 ```
 
-## Which value should I choose?
+## Which clustering values should I choose?
 
 | Option | In this lesson | When to change it |
 |---|---|---|
@@ -303,24 +315,24 @@ STUDY = pop_savestudy(STUDY, ALLEEG, 'savemode', 'resave');
 | Seed | `rng(1)` in the script | k-means starts at random, so without a fixed seed the clusters change a little each run. |
 | ICA seed | `'rndreset', 'no'` when you run ICA yourself | Here ICA comes with the data. In your own data, without it runica starts from a random point set by the clock. Keep it `'no'` whenever you want a repeatable result. |
 
-## Common mistakes
+## How do I check that the clustering worked?
+
+- **The script prints** `Components kept per dataset:` with a median and a range, and each dataset keeps at least a few components.
+- **The script prints** one line per cluster with its number of ICs, its number of participants and its median brain probability.
+- **The cluster editor** lists the clusters with their number of ICs, and an `outlier` cluster if outliers were found.
+- **For the cluster with the most participants,** the member maps look alike and the dipoles are grouped in one area of the head.
+
+## Common mistakes in component clustering
 
 - **One ICA per file instead of per participant.** EEGLAB then sees two unrelated decompositions for the same person, and the two conditions of a cluster no longer contain the same components.
 - **Trusting the cluster number.** `Cls 3` in your run is not `Cls 3` in another run or another person's analysis. Name a cluster by its location and map, for example "medial parietal".
 - **A cluster from few participants.** The tutorial warns that several components from the same participant in one cluster change the question from people to components. Look at the number of participants, not only the number of ICs.
 - **Clustering on the measure you then test.** This is double-dipping: the clusters were partly built from the effect.
 - **ICA without `'rndreset', 'no'`** in your own data. runica then starts from a different random point, so the components, and then the clusters, change on every run, even with `rng(1)` before k-means.
-- **Clustering on top of old clusters.** The ready `animal.study` holds nine clusters from the authors (`Cls 2` to `Cls 9` under the parent cluster), and every new run of `pop_clust` adds clusters to the list. Delete the earlier clusters first, as the script does, and work on `animal_mine.study`.
+- **Clustering on top of old clusters.** The ready `animal.study` holds eight clusters from the authors (`Cls 2` to `Cls 9` under the parent cluster `Cls 1`), and every new run of `pop_clust` adds clusters to the list. Delete the earlier clusters first, as the script does, and work on `animal_mine.study`.
 - **Forgetting to save.** Clusters live in the STUDY. Without saving, they are lost when you close EEGLAB.
 
 {/* "From experience" box: waiting for a story from the project owner. Not written before it arrives. */}
-
-## How do you know it worked?
-
-- **The script prints** `Components kept per dataset:` with a median and a range, and each dataset keeps at least a few components.
-- **The script prints** one line per cluster with its number of ICs, its number of participants and its median brain probability.
-- **The cluster editor** lists the clusters with their number of ICs, and an `outlier` cluster if outliers were found.
-- **For the cluster with the most participants,** the member maps look alike and the dipoles are grouped in one area of the head.
 
 <Methods>
 Independent components whose equivalent dipole had a residual variance below [15]% and lay inside the brain were clustered across participants (EEGLAB 2026.1, std_preclust and pop_clust) using k-means on dipole locations (weight [10]) and scalp maps reduced to [3] principal dimensions; components further than [3] standard deviations from any centroid were assigned to an outlier cluster. The ICA decompositions (one per participant) and equivalent dipoles (spherical four-shell BESA head model, dipfit) distributed with the EEGLAB STUDY version of the dataset were used.

@@ -50,21 +50,25 @@ eeglabVersion: "2026.1"
 updated: 2026-10-28
 ---
 
-## Why this step matters
+## The idea
 
-Every lab names and arranges its files in its own way. BIDS (Brain Imaging Data Structure) is a shared standard: fixed folder names, fixed file names, and side files that describe the recording. A dataset in BIDS can be read by any tool that knows the standard, without asking the lab how it saved its data.
+Every lab arranges its files its own way. BIDS (Brain Imaging Data Structure) is a shared standard: fixed folder and file names, and side files that describe the recording. Any tool that knows the standard can read it.
 
-OpenNeuro is a free site that hosts hundreds of public datasets in BIDS. For an EEGLAB user, BIDS saves two steps that you did by hand in this station: the events and the channel locations come ready in their own files.
+OpenNeuro is a free site that hosts hundreds of public BIDS datasets. It saves you two steps from this station: [the events](/en/lesson/events/) and [the channel locations](/en/lesson/channel-locations/) come ready in their own files.
 
-We use dataset `ds002718` (Wakeman and Henson): participants viewed famous, unfamiliar and scrambled faces. The whole dataset is about 4 GB, so we download one participant only, `sub-002`, about 235 MB.
+So how do you import a participant from a BIDS dataset into EEGLAB, with its events and positions?
 
-## Before and after
+## What is inside a BIDS dataset folder?
+
+At the root are files that describe the whole dataset. Inside each participant's folder is the signal file, with side files for the channels, the electrodes and the events.
 
 <Figure src="bids-openneuro/bids-tree.svg" alt="Folder tree of ds002718: at the root dataset_description.json, README and task-FaceRecognition_events.json; then sub-002, then eeg with five files: the .set signal of about 235 MB, eeg.json with recording details, channels.tsv with 74 channel names, electrodes.tsv with electrode positions and events.tsv with 1479 events." source="original" />
 
-## Steps in the GUI
+## How do I import a participant from the menus?
 
 ### 1. Download one participant
+
+We use dataset `ds002718` (Wakeman and Henson): participants viewed famous, unfamiliar and scrambled faces. The whole dataset is about 4 GB, so we download one participant only, `sub-002`, about 235 MB.
 
 1. Open the dataset page: [ds002718 on OpenNeuro](https://openneuro.org/datasets/ds002718).
 2. In the file list, download these files, and keep the same folder structure on your computer, in a folder named `ds002718`:
@@ -72,7 +76,11 @@ We use dataset `ds002718` (Wakeman and Henson): participants viewed famous, unfa
    - In `sub-002/eeg/`: the five files that start with `sub-002_task-FaceRecognition_`.
 3. You do not need the `anat` folder (the MRI) for this lesson.
 
-The script in the starting point box does the same download in one go.
+To download them all in one go, open "Script to reach this state" under "Starts from" at the top of the lesson.
+
+<Callout type="note" title="About the data">
+Data: Wakeman, D. G., & Henson, R. N. (2015). A multi-subject, multi-modal human neuroimaging dataset. Scientific Data, 2, 150001. https://doi.org/10.1038/sdata.2015.1. EEGLAB version on OpenNeuro: ds002718 v1.0.5, DOI 10.18112/openneuro.ds002718.v1.0.5. License: CC0.
+</Callout>
 
 ### 2. Look at the side files
 
@@ -91,7 +99,7 @@ Open `sub-002_task-FaceRecognition_channels.tsv`. The channel names are `EEG001`
 
 In EEGLAB 2026.1, this command always creates a STUDY, even for one participant. The main window shows the STUDY, and the <UiLabel>Datasets</UiLabel> menu lists dataset 1. Choose it from the <UiLabel>Datasets</UiLabel> menu to see its details: 74 channels, 250 Hz and 1479 events. You will learn about STUDY in station 8.
 
-## The equivalent script
+## How do I import the participant with a script?
 
 ```matlab
 % Start EEGLAB (EEG-BIDS ships with EEGLAB 2026.1)
@@ -117,9 +125,9 @@ eeg_eventtypes(EEG(1))       % right_sym 500, famous_new 150, ...
 ```
 
 - `'eventtype', 'trial_type'` is the same choice as the list in the window. Without it, EEGLAB uses the `value` column, and the event types become numbers such as `13` and `4096`.
-- The imported file is written to `derivatives/eeglab/sub-002/eeg/`, and the STUDY file to `derivatives/eeglab/ds002718.study`. The file takes its name from the BIDS folder; the STUDY itself has no name (`STUDY.name` is empty) unless you give it one.
+- The imported file is written to `derivatives/eeglab/sub-002/eeg/`, and the STUDY file to `derivatives/eeglab/ds002718.study`. The STUDY file takes its name from the BIDS folder; the STUDY itself has no name (`STUDY.name` is empty) unless you give it one.
 
-## Which value should I choose?
+## Which options do I pick in the BIDS import window?
 
 | Option | Our choice | Why |
 |---|---|---|
@@ -128,29 +136,25 @@ eeg_eventtypes(EEG(1))       % right_sym 500, famous_new 150, ...
 | Study output folder | `derivatives/eeglab` (default) | BIDS keeps processed files in `derivatives`, away from the raw data. |
 | Import only the following participant indices | unticked | We downloaded one participant only. In a full dataset, use it to import a few participants first. |
 
-## Common mistakes
-
-- **Pointing EEGLAB at the `sub-002` or `eeg` folder.** Choose the dataset's top folder, the one that holds `dataset_description.json`.
-- **Downloading the `.set` file only.** Without `events.tsv` and `electrodes.tsv`, the side files that make BIDS useful are missing. Keep the folder structure as on OpenNeuro.
-- **Event types appear as numbers.** You kept `value` in the event column list. Import again and choose `trial_type`.
-- **Unticking the electrode.tsv option.** The lookup by name finds no position for `EEG001`, and the channels have no locations.
-- **Looking for 70 channels.** The recording has 70 EEG channels plus `HEOG`, `VEOG` and two `EKG` channels, so `EEG.nbchan` is 74.
-
-{/* "From experience" box: waiting for a story from the project owner. Do not write it before it arrives. */}
-
-## How to check it worked
+## How do I verify that the events and positions arrived?
 
 1. The <UiLabel>Datasets</UiLabel> menu lists dataset 1, and choosing it shows 74 channels, 250 Hz and 1479 events.
 2. `eeg_eventtypes(EEG(1))` lists names such as `right_sym`, `famous_new` and `boundary`, not numbers.
 3. The <UiLabel>Channel locations</UiLabel> line shows `Yes`, and <MenuPath>Plot > Channel locations > By name</MenuPath> shows the electrodes on the head. You also see points for the eye and heart channels, because the file gives them positions too.
 4. The folder `ds002718/derivatives/eeglab/sub-002/eeg/` has the imported `.set` file.
 
-That is all for BIDS. Close the STUDY with <MenuPath>File > Clear study / Clear all</MenuPath> before the next lesson. From the next station we work on `eeglab_data.set`, which ships with EEGLAB, because it is small and matches the documentation.
+That is all for BIDS. Close the STUDY with <MenuPath>File > Clear study / Clear all</MenuPath> before the next lesson. From the next station on, we work on `eeglab_data.set`, which ships with EEGLAB, because it is small and matches the documentation.
 
 <Methods>
 EEG data in BIDS format (OpenNeuro ds002718, participant sub-002) were imported with pop_importbids (EEG-BIDS plugin 10.5, EEGLAB 2026.1), using the trial_type column for event types and electrode positions from electrodes.tsv.
 </Methods>
 
-<Callout type="note" title="About the data">
-Data: Wakeman, D. G., & Henson, R. N. (2015). A multi-subject, multi-modal human neuroimaging dataset. Scientific Data, 2, 150001. https://doi.org/10.1038/sdata.2015.1. EEGLAB version on OpenNeuro: ds002718 v1.0.5, DOI 10.18112/openneuro.ds002718.v1.0.5. License: CC0.
-</Callout>
+## Why are locations or event names missing? Common mistakes with BIDS
+
+- **Pointing EEGLAB at the `sub-002` or `eeg` folder.** Choose the dataset's top folder, the one that holds `dataset_description.json`.
+- **Downloading the `.set` file only.** If you skip `events.tsv` and `electrodes.tsv`, you lose the side files that make BIDS useful. Keep the folder structure as on OpenNeuro.
+- **Event types appear as numbers.** You kept `value` in the event column list. Import again and choose `trial_type`.
+- **Unticking the electrode.tsv option.** The lookup by name finds no position for `EEG001`, and the channels have no locations.
+- **Looking for 70 channels.** The recording has 70 EEG channels plus `HEOG`, `VEOG` and two `EKG` channels, so `EEG.nbchan` is 74.
+
+{/* "From experience" box: waiting for a story from the project owner. Do not write it before it arrives. */}

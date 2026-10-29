@@ -89,59 +89,67 @@ eeglabVersion: "2026.1"
 updated: 2026-10-28
 ---
 
-## Why this step matters
+## The idea
 
-ERPs and spectra describe each source on its own. <En>Connectivity</En> asks a different question: does the activity of one source help predict the activity of another source a moment later? At which frequency? And when after the stimulus?
+ERPs and spectra describe each source on its own. <En>Connectivity</En> asks a different question: does the activity of one source help predict the activity of another a moment later? At which frequency? And when after the stimulus?
 
-The SIFT plugin answers with a multivariate autoregressive model (<En>MVAR</En>). The model predicts each value of each component from the past values of all components. From its coefficients, directed measures such as dDTF are computed, drawing arrows between sources over time and frequency.
+The SIFT plugin answers with a multivariate autoregressive model (<En>MVAR</En>), which draws arrows between sources over time and frequency. It is easy to run and easy to get wrong.
 
-The computation is easy to run and easy to get wrong. That is why this lesson focuses on two conditions before any plot: enough data for the number of parameters, and a model that passes the validity checks.
+So how do you build a model with enough data, and check that it is valid before you read any arrow?
 
-<Callout type="warning">
-An arrow between two components means that the first one improves the prediction of the second in this model. It does not mean that one region controls the other. Report your results within these limits.
-</Callout>
-
-A newer alternative: the ROIconnect plugin computes connectivity between defined brain regions after source estimation, rather than between ICA components. You will find it in the extension manager.
-
-## Before and after
+## What does the SIFT time-frequency grid show?
 
 <ImageSpec>
 The SIFT grid from Visualization > Time-Frequency Grid for four ICA components of D1 after epoching: a 4 × 4 matrix, each off-diagonal cell a time-frequency plot of dDTF08 from the column component to the row component, time across the epoch (window centers from about -0.75 to 1.75 seconds), frequency from 2 to 30 Hz, with a vertical line at zero. Above each column and left of each row, the component's scalp map. Source: screenshot from EEGLAB 2026.1 with SIFT on the project owner's computer.
 </ImageSpec>
 
-## Steps in the GUI
+Each off-diagonal cell shows the connectivity from the column component to the row component, over time and frequency. Do not read this grid before you have confirmed that the model is valid, as you will in step 10. The diagonal cells show a component with itself, not a connection between two components, so do not read them as arrows.
+
+## What does an arrow between two components mean, and what does it not mean?
+
+The model predicts each value of each component from the past values of all components. The number of past values it looks at is the model order. From the model's coefficients, directed measures such as dDTF are computed, and these draw the arrows.
+
+<Callout type="warning">
+An arrow between two components means that the first one improves the prediction of the second in this model. It does not mean that one region controls the other. Report your results within these limits.
+</Callout>
+
+If you want connectivity between defined brain regions rather than between ICA components, the newer ROIconnect plugin computes it after source estimation. You will find it in the extension manager.
+
+## How do I build and plot the connectivity model from the menus?
 
 **First: install SIFT**
 
-1. Open <MenuPath>File > Manage EEGLAB extensions</MenuPath>, search for SIFT and install it. Note the version you installed (the latest release in the SIFT repository when this lesson was written is 1.6).
+1. Open <MenuPath>File > Manage EEGLAB extensions</MenuPath>, search for SIFT and install it. Note the version you installed, because you will write it in the Methods sentence (the latest release in the SIFT repository when this lesson was written is 1.6).
 2. Restart `eeglab`. A new menu appears: <MenuPath>Tools > SIFT</MenuPath>.
 
 **Second: choose four brain components**
 
-3. Start from `D1 epochs clean nolp`, as in "Starting point". This is a side branch: the same pipeline as station 5 without the 30 Hz <En>low-pass</En> filter.
+3. Start with `D1 epochs clean nolp` open. If you don't have it, open "Script to reach this state" under "Starts from" at the top of the lesson. This dataset is a side branch: the same pipeline as station 5 without the 30 Hz <En>low-pass</En> filter, because MVAR models need the full spectrum.
 4. Open <MenuPath>Tools > Classify components using ICLabel > Label components</MenuPath> and pick four components whose top class is <En>Brain</En>. Note their numbers.
-5. Open <MenuPath>Tools > Remove components from data</MenuPath>, type the four numbers in <UiLabel>Or list of component(s) to retain</UiLabel>, and clear the <UiLabel>List of component(s) to remove from data</UiLabel> box if it holds numbers. Click <UiLabel>Ok</UiLabel> then <UiLabel>Accept</UiLabel>, and name the new dataset `D1 sift`.
+5. Open <MenuPath>Tools > Remove components from data</MenuPath>, type the four numbers in <UiLabel>Or list of component(s) to retain</UiLabel>, and clear the <UiLabel>List of component(s) to remove from data</UiLabel> box if it holds numbers. Click <UiLabel>Ok</UiLabel>, then <UiLabel>Accept</UiLabel>, and name the new dataset `D1 sift`.
 
-Why only four? The number of model parameters equals the number of components squared times the model order. You will compute it in "Which value should I choose?".
+Why only four? The number of model parameters equals the number of components squared times the model order, so it grows fast with every component you add. The numbers are worked out in "How many components, and which order, window and measure?".
 
 **Third: prepare the data and fit the model**
 
 6. Open <MenuPath>Tools > SIFT > Pre-processing</MenuPath>. Choose the <UiLabel>Components</UiLabel> signal type, enable <UiLabel>Detrend</UiLabel> and <UiLabel>NormalizeData</UiLabel>, and click <UiLabel>OK</UiLabel>.
-7. Open <MenuPath>Tools > SIFT > Model fitting and validation > Model Order Selection</MenuPath>. Type a window length of `0.5` seconds and an order range from `1` to `15`, and click <UiLabel>OK</UiLabel>. The order selection curves appear. Choose the order at the bend of the curve (<En>elbow</En>), not only at its lowest point.
+7. Open <MenuPath>Tools > SIFT > Model fitting and validation > Model Order Selection</MenuPath>. Type a window length of `0.5` seconds and an order range from `1` to `15`, and click <UiLabel>OK</UiLabel>. The order selection curves appear. Choose the order at the bend of the curve (<En>elbow</En>), not at its lowest point.
 8. Open <MenuPath>Tools > SIFT > Model fitting and validation > Fit AMVAR Model</MenuPath>, type the order you chose, and keep the window length at `0.5` seconds.
 9. Read what the command window prints: <UiLabel>Ratio of number of parameters to datapoints</UiLabel>. It must be below 0.1.
 
 **Fourth: validate the model, then plot**
 
 10. Open <MenuPath>Tools > SIFT > Model fitting and validation > Validate model</MenuPath>. Three checks appear for each time window: residual <En>whiteness</En>, <En>stability</En> and <En>consistency</En>. Do not go on if most windows fail.
-11. Open <MenuPath>Tools > SIFT > Connectivity</MenuPath>, choose the `dDTF08` measure and frequencies from `2` to `30`. We keep frequencies between 2 and 30 Hz, where most of the D1 activity is, and away from the line-noise filter at 58 to 62 Hz.
+   - **Whiteness:** what the model does not explain should be random noise with no pattern. A failure usually means the model order is too low.
+   - **Stability:** a stable model does not grow without limit over time. A failure means the model does not suit that window.
+   - **Consistency:** data generated by the model should have the same correlations as the real data, shown as a percentage. A low percentage means the model does not represent the data well.
+11. Open <MenuPath>Tools > SIFT > Connectivity</MenuPath>, choose the `dDTF08` measure and frequencies from `2` to `30`. We keep this range because most of the D1 activity is in it, and to stay away from the line-noise filter between 58 and 62 Hz.
 12. Open <MenuPath>Tools > SIFT > Visualization > Time-Frequency Grid</MenuPath> and click <UiLabel>OK</UiLabel>.
-13. Type `eegh` in the command window and save the lines SIFT generated. They are your full script with every option, as you learned in the command history lesson.
+13. Type `eegh` in the command window and save the lines SIFT generated. They are your full script with every option, as you learned in [the command history lesson](/en/lesson/eegh-history/).
 
-## The equivalent script
+## How do I run SIFT from a script?
 
-
-A short version that uses the SIFT defaults for everything not listed. For the full version with every option, run the GUI steps and save `eegh`.
+This is a short version that uses the SIFT defaults for everything not listed. For the full version with every option, run the GUI steps and save `eegh`.
 
 ```matlab
 % Install SIFT from the extension manager if it is missing
@@ -190,17 +198,24 @@ EEG = pop_est_mvarConnectivity(EEG, 'nogui', ...
 pop_vis_TimeFreqGrid(EEG);
 ```
 
-## Which value should I choose?
+## How many components, and which order, window and measure?
 
 | Setting | Value in this lesson | Why |
 |---|---|---|
 | Number of components | 4 | Parameters = (number of components)² × order. With four components and order 10: 160 parameters. With thirty components: 9000 parameters, more than our data points. |
-| Ratio of parameters to data points | Below 0.1, never above 1 | The rule SIFT checks itself and warns about when exceeded (`est_checkMVARParams.m`, after Korzeniewska et al. 2008). With D1: 0.5 seconds × 128 samples × about 80 epochs is roughly 5120 points, so the ratio is about 0.03. |
+| Ratio of parameters to data points | Below 0.1, never above 1 | SIFT checks this rule itself and warns when it is exceeded (`est_checkMVARParams.m`, after Korzeniewska et al. 2008). With D1: 0.5 seconds × 128 samples per second × about 80 epochs is roughly 5120 points, so the ratio is about 0.03. |
 | Window length | 0.5 seconds | The SIFT default. Shorter means finer time resolution and less data per window. |
 | Model order | At the bend of the criterion curve (HQ, for example) | The method used in the official SIFT example for epoched data. The lowest point may pick a very high order. |
 | Measure | dDTF08 | A directed measure that focuses on direct influence, used in the official SIFT example. |
 
-## Common mistakes
+## How do I verify that the model is valid?
+
+- The command window prints a ratio of parameters to data points below 0.1.
+- The <UiLabel>Validate model</UiLabel> checks pass in most windows: residuals are white and the model is stable.
+- `size(EEG.CAT.Conn.dDTF08)` is 4 × 4 × number of frequencies (29) × number of time windows.
+- The time-frequency grid appears for every pair of the four components.
+
+## Common mistakes in connectivity analysis
 
 - **Entering all components.** The number of parameters grows with the square of the number of components, so the model fails or gives meaningless arrows. Start with a few brain components.
 - **Reading arrows before checking the model.** If the whiteness or stability check fails, the model does not represent the data, and the plot after it cannot be trusted.
@@ -209,13 +224,6 @@ pop_vis_TimeFreqGrid(EEG);
 - **Artifact components in the network.** An eye or muscle component creates spurious connectivity with everything around it. Choose brain components only, and check them by eye.
 
 {/* "From experience" box: waiting for the project owner's story. Do not write it before it arrives. */}
-
-## How to check it worked
-
-- The command window prints a ratio of parameters to data points below 0.1.
-- The <UiLabel>Validate model</UiLabel> checks pass in most windows: residuals are white and the model is stable.
-- `size(EEG.CAT.Conn.dDTF08)` is 4 × 4 × number of frequencies (29) × number of time windows.
-- The time-frequency grid appears for every pair of the four components.
 
 <Methods>
 Directed connectivity between four brain independent components was estimated with SIFT [version] (EEGLAB 2026.1) using a sliding-window multivariate autoregressive model (ARfit, 0.5-s windows, 0.03-s steps, model order [p] chosen at the elbow of the Hannan-Quinn criterion, averaged across windows) and the dDTF08 measure from 2 to 30 Hz, on epochs from −1 to 2 s without low-pass filtering.

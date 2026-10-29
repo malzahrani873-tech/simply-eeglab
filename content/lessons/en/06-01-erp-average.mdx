@@ -87,23 +87,25 @@ eeglabVersion: "2026.1"
 updated: 2026-10-28
 ---
 
-## Why this step matters
+## The idea
 
-In each epoch, the brain's response to the square is small, a few microvolts, with other, larger activity on top of it that has nothing to do with the stimulus. So you can hardly see the response in a single trial.
+In each epoch, the brain's response to the square is a few microvolts, buried under larger unrelated activity. You can hardly see it in one trial.
 
-The idea: the response to the stimulus repeats with the same shape and timing in every trial, while the other activity varies at random. If you average all epochs point by point, the response stays and the random activity cancels out.
+But the response repeats with the same shape and timing in every trial, while the other activity varies at random. Average the epochs point by point: the response stays; the random activity cancels out.
 
-The resulting waveform is the event-related potential (<En>ERP</En>). Everything after it builds on it: measurement, comparing conditions, and statistics.
+The result is the event-related potential (<En>ERP</En>), the basis for measurement, condition comparisons, and statistics. How do you compute it in EEGLAB, and how do you read it?
 
-## Before and after
+## What happens to the waveform as trials add up?
+
+One trial looks like noise. With 10 trials the waveform starts to appear, and with all 77, a clear positive peak appears after 400 ms.
 
 <Figure src="erp-average/erp-average-1-10-all.png" alt="Three panels for Pz with the same axes: one epoch, the average of 10, and the average of all 77. The single epoch is noise; the full average is smoother, with a positive peak after 400 ms." caption="n = 1, n = 10 and n = 77" source="D1" />
 
-## Steps in the GUI
+## How do I see each channel's average from the menus?
 
-Start with the dataset `D1 epochs clean` open, as in "Starting point".
+EEGLAB has no separate "compute average" menu. The average is computed inside the ERP plotting menus, or with one line in a script. Here we display it once for a first look; station 7 covers the plotting options in detail.
 
-EEGLAB has no separate "compute average" menu. The average is computed inside the ERP plotting menus, or with one line in a script. Here we display it once for a first look; the plotting options in detail come in station 7.
+Start with the dataset `D1 epochs clean` open. If you don't have it, open "Script to reach this state" at the top of the lesson.
 
 1. Open <MenuPath>Plot > Channel ERPs > In scalp/rect. array</MenuPath>.
 2. The <UiLabel>Topographic ERP plot - pop_plottopo()</UiLabel> window opens. Keep <UiLabel>Channels to plot</UiLabel> at `1:32`, leave <UiLabel>Plot single trials</UiLabel> and <UiLabel>Plot in rect. array</UiLabel> unchecked, and press <UiLabel>Ok</UiLabel>.
@@ -116,7 +118,7 @@ EEGLAB has no separate "compute average" menu. The average is computed inside th
 In this window, positive is up (the `'ydir', 1` option in the last box). Some books and programs plot negative up, so always check the axis labels before you say "positive peak".
 </Callout>
 
-## The equivalent script
+## How do I compute the average and find the peak in a script?
 
 ```matlab
 % The ERP is the mean over epochs: channels x time points
@@ -143,25 +145,15 @@ fprintf('Positive peak at Pz: %.1f uV at %.0f ms\n', peakAmp, winTimes(iPeak));
 figure; pop_plottopo(EEG, 1:EEG.nbchan, EEG.setname, 0, 'ydir', 1);
 ```
 
-## Which value should I choose?
+## What goes into the average, and how many trials do I need?
 
 | Setting | Value | Why |
 |---|---|---|
 | What goes into the average | Clean epochs from one condition only | The average mixes whatever you give it. With two conditions, compute one average per condition. |
 | Number of trials | As many as you can keep after rejection, and about the same number per condition | Noise in the average falls with the square root of the number of trials: 4 times the trials means half the noise. |
-| Peak search window | Set before you look at the data, from the literature | The 250 to 600 ms window here is for one example only. Precise amplitude and latency measurement comes in the ERPLAB lesson. |
+| Peak search window | Set before you look at the data, from the literature | The 250 to 600 ms window here is for one example only. Precise amplitude and latency measurement comes in the "ERPLAB: measuring amplitude & latency" lesson. |
 
-## Common mistakes
-
-- **Mixing conditions in one average.** In D1 the square appeared at two positions (the `position` field). Averaging both positions together is fine as an example here, but comparing positions needs one average each. Comparing conditions is covered in the channel ERP plotting lesson in station 7.
-- **Reading the highest peak as "the component".** A peak at one channel can come from more than one overlapping ERP component. The approximate latency here is for recognizing the waveform, not for a scientific conclusion.
-- **Confusing the axis direction.** A positive wave plotted downward is misread as negative. Check the axis.
-- **Averaging before rejection.** One epoch with a large artifact is enough to change the average. Reject first, as in the previous lesson.
-- **Very different trial counts between conditions.** A condition with 20 trials and another with 80 differ in noise, so their peaks look different even when the response is the same.
-
-{/* "From experience" box: waiting for the project owner's story. Do not write it before it arrives. */}
-
-## How to check it worked
+## How do I check that the average is right?
 
 - `size(erp)` returns `32 384`: channels × time points, with no epoch dimension.
 - At Pz there is a positive peak between roughly 300 and 500 ms, of about 10 µV. The official tutorial notes that the largest ERP variance in these data is at about 430 ms.
@@ -171,3 +163,13 @@ figure; pop_plottopo(EEG, 1:EEG.nbchan, EEG.setname, 0, 'ydir', 1);
 <Methods>
 ERPs were computed by averaging the [N] artifact-free epochs time-locked to the square stimulus (EEGLAB 2026.1).
 </Methods>
+
+## Which mistakes spoil the average?
+
+- **Mixing conditions in one average.** In D1 the square appeared at two positions (the `position` field). Averaging both positions together is fine as an example here, but comparing positions needs one average per position. Comparing conditions is covered in the channel ERP plotting lesson in station 7.
+- **Reading the highest peak as "the component".** A peak at one channel can come from more than one overlapping ERP component. The approximate latency here is for recognizing the waveform, not for a scientific conclusion.
+- **Confusing the axis direction.** A positive wave plotted downward is misread as negative. Check the axis.
+- **Averaging before rejection.** One epoch with a large artifact is enough to change the average. Reject first, as in [the epoch rejection lesson](/en/lesson/epoch-rejection/).
+- **Very different trial counts between conditions.** A condition with 20 trials and another with 80 differ in noise, so their peaks look different even when the response is the same.
+
+{/* "From experience" box: waiting for the project owner's story. Do not write it before it arrives. */}

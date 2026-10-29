@@ -117,25 +117,29 @@ eeglabVersion: "2026.1"
 updated: 2026-10-28
 ---
 
-## Why this step matters
+## The idea
 
-In the channel ERP lesson (station 7) you read one participant's curve: time on the horizontal axis, amplitude in µV on the vertical one, and two conditions in two colors. **The same reading applies here.** The difference is that each curve is now the average of 14 participants (or 7 per group), not the average of one person's trials.
+In the channel ERP lesson (station 7) you read one participant's curve: time on the horizontal axis, amplitude in µV on the vertical one, and two conditions in two colors. **The same reading applies here.** Each curve is now the average of 14 participants (or 7 per group), not of one person's trials.
 
-The average hides differences between people. One participant with a very large amplitude can create a "difference" in the average that the others do not have. So this lesson teaches two things together: plotting the average, and looking at each participant before you trust the average.
+So how do you plot group ERPs, maps and spectra from the precomputed measures, and how do you know the average represents the participants?
 
-## Before and after
+## What do the group ERP and the scalp maps look like?
 
 <ImageSpec>
 An image from the lesson script on the run day, not a hand drawing. Left: the group ERP window at Pz for design 2, two panels (F and M), each with two curves, animal and distractor, in two colors and two line styles. Right: two scalp maps of the 150 to 250 ms mean for design 3 (animal and distractor) on one color scale. Axis text and titles come from EEGLAB in English, so one version serves both languages.
 </ImageSpec>
 
-## Steps in the GUI
+## Why not stop at the average curve?
 
-**About the data (D6):** `animal_mine.study` with its three designs from the design lesson, and the measures from the last lesson: ERPs, spectra and ERSPs at all channels (ERSPs on a light grid: 20 frequencies from 3 to 30 Hz).
+The average hides differences between people. One participant with a very large amplitude can create a "difference" in the average that the others do not have. So always plot two things: the average, then each participant alone. Only then decide whether you trust the average.
+
+## How do I plot the group results from the menus?
+
+**About the data (D6):** `animal_mine.study` with its three designs from [the design lesson](/en/lesson/study-design/), and the measures from [the precompute lesson](/en/lesson/study-precompute/): ERPs, spectra and ERSPs at all channels (ERSPs on a light grid: 20 frequencies from 3 to 30 Hz).
 
 **1. Open the plot window**
 
-1. Run the "Starting point" script. It computes the measures only if it cannot find them.
+1. Start with `animal_mine.study` open and its measures computed. If you don't have it, open "Script to reach this state" under "Starts from" at the top of the lesson. The script computes the measures only if it cannot find them.
 2. Open <MenuPath>Study > Plot channel measures</MenuPath>. The <UiLabel>View and edit current channels -- pop_chanplot()</UiLabel> window opens.
 3. At the top is <UiLabel>Select design:</UiLabel>. Choose `image x gender`.
 4. The left column, <UiLabel>Select channel to plot</UiLabel>, holds the channel list and the buttons that plot the average: <UiLabel>Plot ERPs</UiLabel>, <UiLabel>Plot spectra</UiLabel> and <UiLabel>Plot ERSPs</UiLabel>. Next to each button is <UiLabel>Params</UiLabel> for its options.
@@ -147,7 +151,7 @@ An image from the lesson script on the run day, not a hand drawing. Left: the gr
 2. Press <UiLabel>Params</UiLabel> next to <UiLabel>Plot ERPs</UiLabel>. The <UiLabel>ERP plotting options -- pop_erpparams()</UiLabel> window opens.
 3. Tick <UiLabel>Plot first variable on the same panel</UiLabel>, so animal and distractor appear in one panel. Leave <UiLabel>Plot second variable on the same panel</UiLabel> unticked, so each group has its own panel. Leave <UiLabel>Time range (ms) [low high]</UiLabel> empty for the whole epoch. Press <UiLabel>Ok</UiLabel>.
 4. Press <UiLabel>Plot ERPs</UiLabel>. Two panels appear, F and M, each with the curves of both pictures.
-5. Read them as in the station 7 lesson: where do the two curves start to separate? Is the difference similar in both panels? Look first at the y axis and its direction.
+5. Read them as in the channel ERP lesson: look first at the y axis and its direction. Then ask: where do the two curves start to separate? Is the difference similar in both panels?
 
 **3. Each participant**
 
@@ -160,17 +164,17 @@ An image from the lesson script on the run day, not a hand drawing. Left: the gr
 2. Press <UiLabel>Sel. all</UiLabel> to select every channel.
 3. Press <UiLabel>Params</UiLabel> next to <UiLabel>Plot ERPs</UiLabel>. First type `150 250` in <UiLabel>Time range (ms) [low high]</UiLabel>, then choose <UiLabel>Plot averaged topography over time range</UiLabel> in <UiLabel>Multiple channels selection</UiLabel>. The order matters: if you choose the map while the time is empty, the list returns to the first option and a warning appears: `Select time range first for plotting topography, then select that setting again.` Press <UiLabel>Ok</UiLabel>.
 4. Press <UiLabel>Plot ERPs</UiLabel>. Two maps appear: the 150 to 250 ms mean for each picture.
-5. Afterwards set <UiLabel>Multiple channels selection</UiLabel> back to <UiLabel>Plot channels individually</UiLabel> and clear <UiLabel>Time range (ms) [low high]</UiLabel>. Going back alone does not clear the time, so every later ERP plot stays cut to 150 to 250 ms.
+5. Afterwards set <UiLabel>Multiple channels selection</UiLabel> back to <UiLabel>Plot channels individually</UiLabel> and clear <UiLabel>Time range (ms) [low high]</UiLabel>. Switching the option back does not clear the time range, so every later ERP plot stays limited to 150 to 250 ms.
 
-The 150 to 250 ms window here is an example for learning. In your research the window is chosen before looking at the difference, from earlier studies or from your question, not from the plot itself. The reason is in the next lesson, on statistics.
+The 150 to 250 ms window here is an example for learning. In your research the window is chosen before looking at the difference, from earlier studies or from your question, not from the plot itself. The next lesson, on statistics and multiple comparisons, explains why.
 
 **5. Spectrum and ERSP**
 
-1. Select `Oz` alone. Press <UiLabel>Params</UiLabel> next to <UiLabel>Plot spectra</UiLabel>, type `3 40` in <UiLabel>Frequency [low_Hz high_Hz]</UiLabel>, and tick <UiLabel>Plot first variable on the same panel</UiLabel>. Then <UiLabel>Plot spectra</UiLabel>.
-2. Select `Pz` alone, then <UiLabel>Plot ERSPs</UiLabel>. A time × frequency image appears for each picture.
-3. ERSPs were computed at every channel, so you can select any channel. The plot covers 3 to 30 Hz only, because that is the grid computed in the last lesson.
+1. Select `Oz` alone. Press <UiLabel>Params</UiLabel> next to <UiLabel>Plot spectra</UiLabel>, type `3 40` in <UiLabel>Frequency [low_Hz high_Hz]</UiLabel>, and tick <UiLabel>Plot first variable on the same panel</UiLabel>. Then press <UiLabel>Plot spectra</UiLabel>.
+2. Select `Pz` alone, then press <UiLabel>Plot ERSPs</UiLabel>. A time × frequency image appears for each picture.
+3. ERSPs were computed at every channel, so you can select any channel. The plot covers 3 to 30 Hz only, because that is the grid computed in the precompute lesson.
 
-## The matching script
+## How do I plot the same results with a script?
 
 ```matlab
 % STUDY and ALLEEG come from the starting point script (design 2 is current)
@@ -196,7 +200,7 @@ STUDY = std_specplot(STUDY, ALLEEG, 'channels', oz, 'design', 3);
 STUDY = std_erspplot(STUDY, ALLEEG, 'channels', pz, 'design', 3);
 ```
 
-## Which value should I choose?
+## Which plot options should I choose?
 
 | Option | In this lesson | When to change it |
 |---|---|---|
@@ -208,22 +212,22 @@ STUDY = std_erspplot(STUDY, ALLEEG, 'channels', pz, 'design', 3);
 | <UiLabel>Lowpass plotted data [Hz]</UiLabel> | Empty | It changes the plot only, not the data. Do not use it to make a weak curve look better. |
 | Map window | 150 to 250 ms (example) | From your question or earlier studies, before looking at the result. |
 
-## Common mistakes
-
-- **The wrong design in <UiLabel>Select design:</UiLabel>.** The window remembers the last choice. Look at the number of panels: design 2 gives two panels, and design 3 one panel.
-- **Trusting the average without looking at the participants.** If one or two participants create the difference, the average does not represent the group.
-- **Choosing the map window after seeing the difference.** This greatly raises the chance of finding a "difference" even in random data. We explain this in the statistics lesson.
-- **ERSPs computed at a few channels only.** In EEGLAB 2026.1, reading them back fails with `Unrecognized field name "chan1"`. Recompute at every channel, as the start block does.
-- **Comparing two panels on different scales.** EEGLAB picks the scale for each plot. Fix <UiLabel>Plot limits [low high]</UiLabel> before comparing.
-
-{/* "From experience" box: waiting for a story from the project owner. Not written before it arrives. */}
-
-## How do you know it worked?
+## How do I check that the plots are right?
 
 - **The group ERP at Pz** with design 2: two panels titled F and M, each with two curves and a legend for animal and distractor.
 - **The all-participants plot:** a thin curve for each participant, and you can tell whether most of them follow the direction of the average.
 - **The maps:** two maps for animal and distractor, with a title that shows 150 to 250 ms.
 - **The ERSP at Pz:** two time × frequency images, one per picture, with no error in the command window.
+
+## Common mistakes when plotting group results
+
+- **The wrong design in <UiLabel>Select design:</UiLabel>.** The window remembers the last choice. Look at the number of panels: design 2 gives two panels, and design 3 one panel.
+- **Trusting the average without looking at the participants.** If one or two participants create the difference, the average does not represent the group.
+- **Choosing the map window after seeing the difference.** This greatly raises the chance of finding a "difference" even in random data. The statistics lesson explains why.
+- **ERSPs computed at a few channels only.** In EEGLAB 2026.1, reading them back fails with `Unrecognized field name "chan1"`. Recompute at every channel, as in "Starts from" at the top of the lesson.
+- **Comparing two panels on different scales.** EEGLAB picks the scale for each plot. Fix <UiLabel>Plot limits [low high]</UiLabel> before comparing.
+
+{/* "From experience" box: waiting for a story from the project owner. Not written before it arrives. */}
 
 <Methods>
 Grand-average ERPs at [Pz] were plotted for each image category and gender group, and spectra at [Oz] and event-related spectral perturbations at [Pz] for each image category (std_erpplot, std_specplot, std_erspplot, EEGLAB 2026.1); scalp maps show the mean amplitude from [150] to [250] ms.

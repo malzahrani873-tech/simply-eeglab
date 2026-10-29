@@ -8,7 +8,7 @@ level: recommended
 status: approved
 objectives:
   - Plot an ERP image for one channel with trials sorted by the latency of the rt response event.
-  - Choose the sorting event window, the smoothing width and the color scale deliberately.
+  - Choose the sorting event window, the smoothing width, and the color scale deliberately.
   - Interpret activity that follows the response or oscillates without phase locking, and explain why it weakens or vanishes in the averaged ERP.
 prerequisites: [erp-average]
 references:
@@ -85,28 +85,36 @@ eeglabVersion: "2026.1"
 updated: 2026-10-28
 ---
 
-## Why this step matters
+## The idea
 
-An ERP is an average. It combines dozens of trials into one waveform, so whatever happens at the same latency every time survives, and whatever shifts in time from trial to trial weakens.
+An ERP averages dozens of trials: what happens at the same latency survives; what shifts in time weakens.
 
-The brain does not respond with the same timing on every trial. If a component comes with the button press, and the press time varies between 330 and 730 ms, that component is smeared across the average and looks smaller and wider than it really is.
+But response timing varies from trial to trial. If a component is tied to the button press, which varies between 330 and 730 ms, the average smears it: it looks smaller and wider than it is.
 
-An ERP image shows each trial as one colored row and stacks the rows on top of each other. Sort them by reaction time and you can see what follows the response and what follows the stimulus, before the difference disappears in the average.
+An ERP image shows every trial as one colored row, stacked. How do you plot one in EEGLAB, and sort the trials to see what follows the response and what follows the stimulus?
 
-## Before and after
+## What changes when you sort trials by reaction time?
 
 <BeforeAfter>
 <ImageSpec>
-Before: an EEGLAB 2026.1 ERP image of channel Pz in the D1 epochs clean dataset, from -200 to 800 ms, with trials in recording order and no smoothing (Smoothing = 1). Each row is one trial. The image is crowded with broken horizontal streaks and shows no clear pattern. Below it is the averaged ERP, on the right a color bar in microvolts, and at the top left a small scalp map with a dot at Pz. Both images must use exactly the same frame, size and axes.
+Before: an EEGLAB 2026.1 ERP image of channel Pz in the D1 epochs clean dataset, from -200 to 800 ms, with trials in recording order and no smoothing (Smoothing = 1). Each row is one trial. The image is crowded with broken horizontal streaks and shows no clear pattern. Below it is the averaged ERP, on the right a color bar in microvolts, and at the top left a small scalp map with a dot at Pz. Both images must use exactly the same frame, size, and axes.
 </ImageSpec>
 <ImageSpec>
 After: the same channel, frame and axes, but trials sorted by the latency of the rt event (fastest at the bottom, slowest at the top) and smoothed with a 10-trial moving average. A slanted black curve marks the response time on each trial, and patterns stand out more clearly. EEGLAB default colors (turbo) with a color scale symmetric around zero.
 </ImageSpec>
 </BeforeAfter>
 
-## Steps in the GUI
+## How do I read an ERP image?
 
-Start with the `D1 epochs clean` dataset loaded, as in "Starting point". Each epoch has a `square` event at time 0, and most have an `rt` event at the button press.
+- **A straight vertical colored band after 0 ms:** Activity at the same latency after the stimulus on every trial. It stays strong in the averaged ERP.
+- **A slanted band that follows the black curve:** Response-related activity. In the stimulus-locked average it is spread over the range of reaction times, so it looks weaker and wider.
+- **Repeating diagonal stripes of alternating color that follow nothing:** An ongoing oscillation (such as alpha near 10 Hz) with a different phase on each trial. It largely cancels out in the average.
+- **One row with an extreme color unlike its neighbors:** A noisy trial. With smoothing it spreads into the neighboring rows.
+- **Empty corners at the bottom left and top right after Align:** No data there after the shift. EEGLAB colors them as zero.
+
+## How do I plot and sort the image from the menus?
+
+Start with the `D1 epochs clean` dataset loaded. If you don't have it, open "Script to reach this state" at the top of the lesson. Each epoch has a `square` event at time 0, and most have an `rt` event at the button press.
 
 **1. The raw image**
 
@@ -114,7 +122,7 @@ Start with the `D1 epochs clean` dataset loaded, as in "Starting point". Each ep
 2. In <UiLabel>Channel</UiLabel>, click the `...` button and choose `Pz`.
 3. In <UiLabel>Smoothing</UiLabel>, enter `1`. The default is 10, but first we want to see each trial on its own.
 4. In <UiLabel>Time limits (ms)</UiLabel>, enter `-200 800`.
-5. Make sure <UiLabel>Plot scalp map</UiLabel>, <UiLabel>Plot ERP</UiLabel> and <UiLabel>Plot colorbar</UiLabel> are checked. Click <UiLabel>Ok</UiLabel>.
+5. Make sure <UiLabel>Plot scalp map</UiLabel>, <UiLabel>Plot ERP</UiLabel>, and <UiLabel>Plot colorbar</UiLabel> are checked. Click <UiLabel>Ok</UiLabel>.
 6. An image appears. The horizontal axis is time, and each row from bottom to top is one trial in recording order. The averaged ERP is below it.
 
 **2. Sort trials by reaction time**
@@ -123,7 +131,7 @@ Start with the `D1 epochs clean` dataset loaded, as in "Starting point". Each ep
 2. In <UiLabel>Smoothing</UiLabel>, enter `10`.
 3. Click the <UiLabel>Epoch-sorting field</UiLabel> button and choose `latency`.
 4. Click the <UiLabel>Event type(s)</UiLabel> button and choose `rt`.
-5. In <UiLabel>Event time range</UiLabel>, enter `0 1000`. EEGLAB then only takes the response that follows the stimulus of that epoch.
+5. In <UiLabel>Event time range</UiLabel>, enter `0 1000`. EEGLAB then takes only the response that follows the stimulus of that epoch.
 6. Leave <UiLabel>Rescale</UiLabel> at `no` and <UiLabel>Align</UiLabel> empty. Click <UiLabel>Ok</UiLabel>.
 7. The trials are now sorted, fastest at the bottom and slowest at the top, with a black curve through the response time on each row. Look in the command window for the line `Removing ... trials with NaN sortvar values`: these are trials without a response, left out of the image.
 
@@ -133,21 +141,11 @@ Start with the `D1 epochs clean` dataset loaded, as in "Starting point". Each ep
 2. All trials are now shifted so the response falls on a straight line at the median reaction time, and the slanted curve now marks the stimulus time.
 3. Compare: what stays straight in the second image is tied to the stimulus, and what becomes straight here is tied to the response.
 
-**4. Read the image**
-
-| What you see | What it means |
-|---|---|
-| A straight vertical colored band after 0 ms | Activity at the same latency after the stimulus on every trial. It stays strong in the averaged ERP. |
-| A slanted band that follows the black curve | Response-related activity. In the stimulus-locked average it is spread over the range of reaction times, so it looks weaker and wider. |
-| Repeating diagonal stripes of alternating color that follow nothing | An ongoing oscillation (such as alpha near 10 Hz) with a different phase on each trial. It largely cancels out in the average. |
-| One row with an extreme color unlike its neighbors | A noisy trial. With smoothing it spreads into the neighboring rows. |
-| Empty corners at the bottom left and top right after Align | No data there after the shift. EEGLAB colors them as zero. |
-
 <Callout type="note" title="Trials without rt">
-D1 has six trials without an `rt` event between 0 and 1000 ms. If you leave <UiLabel>Event time range</UiLabel> empty, EEGLAB searches the whole epoch from -1000 to 2000 ms, and may find the next stimulus's response at about 1080 ms in one of them and sort it by that by mistake.
+D1 has six trials without an `rt` event between 0 and 1000 ms. If you leave <UiLabel>Event time range</UiLabel> empty, EEGLAB searches the whole epoch from -1000 to 2000 ms, and in one of them it may find the next stimulus's response at about 1080 ms and sort the trial by it by mistake.
 </Callout>
 
-## The equivalent script
+## How do I plot the three images in a script?
 
 ```matlab
 EEG = pop_loadset('D1_epochs_clean.set', pwd);
@@ -174,28 +172,18 @@ figure; pop_erpimage(EEG, 1, chan, [], 'Pz aligned to response', 10, 1, {'rt'}, 
     'topo', {chan EEG.chanlocs EEG.chaninfo});
 ```
 
-## Which value should I choose?
+## How much smoothing, and which event window and channel?
 
 | Setting | Value | Why |
 |---|---|---|
-| <UiLabel>Smoothing</UiLabel> | `1` for a first look, then 5 to 10 | Smoothing is a moving average over neighboring trials after sorting. It brings out the pattern, but a large width erases the trial-to-trial differences that are the reason for the plot. With about 80 trials, 10 is a sensible ceiling. |
-| <UiLabel>Event time range</UiLabel> | `0 1000` for D1 | It limits the search to the response to the epoch's own stimulus. The -1000 to 2000 ms epoch sometimes contains events from the previous or next stimulus, and EEGLAB only takes the first event it finds. |
+| <UiLabel>Smoothing</UiLabel> | `1` for a first look, then 5 to 10 | Smoothing is a moving average over neighboring trials after sorting. It brings out the pattern, but a large width erases the trial-to-trial differences that are the reason for the plot. With about 77 trials, 10 is a sensible ceiling. |
+| <UiLabel>Event time range</UiLabel> | `0 1000` for D1 | It limits the search to the response to the epoch's own stimulus. The -1000 to 2000 ms epoch sometimes contains events from the previous or next stimulus, and EEGLAB takes only the first event it finds. |
 | Channel | Pz for a late positive component, POz or Oz for alpha | Pick the channel where the effect is clearest in the channel ERP plot, then open it here. |
 | <UiLabel>Color limits (see Help)</UiLabel> | Empty (the default) or a fraction such as `0.9` | The default is symmetric around zero from the largest absolute value. If one outlier trial washes out the image, a fraction such as 0.9 narrows the scale. Say so in the figure caption. |
 | <UiLabel>Downsampling</UiLabel> | `1` | You only need it with hundreds of trials. Here it throws information away for nothing. |
 | <UiLabel>Align</UiLabel> | Empty, or `Inf` to view from the response side | `Inf` means the median of the sorting values. You can enter a value in milliseconds instead. |
 
-## Common mistakes
-
-- **Leaving <UiLabel>Event time range</UiLabel> empty.** EEGLAB takes the first `rt` anywhere in the epoch, which may belong to another stimulus. The sorting is then wrong, with no error message.
-- **Smoothing too much.** With a 40-trial width out of about 75 trials, each row averages more than half the data, and the image becomes a repeated ERP that adds nothing.
-- **Forgetting the excluded trials.** Trials without a sorting value are removed from the image and from the waveform below it. That waveform may therefore differ slightly from the ERP in the averaging lesson. Read the `Removing ... trials` message and report the count.
-- **Reading a slanted band as a new component.** The image shows a relation to the response, not its source. Confirming it takes a group-level analysis.
-- **Plotting an ERP image for every channel.** The tool handles one channel (or the mean of several) at a time. Choose the channel from the channel ERP plot first.
-
-{/* "From experience" box: waiting for a story from the project owner. Do not write it before it arrives. */}
-
-## How to check it worked
+## How do I check that the sorting is right?
 
 - **The black curve rises from left to right** between about 330 and 730 ms, a little narrower with smoothing, and never passes 800 ms.
 - **The exclusion message** in the command window reports 6 trials or fewer, equal to the number of epochs minus the count with a response from the script's `fprintf` line.
@@ -205,3 +193,13 @@ figure; pop_erpimage(EEG, 1, chan, [], 'Pz aligned to response', 10, 1, {'rt'}, 
 <Methods>
 Single-trial ERP images at Pz were sorted by reaction time and smoothed with a 10-trial moving average (pop_erpimage, EEGLAB 2026.1); [N] epochs without a response between 0 and 1000 ms were excluded from the image.
 </Methods>
+
+## Which mistakes are common with ERP images?
+
+- **Leaving <UiLabel>Event time range</UiLabel> empty.** EEGLAB takes the first `rt` anywhere in the epoch, which may belong to another stimulus. The sorting is then wrong, with no error message.
+- **Smoothing too much.** With a 40-trial width out of about 77 trials, each row averages more than half the data, and the image becomes a repeated ERP that adds nothing.
+- **Forgetting the excluded trials.** Trials without a sorting value are removed from the image and from the waveform below it. That waveform may therefore differ slightly from the ERP in [the ERP averaging lesson](/en/lesson/erp-average/). Read the `Removing ... trials` message and report the count.
+- **Reading a slanted band as a new component.** The image shows that the activity is tied to the response, not where it comes from. Confirming it takes a group-level analysis.
+- **Plotting an ERP image for every channel.** The tool handles one channel (or the mean of several) at a time. Choose the channel from the channel ERP plot first.
+
+{/* "From experience" box: waiting for a story from the project owner. Do not write it before it arrives. */}

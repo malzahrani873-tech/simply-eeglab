@@ -33,7 +33,7 @@
     "other": {
       "name": "Other",
       "term": "Other",
-      "signature": "The signs of no class fit clearly: a scattered map, a spectrum with neither an alpha peak nor the muscle rise, and mixed activity over time. ICLabel puts here what it cannot explain, and many of these components mix more than one source."
+      "signature": "No class's signs fit clearly: a scattered map, a spectrum with neither an alpha peak nor the muscle rise, and mixed activity over time. ICLabel puts here what it cannot explain, and many of these components mix more than one source."
     }
   },
   "confusions": {
@@ -58,7 +58,7 @@
       "alt": "Scalp map: a strong color at the front of the head and a broad spot of the opposite color over the center and back, with a smooth transition between them. Spectrum: a clear peak near 10 Hz, then a fall with frequency, and a small narrow peak at 50 Hz. Activity over time: an ongoing irregular oscillation, slightly larger in the first second."
     },
     "c004": {
-      "note": "The sharp peaks about every 1.2 seconds, around 50 beats per minute, are the heart rhythm. The component's correlation with the heart channel (ECG) is 0.61. ICLabel was not sure, 62% heart and 35% brain, because the background activity is strong. Here the rhythm is the strongest clue.",
+      "note": "The sharp peaks about every 1.2 seconds, around 50 beats per minute, are the heart rhythm. The component's correlation with the heart channel (ECG) is 0.61. ICLabel was not sure (62% heart, 35% brain) because the background activity is strong. Here the rhythm is the strongest clue.",
       "alt": "Scalp map: a strong spot at the edge of the head at the back on the left, and a calm gradient over the rest of the head. Spectrum: falls with frequency, with small peaks below 10 Hz and a narrow peak at 50 Hz. Activity over time: sharp, similar peaks that repeat about every 1.2 seconds over an irregular background."
     },
     "c005": {
@@ -82,7 +82,7 @@
       "alt": "Scalp map: a strong focus at the front edge of the head over the forehead, equal on both sides, with the rest of the head calm. Spectrum: very high at the lowest frequencies and falling quickly, with a small peak near 10 Hz and a narrow one at 50 Hz. Activity over time: two large upward deflections near 0.5 and 3.6 s, each lasting less than half a second."
     },
     "c016": {
-      "note": "A smooth posterior map and a strong alpha peak at 10 Hz: alpha activity from the back of the head. Amplitude changing over time is normal for alpha, which waxes and wanes.",
+      "note": "A smooth posterior map and a strong alpha peak at 10 Hz: alpha activity from the back of the head. An amplitude that changes over time is normal for alpha, which waxes and wanes.",
       "alt": "Scalp map: a strong color at the back of the head and the opposite color over the front and center, with a smooth transition between them. Spectrum: a tall, sharp peak near 10 Hz, then a fall with frequency, and a small peak at 50 Hz. Activity over time: an ongoing oscillation whose amplitude grows in the last two seconds."
     },
     "c018": {
@@ -90,7 +90,7 @@
       "alt": "Scalp map: a small strong spot at the edge of the head at the front left, next to a small spot of the opposite color at the left temple, with the rest of the head calm. Spectrum: falls until about 8 Hz, rises to a broad peak near 25 Hz, and stays high until 80 Hz. Activity over time: very dense, fast activity."
     },
     "c019": {
-      "note": "Two peaks near 10 and 20 Hz, and a smooth map over the motor area on one side: this looks like the mu motor rhythm, which is brain activity.",
+      "note": "Two peaks near 10 and 18 Hz, and a smooth map over the motor area on one side: this looks like the mu motor rhythm, which is brain activity.",
       "alt": "Scalp map: a strong spot over the center and back on the right, and a spot of the opposite color at the front of the midline, with a smooth transition. Spectrum: two peaks near 10 and 18 Hz, then a fall, and a small peak at 50 Hz. Activity over time: an ongoing irregular oscillation."
     },
     "c020": {

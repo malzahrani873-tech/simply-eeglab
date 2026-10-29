@@ -77,11 +77,13 @@
 .help-list li{margin:0!important;padding:8px 0;border-bottom:1px solid var(--sep)}
 .help-list li:last-child{border:0}
 .pn .pv{text-align:start}
-.backnote{display:flex;gap:8px;align-items:center;margin:0 0 16px;padding:6px;padding-inline-start:14px;border:1px solid var(--sep);border-radius:var(--r3);background:var(--surface);color:var(--muted);font-size:15px;line-height:1.6}
-.backnote[hidden]{display:none}
-.backnote p{margin:0;flex:1}
-.backnote button{flex:none;border:0;background:none;color:var(--muted);width:44px;height:44px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;border-radius:var(--r2)}
-.backnote button:hover{color:var(--text);background:var(--surface-2)}
+.pn a{flex-direction:row;align-items:center;gap:12px}
+.pn a>span{display:flex;flex-direction:column;gap:2px;flex:1;min-width:0}
+.pn a .pp{font-size:13px;color:var(--muted)}
+.pn a .pa{flex:none;color:var(--primary)}
+.pn a.nx{border-color:var(--primary)}
+.pn a.nx small{color:var(--primary);font-weight:600}
+@container site (min-width:480px){.pn a.nx:only-child{grid-column:2}}
 /* map */
 .node.done-n .done{display:inline-flex}
 .node .done{display:none}
@@ -179,7 +181,7 @@ dialog .acts{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;margin
 .sr-res mark{background:var(--warn-soft);color:inherit}
 /* print */
 @media print{
-  .hdr,.tabs,.ftr,.backnote,.done-box,.pn,.mbar,.mtools,filter-demo,reref-demo,epoch-reject-demo,.ba-ctl,.cp,.copy-btn{display:none!important}
+  .hdr,.tabs,.ftr,.done-box,.pn,.mbar,.mtools,filter-demo,reref-demo,epoch-reject-demo,.ba-ctl,.cp,.copy-btn{display:none!important}
   details{display:none!important}
   .print-copy{display:block!important}
   .si{display:block}

@@ -46,42 +46,42 @@ eeglabVersion: "2026.1"
 updated: 2026-10-27
 ---
 
-## Why this step matters
+## The idea
 
 A bad channel is a channel that does not record brain activity properly. The cause is often an electrode with poor skin contact, a damaged wire, or two electrodes bridged by gel.
 
-It shows up in three ways: a flat line, much more noise than its neighbors, or a signal unlike the channels next to it.
+One bad channel harms all the data. In an average reference, its noise enters every channel. In ICA, it takes components away from the real sources.
 
-One bad channel harms all the data. In an average reference its noise enters every channel. In ICA it takes components for itself instead of the real sources.
+So you find bad channels now, record their names and remove them, then rebuild them in [the interpolation lesson](/en/lesson/interpolation/). But how do you know a channel is really bad?
 
-So you find bad channels now, record their names, and remove them. In the next lesson you rebuild them by interpolation.
+## What does a bad channel look like?
+
+It shows up in three ways: a flat line, much more noise than its neighbors, or a signal unlike the channels next to it. In this picture from other data, look at `FP1` and its large drift.
+
+<Figure src="bad-channels/bad-channels-d3-scroll.png" alt="Ten seconds of one ERP CORE N400 participant in the scroll window: some channels, such as FP1, drift strongly and are noisier than their neighbors." caption="Data: ERP CORE, license CC BY-SA 4.0" source="D3" />
+
+## How do I find and remove bad channels from the menus?
 
 <Callout type="note">
-**About D1:** the official tutorial says the tutorial data are relatively clean and do not contain channels you would normally reject. And the clean_rawdata check with the settings in this lesson does not remove any channel. This is a valid result: not all data have bad channels. We will not invent a fault. You learn the method on D1 and see what a bad channel looks like in a picture from other data.
+**About D1:** the official tutorial says the tutorial data are relatively clean and do not contain channels you would normally reject. The clean_rawdata check with this lesson's settings also removes no channel. This is a valid result: not all data have bad channels. We will not invent a fault. You learn the method on D1 and see what a bad channel looks like in the picture above, from other data.
 </Callout>
 
-## Before and after
-
-<Figure src="bad-channels/bad-channels-d3-scroll.png" alt="Ten seconds of one ERP CORE N400 participant in the scroll window: some channels, such as FP1, drift strongly and are noisier than their neighbours." caption="Data: ERP CORE, licence CC BY-SA 4.0" source="D3" />
-
-## Steps in the GUI
-
-Start with the main dataset `D1 hp0.1 notch60` loaded, as in the Starting point.
+Start with the main dataset `D1 hp0.1 notch60` open. If you don't have it, open "Script to reach this state" under "Starts from" at the top of the lesson.
 
 **First: look at the signal**
 
 1. Open <MenuPath>Plot > Channel data (scroll)</MenuPath>.
 2. Scroll through the whole recording, not just the first few seconds. Some channels go bad for a short time and then recover.
 3. Look for three signs: a flat line, an amplitude much larger than the neighboring channels, or repeated jumps in a single channel.
-4. In D1 you will see large peaks in `EOG1`, `EOG2`, and the frontal channels. These are eye blinks, a normal artifact that ICA removes later. A channel is not bad because it records blinks.
+4. In D1, you will see large peaks in `EOG1`, `EOG2`, and the frontal channels. These are eye blinks, a normal artifact that ICA removes later. A channel is not bad because it records blinks.
 
 **Second: look at the spectrum**
 
 1. Open <MenuPath>Plot > Channel spectra and maps</MenuPath>.
 2. Change <UiLabel>Plotting frequency range [lo_Hz hi_Hz]:</UiLabel> to `1 64`, then press <UiLabel>OK</UiLabel>.
 3. A bad channel shows up as a line far from the group: much higher, or much lower if it is flat.
-4. Click any line in the plot, and its channel number appears in the command window.
-5. In D1 the lines stay close together, and no line clearly stands apart.
+4. Click any line in the plot, and its channel number appears in the Command Window.
+5. In D1, the lines stay close together, and no line clearly stands apart.
 6. To look closely at one suspect channel, open <MenuPath>Plot > Channel properties</MenuPath> and type its number. The window shows the channel's location on the head, its activity over time, and its spectrum together.
 
 **Third: check with the clean_rawdata channel criteria only**
@@ -92,17 +92,17 @@ Start with the main dataset `D1 hp0.1 notch60` loaded, as in the Starting point.
 4. Check <UiLabel>Ignore these channels (ECG, EMG, ...)</UiLabel> and type `EOG1 EOG2` in the field next to it.
 5. Leave the three criteria at their defaults: <UiLabel>Remove channel if it is flat for more than (seconds)</UiLabel> at 5, <UiLabel>Max acceptable high-frequency noise std dev</UiLabel> at 4, and <UiLabel>Min acceptable correlation with nearby chans [0-1]</UiLabel> at 0.8.
 6. Uncheck <UiLabel>Perform Artifact Subspace Reconstruction bad burst correction/rejection</UiLabel>, and uncheck <UiLabel>Additional removal of bad data periods</UiLabel>. These two remove time segments, which is the topic of another lesson.
-7. Press <UiLabel>OK</UiLabel>. The command window prints `Scanning for bad channels...` and then its progress over 5-second blocks.
+7. Press <UiLabel>OK</UiLabel>. The Command Window prints `Scanning for bad channels...` and then its progress over 5-second blocks.
 8. A window comparing the data before and after appears. A removed channel shows in red. In D1 no channel is red.
 9. Name the resulting dataset `D1 badch` and leave <UiLabel>Overwrite it in memory (set=yes; unset=create a new dataset)</UiLabel> unchecked.
 
 **Fourth: record the names and remove what you found by eye**
 
 1. Write down the names of all the bad channels you found, from all three methods. You will need them for interpolation and for the Methods section of your paper.
-2. clean_rawdata removes what it detects by itself. A channel you found only by eye, remove it with <MenuPath>Edit > Select data</MenuPath>: type its name in <UiLabel>Channel(s)</UiLabel>, check the box under <UiLabel>on->remove these</UiLabel> on the same row, then press <UiLabel>OK</UiLabel>.
-3. In D1 the list is empty, so you remove nothing. Save `D1 badch` with <MenuPath>File > Save current dataset as</MenuPath>. The interpolation lesson starts from it.
+2. clean_rawdata removes what it detects by itself. Remove a channel you found only by eye with <MenuPath>Edit > Select data</MenuPath>: type its name in <UiLabel>Channel(s)</UiLabel>, check the box under <UiLabel>on->remove these</UiLabel> on the same row, then press <UiLabel>OK</UiLabel>.
+3. In D1, the list is empty, so you remove nothing. Save `D1 badch` with <MenuPath>File > Save current dataset as</MenuPath>. [The interpolation lesson](/en/lesson/interpolation/) starts from it.
 
-## The equivalent script
+## How do I find and remove them with a script?
 
 ```matlab
 % Detection with clean_rawdata channel criteria only:
@@ -126,33 +126,23 @@ EEG.setname = 'D1 badch';
 EEG = pop_saveset(EEG, 'filename', 'D1_badch.set', 'filepath', pwd);
 ```
 
-On D1 the script prints `Bad channels: ` with an empty list, and the channel count stays 32. Copy `badChans` into the Starting point script of the following lessons, which start with the same variable.
+On D1, the script prints `Bad channels: ` with an empty list, and the channel count stays 32. Copy `badChans` into the "Script to reach this state" of the following lessons, which start with the same variable.
 
-## Which value should I choose?
+## Which clean_rawdata criteria do I use?
 
 | Setting | Value | Why |
 |---|---|---|
 | Flat line | 5 seconds | The clean_rawdata default. A channel that stays flat longer than that records nothing. |
 | High-frequency noise | 4 standard deviations | The default. It compares each channel with the other channels, so it catches a channel that is clearly noisier. |
 | Correlation with nearby channels | 0.8 | The default, also given in the official tutorial. A channel is removed if its correlation stays below 0.8 for more than half of the recording. It depends on electrode locations, so make sure they are correct. |
-| Eye and heart channels | Excluded from detection | clean_rawdata is designed for EEG channels. An eye channel is naturally unlike its neighbors, so it may be removed although it is fine. |
-| ASR and segment removal | Off in this lesson | Our goal here is channels only. Segment removal is in the clean_rawdata & ASR lesson. |
+| Eye and heart channels | Excluded from detection | clean_rawdata is designed for EEG channels. An eye channel is naturally unlike its neighbors, so it may be removed even though it is fine. |
+| ASR and segment removal | Off in this lesson | Our goal here is channels only. Segment removal is in [the clean_rawdata & ASR lesson](/en/lesson/asr/). |
 
 <Callout type="note">
 **An automated alternative:** the PREP extension (PrepPipeline) detects bad channels and computes an average reference that resists bad channels, all automatically. Install it from <MenuPath>File > Manage EEGLAB extensions</MenuPath>. We start here with the manual method so you understand each step.
 </Callout>
 
-## Common mistakes
-
-- **Not excluding the eye channels.** Without excluding `EOG1` and `EOG2`, clean_rawdata may remove `EOG1` in D1, because its signal is unlike the neighboring channels. It is not bad: it is a non-brain channel by nature. The clean_rawdata documentation itself says that channels carrying non-brain signals are usually removed this way. That is why the official clean_rawdata page may show red channels on the same data.
-- **Treating a blink channel as bad.** Large peaks in the frontal channels are eye blinks. ICA removes them later, and the channel is not removed because of them.
-- **Looking only at the first few seconds.** Some channels go bad in the middle of a recording. Scroll through all of it.
-- **Removing a channel without recording its name.** You need the names for interpolation, for the Methods section, and to process the other participants the same way.
-- **Removing many channels without asking why.** If many channels look bad, first check the electrode locations and the whole recording. clean_rawdata itself stops with an error if it would remove more than 75% of the channels, and says the cause is usually wrong electrode locations.
-
-{/* "From experience" box: waiting for the project owner's story. Do not write it before it arrives. */}
-
-## How to check it worked
+## How do I check the removal worked?
 
 1. **Channel count:** in the main window, <UiLabel>Channels per frame</UiLabel> equals the original number minus the removed channels. In D1 it stays 32.
 2. **Your list is written down:** you have the names of the removed channels, or "none" as in D1.
@@ -162,3 +152,13 @@ On D1 the script prints `Bad channels: ` with an empty list, and the channel cou
 <Methods>
 Bad channels were identified by visual inspection of the continuous data and channel spectra and with clean_rawdata (flatline criterion 5 s, channel correlation criterion 0.8, line noise criterion 4 SD; EOG channels excluded; clean_rawdata plugin 2.11, EEGLAB 2026.1) and removed ([0] channels).
 </Methods>
+
+## Common bad-channel mistakes
+
+- **Not excluding the eye channels.** Without excluding `EOG1` and `EOG2`, clean_rawdata may remove `EOG1` in D1, because its signal is unlike the neighboring channels. It is not bad: it is a non-brain channel by nature. The clean_rawdata documentation itself says that channels carrying non-brain signals are usually removed this way. That is why the official clean_rawdata page may show red channels on the same data.
+- **Treating a blink channel as bad.** Large peaks in the frontal channels are eye blinks. ICA removes them later, and the channel is not removed because of them.
+- **Looking only at the first few seconds.** Some channels go bad in the middle of a recording. Scroll through all of it.
+- **Removing a channel without recording its name.** You need the names for interpolation, for the Methods section, and to process the other participants the same way.
+- **Removing many channels without asking why.** If many channels look bad, first check the electrode locations and the whole recording. clean_rawdata itself stops with an error if it would remove more than 75% of the channels, and says the cause is usually wrong electrode locations.
+
+{/* "From experience" box: waiting for the project owner's story. Do not write it before it arrives. */}

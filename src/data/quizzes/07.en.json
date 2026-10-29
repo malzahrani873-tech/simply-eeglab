@@ -46,7 +46,7 @@
       "type": "image",
       "lesson": "channel-erp-plot",
       "objective": 3,
-      "prompt": "This is an ERP plot of two conditions at channel Pz. What is it missing so that others read it correctly?",
+      "prompt": "This is an ERP plot of two conditions at channel Pz. What does it need so that others read it correctly?",
       "image": {
         "src": "/quiz/07/s07-q02.webp",
         "w": 720,
@@ -76,7 +76,7 @@
       "answer": [
         "b"
       ],
-      "explanation": "A reader needs three things: which direction is positive, what unit each axis has, and how many trials are in each average. Without them a positive peak may be read as negative, and a difference between conditions may be blamed on the brain when it comes from different trial counts."
+      "explanation": "A reader needs to know which direction is positive, what unit each axis has, and how many trials are in each average. Without them a positive peak may be read as negative, and a difference between conditions may be blamed on the brain when it comes from different trial counts."
     },
     {
       "id": "s07-q03",
@@ -105,7 +105,7 @@
       "answer": [
         "a"
       ],
-      "explanation": "The map is a view from above the head: the small triangle at the top is the nose, with the ears at the sides. Scientific plots are never mirrored, not even on the Arabic page."
+      "explanation": "The map is a view from above the head: the small triangle at the top is the nose, with the ears at the sides. So the left of the map is the participant's left. Scientific plots are never mirrored, not even on the Arabic page."
     },
     {
       "id": "s07-q04",

@@ -7,7 +7,7 @@ order: 4
 level: recommended
 status: approved
 objectives:
-  - تتعرّف على مجلدات داتاست BIDS وملفاته، وأي ملف يحمل الأحداث وأيها مواقع الأقطاب.
+  - تتعرّف على مجلدات داتاست BIDS وملفاته، وأي ملف يحمل الأحداث وأيها يحمل مواقع الأقطاب.
   - تنزّل مشاركاً واحداً من OpenNeuro بدل الداتاست كاملة.
   - تستورد المشارك من File > Import data، وتختار عمود الأحداث، وتُبقي مواقع الأقطاب من BIDS.
 prerequisites: [import-raw, events]
@@ -50,21 +50,25 @@ eeglabVersion: "2026.1"
 updated: 2026-10-28
 ---
 
-## لماذا هذه الخطوة مهمة؟
+## الفكرة
 
-كل مختبر يسمّي ملفاته ويرتّبها بطريقته. أما <En>BIDS</En> (Brain Imaging Data Structure) فمعيار مشترك: أسماء مجلدات ثابتة، وأسماء ملفات ثابتة، وملفات جانبية تصف التسجيل. والداتاست (<En>dataset</En>) المكتوبة بـ BIDS تقرؤها أي أداة تعرف المعيار، دون أن تسأل المختبر كيف حفظ بياناته.
+كل مختبر يسمّي ملفاته ويرتّبها بطريقته. أما <En>BIDS</En> (Brain Imaging Data Structure) فمعيار مشترك: أسماء مجلدات وملفات ثابتة، وملفات جانبية تصف التسجيل. تقرؤها أي أداة تعرف المعيار، دون أن تسأل المختبر كيف حفظ بياناته.
 
-و OpenNeuro موقع مجاني يستضيف مئات الداتاست العامة بصيغة BIDS. وفائدة BIDS لمستخدم EEGLAB أنها توفّر خطوتين عملتهما بيدك في هذه المحطة: الأحداث (<En>event</En>) ومواقع الأقطاب (<En>electrode</En>) تأتي جاهزة في ملفاتها.
+و OpenNeuro موقع مجاني يستضيف مئات الداتاست العامة بصيغة BIDS. وفائدة BIDS لك أنها توفّر عليك خطوتين نفّذتهما بيدك في هذه المحطة: [الأحداث](/lesson/events/) و[مواقع الأقطاب](/lesson/channel-locations/) تأتي جاهزة في ملفاتها.
 
-نستخدم الداتاست `ds002718` (Wakeman و Henson): شاهد المشاركون وجوهاً مشهورة، ووجوهاً غير مألوفة، وصوراً مبعثرة الأجزاء. الداتاست كاملة حوالي 4 جيجابايت، لذلك ننزّل مشاركاً واحداً فقط، `sub-002`، بحوالي 235 ميغابايت.
+فكيف تستورد مشاركاً من داتاست BIDS إلى EEGLAB، مع أحداثه ومواقع أقطابه؟
 
-## قبل وبعد
+## ماذا يوجد في مجلد داتاست BIDS؟
+
+في الجذر ملفات تصف الداتاست كلها. وداخل مجلد كل مشارك ملف الإشارة، ومعه ملفات جانبية للقنوات والأقطاب والأحداث.
 
 <Figure src="bids-openneuro/bids-tree.svg" alt="شجرة مجلد ds002718: في الجذر dataset_description.json و README و task-FaceRecognition_events.json، ثم sub-002 ثم eeg وفيه خمسة ملفات: ملف الإشارة set بحوالي 235 MB، و eeg.json بتفاصيل التسجيل، و channels.tsv بأسماء 74 قناة، و electrodes.tsv بمواقع الأقطاب، و events.tsv بـ 1479 حدثاً." source="original" />
 
-## الخطوات من الواجهة
+## كيف أستورد مشاركاً من القوائم؟
 
 ### 1. نزّل مشاركاً واحداً
+
+نستخدم الداتاست (<En>dataset</En>) `ds002718` (Wakeman و Henson): شاهد المشاركون وجوهاً مشهورة، ووجوهاً غير مألوفة، وصوراً مبعثرة الأجزاء. حجم الداتاست كاملة حوالي 4 جيجابايت، لذلك ننزّل مشاركاً واحداً فقط، `sub-002`، وحجمه حوالي 235 ميغابايت.
 
 1. افتح صفحة الداتاست: [ds002718 على OpenNeuro](https://openneuro.org/datasets/ds002718).
 2. من قائمة الملفات نزّل هذه الملفات، واحفظها على جهازك بنفس ترتيب المجلدات، داخل مجلد اسمه `ds002718`:
@@ -72,7 +76,11 @@ updated: 2026-10-28
    - في `sub-002/eeg/`: الملفات الخمسة التي تبدأ بـ `sub-002_task-FaceRecognition_`.
 3. لا تحتاج مجلد `anat` (صور الرنين المغناطيسي) في هذا الدرس.
 
-السكربت في صندوق نقطة البداية ينزّل نفس الملفات دفعة واحدة.
+ولتنزيلها كلها دفعة واحدة، افتح «سكربت للوصول إلى هذه الحالة» تحت «تبدأ من» أعلى الدرس.
+
+<Callout type="note" title="مصدر البيانات">
+البيانات: Wakeman, D. G., & Henson, R. N. (2015). A multi-subject, multi-modal human neuroimaging dataset. Scientific Data, 2, 150001. https://doi.org/10.1038/sdata.2015.1. نسخة EEGLAB على OpenNeuro: ds002718 v1.0.5، DOI 10.18112/openneuro.ds002718.v1.0.5. الرخصة: CC0.
+</Callout>
 
 ### 2. انظر في الملفات الجانبية
 
@@ -82,16 +90,16 @@ updated: 2026-10-28
 
 ### 3. استورد المشارك
 
-1. افتح <MenuPath>File > Import data > Using EEGLAB functions and plugins > From BIDS folder structure</MenuPath>. (ونفس الأمر في <MenuPath>File > BIDS tools > Import BIDS folder to STUDY</MenuPath>.)
+1. افتح <MenuPath>File > Import data > Using EEGLAB functions and plugins > From BIDS folder structure</MenuPath>. (والأمر نفسه موجود في <MenuPath>File > BIDS tools > Import BIDS folder to STUDY</MenuPath>.)
 2. اختر مجلد `ds002718` واضغط <UiLabel>Select Folder</UiLabel> (في macOS: <UiLabel>Open</UiLabel>). تظهر نافذة <UiLabel>Import BIDS data -- pop_importbids()</UiLabel>.
 3. أبقِ خانة <UiLabel>Use BIDS electrode.tsv files (when present) for channel locations; off: look up locations using channel labels</UiLabel> مفعّلة. الأسماء `EEG001` وأخواتها غير قياسية، فالبحث بالاسم لن يجد شيئاً.
 4. أبقِ خانة <UiLabel>Use BIDS event.tsv files for events and use the following BIDS field for event type</UiLabel> مفعّلة، واختر من القائمة تحتها `trial_type` بدل `value`.
 5. خانة <UiLabel>Study output folder</UiLabel> تعرض مساراً ينتهي بـ `ds002718/derivatives/eeglab`. أبقِها. يكتب EEGLAB ملفاته هناك ولا يمسّ الملفات التي نزّلتها.
 6. اضغط <UiLabel>OK</UiLabel>. يأخذ الاستيراد دقيقة أو دقيقتين.
 
-في EEGLAB 2026.1 ينشئ هذا الأمر STUDY دائماً، حتى لمشارك واحد. تعرض النافذة الرئيسية الـ STUDY، وقائمة <UiLabel>Datasets</UiLabel> فيها الداتاست 1. اخترها من قائمة <UiLabel>Datasets</UiLabel> لترى تفاصيلها: 74 قناة، و 250 هرتز، و 1479 حدثاً. ستتعلّم الـ STUDY في المحطة 8.
+في EEGLAB 2026.1 ينشئ هذا الأمر STUDY دائماً، حتى لمشارك واحد. تعرض النافذة الرئيسية الـ STUDY، وقائمة <UiLabel>Datasets</UiLabel> فيها الداتاست 1. اخترها من قائمة <UiLabel>Datasets</UiLabel> لترى تفاصيلها: 74 قناة، و 250 هرتز، و 1479 حدثاً. ستتعرّف على الـ STUDY في المحطة 8.
 
-## السكربت المقابل
+## كيف أستورد المشارك بسكربت؟
 
 ```matlab
 % Start EEGLAB (EEG-BIDS ships with EEGLAB 2026.1)
@@ -119,7 +127,7 @@ eeg_eventtypes(EEG(1))       % right_sym 500, famous_new 150, ...
 - `'eventtype', 'trial_type'` هو نفس الاختيار من القائمة في النافذة. وبدونه يستخدم EEGLAB عمود `value`، فتصبح أنواع الأحداث أرقاماً مثل `13` و `4096`.
 - الملف المستورد يُكتب في `derivatives/eeglab/sub-002/eeg/`، وملف الـ STUDY في `derivatives/eeglab/ds002718.study`. الملف يأخذ اسمه من مجلد BIDS، أما الـ STUDY نفسها فبلا اسم (`STUDY.name` فارغ) ما لم تعطها اسماً.
 
-## أي قيمة أختار؟
+## أي خيارات أختار في نافذة استيراد BIDS؟
 
 | الخيار | اختيارنا | لماذا |
 |---|---|---|
@@ -128,17 +136,7 @@ eeg_eventtypes(EEG(1))       % right_sym 500, famous_new 150, ...
 | Study output folder | `derivatives/eeglab` (الافتراضي) | BIDS يضع الملفات المعالَجة في `derivatives`، بعيداً عن البيانات الخام. |
 | Import only the following participant indices | غير مفعّلة | نزّلنا مشاركاً واحداً فقط. وفي داتاست كاملة استخدمها لتستورد بضعة مشاركين أولاً. |
 
-## أخطاء شائعة
-
-- **اختيار مجلد `sub-002` أو `eeg`.** اختر المجلد الأعلى للداتاست، وهو الذي فيه `dataset_description.json`.
-- **تنزيل ملف `.set` وحده.** بدون `events.tsv` و `electrodes.tsv` تغيب الملفات الجانبية التي تجعل BIDS مفيدة. حافظ على ترتيب المجلدات كما في OpenNeuro.
-- **ظهور أنواع الأحداث أرقاماً.** أبقيت `value` في قائمة عمود الأحداث. أعد الاستيراد واختر `trial_type`.
-- **إلغاء خانة electrode.tsv.** البحث بالاسم لا يجد موقعاً لـ `EEG001`، فتبقى القنوات بلا مواقع.
-- **البحث عن 70 قناة.** في التسجيل 70 قناة EEG، ومعها `HEOG` و `VEOG` وقناتا `EKG`، فيكون `EEG.nbchan` = 74.
-
-{/* صندوق "من التجربة": بانتظار قصة من صاحب المشروع. لا يُكتب قبل وصولها. */}
-
-## كيف تتأكد أن الخطوة نجحت؟
+## كيف أتأكد أن الأحداث والمواقع وصلت؟
 
 1. قائمة <UiLabel>Datasets</UiLabel> فيها الداتاست 1، واختيارها يعرض 74 قناة، و 250 هرتز، و 1479 حدثاً.
 2. `eeg_eventtypes(EEG(1))` يعرض أسماء مثل `right_sym` و `famous_new` و `boundary`، لا أرقاماً.
@@ -151,6 +149,12 @@ eeg_eventtypes(EEG(1))       % right_sym 500, famous_new 150, ...
 EEG data in BIDS format (OpenNeuro ds002718, participant sub-002) were imported with pop_importbids (EEG-BIDS plugin 10.5, EEGLAB 2026.1), using the trial_type column for event types and electrode positions from electrodes.tsv.
 </Methods>
 
-<Callout type="note" title="مصدر البيانات">
-البيانات: Wakeman, D. G., & Henson, R. N. (2015). A multi-subject, multi-modal human neuroimaging dataset. Scientific Data, 2, 150001. https://doi.org/10.1038/sdata.2015.1. نسخة EEGLAB على OpenNeuro: ds002718 v1.0.5، DOI 10.18112/openneuro.ds002718.v1.0.5. الرخصة: CC0.
-</Callout>
+## لماذا لا تصل المواقع أو أسماء الأحداث؟ أخطاء شائعة مع BIDS
+
+- **اختيار مجلد `sub-002` أو `eeg`.** اختر المجلد الأعلى للداتاست، وهو الذي فيه `dataset_description.json`.
+- **تنزيل ملف `.set` وحده.** بدون `events.tsv` و `electrodes.tsv` تغيب الملفات الجانبية التي تجعل BIDS مفيدة. حافظ على ترتيب المجلدات كما في OpenNeuro.
+- **ظهور أنواع الأحداث أرقاماً.** السبب أنك أبقيت `value` في قائمة عمود الأحداث. أعد الاستيراد واختر `trial_type`.
+- **إلغاء خانة electrode.tsv.** البحث بالاسم لا يجد موقعاً لـ `EEG001`، فتبقى القنوات بلا مواقع.
+- **توقّع 70 قناة.** في التسجيل 70 قناة EEG، ومعها `HEOG` و `VEOG` وقناتا `EKG`، فيكون `EEG.nbchan` = 74.
+
+{/* صندوق "من التجربة": بانتظار قصة من صاحب المشروع. لا يُكتب قبل وصولها. */}

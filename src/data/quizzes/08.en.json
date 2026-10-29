@@ -45,7 +45,7 @@
       "type": "single",
       "lesson": "create-study",
       "objective": 2,
-      "prompt": "In the `pop_studywizard` window you typed `cba` for one of a participant's files, and `CBA ` with capitals and a space for their second file. What happens?",
+      "prompt": "In the `pop_studywizard` window you typed `cba` for a participant's first file, and `CBA ` (capitals and a trailing space) for their second file. What happens?",
       "options": [
         {
           "id": "a",
@@ -74,7 +74,7 @@
       "type": "single",
       "lesson": "study-design",
       "objective": 1,
-      "prompt": "In D6 each participant has one gender (F or M), and every participant saw both animal and other pictures. How do you treat the gender variable?",
+      "prompt": "In D6 each participant has one gender (F or M), and every participant saw both animal and other pictures (the animal and distractor conditions). How do you treat the gender variable?",
       "options": [
         {
           "id": "a",
@@ -223,7 +223,7 @@
       "answer": [
         "c"
       ],
-      "explanation": "200 × 0.05 = about 10 points by chance alone. This is the multiple comparisons problem. FDR correction raises the bar so that most chance points disappear, so the corrected count is less than or equal to the uncorrected one. Short isolated bars, especially before the stimulus, are usually this chance."
+      "explanation": "200 × 0.05 = about 10 points by chance alone. This is the multiple comparisons problem. FDR correction makes the threshold stricter so that most chance points disappear, so the corrected count is less than or equal to the uncorrected one. Short isolated bars, especially before the stimulus, are usually chance findings like these."
     }
   ]
 }

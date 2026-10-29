@@ -35,25 +35,27 @@ eeglabVersion: "2026.1"
 updated: 2026-10-28
 ---
 
-## Why this step matters
+## The idea
 
-The single-subject script works on D1. Your real project has twenty participants or more, with the same steps and the same settings for each one. Running the script twenty times and changing the file name by hand each time is slow, and it invites mistakes.
+[The single-subject script](/en/lesson/single-subject-script/) works on D1. Your real project has twenty participants or more, with the same steps and settings. Running the script twenty times and renaming the file by hand is slow, and it invites mistakes.
 
-The solution is a <En>loop</En>: a list of participant names, with the same steps applied to each name. This is called <En>batch processing</En>.
+The solution is a <En>loop</En> that applies the same steps to each participant. This is called <En>batch processing</En>. But in a simple loop, if one participant fails, everything stops.
 
-But a simple loop has a problem: if the seventh participant fails for some reason (a missing file, an odd channel, memory), everything stops, and in the morning you find that only six finished. That is why we wrap each participant in `try` and `catch`: if it fails, the error is written to a file, and the loop moves on to the next participant.
+So how do you write a loop that processes everyone, logs whoever fails, and moves on?
 
-In this lesson we process only three participants from D4 (about 700 MB to download). The same script works on all eighteen if you download them.
-
-## Before and after
+## How does the loop go through the participants?
 
 <Figure src="batch-processing/batch-loop.svg" alt="A loop: three participants sub-002, sub-003 and sub-004 go one at a time into the function process_subject, which applies the pipeline steps; outputs go to derivatives/eeglab, one folder per participant, with batch_summary.csv. A circular arrow returns to the next participant, and a red arrow goes from the function to logs/batch_log.txt on error: log and continue." source="original" />
 
-## Steps in the GUI
+A participant can fail for many reasons: a missing file, an odd channel, or running out of memory. A simple loop stops right there, so you leave it running overnight and find in the morning that only six participants finished. That is why we wrap each participant in `try` and `catch`: if it fails, the error is written to a file (the red arrow), and the loop moves on to the next participant.
+
+## How do I build the processing loop for the D4 participants?
+
+Here we process only three participants from D4 (about 700 MB to download). The same script works on all eighteen if you download them.
 
 **First: download three participants from D4**
 
-1. Create a folder named `faces_project` with a `rawdata` folder inside it, and make `faces_project` the MATLAB working folder (`cd`). Run every script in station 9 from inside this folder. The file organization lesson explains the other folders.
+1. Create a folder named `faces_project` with a `rawdata` folder inside it, and make `faces_project` the MATLAB working folder (`cd`). Run every script in station 9 from inside this folder. [The file organization lesson](/en/lesson/file-organization/) explains the other folders.
 2. From the ds002718 page on OpenNeuro, download into `rawdata` the top-level files (`dataset_description.json`, `README` and `task-FaceRecognition_events.json`) and the full `sub-002`, `sub-003` and `sub-004` folders. Or, from the system command line, if you have the AWS CLI:
 
 ```text
@@ -62,19 +64,19 @@ aws s3 sync --no-sign-request s3://openneuro.org/ds002718 rawdata --exclude "sub
 
 **Second: try the pipeline on one participant in the GUI**
 
-3. Open <MenuPath>File > Import data > Using EEGLAB functions and plugins > From BIDS folder structure</MenuPath> and choose the `rawdata` folder. Enable importing events and electrode locations from the BIDS files, and take the event type from the `trial_type` column. Click <UiLabel>Ok</UiLabel>. A STUDY is created with the three participants.
+3. Open <MenuPath>File > Import data > Using EEGLAB functions and plugins > From BIDS folder structure</MenuPath> and choose the `rawdata` folder. Enable importing events and electrode locations from the BIDS files, and take the event type from the `trial_type` column. In <UiLabel>Study output folder</UiLabel>, change the folder to `faces_project/derivatives/eeglab`: the default puts it inside `rawdata`, while the script and the cluster lesson look for the files in `faces_project/derivatives/eeglab`. Click <UiLabel>Ok</UiLabel>. A STUDY is created with the three participants.
 4. Pick one participant from the <MenuPath>Datasets</MenuPath> menu and apply the steps in the GUI as in stations 3 to 5, changing only three settings: mains power in the UK is 50 Hz, not 60; the eye channels are `EEG061` and `EEG062`; and the heart channels `EEG063` and `EEG064` are removed.
-5. Type `eegh`. These lines are what you will put inside the loop.
+5. Type `eegh` and compare the lines with the single-subject script. The steps are the same; only the three settings differ. Those settings are what you will put in `cfg` at the top of the file.
 
 **Third: turn the pipeline into a loop**
 
 6. Copy the single-subject script into a new file `batch_d4.m`. Move the processing steps into a function at the end of the file named `process_subject`, which takes the participant file and the settings, saves the results, and returns a summary.
 7. At the top of the file: the list of participants, the settings, and a `for` loop that calls the function inside `try`.
 8. In `catch`: write the participant name and the error message to `logs/batch_log.txt`, and record the status `failed` in the summary table.
-9. Run the file. ICA on 72 channels (70 EEG and 2 EOG) and fifty minutes of recording takes time for each participant, so let it run. If you have many participants, see the HPC lesson.
+9. Run the file. ICA on 72 channels (70 EEG and 2 EOG) and fifty minutes of recording takes a long time for each participant, so let it run. If you have many participants, see [the HPC lesson](/en/lesson/hpc/).
 10. When it finishes, open `batch_summary.csv`. Each row is one participant: status, bad channels, removed components, and remaining epochs.
 
-## The equivalent script
+## What does the full batch script look like?
 
 ```matlab
 %% D4 batch pipeline: same steps for every subject, errors logged
@@ -216,34 +218,34 @@ res.nEpochs    = EEG.trials;
 end
 ```
 
-## Which value should I choose?
+## Which settings does D4 need, and why?
 
 | Setting | Value in this lesson | Why |
 |---|---|---|
-| Line frequency | 50 Hz | D4 was recorded in Cambridge, UK, and `PowerLineFrequency` in the `eeg.json` file is 50. Your data from Saudi Arabia are 60. This setting is the clearest difference between D1 and D4. |
+| Line frequency | 50 Hz | D4 was recorded in Cambridge, UK, and `PowerLineFrequency` in the `eeg.json` file is 50. Data recorded in Saudi Arabia use 60 Hz. This setting is the clearest difference between D1 and D4. |
 | Eye and heart channels | `EEG061` and `EEG062` for the eyes, `EEG063` and `EEG064` for the heart | From the `channels.tsv` file in D4. Heart channels are removed; eye channels stay to help ICA and do not enter the reference. |
 | Events for epoching | `famous_new`, `unfamiliar_new` and `scrambled_new` | The first presentation of each image, 150 of each type in sub-002. Repetitions have other names (`_second_early` and `_second_late`). |
 | Import | `pop_importbids` once before the loop | Reads events from `events.tsv` and electrode locations from `electrodes.tsv`, as in the official EEGLAB tutorial on the same data. |
 | Where settings live | The `cfg` variable at the top | Everything that differs between projects is in one place, and the function itself does not change. |
 | What happens on error | A line in `batch_log.txt`, status `failed`, then the next participant | In the morning you know who failed and why, and you rerun that participant alone. |
 
-## Common mistakes
-
-- **A loop without `try` and `catch`.** One error in one participant stops all processing, and the night's hours are lost.
-- **A silent `catch`.** Catching an error without logging it is worse than stopping: you think every participant finished. Always log the name and the message, and look at the summary table.
-- **Settings written inside the function.** If you write 60 inside `process_subject` and forget it, you process UK data with a Saudi filter. Every setting goes in `cfg`.
-- **Forgetting the differences between datasets.** The eye channels in D1 are named `EOG1` and `EOG2`, and in D4 `EEG061` and `EEG062`. Copying the script without checking these names makes ICA and the reference treat eye channels as scalp channels.
-- **Trusting the loop without checking.** A summary saying `ok` does not mean the cleaning is good. Open one or two files in the GUI, and look at the number of removed components and remaining epochs for each participant. The odd value in the table is the participant you review first.
-
-{/* "From experience" box: waiting for the project owner's story. Do not write it before it arrives. */}
-
-## How to check it worked
+## How do I verify that every participant was processed?
 
 - The table printed at the end has three rows, with status `ok` in each row.
 - `logs/batch_log.txt` does not exist or is empty. If there is a line, it holds the participant name and the reason.
 - In each participant's folder inside `derivatives/eeglab` there are two new files: `desc-clean` and `desc-epochs`.
 - The number of remaining epochs for each participant is close to 450 (150 of each type), minus the rejected ones and any epoch that crosses a `boundary` event (5 in sub-002), because `pop_epoch` drops those. If it is much lower for one participant, review it.
 
+## Common mistakes in batch processing
+
+- **A loop without `try` and `catch`.** One error in one participant stops all processing, and a whole night of running is lost.
+- **A silent `catch`.** Catching an error without logging it is worse than stopping: you think every participant finished. Always log the name and the message, and look at the summary table.
+- **Settings written inside the function.** If you write 60 inside `process_subject` and forget it, you process UK data with a 60 Hz filter. Every setting goes in `cfg`.
+- **Forgetting the differences between datasets.** The eye channels in D1 are named `EOG1` and `EOG2`, and in D4 `EEG061` and `EEG062`. Copying the script without checking these names makes ICA and the reference treat eye channels as scalp channels.
+- **Trusting the loop without checking.** A summary saying `ok` does not mean the cleaning is good. Open one or two files in the GUI, and look at the number of removed components and remaining epochs for each participant. The odd value in the table is the participant you review first.
+
+{/* "From experience" box: waiting for the project owner's story. Do not write it before it arrives. */}
+
 <Methods>
-Data from [n] participants (ds002718; EEG-BIDS plugin 10.5, EEGLAB 2026.1) were high-pass filtered (passband edge 0.1 Hz; firfilt plugin 2.8), and line noise was attenuated with a band-stop filter (passband edges 48 and 52 Hz). Bad channels were identified with clean_rawdata (clean_rawdata plugin 2.11; flatline 5 s, channel correlation 0.8) and interpolated, then data were average-referenced, EOG excluded. Independent component analysis (extended Infomax; Lee et al., 1999) was computed on a 1 Hz high-passed copy, and components labelled Eye or Muscle with probability ≥ 0.9 (ICLabel 1.7; Pion-Tonachini et al., 2019) were removed. After low-pass filtering (passband edge 30 Hz), epochs from −1 to 2 s were baseline-corrected (−200 to 0 ms), and epochs beyond ±100 µV were rejected.
+Data from [n] participants (ds002718; EEG-BIDS plugin 10.5, EEGLAB 2026.1) were high-pass filtered (passband edge 0.1 Hz; firfilt plugin 2.8), and line noise was attenuated with a band-stop filter (passband edges 48 and 52 Hz). Bad channels were identified with clean_rawdata (clean_rawdata plugin 2.11; flatline 5 s, channel correlation 0.8) and interpolated, then data were average-referenced, EOG excluded. Independent component analysis (extended Infomax; Lee et al., 1999) was computed on a 1 Hz high-passed copy, and components labeled Eye or Muscle with probability ≥ 0.9 (ICLabel 1.7; Pion-Tonachini et al., 2019) were removed. After low-pass filtering (passband edge 30 Hz), epochs from −1 to 2 s were baseline-corrected (−200 to 0 ms), and epochs beyond ±100 µV were rejected.
 </Methods>

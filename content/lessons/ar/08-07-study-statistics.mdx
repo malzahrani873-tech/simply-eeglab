@@ -10,7 +10,7 @@ objectives:
   - يجري اختباراً مزدوجاً لنوعي الصور في Pz من زر STATS، ويحدد الأزمنة الدالة مع تصحيح FDR.
   - يقارن عدد النقاط الزمنية الدالة مع التصحيح وبدونه، ويشرح سبب الفرق.
   - يختبر نافذة زمنية محددة قبل النظر إلى البيانات في كل القنوات، ويقرأ خريطة قيم p.
-  - يتحقق هل إضافة Fieldtrip-lite مثبّتة، ويجري تصحيح العناقيد إذا كانت مثبّتة.
+  - يتحقق مما إذا كانت إضافة Fieldtrip-lite مثبّتة، ويجري تصحيح العناقيد إذا كانت كذلك.
 prerequisites: [study-plot-channels]
 references:
   - title: EEGLAB Tutorial
@@ -122,27 +122,39 @@ eeglabVersion: "2026.1"
 updated: 2026-10-28
 ---
 
-## لماذا هذه الخطوة مهمة؟
+## الفكرة
 
-في الدرس السابق رأيت المنحنيين يفترقان في Pz. لكن متوسطي مجموعتين لا يتساويان تماماً أبداً، حتى لو لم يكن للصور أي أثر. الاختبار يجيب عن سؤال واحد: **هل الفرق ثابت بما يكفي عبر المشاركين الـ 14 بحيث يصعب أن تفسّره الصدفة وحدها؟**
+في درس رسم نتائج المجموعة رأيت المنحنيين يفترقان في Pz. لكن أي متوسطين لا يتساويان تماماً أبداً، حتى لو لم يكن للصور أي أثر.
 
-وهناك مشكلة ثانية. EEGLAB يختبر كل نقطة زمنية وحدها، والإيبوك فيه مئات النقاط. عند عتبة 0.05، إذا اختبرت 100 نقطة زمنية مستقلة لا يوجد فيها فرق حقيقي، فتتوقع أن يخرج نحو 5 منها "دالة" بالصدفة. هذه مشكلة **المقارنات المتعددة**. التصحيح مثل FDR يرفع الحد بحيث تختفي أغلب نقاط الصدفة هذه.
+الاختبار يجيب عن سؤال واحد: **هل الفرق ثابت بما يكفي عبر المشاركين الـ 14 بحيث يصعب أن تفسّره الصدفة وحدها؟**
 
-والمشكلة الثالثة بيدك أنت لا بيد EEGLAB: **اختيار النافذة بعد رؤية الفرق.** إذا نظرت إلى الرسم، ووجدت أين يفترق المنحنيان أكثر، ثم اختبرت تلك النافذة، فسينجح الاختبار غالباً حتى في بيانات عشوائية. النافذة تأتي من سؤالك أو من دراسات سابقة، قبل الرسم.
+فكيف تجري هذا الاختبار في EEGLAB دون أن تخدعك نقاط الصدفة؟
 
-## قبل وبعد
+## كيف تظهر النتيجة الدالة على الرسم؟
 
 <ImageSpec>
 صورة من سكربت الدرس يوم التشغيل، لا رسم يدوي. يسار: ERP المجموعة في Pz للتصميم 3، منحنيا animal و distractor في لوحة واحدة، مع أشرطة داكنة على طول أسفل اللوحة في الأزمنة التي تجتاز تصحيح FDR. يمين: خريطتا الرأس لـ 150 إلى 250 ms لـ animal و distractor، وبجانبهما خريطة قيم p. نصوص المحاور والعناوين من EEGLAB بالإنجليزية، ونسخة واحدة تكفي للغتين.
 </ImageSpec>
 
-## الخطوات من الواجهة
+## لماذا أصحّح للمقارنات المتعددة، وما الفرق بين FDR والعناقيد؟
 
-**عن البيانات (D6):** `animal_mine.study` بتصاميمها الثلاثة والمقاييس من درس الحساب المسبق. نبدأ بالتصميم 3، `image only`: متغيّر واحد داخل المشارك (animal و distractor)، فالاختبار **مزدوج** (paired) عبر المشاركين الـ 14.
+EEGLAB يختبر كل نقطة زمنية وحدها، والإيبوك فيه مئات النقاط. عند عتبة 0.05، إذا اختبرت 100 نقطة زمنية مستقلة لا يوجد فيها فرق حقيقي، فستخرج نحو 5 منها "دالة" بالصدفة. هذه مشكلة **المقارنات المتعددة**. تصحيح مثل FDR يرفع الحد، فتختفي أغلب نقاط الصدفة هذه.
+
+تصحيح العناقيد (cluster correction) لا يحكم على كل نقطة زمنية وحدها. يبحث عن سلاسل من النقاط الدالة المتجاورة، ويسأل: هل سلسلة بهذا الطول نادرة عند التباديل؟ لذلك يكون غالباً أقوى من FDR في كشف أثر يستمر عشرات المللي ثانية. في EEGLAB يأتي من إضافة Fieldtrip-lite، وهي ليست جزءاً من التثبيت الأساسي.
+
+## لماذا أحدد النافذة الزمنية قبل أن أرى الرسم؟
+
+هذه المشكلة لا يحلّها EEGLAB عنك، لأنها تأتي من طريقة اختيارك أنت. إذا نظرت إلى الرسم، ووجدت أين يفترق المنحنيان أكثر، ثم اختبرت تلك النافذة، فسينجح الاختبار غالباً حتى في بيانات عشوائية. لذلك تأتي النافذة من سؤالك أو من دراسات سابقة، قبل الرسم.
+
+في هذه المهمة صور الحيوانات هي محاولات go (يرفع المشارك إصبعه)، والمشتّتات هي محاولات no-go (يُبقي الزر مضغوطاً)، كما في وصف الداتاست. ذكر Thorpe وزملاؤه (1996) أن الفرق بين المحاولتين في هذه المهمة يظهر موجةً سالبة فوق المناطق الأمامية في محاولات no-go، تبدأ عند نحو 150 ms. لذلك أخذنا بداية النافذة (150 ms) من دراسة سابقة، لا من رسمنا. أما نهايتها (250 ms) فاختيار لهذا الدرس.
+
+## كيف أختبر الفرق من القوائم؟
+
+**عن البيانات (D6):** `animal_mine.study` بتصاميمها الثلاثة والمقاييس من [درس الحساب المسبق](/lesson/study-precompute/). نبدأ بالتصميم 3، `image only`: متغيّر واحد داخل المشارك (animal و distractor)، فالاختبار **مزدوج** (paired) عبر المشاركين الـ 14.
 
 **أولاً: جهّز الرسم**
 
-1. شغّل سكربت "نقطة البداية".
+1. ابدأ و`animal_mine.study` مفتوحة بمقاييسها المحسوبة. إن لم تكن عندك، فافتح «سكربت للوصول إلى هذه الحالة» تحت «تبدأ من» أعلى الدرس.
 2. افتح <MenuPath>Study > Plot channel measures</MenuPath>. في <UiLabel>Select design:</UiLabel> اختر `image only`، ثم اختر `Pz` في القائمة اليسرى.
 3. اضغط <UiLabel>Params</UiLabel> بجانب <UiLabel>Plot ERPs</UiLabel>. فعّل <UiLabel>Plot first variable on the same panel</UiLabel>، واترك <UiLabel>Time range (ms) [low high]</UiLabel> فارغاً، وتأكد أن <UiLabel>Multiple channels selection</UiLabel> على <UiLabel>Plot channels individually</UiLabel>. اضغط <UiLabel>Ok</UiLabel>.
 
@@ -156,7 +168,7 @@ updated: 2026-10-28
 6. اضغط <UiLabel>Plot ERPs</UiLabel>. يظهر المنحنيان في لوحة واحدة، وتحدد أشرطة داكنة على طول أسفل اللوحة الأزمنة التي يجتاز فيها الفرق العتبة المصحّحة.
 
 <Callout type="note" title="صندوق الإحصاء في MATLAB">
-الاختبار البارامتري يحتاج الدالة `fcdf` من صندوق أدوات MATLAB المسمّى Statistics and Machine Learning Toolbox. بدون هذا الصندوق يكتب EEGLAB في نافذة الأوامر رسالة تبدأ بـ `statcond(): parametric testing requires fcdf()` ويجري اختبار التباديل (permutation) بدلاً منه. النتيجة تبقى صحيحة، لكنها أبطأ وقد تتغير قليلاً من تشغيل لآخر.
+الاختبار البارامتري يحتاج الدالة `fcdf` من صندوق أدوات MATLAB المسمّى Statistics and Machine Learning Toolbox. بدون هذا الصندوق يكتب EEGLAB في نافذة الأوامر رسالة تبدأ بـ `statcond(): parametric testing requires fcdf()`، ويجري اختبار التباديل (permutation) بدلاً منه. النتيجة تبقى صحيحة، لكن الحساب أبطأ، وقد تتغير النتيجة قليلاً من تشغيل لآخر.
 </Callout>
 
 **ثالثاً: انظر ماذا يفعل التصحيح**
@@ -167,34 +179,30 @@ updated: 2026-10-28
 
 **رابعاً: اختبر نافذة محددة مسبقاً**
 
-في هذه المهمة صور الحيوانات هي محاولات go (يرفع المشارك إصبعه)، والمشتّتات هي محاولات no-go (يُبقي الزر مضغوطاً)، كما في وصف الداتاست. ذكر Thorpe وزملاؤه (1996) أن الفرق بين محاولات go و no-go في هذه المهمة يظهر كسالبية فوق المناطق الأمامية في محاولات no-go، ويبدأ عند نحو 150 ms. لذلك بداية النافذة (150 ms) من دراسة سابقة، لا من رسمنا. أما نهايتها (250 ms) فاختيار لهذا الدرس.
+النافذة هي 150 إلى 250 ms. سبب اختيارها في قسم "لماذا أحدد النافذة الزمنية قبل أن أرى الرسم؟" أعلاه.
 
 1. اضغط <UiLabel>Sel. all</UiLabel> لتحديد كل القنوات.
 2. اضغط <UiLabel>Params</UiLabel> بجانب <UiLabel>Plot ERPs</UiLabel>. اكتب أولاً `150 250` في <UiLabel>Time range (ms) [low high]</UiLabel>، ثم اختر <UiLabel>Plot averaged topography over time range</UiLabel> في <UiLabel>Multiple channels selection</UiLabel>. اضغط <UiLabel>Ok</UiLabel>.
-3. اضغط <UiLabel>Plot ERPs</UiLabel>. تظهر خريطتا رأس، واحدة لكل صورة، وخريطة ثالثة للاختبار في كل قناة. هنا يصحّح FDR عبر كل القنوات، لأن كل قناة أصبحت اختباراً واحداً. المقال يصف الأثر فوق المناطق الأمامية، أما اختبار الخطوة الثانية ففي Pz. هذا تحليل منفصل لا تناقض فيه، فانظر في خريطة الاختبار أين يظهر الفرق.
+3. اضغط <UiLabel>Plot ERPs</UiLabel>. تظهر خريطتا رأس، واحدة لكل صورة، وخريطة ثالثة للاختبار في كل قناة. هنا يصحّح FDR عبر كل القنوات، لأن كل قناة أصبحت اختباراً واحداً. لاحظ أن Thorpe وزملاءه وصفوا الأثر فوق المناطق الأمامية، بينما اختبرت في "ثانياً" قناة Pz وحدها. لا تناقض هنا: هذان تحليلان منفصلان. خريطة الاختبار تريك أين يظهر الفرق فعلاً.
 4. بعد ذلك أرجع <UiLabel>Multiple channels selection</UiLabel> إلى <UiLabel>Plot channels individually</UiLabel> وامسح <UiLabel>Time range (ms) [low high]</UiLabel>.
 
 **خامساً: تصحيح العناقيد (يحتاج Fieldtrip-lite)**
 
-تصحيح العناقيد (cluster correction) لا يحكم على كل نقطة زمنية وحدها. يبحث عن سلاسل من النقاط الدالة المتجاورة، ويسأل هل سلسلة بهذا الطول نادرة تحت التباديل. وهو غالباً أقوى من FDR لأثر يستمر عشرات المللي ثانية. في EEGLAB يأتي من إضافة Fieldtrip-lite، وهي ليست جزءاً من التثبيت الأساسي.
-
-1. **تحقق هل هي مثبّتة.** افتح <UiLabel>STATS</UiLabel>. إذا كان السطر <UiLabel>Use Fieldtrip statistics (to use install "Fieldtrip-lite" using File > Manage EEGLAB extensions)</UiLabel> ولا يمكن تفعيله، فالإضافة غير موجودة. ويمكنك أيضاً كتابة `exist('ft_freqstatistics', 'file')` في نافذة الأوامر: `2` تعني مثبّتة، و `0` تعني غير موجودة.
-2. **لتثبيتها:** افتح <MenuPath>File > Manage EEGLAB extensions</MenuPath>. في <UiLabel>List of plugins (bolded means installed)</UiLabel> اضغط `Fieldtrip-lite`، ثم <UiLabel>Install/Update</UiLabel>. افتح <UiLabel>STATS</UiLabel> مرة أخرى: يجب أن يصبح السطر <UiLabel>Use Fieldtrip statistics</UiLabel>. إذا بقي رمادياً، أعد تشغيل EEGLAB وشغّل سكربت "نقطة البداية" مرة أخرى.
+1. **تحقق من أنها مثبّتة.** افتح <UiLabel>STATS</UiLabel>. إذا ظهر السطر <UiLabel>Use Fieldtrip statistics (to use install "Fieldtrip-lite" using File > Manage EEGLAB extensions)</UiLabel> ولا يمكن تفعيله، فالإضافة غير موجودة. ويمكنك أيضاً كتابة `exist('ft_freqstatistics', 'file')` في نافذة الأوامر: `2` تعني مثبّتة، و `0` تعني غير موجودة.
+2. **لتثبيتها:** افتح <MenuPath>File > Manage EEGLAB extensions</MenuPath>. في <UiLabel>List of plugins (bolded means installed)</UiLabel> اضغط `Fieldtrip-lite`، ثم <UiLabel>Install/Update</UiLabel>. افتح <UiLabel>STATS</UiLabel> مرة أخرى: يجب أن يصبح السطر <UiLabel>Use Fieldtrip statistics</UiLabel>. إذا بقي رمادياً، أعد تشغيل EEGLAB، ثم شغّل مرة أخرى «سكربت للوصول إلى هذه الحالة» تحت «تبدأ من» أعلى الدرس.
 3. **لتشغيله:** حدد `Pz` وحدها، وافتح <UiLabel>STATS</UiLabel>، وتأكد أن المتغيّر الأول وحده مفعّل، وفعّل <UiLabel>Use Fieldtrip statistics</UiLabel>، واختر <UiLabel>Use montecarlo/permutation statistics</UiLabel> و <UiLabel>Use cluster correction (CC)</UiLabel>، واكتب `0.05` عتبةً. اضغط <UiLabel>Ok</UiLabel>، ثم <UiLabel>Plot ERPs</UiLabel>.
 4. فعّل <UiLabel>Use EEGLAB statistics</UiLabel> مرة أخرى بعد ذلك، من أجل الخطوة التالية.
 
 **سادساً: التصميم المختلط 2×2**
 
-1. غيّر <UiLabel>Select design:</UiLabel> إلى `image x gender`، مع `Pz` محددة.
+1. غيّر <UiLabel>Select design:</UiLabel> إلى `image x gender`، و`Pz` ما زالت محددة.
 2. افتح <UiLabel>STATS</UiLabel> وفعّل أيضاً <UiLabel>Compute 2nd independent variable statistics if any</UiLabel>. أبقِ <UiLabel>Use FDR correction</UiLabel> والعتبة `0.05`. اضغط <UiLabel>Ok</UiLabel>.
-3. اضغط <UiLabel>Plot ERPs</UiLabel>. تظهر في نافذة الأوامر `Warning: cannot plot condition/group on the same panel while using a fixed`، ويرسم EEGLAB كل خلية في لوحة وحدها، مع لوحات إضافية لأثر الصورة وأثر الجنس والتفاعل بينهما.
+3. اضغط <UiLabel>Plot ERPs</UiLabel>. تظهر في نافذة الأوامر الرسالة `Warning: cannot plot condition/group on the same panel while using a fixed`، ويرسم EEGLAB كل خلية في لوحة وحدها، مع لوحات إضافية لأثر الصورة وأثر الجنس والتفاعل بينهما.
 4. ألغِ تفعيل <UiLabel>Compute 2nd independent variable statistics if any</UiLabel> عندما تنتهي.
 
-<Callout type="warning">
-**حدّ يجب أن تعرفه.** في الاختبار الثنائي يمرّر EEGLAB إعداد ازدواج واحداً للاختبار، وإذا كان أحد المتغيّرين غير مزدوج استعمل النسخة غير المزدوجة (في `std_stat.m` تُرتَّب قائمة الازدواج بحيث تأتي `off` أولاً). في تصميمنا المختلط يعني هذا أن التفاعل يُختبر كأن نوع الصورة بين المشاركين أيضاً، فتضيع قوة إحصائية. استخدم النتيجة الثنائية هنا للاستكشاف. أما تحليل ANOVA مختلط حقيقي فصدّر القيم (الدرس التالي) إلى برنامج إحصاء، أو استخدم LIMO (الدرس الذي بعده). ومع 7 مشاركين في كل مجموعة، أي نتيجة عن الجنس هي للتعلم فقط.
-</Callout>
+قبل أن تفسّر لوحة التفاعل، اقرأ قسم "هل أثق باختبار التصميم المختلط 2×2 في EEGLAB؟" أدناه.
 
-## السكربت المقابل
+## كيف أجري نفس الاختبارات بسكربت؟
 
 ```matlab
 % STUDY and ALLEEG come from the starting point script
@@ -242,22 +250,37 @@ fprintf('Interaction time points after FDR: %d\n', nnz(pinter{3}));
 STUDY = pop_statparams(STUDY, 'groupstats', 'off');
 ```
 
-## أي قيمة أختار؟
+## هل أثق باختبار التصميم المختلط 2×2 في EEGLAB؟
+
+في الاختبار الثنائي (two-way) يعطي EEGLAB الاختبار إعداد ازدواج واحداً للمتغيّرين معاً. فإذا كان أحدهما غير مزدوج، كالجنس هنا، استعمل النسخة غير المزدوجة للاختبار كله (في `std_stat.m` تُرتَّب قائمة الازدواج بحيث تأتي `off` أولاً).
+
+النتيجة في تصميمنا المختلط: يُختبر التفاعل كأن نوع الصورة أيضاً بين المشاركين، مع أن كل مشارك رأى النوعين. وهذا يضيّع قوة إحصائية.
+
+لذلك استخدم النتيجة الثنائية هنا للاستكشاف فقط. لتحليل ANOVA مختلط حقيقي، صدّر القيم إلى برنامج إحصاء ([درس إخراج النتائج](/lesson/study-export-results/))، أو استخدم LIMO (درس LIMO في آخر هذه المحطة). ومع 7 مشاركين في كل مجموعة، أي نتيجة عن الجنس هي للتعلم فقط.
+
+## أي اختبار وتصحيح أختار؟
 
 | الخيار | في هذا الدرس | متى تغيّره |
 |---|---|---|
 | التصميم | 3 لأثر الصورة، و 2 للتفاعل | التصميم الذي يطابق سؤالك، محدداً قبل التحليل. |
 | <UiLabel>Use parametric statistics</UiLabel> | نعم | <UiLabel>Use permutation statistics</UiLabel> للنتائج النهائية، أو عندما تكون البيانات بعيدة عن التوزيع الطبيعي. اترك <UiLabel>Randomization (n)</UiLabel> على `auto` أو اكتب 2000 أو أكثر: اختبار التباديل لا يعطي قيمة p أصغر من 1 مقسوماً على هذا العدد، والتصحيح يحتاج قيم p صغيرة. |
-| <UiLabel>Use bootstrap statistics</UiLabel> | لا | باقٍ للتحليلات القديمة فقط. EEGLAB نفسه يحذّر أنه يبالغ في الدلالة للبيانات المزدوجة. استخدم التباديل بدلاً منه. |
+| <UiLabel>Use bootstrap statistics</UiLabel> | لا | باقٍ للتحليلات القديمة فقط. EEGLAB نفسه يحذّر من أنه يبالغ في الدلالة للبيانات المزدوجة. استخدم التباديل بدلاً منه. |
 | العتبة | 0.05 | `exact` (فارغ) يعرض قيم p بدل الأشرطة، وهذا مفيد للاستكشاف. |
-| التصحيح | FDR | Bonferroni و Holm أشدّ، ويضيّعان آثاراً حقيقية أكثر. تصحيح العناقيد (Fieldtrip-lite) للآثار الممتدة في الزمن أو عبر القنوات. لا تترك التصحيح أبداً لنتيجة نهائية. |
+| التصحيح | FDR | Bonferroni و Holm أشدّ، ويضيّعان آثاراً حقيقية أكثر. تصحيح العناقيد (Fieldtrip-lite) للآثار الممتدة في الزمن أو عبر القنوات. لا تتخلَّ عن التصحيح أبداً في نتيجة نهائية. |
 | <UiLabel>Plot marginal statistics (unckeck to plot main effect)</UiLabel> | غير مفعّل (الأثر الرئيسي) | فعّله لتختبر الصورة داخل كل جنس على حدة. |
 | <UiLabel>Use single trials for statistics (not recommended if more than 1 subject in the study)</UiLabel> | غير مفعّل | فقط في STUDY فيها مشارك واحد. مع مشاركين كثيرين يغيّر السؤال من الناس إلى المحاولات. |
 | النافذة الزمنية | 150 إلى 250 ms: البداية من Thorpe وزملائه (1996)، والنهاية اختيار للدرس | من سؤالك أو دراسات سابقة، مكتوبة قبل التحليل. |
 
-## أخطاء شائعة
+## كيف أتأكد أن الاختبار نجح؟
 
-- **اختيار النافذة من الرسم ثم اختبارها.** عندها يكاد ينجح الاختبار حتماً. اكتب النافذة قبل أن تفتح الرسم.
+- **رسم Pz** للتصميم 3 فيه منحنيان في لوحة واحدة، وأشرطة داكنة على طول أسفلها في الأزمنة الدالة.
+- **السكربت يطبع** `Significant time points at Pz:` مع رقمين، والرقم بعد FDR أصغر من غير المصحّح أو يساويه.
+- **اختبار النافذة** يعرض ثلاث خرائط (animal و distractor وخريطة قيم p)، والسكربت يطبع قائمة القنوات الدالة (وقد تكون القائمة فارغة).
+- **Fieldtrip-lite:** السكربت يطبع إما عدد النقاط بعد تصحيح العناقيد، وإما السطر `Fieldtrip-lite is not installed`.
+
+## أخطاء شائعة في إحصاء المجموعة
+
+- **اختيار النافذة من الرسم ثم اختبارها.** عندها يكاد الاختبار ينجح دائماً. اكتب النافذة قبل أن تفتح الرسم.
 - **نشر الأشرطة غير المصحّحة.** مع مئات النقاط الزمنية، بعض الأشرطة صدفة. انشر النتيجة المصحّحة، واذكر التصحيح الذي استخدمته.
 - **تصديق شريط قصير منعزل.** نقطة أو نقطتان دالتان في خط الأساس، أو بعيداً عن أي أثر متوقع، أقرب إلى الصدفة منها إلى اكتشاف.
 - **ترك المتغيّر الثاني مفعّلاً عند التحويل إلى Fieldtrip.** Fieldtrip-lite لا يجري اختباراً ثنائياً. تظهر نافذة تحذير فيها `Switching to EEGLAB statistics since Fieldtrip cannot perform 2-way statistics`، وترجع النافذة إلى إحصاء EEGLAB.
@@ -265,15 +288,8 @@ STUDY = pop_statparams(STUDY, 'groupstats', 'off');
 
 {/* صندوق "من التجربة": بانتظار قصة من صاحب المشروع. لا يُكتب قبل وصولها. */}
 
-## كيف تتأكد أن الخطوة نجحت؟
-
-- **رسم Pz** للتصميم 3 فيه منحنيان في لوحة واحدة، وأشرطة داكنة على طول أسفلها في الأزمنة الدالة.
-- **السكربت يطبع** `Significant time points at Pz:` مع رقمين، والرقم بعد FDR أصغر من غير المصحّح أو يساويه.
-- **اختبار النافذة** يعرض ثلاث خرائط (animal و distractor وخريطة قيم p)، والسكربت يطبع قائمة القنوات الدالة (وقد تكون القائمة فارغة).
-- **Fieldtrip-lite:** السكربت يطبع إما عدد النقاط بعد تصحيح العناقيد، وإما السطر `Fieldtrip-lite is not installed`.
-
 <Methods>
-Animal and distractor ERPs were compared at [Pz] with paired t-tests at each time point across [14] participants (std_stat, EEGLAB 2026.1), with false discovery rate (FDR) correction across time points at q = 0.05. Mean amplitude from [150] to [250] ms, a window chosen a priori [Thorpe et al., 1996], was compared at every channel with FDR correction across channels.
+Animal and distractor ERPs were compared at [Pz] with [paired t-tests] at each time point across [14] participants (std_stat, EEGLAB 2026.1), with false discovery rate (FDR) correction across time points at q = 0.05. Mean amplitude from [150] to [250] ms, a window chosen a priori (Thorpe et al., 1996), was compared at every channel with FDR correction across channels.
 </Methods>
 
 <Callout type="note" title="مصدر البيانات">

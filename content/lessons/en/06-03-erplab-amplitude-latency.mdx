@@ -44,30 +44,42 @@ eeglabVersion: "2026.1"
 updated: 2026-10-28
 ---
 
-## Why this step matters
+## The idea
 
-We start this lesson from ready-made ERPsets from Luck's book (chapter 10). Building an ERPset from your own data is explained in chapters 2 and 6 of the book.
+After [averaging](/en/lesson/erp-average/), you need one number per participant and condition to put into your statistics. That number is the "score".
 
-An <En>ERPset</En> is an ERPLAB file that holds one participant's averaged waveforms, split into bins. ERPLAB is a separate plugin that does not ship with EEGLAB, and it has its own chain for building an ERPset: EventList, then BINLISTER, then epoching by bin, then averaging. That chain is long, so we leave it to the book and start here at the measurement step.
+The key question: do you take the peak of the wave, or its mean in a time window? Luck's answer is clear: peak amplitude is a poor way to score the amplitude of an ERP component, and mean amplitude is better in most cases.
 
-The data come from the ERP CORE flankers experiment, 40 participants. On each trial a central arrow appears, and the participant presses with the right or left hand according to its direction, while the arrows around it point the same way (compatible) or the opposite way (incompatible).
+So how do you measure amplitude and latency with ERPLAB's measurement tool, and why is mean amplitude more robust than the peak?
 
-Before the hand moves, the motor area in the hemisphere opposite that hand prepares it: the right hand is moved by the left hemisphere (channel C3), and the left hand by the right hemisphere (C4). So we subtract the channel on the same side as the hand from the opposite channel, which removes the activity shared by both hemispheres and leaves only the motor preparation. The component is the lateralized readiness potential (<En>LRP</En>): a negative wave over the hemisphere opposite the hand that is about to respond. Each ERPset in the `ERPsets_CI_Diff` folder holds the difference wave (contralateral minus ipsilateral) at channel `C3/C4`, in bin 1 for compatible trials (<En>Compatible</En>) and bin 2 for incompatible trials (<En>Incompatible</En>).
-
-After averaging, you need one number per participant and condition to put into your statistics. That number is the "score". The key question: do you take the peak of the wave, or its mean in a window? Luck answers clearly: peak amplitude is a poor way to score the amplitude of an ERP component, and mean amplitude is better in most cases.
-
-## Before and after
+## How do mean amplitude, peak amplitude, and latency differ?
 
 <ImageSpec>
-Grand average of the LRP difference wave at `C3/C4` across 40 participants, bin 1 (Compatible), from -200 to 800 ms, negative down. The window from 150 to 400 ms is shaded. Inside it, a dashed horizontal line at the mean amplitude, and a dot at the lowest value (the negative peak amplitude) with a vertical line down to the time axis (the latency). Source: script on the chapter 10 data from Luck's book. Data: ERP CORE, image licence CC BY-SA 4.0.
+Grand average of the LRP difference wave at `C3/C4` across 40 participants, bin 1 (Compatible), from -200 to 800 ms, negative down. The window from 150 to 400 ms is shaded. Inside it, a dashed horizontal line at the mean amplitude, and a dot at the lowest value (the negative peak amplitude) with a vertical line down to the time axis (the latency). Source: script on the chapter 10 data from Luck's book. Data: ERP CORE, image license CC BY-SA 4.0.
 </ImageSpec>
 
-## Steps in the GUI
+Mean amplitude is the dashed line: the average of all points inside the window. Peak amplitude is the lowest point alone, and latency is its time.
+
+## Which data are we measuring here?
+
+The data come from the ERP CORE flankers experiment, with 40 participants. On each trial, a central arrow appears, and the participant presses with the right or left hand according to its direction. The arrows around it point the same way (compatible) or the opposite way (incompatible).
+
+Before the hand moves, the motor area in the hemisphere opposite that hand prepares it: the right hand is moved by the left hemisphere (channel C3), and the left hand by the right hemisphere (C4). So we subtract the channel on the same side as the hand from the opposite channel. This removes the activity shared by both hemispheres and leaves only the motor preparation.
+
+The component is the lateralized readiness potential (<En>LRP</En>): a negative wave over the hemisphere opposite the hand that is about to respond. Each ERPset in the `ERPsets_CI_Diff` folder holds the difference wave (contralateral minus ipsilateral) at channel `C3/C4`, in bin 1 for compatible trials (<En>Compatible</En>) and bin 2 for incompatible trials (<En>Incompatible</En>).
+
+## What is an ERPset, and why start from ready-made files?
+
+An <En>ERPset</En> is an ERPLAB file that holds one participant's averaged waveforms, split into bins. ERPLAB is a separate plugin that does not ship with EEGLAB.
+
+ERPLAB has its own chain for building an ERPset: EventList, then BINLISTER, then epoching by bin, then averaging. That chain is long, so here we start from ready-made ERPsets from Luck's book (chapter 10), directly at the measurement step. Building an ERPset from your own data is explained in chapters 2 and 6 of the book.
+
+## How do I measure amplitude and latency from the ERPLAB menus?
 
 **First: install ERPLAB and load the data (only once)**
 
 1. Open <MenuPath>File > Manage EEGLAB extensions</MenuPath>, search for `ERPLAB`, and install it. This lesson is written for ERPLAB 13.10.
-2. Download the `Chapter_10` folder from the master folder of Luck's book (the link is under "Going further"), and put it in your working folder.
+2. Download the `Chapter_10` folder from the master folder of Luck's book (the link is in the sources at the bottom of the lesson), and put it in your working folder.
 3. From the new menu <MenuPath>ERPLAB > Load existing ERPset(s)</MenuPath>, select all forty `.erp` files in `Chapter_10/Data/ERPsets_CI_Diff`. Their names appear under the new <MenuPath>ERPsets</MenuPath> menu in the EEGLAB window.
 
 **Second: measure the mean amplitude**
@@ -93,7 +105,7 @@ Grand average of the LRP difference wave at `C3/C4` across 40 participants, bin 
 The txt files hold one value per participant and bin. Open them in Excel or any statistics program, then compare the two conditions with a paired t test. Statistics are outside this lesson.
 </Callout>
 
-## The equivalent script
+## How do I score all three in a script, and see the peak bias?
 
 
 ```matlab
@@ -133,7 +145,7 @@ fprintf('Before the stimulus: mean %.2f uV, negative peak %.2f uV\n', ...
     mean(blMean(:)), mean(blPeak(:)));
 ```
 
-## Which value should I choose?
+## Which measure and which window should I choose?
 
 | Setting | Value | Why |
 |---|---|---|
@@ -143,7 +155,18 @@ fprintf('Before the stimulus: mean %.2f uV, negative peak %.2f uV\n', ...
 | Baseline | <UiLabel>Pre</UiLabel> | The data are already corrected with the prestimulus period, so this changes nothing here, but it protects you with other data. |
 | Latency | Peak latency for recognition, fractional area latency for results | Luck prefers `Fractional Area latency` because it is more robust. Chapter 10 of his book explains it. |
 
-## Common mistakes
+## How do I check that the scores are right?
+
+- `numel(ALLERP)` is 40, and the file `mean_amp_150_400.txt` exists with 80 values: two per participant, one for each bin.
+- The mean negative peak amplitude for compatible trials is about -3.2 µV, as in Luck's book.
+- Mean peak latency: compatible before incompatible, about 320 and 375 ms in Luck's book.
+- Before the stimulus (-100 to 0 ms): the mean amplitude is close to zero, but the negative peak is not (about -0.9 µV in Luck's book). This is the bias of peak measures.
+
+<Methods>
+Mean amplitude of the contralateral-minus-ipsilateral LRP difference wave was measured from 150 to 400 ms at C3/C4 (ERPLAB 13.10; Lopez-Calderon & Luck, 2014).
+</Methods>
+
+## Which mistakes are common when scoring?
 
 - **Choosing the window from the grand average of the same data.** You see where the difference is largest and measure it there, so you get an effect that may be chance. Set the window before the analysis.
 - **Measuring peak amplitude and comparing two conditions with different noise.** The peak grows as noise grows. A condition with fewer trials seems to have a larger peak.
@@ -152,14 +175,3 @@ fprintf('Before the stimulus: mean %.2f uV, negative peak %.2f uV\n', ...
 - **Mixing up the bin number and the channel number.** In a script, find `C3/C4` by name, as in the first line, instead of a number you remember.
 
 {/* "From experience" box: waiting for the project owner's story. Do not write it before it arrives. */}
-
-## How to check it worked
-
-- `numel(ALLERP)` is 40, and the file `mean_amp_150_400.txt` exists with 80 values (40 participants × bin).
-- The mean negative peak amplitude for compatible trials is about -3.2 µV, as in Luck's book.
-- Mean peak latency: compatible before incompatible, about 320 and 375 ms in Luck's book.
-- Before the stimulus (-100 to 0 ms): the mean amplitude is close to zero, but the negative peak is not (about -0.9 µV in Luck's book). This is the bias of peak measures.
-
-<Methods>
-Mean amplitude of the contralateral-minus-ipsilateral LRP difference wave was measured from 150 to 400 ms at C3/C4 (ERPLAB 13.10; Lopez-Calderon & Luck, 2014).
-</Methods>

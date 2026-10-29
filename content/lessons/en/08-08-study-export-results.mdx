@@ -120,34 +120,27 @@ eeglabVersion: "2026.1"
 updated: 2026-10-28
 ---
 
-## Why this step matters
+## The idea
 
-The last lesson ended with a limit: EEGLAB's two-way test does not handle a mixed design properly. Many researchers also need tests EEGLAB does not offer at all: a mixed ANOVA, a linear mixed model, a Bayesian test, or a covariate such as age.
+The statistics lesson ended with a limit: EEGLAB's two-way test does not handle a mixed design properly. Many researchers also need tests EEGLAB does not offer at all: a mixed ANOVA, a linear mixed model, a Bayesian test, or a covariate such as age.
 
-The usual route is simple. You summarize each participant's ERP in one number per condition (for example the mean amplitude from 150 to 250 ms), put these numbers in a table, and open the table in a statistics program. The table is also what you report in a paper, and what a reviewer can check.
+The answer is to put each participant's results in a table that any statistics program can open.
 
-There is no EEGLAB menu that writes this table. It takes a few lines of script, and this lesson gives them to you.
+So how do you get this table out of the STUDY?
 
-## Before and after
+## Why a table with one number per participant and condition?
 
-Before: the ERPs are in the `.daterp` files of each participant, readable only from EEGLAB. After: one file `erp_150_250_mean.csv` next to `animal_mine.study`, which any statistics program opens. Its first rows look like this (your participant order and values come from your run):
+The usual route is simple. You summarize each participant's ERP in one number per condition (for example the mean amplitude from 150 to 250 ms), put these numbers in a table, then open the table in a statistics program. The same table is what you report in a paper, and what a reviewer can check.
 
-| subject | gender | condition | channel | mean_uV |
-|---|---|---|---|---|
-| cba | F | animal | Fz | … |
-| clm | F | animal | Fz | … |
-| ega | F | animal | Fz | … |
-| fsa | M | animal | Fz | … |
+Right now the ERPs are stored in each participant's `.daterp` file, which only EEGLAB can read. No EEGLAB menu writes the table, but a few lines of script do: they write one file, `erp_150_250_mean.csv`, next to `animal_mine.study`.
 
-The full table has 56 rows: 14 participants × 2 conditions × 2 channels.
+## How do I get from the Pz plot to the numbers in the table?
 
-## Steps in the GUI
-
-**About the data (D6):** `animal_mine.study` with the ERPs computed in the precompute lesson. We use design 3, `image only`, because every participant appears in both conditions, so each column of the data is one person. Gender is taken from the STUDY, where the creation lesson stored it in `group`.
+**About the data (D6):** `animal_mine.study` with the ERPs computed in [the precompute lesson](/en/lesson/study-precompute/). We use design 3, `image only`, because every participant appears in both conditions, so each column of the data is one person. Gender is taken from the STUDY, where the creation lesson stored it in `group`.
 
 **1. See what you will export**
 
-1. Run the "Starting point" script.
+1. Start with `animal_mine.study` open and its measures computed. If you don't have it, open "Script to reach this state" under "Starts from" at the top of the lesson.
 2. Open <MenuPath>Study > Plot channel measures</MenuPath>, choose `image only` in <UiLabel>Select design:</UiLabel>, and select `Pz`.
 3. Press <UiLabel>Params</UiLabel> next to <UiLabel>Plot ERPs</UiLabel> and type `150 250` in <UiLabel>Time range (ms) [low high]</UiLabel>. Press <UiLabel>Ok</UiLabel>, then <UiLabel>Plot ERPs</UiLabel>. The plot now shows only the window you will average. Clear the time range afterwards.
 
@@ -158,15 +151,11 @@ The full table has 56 rows: 14 participants × 2 conditions × 2 channels.
 
 **3. Run the script and open the table**
 
-1. Run the script in "The matching script". The command window shows `56 rows written to` with the file path, then the first four rows.
+1. Run the script below. The command window shows `56 rows written to` with the file path, then the first four rows.
 2. Open `erp_150_250_mean.csv` in a text editor first. You should see a header line and values separated by commas.
-3. In JASP or R, the columns are ready: `subject` identifies the person, `condition` is within subjects, `gender` is between subjects.
+3. In JASP or R, the columns are ready: `subject` identifies the person, `condition` is a within-subject variable, and `gender` is a between-subject variable.
 
-<Callout type="note">
-**Long or wide?** The table is in **long** format: one row per participant, condition and channel. R (for example with `lme4` or `afex`) and JASP's mixed models use this format directly. SPSS and JASP's classic repeated-measures ANOVA want **wide** format: one row per participant and one column per condition. Both programs can convert, or you can convert in MATLAB with `unstack`.
-</Callout>
-
-## The matching script
+## How do I write the table with a script?
 
 ```matlab
 % STUDY, ALLEEG and studyDir come from the starting point script
@@ -207,35 +196,52 @@ for k = 1:numel(conds)
 end
 ```
 
-## Which value should I choose?
+## Do I need the table in long or wide format?
+
+The table is in **long** format: one row per participant, condition and channel. R (for example with `lme4` or `afex`) and JASP's mixed models use this format directly.
+
+SPSS and JASP's classic repeated-measures ANOVA want **wide** format: one row per participant and one column per condition. Both programs can convert, or you can convert in MATLAB with `unstack`.
+
+## Which measure, window and channels should I choose?
 
 | Choice | In this lesson | When to change it |
 |---|---|---|
-| Measure | Mean amplitude in a window | Peak amplitude and latency are noisier for single participants. If you need them, see the ERPLAB amplitude and latency lesson. |
+| Measure | Mean amplitude in a window | Peak amplitude and latency are noisier for single participants. If you need them, see the lesson "ERPLAB: measuring amplitude & latency". |
 | Window | 150 to 250 ms: the start from Thorpe et al. (1996), the end a choice for this lesson | From your question or earlier studies, fixed before you look. Never from the group plot of the same data. |
 | Channels | Fz and Pz | The channels named in your hypothesis. Averaging a few neighboring channels gives a more stable value than one channel. |
-| Design | 3, all participants in both conditions | Any design, but then each cell holds only some participants: `setinds` (the seventh output of `std_readdata`) gives the dataset numbers in each cell, and the participant names are in `STUDY.datasetinfo(setinds{c}).subject`. |
+| Design | 3, all participants in both conditions | Any design, but a cell may then hold only some participants: `setinds` (the seventh output of `std_readdata`) gives the dataset numbers in each cell, and the participant names are in `STUDY.datasetinfo(setinds{c}).subject`. |
 | Format | CSV, long format | Wide format for SPSS. Use `writetable(T, 'file.xlsx')` if you need Excel. |
 
-## Common mistakes
+## How do I check that the table is right?
 
-- **Assuming the column order of the data.** In design 3 each column follows `STUDY.design(3).cases.value`. In a design where a cell holds only some participants, this order no longer matches. The script stops with an error if a condition does not hold every participant.
-- **Choosing the window from the plot of the same data.** This is the same "fishing" problem as in the statistics lesson, and it carries into any program you export to.
-- **Opening the CSV directly in Excel with a regional setting that uses a comma as decimal mark.** All values then land in one column. Use Excel's text import and choose comma as separator, or open the file in JASP or R.
-- **Forgetting the unit.** The values are in µV, after the baseline correction chosen in the precompute lesson. Write both in your Methods.
-- **Exporting one value per trial and analyzing it as if trials were people.** With 14 participants the unit of analysis is the participant, unless you use a mixed model that knows which trials belong to whom.
+Its first rows look like this (your participant order and values come from your run):
 
-{/* "From experience" box: waiting for a story from the project owner. Not written before it arrives. */}
+| subject | gender | condition | channel | mean_uV |
+|---|---|---|---|---|
+| cba | F | animal | Fz | … |
+| clm | F | animal | Fz | … |
+| ega | F | animal | Fz | … |
+| fsa | M | animal | Fz | … |
 
-## How do you know it worked?
+The full table has 56 rows: 14 participants × 2 conditions × 2 channels.
 
 - **The command window** shows `56 rows written to` followed by the full path of `erp_150_250_mean.csv`.
 - **The file** opens in a text editor with the header `subject,gender,condition,channel,mean_uV` and 56 lines of values.
 - **The gender column** has 28 rows of `F` and 28 rows of `M` (7 women and 7 men, 4 rows each).
 - **The check lines** `Pz animal: mean` and `Pz distractor: mean` give values that match the height of the two curves between 150 and 250 ms in the Pz plot.
 
+## Common mistakes when exporting results
+
+- **Assuming the column order of the data.** In design 3 each column follows `STUDY.design(3).cases.value`. In a design where a cell holds only some participants, this order no longer matches. The script stops with an error if a condition does not hold every participant.
+- **Choosing the window from the plot of the same data.** This is the same problem the statistics lesson explains in "Why choose the time window before looking at the plot?", and it carries into any program you export to.
+- **Opening the CSV directly in Excel with a regional setting that uses a comma as the decimal mark.** All values then land in one column. Use Excel's text import and choose comma as the separator, or open the file in JASP or R.
+- **Forgetting the unit.** The values are in µV, after the baseline correction chosen in the precompute lesson. Write both in your Methods.
+- **Exporting one value per trial and analyzing it as if trials were people.** With 14 participants the unit of analysis is the participant, unless you use a mixed model that knows which trials belong to whom.
+
+{/* "From experience" box: waiting for a story from the project owner. Not written before it arrives. */}
+
 <Methods>
-For each participant and image category, the mean ERP amplitude from [150] to [250] ms was extracted at [Fz] and [Pz] (std_readdata, EEGLAB 2026.1; window chosen a priori from [Thorpe et al., 1996]) and exported for analysis in [software and version].
+For each participant and image category, the mean ERP amplitude from [150] to [250] ms was extracted at [Fz] and [Pz] (std_readdata, EEGLAB 2026.1; window chosen a priori from Thorpe et al., 1996) and exported for analysis in [software and version].
 </Methods>
 
 <Callout type="note" title="About the data">

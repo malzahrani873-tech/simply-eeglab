@@ -71,11 +71,17 @@ eeglabVersion: "2026.1"
 updated: 2026-10-28
 ---
 
-## Why this step matters
+## The idea
 
-ICLabel gives each ICA component a probability for seven classes. But it can be wrong, and the decision to remove a component is yours. In the ICLabel lesson you read three classes: eye, muscle, and brain. This lesson covers all seven, with the sign that tells each one apart.
+ICLabel gives each ICA component a probability for each of seven classes. But it can be wrong, and the decision to remove a component is yours.
 
-The official tutorial gives the order in which to look at a component:
+In [the ICLabel lesson](/en/lesson/iclabel/) you read three classes: eye, muscle, and brain. Here you meet all seven.
+
+So what sign tells each class apart in the scalp map, the spectrum, and the time course?
+
+## In what order do I read the component panels?
+
+The official tutorial gives this order:
 
 1. The scalp map.
 2. The time course of the component.
@@ -85,26 +91,44 @@ The official tutorial gives the order in which to look at a component:
 No single panel is enough. A component is an artifact when the panels agree.
 
 <Callout type="note">
-**Colour and sign do not matter.** In ICA the sign of a component is arbitrary: red and blue on the map can swap, and the time course can flip, without any change in meaning. Look at the shape, not the colour.
+**Color and sign do not matter.** In ICA the sign of a component is arbitrary: red and blue on the map can swap, and the time course can flip, without any change in meaning. Look at the shape, not the color.
 </Callout>
 
-## Before and after
+## What are the signs of each of the seven ICLabel classes?
 
-This lesson reads components without changing the data. The example below is solved, and its link opens the full ICA game: each example there shows the three panels, and after you answer it shows ICLabel's probabilities and why.
+| Class | Scalp map | Spectrum | Time course |
+|---|---|---|---|
+| Brain | Smooth and broad, like one source in the brain | Falls as frequency rises, often with a peak near 10 Hz | Ongoing oscillation without sharp peaks |
+| Eye | Far frontal. A blink: symmetric at the front. A sideways movement: opposite colors on the left and right sides of the front | Highest at low frequencies, then falls smoothly | Large isolated peaks for blinks, or steps for sideways movements |
+| Muscle | A small, focal spot at the edge, near the temples or neck | Rises or stays high from about 20 Hz upward | Fast, rough activity, often in bursts |
+| Heart | Broad, often a gradient across the whole head | No distinctive peak | Sharp, regular spikes, about one per second |
+| Line Noise | Any shape | A narrow, tall peak at 50 or 60 Hz, depending on the country of recording | Continuous fast oscillation |
+| Channel Noise | Concentrated on a single electrode | Often irregular | Jumps or drifts, like one bad channel |
+| Other | Mixed or scattered | Mixed | No clear pattern |
+
+**Which classes to remove:** on our path, components above 0.9 for Eye or Muscle, after review ([the ICLabel lesson](/en/lesson/iclabel/)). Heart, line noise, and channel noise are removed only after a clear review. Do not remove Other or Brain.
+
+<Callout type="expert">
+**Training your eye:** the official tutorial points to the ICLabel website, where you can practice labeling components and compare your answers with experts. The tutorial also mentions other automatic classifiers, such as MARA, FASTER, SASICA, and ADJUST.
+</Callout>
+
+## How do I practice reading components?
 
 <IcaGameTeaser />
 
-## Steps in the GUI
+The example here is solved, and its link opens the full ICA game. Each example there shows the three panels, and after you answer, it shows ICLabel's probabilities and the reasons behind them.
 
-Start with the main dataset loaded and holding ICA weights, as in the Starting point. If you continue from the ICLabel lesson, select `D1 main` from the <MenuPath>Datasets</MenuPath> menu, not `D1 main clean`, because the artifact components are still in it.
+## How do I open the component panels from the menus?
+
+Start with the main dataset open and holding ICA weights. If you don't have it, open "Script to reach this state" under "Starts from" at the top of the lesson. If you continue from the ICLabel lesson, select `D1 main` from the <MenuPath>Datasets</MenuPath> menu, not `D1 main clean`, because the artifact components are still in it.
 
 1. Open <MenuPath>Tools > Classify components using ICLabel > Label components</MenuPath>, keep <UiLabel>Default (recommended)</UiLabel>, and press <UiLabel>OK</UiLabel>. The maps appear with the most likely class above each one.
 2. Open <MenuPath>Tools > Classify components using ICLabel > View extended component properties</MenuPath> and choose a component. Its window shows the scalp map, the activity spectrum, the time course, and the probability of each class.
 3. To see time courses side by side, open <MenuPath>Plot > Component activations (scroll)</MenuPath>. Blinks and heartbeats are easiest to spot here.
-4. For each component, read the panels in the order above and compare them with the table in the next section.
-5. Write down the components you would remove and why. Do not remove anything in this lesson; removal is in the ICLabel lesson.
+4. For each component, read the panels in the order given earlier and compare them with the table of class signs.
+5. Write down the components you would remove and why. Do not remove anything in this lesson; removal is in [the ICLabel lesson](/en/lesson/iclabel/).
 
-## The equivalent script
+## How do I find the clearest example of each class with a script?
 
 ```matlab
 % Classify the components, then find the clearest example of each class
@@ -129,41 +153,21 @@ pop_viewprops(EEG, 0, examples);
 
 The loop prints, for each class, how many components have it as their most likely class, and the component with the highest probability for it. The last line opens the panels of the clearest eye, muscle, and brain components. If the highest probability for a class is below 50%, D1 most likely has no clear component of that class.
 
-In D1 expect several brain components and at least one eye component among the first. Heart and channel noise may be missing: not every dataset contains every class.
+In D1, expect several brain components and at least one eye component among the first components. Heart and channel noise may be missing: not every dataset contains every class.
 
-## Which value should I choose?
-
-The signs of the seven ICLabel classes:
-
-| Class | Scalp map | Spectrum | Time course |
-|---|---|---|---|
-| Brain | Smooth and broad, like one source in the brain | Falls as frequency rises, often with a peak near 10 Hz | Ongoing oscillation without sharp peaks |
-| Eye | Far frontal. A blink: symmetric at the front. A sideways movement: opposite colours on the left and right fronts | Highest at low frequencies, then falls smoothly | Large isolated peaks for blinks, or steps for sideways movements |
-| Muscle | A small, focal spot at the edge, near the temples or neck | Rises or stays high from about 20 Hz upward | Fast, rough activity, often in bursts |
-| Heart | Broad, often a gradient across the whole head | No distinctive peak | Sharp, regular spikes, about one per second |
-| Line Noise | Any shape | A narrow, tall peak at 50 or 60 Hz, depending on the country of recording | Continuous fast oscillation |
-| Channel Noise | Concentrated on a single electrode | Often irregular | Jumps or drifts, like one bad channel |
-| Other | Mixed or scattered | Mixed | No clear pattern |
-
-**Which classes to remove:** on our path, components above 0.9 for Eye or Muscle, after review (the ICLabel lesson). Heart, line noise, and channel noise are removed only after a clear review. Do not remove Other or Brain.
-
-<Callout type="expert">
-**Training your eye:** the official tutorial points to the ICLabel website, where you can practise labelling components and compare your answers with experts. The tutorial also mentions other automatic classifiers, such as MARA, FASTER, SASICA, and ADJUST.
-</Callout>
-
-## Common mistakes
-
-- **Judging by colour.** The sign is arbitrary in ICA. A blue blink map is the same as a red one.
-- **Judging from one panel.** A frontal map alone is not enough: a frontal brain component exists too. Its spectrum has a peak, not a smooth fall from the lowest frequencies.
-- **Treating ICLabel's probability as the truth.** It is an estimate from a trained classifier. A component at 55% Eye and 40% Brain needs your review before any decision.
-- **Expecting every class in every dataset.** Heart components often need an ECG artifact strong enough to reach the EEG, and line noise is often weak after a notch filter.
-- **Removing Other components.** Other means ICLabel could not decide. Removing it may remove brain activity with it.
-
-{/* "From experience" box: waiting for the project owner's story. Do not write it before it arrives. */}
-
-## How to check it worked
+## Test yourself: how do you check you read components correctly?
 
 1. **You can name the sign** of each of the seven classes: map, spectrum, and time course.
 2. **In D1** you found the clearest eye component and confirmed it with all three panels.
 3. **Your list is written down:** the components you would remove, with a reason for each, and no Brain or Other component on it.
 4. **In the ICA game**, you classified the examples and read the explanation after each answer.
+
+## What are the common mistakes in reading components?
+
+- **Judging by color.** The sign is arbitrary in ICA. A blue blink map is the same as a red one.
+- **Judging from one panel.** A frontal map alone is not enough: a frontal brain component exists too. Its spectrum has a peak, not a smooth fall from the lowest frequencies.
+- **Treating ICLabel's probability as the truth.** It is an estimate from a trained classifier. A component at 55% Eye and 40% Brain needs your review before any decision.
+- **Expecting every class in every dataset.** Heart components often need an ECG artifact strong enough to reach the EEG, and line noise is often weak after a notch filter.
+- **Removing Other components.** Other means ICLabel could not decide. Removing such a component may also remove brain activity.
+
+{/* "From experience" box: waiting for the project owner's story. Do not write it before it arrives. */}

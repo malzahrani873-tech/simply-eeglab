@@ -85,63 +85,23 @@ eeglabVersion: "2026.1"
 updated: 2026-10-28
 ---
 
-## لماذا هذه الخطوة مهمة؟
+## الفكرة
 
-ICA أزال أغلب الرمش، لكن بعض الـ epochs قد تبقى فيها مشكلة: حركة مفاجئة، أو قطب تحرّك لحظة، أو رمشة كبيرة لم يُزلها ICA كاملة. epoch واحد فيه قمة بمئات الميكروفولت يكفي ليشوّه المتوسط كله.
+ICA أزال أغلب الرمش، لكن بعض الـ epochs قد تبقى فيها مشكلة: حركة مفاجئة، أو قطب تحرّك للحظة، أو رمشة لم يُزلها ICA كاملة. ويكفي epoch واحد فيه قمة بمئات الميكروفولت لتشويه المتوسط كله.
 
-الحل البسيط: ارفض أي epoch تتجاوز فيه السعة حداً معيناً في أي قناة.
+الحل البسيط: ارفض أي epoch تتجاوز فيه السعة حداً معيناً في أي قناة. لكن انتبه: كل epoch ترفضه محاولة أقل في المتوسط، فتزيد فيه الضوضاء.
 
-لكن الرفض له ثمن: كل epoch ترفضه محاولة أقل في المتوسط، والمتوسط من محاولات أقل فيه ضوضاء أكثر. الهدف إذن ليس رفض كل ما يبدو غريباً، بل رفض ما يضر المتوسط فعلاً.
+فأي حد يرفض ما يضر المتوسط فعلاً، دون أن يرمي بيانات جيدة؟
 
-## قبل وبعد
+## جرّب: كيف يغيّر حد الرفض المتوسط؟
 
-جرّب حدود رفض مختلفة، ولاحظ عدد المرفوض وشكل المتوسط.
+اختر حداً للرفض من الأزرار، ولاحظ أمرين: كم epoch يُرفض، وكيف يتغيّر شكل المتوسط.
 
 <EpochRejectDemo />
 
-## الخطوات من الواجهة
+## كيف أرفض الـ epochs المتطرفة بسكربت؟
 
-ابدأ والداتاست `D1 epochs bl` مفتوحة، كما في "نقطة البداية".
-
-<Callout type="note" title="لماذا legacy؟">
-EEGLAB يسمّي هذه القوائم legacy، لأنه يفضّل تنظيف البيانات المستمرة قبل التقطيع (مثل `clean_rawdata`). لكن رفض الـ epochs بحد سعة بعد ICA ما زال خطوة شائعة في تحليل ERP، وهي التي يشرحها كتاب Luck.
-</Callout>
-
-**أولاً: علّم الـ epochs المتطرفة وارفضها بالسكربت**
-
-قائمة رفض الـ epochs مخفية افتراضياً في EEGLAB 2026.1، لذلك نبدأ بالسكربت.
-
-1. انسخ كتلة "السكربت المقابل" أدناه كاملة إلى نافذة الأوامر.
-2. تطبع نافذة الأوامر عدد المعلّم، مثل `Marked 1 of 80 epochs`. السكربت يحذف الـ epochs المعلّمة، ويسمّي الداتاست `D1 epochs clean`، ويحفظها باسم `D1_epochs_clean.set`، ويضيفها إلى قائمة <MenuPath>Datasets</MenuPath>. دروس المحطتين 6 و 7 تبدأ منها.
-3. إذا طُبع `Marked 0 of 80 epochs` فلا يوجد ما يُرفض. الداتاست الجديدة نسخة من السابقة بالاسم الجديد، وهذا صحيح.
-
-**ثانياً (اختياري): نفس الخطوة من القائمة**
-
-هذا طريق بديل للسكربت، لا خطوة إضافية. القائمة هي <MenuPath>Tools > Reject data epochs > Reject extreme values</MenuPath>، لكنها مخفية افتراضياً: تحت قائمة <MenuPath>Tools</MenuPath> ستجد سطراً رمادياً يقول <UiLabel>(Expand tool choices via "File > Preferences")</UiLabel>. لإظهارها:
-
-1. اختر `D1 epochs bl` من قائمة <MenuPath>Datasets</MenuPath>، واحفظها من <MenuPath>File > Save current dataset as</MenuPath> باسم `D1_epochs_bl.set`.
-2. افتح <MenuPath>File > Preferences</MenuPath>، وفعّل <UiLabel>If set, show all menu items from previous EEGLAB versions. You must restart EEGLAB for this to take effect.</UiLabel>، ثم <UiLabel>Ok</UiLabel>.
-3. أعد تشغيل EEGLAB: اكتب `eeglab` في نافذة الأوامر، ثم افتح الملف من <MenuPath>File > Load existing dataset</MenuPath>.
-
-هذا الخيار يبقى محفوظاً، ويغيّر شكل كل القوائم عن صور هذه الدروس، فأطفئه بعد هذه الخطوة. بعد إظهار القائمة:
-
-1. افتح <MenuPath>Tools > Reject data epochs > Reject extreme values</MenuPath>.
-2. تظهر نافذة <UiLabel>Rejection abnormal elec. values -- pop_eegthresh()</UiLabel>. اترك <UiLabel>Electrode (indices(s), Ex: 2 4 5):</UiLabel> على `1:32`، أي كل القنوات.
-3. في <UiLabel>Minimum rejection threshold(s) (uV, Ex:-20 -10 -15):</UiLabel> اكتب `-100` مكان الافتراضي `-10`.
-4. في <UiLabel>Maximum rejection threshold(s) (uV, Ex: 20 10 15):</UiLabel> اكتب `100` مكان الافتراضي `10`.
-5. اترك <UiLabel>Start time limit(s) (seconds, Ex -0.1 0.3):</UiLabel> و<UiLabel>End time limit(s) (seconds, Ex 0.2):</UiLabel> على قيمتيهما، أي كامل الـ epoch.
-6. فعّل <UiLabel>Reject marked trial(s)</UiLabel> واضغط <UiLabel>Ok</UiLabel>.
-7. تفتح نافذة عرض الـ epochs، والمعلّمة للرفض ملوّنة. راجعها بعينك: تستطيع الضغط على epoch لإلغاء علامته أو إضافتها.
-   - **إذا طبعت نافذة الأوامر `0/80 trials marked for rejection`** فلا يوجد ما يُرفض، والزر <UiLabel>REJECT</UiLabel> لن يفعل شيئاً. أغلق نافذة العرض، وافتح <MenuPath>Edit > Dataset info</MenuPath>، واكتب في <UiLabel>Dataset name</UiLabel> الاسم `D1 epochs clean`، ثم <UiLabel>Ok</UiLabel>، وانتقل للخطوة 10.
-8. اضغط <UiLabel>REJECT</UiLabel>، ثم أكّد بـ <UiLabel>YES</UiLabel>.
-9. في نافذة الداتاست الجديدة اكتب في <UiLabel>Name it:</UiLabel> الاسم `D1 epochs clean`، ثم <UiLabel>Ok</UiLabel>.
-10. احفظها من <MenuPath>File > Save current dataset as</MenuPath> باسم `D1_epochs_clean.set`. دروس المحطتين 6 و 7 تبدأ منها.
-
-<Callout type="note" title="الحدود الافتراضية">
-الحدود الافتراضية في النافذة (من -10 إلى 10 ميكروفولت) أمثلة للصيغة لا توصية. بهذه القيمة ستُرفض تقريباً كل الـ epochs.
-</Callout>
-
-## السكربت المقابل
+قائمة رفض الـ epochs مخفية افتراضياً في EEGLAB 2026.1، لذلك السكربت هو الطريق الأساسي هنا. ابدأ والداتاست `D1 epochs bl` مفتوحة (إن لم تكن عندك، فافتح "سكربت للوصول إلى هذه الحالة" أعلى الدرس)، ثم انسخ هذا السكربت كاملاً إلى نافذة الأوامر.
 
 ```matlab
 % Mark epochs where any channel goes beyond +/-100 uV anywhere in the epoch
@@ -162,36 +122,70 @@ EEG = pop_saveset(EEG, 'filename', 'D1_epochs_clean.set', 'filepath', pwd);
 eeglab redraw
 ```
 
-آخر رقم في `pop_eegthresh` يساوي `0`، أي "علّم فقط ولا ترفض". الرفض يتم في السطر التالي، حتى تطبع العدد قبله.
+تطبع نافذة الأوامر عدد الـ epochs المعلّمة، مثل `Marked 1 of 80 epochs`. ثم يحذف السكربت الـ epochs المعلّمة، ويسمّي الداتاست `D1 epochs clean`، ويحفظها باسم `D1_epochs_clean.set`، ويضيفها إلى قائمة <MenuPath>Datasets</MenuPath>. دروس المحطتين 6 و 7 تبدأ من هذا الملف.
 
-## أي قيمة أختار؟
+إذا طُبع `Marked 0 of 80 epochs` فلا يوجد ما يُرفض، والداتاست الجديدة نسخة من السابقة بالاسم الجديد. وهذا صحيح.
+
+لماذا سطران لا سطر واحد؟ آخر رقم في `pop_eegthresh` يساوي `0`، أي "علّم فقط ولا ترفض"، فيُطبع العدد أولاً، ثم يحدث الرفض في السطر التالي.
+
+## كيف أرفضها من القائمة بدل السكربت؟
+
+هذا طريق بديل عن السكربت، لا خطوة إضافية. القائمة هي <MenuPath>Tools > Reject data epochs > Reject extreme values</MenuPath>، لكنها مخفية افتراضياً: تحت قائمة <MenuPath>Tools</MenuPath> ستجد سطراً رمادياً يقول <UiLabel>(Expand tool choices via "File > Preferences")</UiLabel>.
+
+<Callout type="note" title="لماذا legacy؟">
+EEGLAB يسمّي هذه القوائم legacy، لأنه يفضّل تنظيف البيانات المستمرة قبل التقطيع (مثل `clean_rawdata`). لكن رفض الـ epochs بحد سعة بعد ICA ما زال خطوة شائعة في تحليل ERP، وهي التي يشرحها كتاب Luck.
+</Callout>
+
+لإظهار القائمة:
+
+1. اختر `D1 epochs bl` من قائمة <MenuPath>Datasets</MenuPath>، واحفظها من <MenuPath>File > Save current dataset as</MenuPath> باسم `D1_epochs_bl.set`.
+2. افتح <MenuPath>File > Preferences</MenuPath>، وفعّل <UiLabel>If set, show all menu items from previous EEGLAB versions. You must restart EEGLAB for this to take effect.</UiLabel>، ثم <UiLabel>Ok</UiLabel>.
+3. أعد تشغيل EEGLAB: اكتب `eeglab` في نافذة الأوامر، ثم افتح الملف من <MenuPath>File > Load existing dataset</MenuPath>.
+
+هذا الخيار يبقى محفوظاً حتى تلغيه، ويجعل القوائم كلها تختلف عن صور هذه الدروس. لذلك ألغِ تفعيله بعد أن تنتهي من الرفض.
+
+الآن ارفض الـ epochs من القائمة:
+
+1. افتح <MenuPath>Tools > Reject data epochs > Reject extreme values</MenuPath>.
+2. تظهر نافذة <UiLabel>Rejection abnormal elec. values -- pop_eegthresh()</UiLabel>. اترك <UiLabel>Electrode (indices(s), Ex: 2 4 5):</UiLabel> على `1:32`، أي كل القنوات.
+3. في <UiLabel>Minimum rejection threshold(s) (uV, Ex:-20 -10 -15):</UiLabel> اكتب `-100` مكان الافتراضي `-10`. الحدود الافتراضية في النافذة (من -10 إلى 10 ميكروفولت) أمثلة على الصيغة، لا توصية، وبها تُرفض كل الـ epochs تقريباً.
+4. في <UiLabel>Maximum rejection threshold(s) (uV, Ex: 20 10 15):</UiLabel> اكتب `100` مكان الافتراضي `10`.
+5. اترك <UiLabel>Start time limit(s) (seconds, Ex -0.1 0.3):</UiLabel> و<UiLabel>End time limit(s) (seconds, Ex 0.2):</UiLabel> على قيمتيهما، أي كامل الـ epoch.
+6. فعّل <UiLabel>Reject marked trial(s)</UiLabel> واضغط <UiLabel>Ok</UiLabel>.
+7. تفتح نافذة عرض الـ epochs، والمعلّمة للرفض ملوّنة. راجعها بعينك: تستطيع الضغط على epoch لإلغاء علامته أو إضافتها.
+   - **إذا طبعت نافذة الأوامر `0/80 trials marked for rejection`** فلا يوجد ما يُرفض، والزر <UiLabel>REJECT</UiLabel> لن يفعل شيئاً. أغلق نافذة العرض، وافتح <MenuPath>Edit > Dataset info</MenuPath>، واكتب في <UiLabel>Dataset name</UiLabel> الاسم `D1 epochs clean`، ثم <UiLabel>Ok</UiLabel>، وانتقل إلى الخطوة 10.
+8. اضغط <UiLabel>REJECT</UiLabel>، ثم أكّد بـ <UiLabel>YES</UiLabel>.
+9. في نافذة الداتاست الجديدة اكتب في <UiLabel>Name it:</UiLabel> الاسم `D1 epochs clean`، ثم <UiLabel>Ok</UiLabel>.
+10. احفظها من <MenuPath>File > Save current dataset as</MenuPath> باسم `D1_epochs_clean.set`. دروس المحطتين 6 و 7 تبدأ منها.
+
+## أي حد سعة أختار؟
 
 | الإعداد | القيمة | لماذا |
 |---|---|---|
 | حد السعة بعد تنظيف ICA | ±100 ميكروفولت | قاعدة بداية شائعة. النشاط الدماغي في EEG عادة عشرات الميكروفولت، فما فوق 100 غالباً آرتفاكت. |
 | حد صارم | ±50 ميكروفولت أو أقل | يرفض epochs نظيفة بسبب الضوضاء العادية والموجات البطيئة. جرّبه في التمرين أعلاه. |
 | القنوات | كل القنوات، ومنها EOG | قنوات EOG بعد ICA نظيفة من الرمش، فإذا بقيت فيها قمة كبيرة في epoch، فهذا epoch يستحق الرفض. |
-| النافذة الزمنية | كامل الـ epoch | أبسط اختيار. يمكن تضييقها للفترة التي تقيس فيها الـ ERP فقط. |
+| النافذة الزمنية | كامل الـ epoch | أبسط اختيار. يمكن تضييقها إلى الفترة التي تقيس فيها الـ ERP فقط. |
 | الحد الأدنى لعدد المحاولات | لا رقم عام | يعتمد على حجم مكوّن ERP. إذا رُفض أكثر من ربع المحاولات تقريباً، راجع البيانات قبل أن ترفع الحد. |
 
 **القاعدة:** نفس الحد لكل المشاركين ولكل الشروط، وتقرّره قبل رؤية النتائج. واذكر في ورقتك عدد المرفوض لكل شرط.
 
-## أخطاء شائعة
+## كيف أتأكد أن الرفض نجح؟
 
-- **حد صارم جداً.** يرمي بيانات جيدة، فيصير المتوسط من محاولات قليلة وأكثر ضوضاء. الحد الأمثل ليس أصغر رقم ممكن.
+- نافذة الأوامر تطبع عدد الـ epochs المعلّمة، مثل `1/80 trials marked for rejection`. المتوقع في D1 بعد تنظيف ICA عدد قليل، بين 0 و 3 تقريباً، ويختلف قليلاً بين تشغيل وآخر لأن نتيجة ICA تختلف.
+- <UiLabel>Epochs</UiLabel> في النافذة الرئيسية تساوي 80 ناقص عدد المرفوض.
+- `max(abs(EEG.data(:)))` أصغر من 100.
+- الملف `D1_epochs_clean.set` موجود في مجلد العمل.
+
+## ما الأخطاء الشائعة في رفض الـ epochs؟
+
+- **حد صارم جداً.** يرمي بيانات جيدة، فيُحسب المتوسط من محاولات قليلة ويصبح أكثر ضوضاء. الحد الأمثل ليس أصغر رقم ممكن.
 - **الرفض قبل تصحيح baseline.** epoch مزاح كله عن الصفر قد يتجاوز الحد بلا آرتفاكت. صحّح baseline أولاً، كما في مسارنا.
-- **الرفض بدل ICA.** لو رفضت كل epoch فيه رمشة دون ICA، قد تخسر جزءاً كبيراً من بياناتك، كما ترى في المكوّن التفاعلي بحد ±50. ICA يصلح الرمش، والرفض للمشاكل النادرة.
+- **الرفض بدل ICA.** لو رفضت كل epoch فيه رمشة دون ICA، قد تخسر جزءاً كبيراً من بياناتك، كما ترى في التمرين أعلاه بحد ±50. ICA يعالج الرمش، والرفض للمشاكل النادرة.
 - **عدد مختلف جداً بين الشروط.** إذا رُفض 40% من شرط و 5% من آخر، فالمقارنة بينهما غير عادلة. افحص العدد لكل شرط.
 - **نسيان الحفظ بعد الرفض.** في الواجهة، الرفض ينشئ داتاست جديدة في الذاكرة فقط. احفظها قبل إغلاق EEGLAB.
 
 {/* صندوق "من التجربة": بانتظار قصة من صاحب المشروع. لا يُكتب قبل وصولها. */}
-
-## كيف تتأكد أن الخطوة نجحت؟
-
-- نافذة الأوامر تطبع عدد المعلّم، مثل `1/80 trials marked for rejection`. المتوقع في D1 بعد تنظيف ICA عدد قليل، بين 0 و 3 تقريباً، ويختلف قليلاً بين تشغيل وآخر لأن نتيجة ICA تختلف.
-- <UiLabel>Epochs</UiLabel> في النافذة الرئيسية تساوي 80 ناقص عدد المرفوض.
-- `max(abs(EEG.data(:)))` أصغر من 100.
-- الملف `D1_epochs_clean.set` موجود في مجلد العمل.
 
 <Methods>
 Epochs in which the voltage at any channel exceeded ±100 µV were rejected (pop_eegthresh, EEGLAB 2026.1), leaving [N] of 80 epochs.

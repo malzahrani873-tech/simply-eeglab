@@ -65,25 +65,46 @@ eeglabVersion: "2026.1"
 updated: 2026-10-28
 ---
 
-## لماذا هذه الخطوة مهمة؟
+## الفكرة
 
-في الدرس السابق فحصت ملفات المشاركين وتأكدت أنها متشابهة. الآن تجمعها في STUDY واحدة.
+في [درس ما هو STUDY](/lesson/study-concepts/) فحصت ملفات المشاركين وتأكدت أنها متشابهة. الآن تجمعها في STUDY واحدة.
 
 الإنشاء نفسه سهل. الصعب أن تكتب لكل ملف ثلاث معلومات صحيحة: من المشارك، وما الشرط، وما المجموعة. كل التصاميم والرسوم والإحصاء في الدروس التالية تُبنى على هذه الكلمات. خطأ في حرف واحد يصنع مشاركاً جديداً أو شرطاً جديداً، ولا يحذرك EEGLAB.
 
-في D6 كل مشارك له ملفان: صور فيها حيوان (`animal`) وصور بلا حيوان (`distractor`). ونضيف الجنس كمجموعة (`F` أو `M`) لأننا سنستخدمه في درس التصميم.
+فكيف تنشئ STUDY لمشاركي D6، وتكتب لكل ملف المشارك والشرط والمجموعة بلا خطأ؟
 
-## قبل وبعد
+## كيف تتحول ملفات المشاركين إلى STUDY واحدة؟
 
 <Figure src="create-study/create-study-files.svg" alt="قبل: 28 ملف .set صغيراً في 14 مجلداً، على كل مجلد رمز مشارك من cba إلى wpa، وفي كل مجلد ملفان. بعد: مخطط جدول فيه ثلاثة صفوف للمشاركين cba و clm و ega ثم صف نقاط، وعموداه الشرطان animal و distractor، وعمود ضيق للمجموعة F أو M بلونين. سهم من الملفات إلى الجدول، وتحته ملف واحد اسمه animal_mine.study." caption="رسم توضيحي، بلا بيانات" source="original" />
 
-## الخطوات من الواجهة
+## ماذا في ملفات D6، ولماذا تُحوَّل قبل الإنشاء؟
 
-**عن البيانات (D6):** تجربة Go-nogo لـ 14 مشاركاً، 7 نساء و 7 رجال. نسخة EEGLAB الجاهزة فيها مجلد لكل مشارك باسم رمزه، وفيه داتاست لكل شرط: animal و distractor، مثل `sph/sphanimal.set` و `sph/sphdistractor.set`. بيانات كل داتاست في ملف `.dat` بجانبه (و `cba` وحده بياناته داخل `.set`). سكربت "نقطة البداية" يحوّل كل داتاست مرة واحدة إلى الصيغة الحالية، وبياناتها في ملف `.fdt`، ويحذف ملفات `.dat` القديمة. في الملفات الجاهزة <UiLabel>subject</UiLabel> و <UiLabel>condition</UiLabel> مملوءان، أما <UiLabel>group</UiLabel> و <UiLabel>session</UiLabel> ففارغان. في المجلد أيضاً STUDY جاهزة اسمها `animal.study`. نحن ننشئ نسختنا `animal_mine.study` بأيدينا لنتعلم، ونقارنها بالجاهزة في آخر الدرس.
+**عن البيانات (D6):** تجربة Go-nogo لـ 14 مشاركاً، 7 نساء و 7 رجال. نسخة EEGLAB الجاهزة فيها مجلد لكل مشارك باسم رمزه، وفيه داتاست لكل شرط: animal و distractor، مثل `sph/sphanimal.set` و `sph/sphdistractor.set`. بيانات كل داتاست في ملف `.dat` بجانبه (أما `cba` وحده فبياناته داخل `.set`).
+
+السكربت تحت «تبدأ من» أعلى الدرس يحوّل كل داتاست مرة واحدة إلى الصيغة الحالية، التي تحفظ البيانات في ملف `.fdt`، ويحذف ملفات `.dat` القديمة.
+
+في الملفات الجاهزة <UiLabel>subject</UiLabel> و <UiLabel>condition</UiLabel> مملوءان، أما <UiLabel>group</UiLabel> و <UiLabel>session</UiLabel> ففارغان. في المجلد أيضاً STUDY جاهزة اسمها `animal.study`. نحن ننشئ نسختنا `animal_mine.study` بأيدينا لنتعلم، ونقارنها بالجاهزة في آخر الدرس.
 
 <Callout type="warning">
-**لماذا نحوّل الملفات القديمة.** نحوّل الملفات القديمة لأن إعادة حفظها بصيغتها القديمة تفسدها في هذا الإصدار (EEGLAB 2026.1). التحويل يجري مرة واحدة ويأخذ بضع دقائق. إذا كنت أعدت حفظ هذه الملفات من قبل في EEGLAB 2026.1، فاحذف مجلد `animal_study` وشغّل السكربت مرة أخرى لتنزيل نسخة سليمة.
+**لماذا نحوّل الملفات القديمة؟** لأن إعادة حفظها بصيغتها القديمة تفسدها في هذا الإصدار (EEGLAB 2026.1). التحويل يجري مرة واحدة ويأخذ بضع دقائق. إذا كنت أعدت حفظ هذه الملفات من قبل في EEGLAB 2026.1، فاحذف مجلد `animal_study` وشغّل السكربت مرة أخرى لتنزيل نسخة سليمة.
 </Callout>
+
+## ماذا أكتب في خانات subject و condition و group؟
+
+في D6 الشرط هو نوع الصورة: فيها حيوان (`animal`) أو بلا حيوان (`distractor`). ونضيف الجنس مجموعةً (`F` أو `M`)، لأننا سنستخدمه في [درس التصميم](/lesson/study-design/).
+
+| الخانة | ماذا تكتب في D6 | القاعدة العامة |
+|---|---|---|
+| subject | رمز المشارك كما في اسم المجلد (`cba`) | رمز واحد ثابت للمشارك في كل ملفاته. لا تكتب الاسم الحقيقي. |
+| condition | `animal` أو `distractor` | كلمة واحدة لكل شرط، بنفس الكتابة في كل الملفات. |
+| group | `F` أو `M` | للمتغيرات التي تختلف بين المشاركين: الجنس، مريض أو سليم، فئة العمر. |
+| session | فارغة | رقم الجلسة الحقيقية فقط، ويبدأ من 1. EEGLAB يطبع تحذيراً إذا لم يبدأ من 1. |
+| run | فارغة | رقم الشوط إذا قسمت التسجيل إلى أشواط وأبقيتها ملفات منفصلة. |
+| task | فارغة | اسم المهمة إذا جمعت مهمتين مختلفتين في STUDY واحدة. |
+
+الفرق المهم: **الشرط يتغير داخل المشارك** (كل مشارك رأى الصورتين)، و**المجموعة تتغير بين المشاركين** (كل مشارك له جنس واحد). هذا يحدد نوع الاختبار الإحصائي لاحقاً، لذلك لا تضع الجنس في condition ولا الشرط في group.
+
+## كيف أُنشئ الـ STUDY من القوائم؟
 
 **أولاً: جهّز جدول الجنس**
 
@@ -102,21 +123,21 @@ updated: 2026-10-28
 
 **ثانياً: افتح نافذة الإنشاء**
 
-1. شغّل سكربت "نقطة البداية" إذا لم تكن شغّلته.
-2. افتح <MenuPath>File > Create study > Browse for datasets</MenuPath>. تفتح نافذة عنوانها <UiLabel>Create a new STUDY set -- pop_studywizard()</UiLabel>، وفيها جدول اسمه <UiLabel>Select datasets</UiLabel>. قبلها تظهر نافذة <UiLabel>Study warning</UiLabel> عن الذاكرة، تقترح الإلغاء وتغيير <MenuPath>File > Preferences</MenuPath>. اضغط <UiLabel>OK</UiLabel>: ملفات المشاركين الـ 14 تتسع في الذاكرة، وجملتها عن "tutorial study" تخص STUDY قديمة بلا بيانات.
+1. ابدأ وملفات D6 محوّلة في مجلدها. إن لم تكن عندك، فافتح «سكربت للوصول إلى هذه الحالة» تحت «تبدأ من» أعلى الدرس، وشغّله.
+2. افتح <MenuPath>File > Create study > Browse for datasets</MenuPath>. تظهر أولاً نافذة <UiLabel>Study warning</UiLabel> عن الذاكرة، تقترح الإلغاء وتغيير <MenuPath>File > Preferences</MenuPath>. اضغط <UiLabel>OK</UiLabel>، لأن الذاكرة تتسع لملفات المشاركين الـ 14. أما جملتها عن "tutorial study" فتخص STUDY قديمة بلا بيانات. بعدها تفتح نافذة عنوانها <UiLabel>Create a new STUDY set -- pop_studywizard()</UiLabel>، وفيها جدول اسمه <UiLabel>Select datasets</UiLabel>.
 3. أعمدة الجدول: <UiLabel>Raw dataset filename</UiLabel>، وزر <UiLabel>...</UiLabel> للتصفح، ثم <UiLabel>subject</UiLabel> و <UiLabel>session</UiLabel> و <UiLabel>run</UiLabel> و <UiLabel>condition</UiLabel> و <UiLabel>group</UiLabel> و <UiLabel>task</UiLabel>، وزر <UiLabel>CLear</UiLabel> لمسح السطر.
-4. في الصفحة الواحدة 10 أسطر. الزر <UiLabel>></UiLabel> أسفل الجدول ينقلك إلى الصفحة التالية. 28 ملفاً تحتاج 3 صفحات.
+4. في الصفحة الواحدة 10 أسطر، والزر <UiLabel>></UiLabel> أسفل الجدول ينقلك إلى الصفحة التالية. الملفات الـ 28 تحتاج إلى 3 صفحات.
 
 **ثالثاً: املأ سطراً لكل ملف**
 
-1. في السطر 1 اضغط <UiLabel>...</UiLabel> واختر `cba/cbaanimal.set`، ملف الشرط animal لأول مشارك.
+1. في السطر 1 اضغط <UiLabel>...</UiLabel> واختر `cba/cbaanimal.set`، ملف الشرط animal للمشارك الأول.
 2. يقرأ EEGLAB رأس الملف ويملأ الخانات من حقوله إن وُجدت. انظر إلى <UiLabel>subject</UiLabel> و <UiLabel>condition</UiLabel>:
    - إذا امتلأت، تأكد أنها تطابق اسم المجلد واسم الملف.
    - إذا بقيت فارغة، اكتب رمز المشارك (اسم المجلد، مثل `cba`) في <UiLabel>subject</UiLabel>، واكتب `animal` في <UiLabel>condition</UiLabel>.
 3. اكتب حرف الجنس من جدولك في <UiLabel>group</UiLabel>.
 4. اترك <UiLabel>session</UiLabel> و <UiLabel>run</UiLabel> كما هما. لا تكتب فيهما شيئاً لا يعني جلسة أو شوطاً حقيقياً.
 5. في السطر 2 اختر `cba/cbadistractor.set` من نفس المجلد، واكتب نفس الرمز ونفس الجنس، والشرط `distractor`.
-6. كرر لكل المشاركين. اضغط <UiLabel>Ok</UiLabel> بعد السطر 28.
+6. كرّر ذلك لكل المشاركين. اضغط <UiLabel>Ok</UiLabel> بعد السطر 28.
 
 <Callout type="note" title="اختصار الوقت">
 ملء 28 سطراً باليد يأخذ 10 دقائق تقريباً، وهو تمرين جيد على الدقة. إذا أردت توفير الوقت، املأ الصفحة الأولى بيدك لتفهم النافذة، ثم اضغط <UiLabel>Cancel</UiLabel> وشغّل السكربت أدناه، فهو يبني نفس الـ STUDY كاملة.
@@ -138,11 +159,11 @@ updated: 2026-10-28
 3. افتح <MenuPath>File > Clear study / Clear all</MenuPath> (يمسح الـ STUDY والداتاست من الذاكرة، لا من القرص)، ثم <MenuPath>File > Load existing study</MenuPath>. تظهر نافذة <UiLabel>Study warning</UiLabel> مرة أخرى، فاضغط <UiLabel>OK</UiLabel>، ثم اختر `animal_mine.study`.
 4. اقرأ النافذة الرئيسية: <UiLabel>STUDY set: Go-nogo animal (mine)</UiLabel>، و <UiLabel>Nb of subjects</UiLabel> قيمتها 14، و <UiLabel>Nb of conditions</UiLabel> قيمتها 2 per subject، و <UiLabel>Nb of groups</UiLabel> قيمتها 2.
 
-<Callout type="note" title="الخيار الثالث في القائمة">
-في القائمة خيار ثالث هو <MenuPath>File > Create study > Simple ERP STUDY</MenuPath>، وهو نافذة مختصرة لدراسات ERP بسيطة. ونستخدم <MenuPath>File > Create study > Using all loaded datasets</MenuPath> عندما تكون الملفات مفتوحة أصلاً في ALLEEG. الطريقة في هذا الدرس (Browse) هي الأوضح لأنها تعرض كل ملف بسطر.
+<Callout type="note" title="طريقتا الإنشاء الأخريان">
+في القائمة خياران آخران: <MenuPath>File > Create study > Simple ERP STUDY</MenuPath>، وهو نافذة مختصرة لدراسات ERP بسيطة، و <MenuPath>File > Create study > Using all loaded datasets</MenuPath>، ويُستخدم عندما تكون الملفات مفتوحة أصلاً في ALLEEG. طريقة Browse هي الأوضح للتعلّم، لأنها تعرض كل ملف في سطر.
 </Callout>
 
-## السكربت المقابل
+## كيف أبني نفس الـ STUDY بسكربت؟
 
 ```matlab
 % studyDir comes from the starting point script
@@ -185,37 +206,24 @@ fprintf('%d datasets, %d subjects, conditions: %s, groups: %s\n', numel(STUDY.da
 eeglab redraw;
 ```
 
-## أي قيمة أختار؟
+## كيف أتأكد أن الـ STUDY صحيحة؟
 
-| الخانة | ماذا تكتب في D6 | القاعدة العامة |
-|---|---|---|
-| subject | رمز المشارك كما في اسم المجلد (`cba`) | رمز واحد ثابت للمشارك في كل ملفاته. لا تكتب الاسم الحقيقي. |
-| condition | `animal` أو `distractor` | كلمة واحدة لكل شرط، بنفس الكتابة في كل الملفات. |
-| group | `F` أو `M` | للمتغيرات التي تختلف بين المشاركين: الجنس، مريض أو سليم، فئة العمر. |
-| session | فارغة | رقم الجلسة الحقيقية فقط، ويبدأ من 1. EEGLAB يطبع تحذيراً إذا لم يبدأ من 1. |
-| run | فارغة | رقم الشوط إذا قسمت التسجيل إلى أشواط وأبقيتها ملفات منفصلة. |
-| task | فارغة | اسم المهمة إذا جمعت مهمتين مختلفتين في STUDY واحدة. |
+- **النافذة الرئيسية** بعد فتح `animal_mine.study` تعرض <UiLabel>Nb of subjects</UiLabel> 14، و <UiLabel>Nb of conditions</UiLabel> 2 per subject، و <UiLabel>Nb of groups</UiLabel> 2.
+- **السكربت يطبع** `28 datasets, 14 subjects, conditions: animal distractor, groups: F M`.
+- **في مجلد البيانات** 28 ملفاً بامتداد `.fdt`، ملفان لكل مشارك، ولا ملف `.dat` بجانب ملفات `.set`.
+- **في نافذة** <MenuPath>Study > Edit study info</MenuPath> يظهر لكل مشارك سطران بنفس الرمز ونفس المجموعة، وبشرطين مختلفين.
+- **المقارنة مع الجاهزة:** افتح `animal.study` من نفس المجلد. يجب أن يتطابق عدد المشاركين والشروط مع نسختك. المجموعة موجودة في نسختك فقط. النسخة الجاهزة صُنعت بإصدار EEGLAB 6، ولا تصميم محفوظاً فيها، فينشئ EEGLAB التصميم 1 عند فتحها، وفيها مجموعات مكوّنات قديمة: المجموعة الأم `Cls 1` وثماني مجموعات من المؤلفين (`Cls 2` إلى `Cls 9`). نسختك بلا مجموعات، ودرس التجميع يشرح لماذا تُحذف المجموعات السابقة قبل التجميع.
 
-الفرق المهم: **الشرط يتغير داخل المشارك** (كل مشارك رأى الصورتين)، و**المجموعة تتغير بين المشاركين** (كل مشارك له جنس واحد). هذا يحدد نوع الاختبار الإحصائي لاحقاً، لذلك لا تضع الجنس في condition ولا الشرط في group.
+## أخطاء شائعة عند إنشاء STUDY
 
-## أخطاء شائعة
-
-- **رمز المشارك مختلف بين ملفيه.** `cba` في ملف و `CBA ` (بمسافة) في الآخر يصيران مشاركين، فيظهر <UiLabel>Nb of subjects</UiLabel> أكبر من 14 ويظهر <UiLabel>Nb of conditions</UiLabel> مع <UiLabel>(some missing)</UiLabel>.
+- **رمز المشارك مختلف بين ملفيه.** `cba` في ملف و `CBA ` (بمسافة) في الآخر يصيران مشاركَين مختلفين، فيظهر <UiLabel>Nb of subjects</UiLabel> أكبر من 14 ويظهر <UiLabel>Nb of conditions</UiLabel> مع <UiLabel>(some missing)</UiLabel>.
 - **المجموعة فارغة لبعض الملفات.** إذا كتبت المجموعة لملف واحد فاكتبها للكل. ملف بلا مجموعة يخرج من أي تصميم يستخدم المجموعة.
 - **الضغط على No عند سؤال إعادة الحفظ.** الـ STUDY تبقى صحيحة، لكن الملفات نفسها لا تعرف مجموعتها. إذا فتحتها لاحقاً بـ <MenuPath>Using all loaded datasets</MenuPath> تجد خانة group فارغة.
-- **إعادة حفظ ملفات ما زالت تستعمل `.dat`.** في EEGLAB 2026.1، إعادة حفظ داتاست بياناتها في ملف `.dat` قديم تكتب البيانات بترتيب خاطئ، ويزيد التلف مع كل حفظ. حوّل الملفات أولاً كما يفعل سكربت "نقطة البداية": بعده يكون في مجلد كل مشارك ملفا `.fdt` ولا ملف `.dat`. {/* حجم المجلد: يُقاس في التشغيل المجمّع */}
+- **إعادة حفظ ملفات ما زالت تستعمل `.dat`.** في EEGLAB 2026.1، إعادة حفظ داتاست بياناتها في ملف `.dat` قديم تكتب البيانات بترتيب خاطئ، ويزيد التلف مع كل حفظ. حوّل الملفات أولاً كما يفعل السكربت تحت «تبدأ من» أعلى الدرس: بعده يكون في مجلد كل مشارك ملفا `.fdt` ولا ملف `.dat`. {/* حجم المجلد: يُقاس في التشغيل المجمّع */}
 - **نقل المجلد بعد الحفظ.** ملف .study يحفظ مكان كل ملف. انقل المجلد كاملاً مع ملف .study، لا الملفات وحدها.
 - **فتح الـ STUDY الجاهزة والكتابة فوقها.** احفظ نسختك باسم جديد (`animal_mine.study`) حتى تبقى `animal.study` للمقارنة.
 
 {/* صندوق "من التجربة": بانتظار قصة من صاحب المشروع. لا يُكتب قبل وصولها. */}
-
-## كيف تتأكد أن الخطوة نجحت؟
-
-- **النافذة الرئيسية** بعد فتح `animal_mine.study` تعرض <UiLabel>Nb of subjects</UiLabel> 14، و <UiLabel>Nb of conditions</UiLabel> 2 per subject، و <UiLabel>Nb of groups</UiLabel> 2.
-- **السكربت يطبع** `28 datasets, 14 subjects, conditions: animal distractor, groups: F M`.
-- **في مجلد البيانات** 28 ملف `.fdt`، ملفان لكل مشارك، ولا ملف `.dat` بجانب ملفات `.set`.
-- **في نافذة** <MenuPath>Study > Edit study info</MenuPath> يظهر لكل مشارك سطران بنفس الرمز ونفس المجموعة وشرطين مختلفين.
-- **المقارنة مع الجاهزة:** افتح `animal.study` من نفس المجلد. يجب أن يتطابق عدد المشاركين والشروط مع نسختك. المجموعة موجودة في نسختك فقط. النسخة الجاهزة صُنعت بـ EEGLAB 6: لا تصميم محفوظاً فيها، فينشئ EEGLAB التصميم 1 عند فتحها، وفيها تسع مجموعات مكوّنات قديمة. نسختك بلا مجموعات، ودرس التجميع يشرح لماذا تُحذف المجموعات السابقة قبل التجميع.
 
 <Methods>
 A STUDY was created in EEGLAB 2026.1 (Delorme & Makeig, 2004) including [14] participants, with image category ([animal], [distractor]) as a within-subject condition and participant gender as a between-subject group.

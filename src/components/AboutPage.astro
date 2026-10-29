@@ -40,7 +40,6 @@ const x = (s: string) => iso(s, lang);
 
     <section aria-labelledby="a-nav" id="navigation">
       <h2 id="a-nav">{t(lang, 'about.nav.title')}</h2>
-      <p>{t(lang, 'tip.back')}</p>
       <p set:html={x(t(lang, 'about.nav.body'))} />
     </section>
 

@@ -35,25 +35,27 @@ eeglabVersion: "2026.1"
 updated: 2026-10-28
 ---
 
-## لماذا هذه الخطوة مهمة؟
+## الفكرة
 
-سكربت المشارك الواحد يعمل على D1. مشروعك الحقيقي فيه عشرون مشاركاً أو أكثر، بنفس الخطوات ونفس الإعدادات لكل واحد. تشغيل السكربت عشرين مرة وتغيير اسم الملف بيدك كل مرة بطيء، ويفتح باب الخطأ.
+[سكربت المشارك الواحد](/lesson/single-subject-script/) يعمل على D1. مشروعك الحقيقي فيه عشرون مشاركاً أو أكثر، بالخطوات والإعدادات نفسها. تشغيل السكربت عشرين مرة وتغيير اسم الملف بيدك بطيء، ويفتح باب الخطأ.
 
-الحل حلقة (<En>loop</En>): قائمة بأسماء المشاركين، ونفس الخطوات تُطبّق على كل اسم. هذا اسمه معالجة دفعات (<En>batch processing</En>).
+الحل حلقة (<En>loop</En>) تطبّق الخطوات نفسها على كل مشارك. هذا اسمه معالجة دفعات (<En>batch processing</En>). لكن في الحلقة البسيطة، إذا فشل مشارك واحد توقف كل شيء.
 
-لكن الحلقة البسيطة فيها مشكلة: إذا فشل المشارك السابع لسبب ما (ملف ناقص، قناة غريبة، ذاكرة)، يتوقف كل شيء، وتجد الصباح أن ستة فقط انتهوا. لهذا نلفّ كل مشارك بـ `try` و `catch`: إذا فشل، يُسجَّل الخطأ في ملف، وتكمل الحلقة للمشارك التالي.
+فكيف تكتب حلقة تعالج كل المشاركين، وتسجّل خطأ من يفشل، ثم تكمل إلى التالي؟
 
-في هذا الدرس نعالج ثلاثة مشاركين من D4 فقط (حوالي 700 ميجابايت للتنزيل). نفس السكربت يعمل على الثمانية عشر إذا نزّلتهم.
-
-## قبل وبعد
+## كيف تمرّ الحلقة على المشاركين؟
 
 <Figure src="batch-processing/batch-loop.svg" alt="حلقة: ثلاثة مشاركين sub-002 و sub-003 و sub-004 يدخلون واحداً بعد الآخر إلى الدالة process_subject التي تطبّق خطوات البايبلاين، ومخرجاتها في derivatives/eeglab مجلد لكل مشارك مع batch_summary.csv. سهم دائري يعود إلى المشارك التالي، وسهم أحمر من الدالة إلى logs/batch_log.txt عند الخطأ: سجّله وأكمل." source="original" />
 
-## الخطوات من الواجهة
+قد يفشل مشارك لسبب ما: ملف ناقص، أو قناة غريبة، أو نفاد الذاكرة. في الحلقة البسيطة يتوقف كل شيء عنده، فتتركها تعمل ليلاً وتجد في الصباح أن ستة مشاركين فقط انتهوا. لهذا نلفّ كل مشارك بـ `try` و `catch`: إذا فشل، يُسجَّل الخطأ في ملف (السهم الأحمر)، وتنتقل الحلقة إلى المشارك التالي.
+
+## كيف أبني حلقة المعالجة لمشاركي D4؟
+
+نعالج هنا ثلاثة مشاركين من D4 فقط (حوالي 700 ميجابايت للتنزيل). السكربت نفسه يعمل على الثمانية عشر إذا نزّلتهم.
 
 **أولاً: نزّل ثلاثة مشاركين من D4**
 
-1. أنشئ مجلداً اسمه `faces_project` وفيه مجلد `rawdata`، واجعل `faces_project` مجلد العمل في MATLAB (`cd`). شغّل كل سكربتات المحطة 9 من داخل هذا المجلد. درس تنظيم الملفات يشرح بقية المجلدات.
+1. أنشئ مجلداً اسمه `faces_project` وفيه مجلد `rawdata`، واجعل `faces_project` مجلد العمل في MATLAB (`cd`). شغّل كل سكربتات المحطة 9 من داخل هذا المجلد. [درس تنظيم الملفات](/lesson/file-organization/) يشرح بقية المجلدات.
 2. من صفحة ds002718 في OpenNeuro نزّل إلى `rawdata` الملفات العامة (`dataset_description.json` و `README` و `task-FaceRecognition_events.json`) ومجلدات `sub-002` و `sub-003` و `sub-004` كاملة. أو من سطر أوامر النظام، إذا كان عندك AWS CLI:
 
 ```text
@@ -62,19 +64,19 @@ aws s3 sync --no-sign-request s3://openneuro.org/ds002718 rawdata --exclude "sub
 
 **ثانياً: جرّب المسار على مشارك واحد من الواجهة**
 
-3. افتح <MenuPath>File > Import data > Using EEGLAB functions and plugins > From BIDS folder structure</MenuPath>، واختر مجلد `rawdata`. فعّل استيراد الأحداث ومواقع الأقطاب من ملفات BIDS، واجعل نوع الحدث من العمود `trial_type`. اضغط <UiLabel>Ok</UiLabel>. تُنشأ STUDY فيها المشاركون الثلاثة.
+3. افتح <MenuPath>File > Import data > Using EEGLAB functions and plugins > From BIDS folder structure</MenuPath>، واختر مجلد `rawdata`. فعّل استيراد الأحداث ومواقع الأقطاب من ملفات BIDS، واجعل نوع الحدث من العمود `trial_type`. في <UiLabel>Study output folder</UiLabel> غيّر المجلد إلى `faces_project/derivatives/eeglab`، لأن القيمة الافتراضية تضعه داخل `rawdata`، والسكربت ودرس الحوسبة على العنقود يبحثان عن الملفات في `faces_project/derivatives/eeglab`. اضغط <UiLabel>Ok</UiLabel>. تُنشأ STUDY فيها المشاركون الثلاثة.
 4. اختر مشاركاً واحداً من قائمة <MenuPath>Datasets</MenuPath>، وطبّق عليه الخطوات من الواجهة كما في المحطات 3 إلى 5، مع تغيير ثلاثة إعدادات فقط: الكهرباء في بريطانيا 50 هرتز لا 60، وقنوات العين `EEG061` و `EEG062`، وقنوات القلب `EEG063` و `EEG064` تُحذف.
-5. اكتب `eegh`. هذه السطور هي ما ستضعه داخل الحلقة.
+5. اكتب `eegh`، وقارن السطور بسكربت المشارك الواحد. ستجد الخطوات نفسها، والفرق في الإعدادات الثلاثة فقط. هذه الإعدادات هي ما ستضعه في `cfg` في أعلى الملف.
 
 **ثالثاً: حوّل المسار إلى حلقة**
 
 6. انسخ سكربت المشارك الواحد إلى ملف جديد `batch_d4.m`. انقل خطوات المعالجة إلى دالة في آخر الملف اسمها `process_subject`، تأخذ ملف المشارك والإعدادات، وتحفظ النتائج، وتعيد ملخصاً.
 7. في أعلى الملف: قائمة المشاركين، والإعدادات، وحلقة `for` تستدعي الدالة داخل `try`.
 8. في `catch`: اكتب اسم المشارك ورسالة الخطأ في `logs/batch_log.txt`، وسجّل الحالة `failed` في جدول الملخص.
-9. شغّل الملف. ICA على 72 قناة (70 EEG واثنتان EOG) وخمسين دقيقة تسجيل يأخذ وقتاً لكل مشارك، فاتركه يعمل. إذا كان مشاركوك كثيرين، انظر درس الحوسبة على HPC.
-10. بعد الانتهاء، افتح `batch_summary.csv`. كل صف مشارك: الحالة، والقنوات السيئة، والمكوّنات المحذوفة، والـ epochs الباقية.
+9. شغّل الملف. يأخذ ICA وقتاً طويلاً لكل مشارك، لأنه يعمل على 72 قناة (70 EEG واثنتان EOG) وخمسين دقيقة من التسجيل، فاتركه يعمل. إذا كان مشاركوك كثيرين، انظر [درس الحوسبة على HPC](/lesson/hpc/).
+10. بعد الانتهاء، افتح `batch_summary.csv`. كل صف لمشارك واحد: الحالة، والقنوات السيئة، والمكوّنات المحذوفة، والـ epochs الباقية.
 
-## السكربت المقابل
+## كيف يبدو سكربت الدفعات كاملاً؟
 
 ```matlab
 %% D4 batch pipeline: same steps for every subject, errors logged
@@ -216,34 +218,34 @@ res.nEpochs    = EEG.trials;
 end
 ```
 
-## أي قيمة أختار؟
+## ما الإعدادات التي تحتاجها D4، ولماذا؟
 
 | الإعداد | القيمة في الدرس | لماذا |
 |---|---|---|
-| تردد الكهرباء | 50 هرتز | D4 مسجّلة في كامبريدج ببريطانيا، و `PowerLineFrequency` في ملف `eeg.json` يساوي 50. بياناتك من السعودية 60. هذا الإعداد هو الفرق الأوضح بين D1 و D4. |
+| تردد الكهرباء | 50 هرتز | D4 مسجّلة في كامبريدج ببريطانيا، و `PowerLineFrequency` في ملف `eeg.json` يساوي 50. وفي البيانات المسجّلة في السعودية 60. هذا الإعداد هو الفرق الأوضح بين D1 و D4. |
 | قنوات العين والقلب | `EEG061` و `EEG062` للعين، و `EEG063` و `EEG064` للقلب | من ملف `channels.tsv` في D4. قنوات القلب تُحذف، وقنوات العين تبقى لتساعد ICA ولا تدخل المرجع. |
 | الأحداث للتقطيع | `famous_new` و `unfamiliar_new` و `scrambled_new` | العرض الأول لكل صورة، 150 لكل نوع في sub-002. التكرارات لها أسماء أخرى (`_second_early` و `_second_late`). |
 | الاستيراد | `pop_importbids` مرة واحدة قبل الحلقة | يقرأ الأحداث من `events.tsv` ومواقع الأقطاب من `electrodes.tsv`، كما في درس EEGLAB الرسمي لنفس البيانات. |
 | مكان الإعدادات | المتغيّر `cfg` في الأعلى | كل ما يختلف بين المشاريع في مكان واحد، والدالة نفسها لا تتغيّر. |
 | ما يحدث عند الخطأ | سطر في `batch_log.txt`، والحالة `failed`، ثم المشارك التالي | تعرف في الصباح من فشل ولماذا، وتعيد تشغيله وحده. |
 
-## أخطاء شائعة
+## كيف تتأكد أن كل المشاركين عولجوا؟
 
-- **حلقة بلا `try` و `catch`.** خطأ واحد في مشارك واحد يوقف المعالجة كلها، وتضيع ساعات الليل.
+- الجدول المطبوع في النهاية فيه ثلاثة صفوف، والحالة `ok` في كل صف.
+- `logs/batch_log.txt` غير موجود أو فارغ. إذا وُجد سطر، فاسم المشارك والسبب فيه.
+- في مجلد كل مشارك داخل `derivatives/eeglab` ملفان جديدان: `desc-clean` و `desc-epochs`.
+- عدد الـ epochs الباقية لكل مشارك قريب من 450 (150 لكل نوع)، بعد طرح المرفوضة وأي epoch يقطعه حدث `boundary` (5 في sub-002)، لأن `pop_epoch` يحذفها. إذا كان أقل بكثير لمشارك واحد، فراجعه.
+
+## أخطاء شائعة في معالجة الدفعات
+
+- **حلقة بلا `try` و `catch`.** خطأ واحد في مشارك واحد يوقف المعالجة كلها، فتضيع ليلة كاملة من التشغيل.
 - **`catch` صامت.** التقاط الخطأ بلا تسجيله أسوأ من التوقف: تظن أن كل المشاركين انتهوا. سجّل الاسم والرسالة دائماً، وانظر جدول الملخص.
-- **إعدادات مكتوبة داخل الدالة.** إذا كتبت 60 داخل `process_subject` ونسيتها، تعالج بيانات بريطانية بفلتر سعودي. كل إعداد في `cfg`.
+- **إعدادات مكتوبة داخل الدالة.** إذا كتبت 60 داخل `process_subject` ونسيتها، تعالج بيانات بريطانية بفلتر 60 هرتز. كل إعداد في `cfg`.
 - **نسيان الفرق بين مجموعات البيانات.** قنوات العين في D1 اسمها `EOG1` و `EOG2`، وفي D4 `EEG061` و `EEG062`. نسخ السكربت بلا مراجعة هذه الأسماء يجعل ICA والمرجع يعاملان قنوات العين كقنوات رأس.
 - **الثقة بالحلقة بلا فحص.** ملخص يقول `ok` لا يعني أن التنظيف جيد. افتح ملفاً أو اثنين من الواجهة، وانظر عدد المكوّنات المحذوفة والـ epochs الباقية لكل مشارك. القيمة الشاذة في الجدول هي المشارك الذي تراجعه أولاً.
 
 {/* صندوق "من التجربة": بانتظار قصة من صاحب المشروع. لا يُكتب قبل وصولها. */}
 
-## كيف تتأكد أن الخطوة نجحت؟
-
-- الجدول المطبوع في النهاية فيه ثلاثة صفوف، والحالة `ok` في كل صف.
-- `logs/batch_log.txt` غير موجود أو فارغ. إذا وُجد سطر، فاسم المشارك والسبب فيه.
-- في مجلد كل مشارك داخل `derivatives/eeglab` ملفان جديدان: `desc-clean` و `desc-epochs`.
-- عدد الـ epochs الباقية لكل مشارك قريب من 450 (150 لكل نوع)، ناقص المرفوضة وأي epoch يقطع حدث `boundary` (5 في sub-002)، لأن `pop_epoch` يحذفها. إذا كان أقل بكثير لمشارك واحد، فراجعه.
-
 <Methods>
-Data from [n] participants (ds002718; EEG-BIDS plugin 10.5, EEGLAB 2026.1) were high-pass filtered (passband edge 0.1 Hz; firfilt plugin 2.8), and line noise was attenuated with a band-stop filter (passband edges 48 and 52 Hz). Bad channels were identified with clean_rawdata (clean_rawdata plugin 2.11; flatline 5 s, channel correlation 0.8) and interpolated, then data were average-referenced, EOG excluded. Independent component analysis (extended Infomax; Lee et al., 1999) was computed on a 1 Hz high-passed copy, and components labelled Eye or Muscle with probability ≥ 0.9 (ICLabel 1.7; Pion-Tonachini et al., 2019) were removed. After low-pass filtering (passband edge 30 Hz), epochs from −1 to 2 s were baseline-corrected (−200 to 0 ms), and epochs beyond ±100 µV were rejected.
+Data from [n] participants (ds002718; EEG-BIDS plugin 10.5, EEGLAB 2026.1) were high-pass filtered (passband edge 0.1 Hz; firfilt plugin 2.8), and line noise was attenuated with a band-stop filter (passband edges 48 and 52 Hz). Bad channels were identified with clean_rawdata (clean_rawdata plugin 2.11; flatline 5 s, channel correlation 0.8) and interpolated, then data were average-referenced, EOG excluded. Independent component analysis (extended Infomax; Lee et al., 1999) was computed on a 1 Hz high-passed copy, and components labeled Eye or Muscle with probability ≥ 0.9 (ICLabel 1.7; Pion-Tonachini et al., 2019) were removed. After low-pass filtering (passband edge 30 Hz), epochs from −1 to 2 s were baseline-corrected (−200 to 0 ms), and epochs beyond ±100 µV were rejected.
 </Methods>

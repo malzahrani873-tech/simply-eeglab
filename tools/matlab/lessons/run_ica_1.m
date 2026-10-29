@@ -7,6 +7,8 @@ EEG_ica = pop_eegfiltnew(EEG_main, 'locutoff', 1);
 EEG_ica.setname = 'D1 ica1hz';
 
 % Expected rank: channels - interpolated channels - 1 (average reference)
+% badChans: channels you interpolated (set in the starting script; {} if none)
+if ~exist('badChans', 'var'), badChans = {}; end
 expectedRank = EEG_ica.nbchan - numel(badChans) - 1;
 fprintf('Expected data rank: %d\n', expectedRank);
 

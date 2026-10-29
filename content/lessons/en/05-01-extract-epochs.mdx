@@ -78,37 +78,39 @@ eeglabVersion: "2026.1"
 updated: 2026-10-28
 ---
 
-## Why this step matters
+## The idea
 
-Your data are now one continuous recording, about 4 minutes long. But an ERP question is about specific moments: what does the brain do right after the stimulus appears?
+Your data are one continuous recording of about 4 minutes. But an ERP question is about specific moments: what does the brain do right after the stimulus appears?
 
-So you cut a time window around each event, called an <En>epoch</En>. It starts a little before the event and ends a little after it. Every epoch starts at the same time relative to its event, so you can compare epochs and later average them.
+So you cut a short piece around each event, called an <En>epoch</En>: it starts a little before the event and ends a little after it. The event sits at time zero in every epoch, so you can compare epochs and later average them.
 
-In D1, a square (`square`) appeared on the screen 80 times, and the participant pressed a button after some of them (event `rt`). We will cut around the square only.
+So how do you cut around one event type, and with which time window?
 
-## Before and after
+## How do continuous data become epochs?
 
-<Figure src="extract-epochs/extract-epochs-concept.svg" alt="Channel Cz from D1 over 15 seconds with five square events every 3 seconds, each inside a window from 1 s before to 2 s after. After epoching the windows become stacked rows that all start at -1 s, with zero at the event. Total size: 32 channels × 384 time points × 80 epochs." source="D1" />
+<Figure src="extract-epochs/extract-epochs-concept.svg" alt="Channel Cz from D1 over 15 seconds with five square events every 3 seconds, each inside a window from 1 s before to 2 s after. After epoching, the windows become stacked rows that all start at -1 s, with zero at the event. Total size: 32 channels × 384 time points × 80 epochs." source="D1" />
 
-## Steps in the GUI
+D1 has two event types: the square appearing on the screen (`square`, 80 times), and a button press after some of them (`rt`). Our question is about the brain's response to the square, so we cut around the squares only.
 
-Start with the dataset `D1 main clean lp30` open, as in "Starting point".
+## How do I epoch around the square from the menus?
+
+Start with the dataset `D1 main clean lp30` open. If you don't have it, open "Script to reach this state" at the top of the lesson.
 
 1. Open <MenuPath>Tools > Extract epochs</MenuPath>.
 2. The <UiLabel>Extract data epochs - pop_epoch()</UiLabel> window opens. Press the <UiLabel>...</UiLabel> button next to <UiLabel>Time-locking event type(s) ([]=all)</UiLabel>.
 3. A list of event types appears: `rt` and `square`. Select `square` and press <UiLabel>Ok</UiLabel>. You can also type `square` in the box directly.
 4. In <UiLabel>Epoch limits [start, end] in seconds</UiLabel>, keep the default `-1 2`: from 1 second before the event to 2 seconds after it.
 5. In <UiLabel>Name for the new dataset</UiLabel>, type `D1 epochs`.
-6. Leave <UiLabel>Out-of-bounds EEG limits if any [min max]</UiLabel> empty. Rejecting bad epochs has its own lesson, two lessons from now.
+6. Leave <UiLabel>Out-of-bounds EEG limits if any [min max]</UiLabel> empty. Rejecting bad epochs has its own lesson: [Rejecting bad epochs](/en/lesson/epoch-rejection/).
 7. Press <UiLabel>Ok</UiLabel>. The new-dataset window opens with <UiLabel>Name it:</UiLabel> set to the name you typed. Leave <UiLabel>Overwrite it in memory (set=yes; unset=create a new dataset)</UiLabel> unchecked, and press <UiLabel>Ok</UiLabel>.
 
 <Callout type="note" title="The baseline window does not open">
-The official tutorial says a baseline window opens automatically after epoching. In the EEGLAB 2026.1 code it does not; baseline correction is a separate step under <MenuPath>Tools > Remove epoch baseline</MenuPath>, and it is the topic of the next lesson.
+The official tutorial says a baseline window opens automatically after epoching. In the EEGLAB 2026.1 code it does not; baseline correction is a separate step under <MenuPath>Tools > Remove epoch baseline</MenuPath>, and it is the topic of the next lesson: [Baseline correction](/en/lesson/baseline-correction/).
 
 Instead of the window, the command window shows a message that starts with `Warning: Do you also want to remove the single-trial ERP baseline`. It is only a reminder, not an error.
 </Callout>
 
-## The equivalent script
+## How do I epoch with a script?
 
 ```matlab
 % Cut 3-s epochs around every 'square' event: 1 s before to 2 s after
@@ -120,7 +122,7 @@ disp(size(EEG.data));
 fprintf('Epochs: %d, from %.3f s to %.3f s\n', EEG.trials, EEG.xmin, EEG.xmax);
 ```
 
-## Which value should I choose?
+## Which time window should I choose?
 
 | Goal | Window | Why |
 |---|---|---|
@@ -128,25 +130,29 @@ fprintf('Epochs: %d, from %.3f s to %.3f s\n', EEG.trials, EEG.xmin, EEG.xmax);
 | ERP plus time-frequency analysis | Longer, such as `-1 2` here | The official tutorial recommends long epochs so that low frequencies (below 10 Hz) can be analyzed. |
 | Our path on this site | `-1 2` | The EEGLAB and official-tutorial default, and long enough for both the ERP and the ERSP lessons. |
 
-**Rule of thumb:** keep the window shorter than the gap between two events when you can. In D1, squares are about 3 seconds apart and our window is 3 seconds, so no stretch of data appears in two epochs, except once (two squares 0.7 s apart at the start of the recording).
+**Rule of thumb:** keep the window shorter than the gap between two events when you can, so the same stretch of data does not end up in two epochs. In D1, squares are about 3 seconds apart and our window is 3 seconds, so this overlap happens only once: two squares 0.7 s apart at the start of the recording.
 
-**An experiment with more than one condition:** epoch around all conditions together, then pick one condition before averaging. EEGLAB has a menu for this, <MenuPath>Edit > Select epochs or events</MenuPath>, but in 2026.1 it stops on epoched data with an error. The `channel-erp-plot` lesson shows a short script that does the same. In D1 the two square positions are the two conditions, and we compare them in that lesson.
+## What if my experiment has more than one condition?
 
-## Common mistakes
+Epoch around all conditions together, then separate each condition before averaging. In D1 the two conditions are the two positions of the square on the screen.
 
-- **Epoching before filtering.** Filtering short epochs distorts their edges. Filter the continuous data first, then epoch, as we did in station 3.
-- **Leaving the event type empty.** An empty box means "all events", so you get 153 epochs that mix square onsets with button presses (from 154 events, because the last button press is too close to the end of the recording and its epoch is lost). Always type the event type.
+EEGLAB has a menu for this, <MenuPath>Edit > Select epochs or events</MenuPath>, but in 2026.1 it stops with an error on epoched data. So the "Plotting channel ERPs" lesson (coming soon) shows a short script that does the same job and compares the two positions.
+
+## How do I check that the epoching worked?
+
+- In the EEGLAB main window: <UiLabel>Epochs</UiLabel> is 80, <UiLabel>Frames per epoch</UiLabel> is 384, <UiLabel>Epoch start (sec)</UiLabel> is -1, and <UiLabel>Epoch end (sec)</UiLabel> is about 1.992.
+- In the command window: `size(EEG.data)` returns `32 384 80`, and the expected baseline reminder starting with `Warning:` appears.
+- Open <MenuPath>Plot > Channel data (scroll)</MenuPath>: the data now appear as separate epochs with dividing lines, and each epoch has a `square` event at zero.
+
+## What are the common mistakes when epoching?
+
+- **Epoching before filtering.** Filtering short epochs distorts their edges. Filter the continuous data first, then epoch, as we did in [the filtering lesson](/en/lesson/filtering/).
+- **Leaving the event type empty.** An empty box means "all events", so you get 153 epochs that mix square onsets with button presses. (There are 154 events, but the last button press is too close to the end of the recording and its epoch is lost.) Always enter the event type.
 - **A window that is too short.** If the window starts at the event itself, there is no pre-event period for baseline correction. If it ends too early, you cut off late ERP components.
 - **Expecting the number of events to equal the number of epochs.** Each epoch keeps every event that falls inside it, including the button press after the square. So `length(EEG.event)` is larger than `EEG.trials`.
 - **Epochs lost at the edges of the recording.** If an event is too close to the start or end of the recording, EEGLAB drops its epoch and prints a warning in the command window. In D1 the first square comes 1 second after the start, so no epoch is lost, but with no margin: a window starting at -1.1 s would lose the first epoch.
 
 {/* "From experience" box: waiting for the project owner's story. Do not write it before it arrives. */}
-
-## How to check it worked
-
-- In the EEGLAB main window: <UiLabel>Epochs</UiLabel> is 80, <UiLabel>Frames per epoch</UiLabel> is 384, <UiLabel>Epoch start (sec)</UiLabel> is -1, and <UiLabel>Epoch end (sec)</UiLabel> is about 1.992.
-- In the command window: `size(EEG.data)` returns `32 384 80`, and the baseline reminder starting with `Warning:` appears, which is expected.
-- Open <MenuPath>Plot > Channel data (scroll)</MenuPath>: the data now appear as separate epochs with dividing lines, and each epoch has a `square` event at zero.
 
 <Methods>
 Continuous data were segmented into epochs from -1 to 2 s relative to the onset of each square stimulus (pop_epoch, EEGLAB 2026.1), yielding [80] epochs.

@@ -1,35 +1,37 @@
 ---
 import { t } from '../../i18n';
 import { langOf } from '../../lib/lang';
-interface Props { mode?: 'cont' | 'erp'; pipeline?: string }
-const { mode = 'cont', pipeline } = Astro.props;
+interface Props { mode?: 'cont' | 'erp'; filters?: 'on' | 'off'; pipeline?: string }
+const { mode = 'cont', filters = 'on', pipeline } = Astro.props;
 const lang = langOf(Astro.url);
 const S = {
   ar: {
     title: 'جرّب الفلتر', kind: 'نوع الإشارة', cont: 'إشارة مستمرة', erp: 'تأثيره على ERP', hz: 'هرتز',
     hpEdge: 'حافة high-pass بالهرتز', lpEdge: 'حافة low-pass بالهرتز', view: 'العرض', time: 'الزمن', spec: 'الطيف',
     newSig: 'إشارة جديدة', line: 'تردد الكهرباء', line60: '60 هرتز (مثل السعودية وأمريكا)',
-    line50: '50 هرتز (مثل أوروبا وأغلب الدول العربية الأخرى)', before: 'قبل الفلتر', after: 'بعد الفلتر',
+    line50: '50 هرتز (مثل أوروبا وأغلب الدول العربية الأخرى)', before: 'قبل الفلتر', after: 'بعد الفلتر', sig: 'الإشارة',
     band: 'النطاق الانتقالي', does: 'ماذا يفعل EEGLAB بهذا الإعداد', none: 'لا يوجد فلتر مفعّل الآن. الإشارة كما سُجّلت.',
     edge: 'حافة النطاق المسموح (الرقم الذي تكتبه)', width: 'عرض النطاق الانتقالي', cut: 'القطع الفعلي (−6 dB)',
     order: 'رتبة الفلتر', note: 'فلتر FIR بنافذة Hamming، بلا إزاحة زمنية (zero-phase). كل فلتر في سطر مستقل.',
     erpLabel: 'موجة ERP مصطنعة. بعد الفلتر صارت قمة P3 {n}% من حجمها الأصلي.',
     timeLabel: 'عشر ثوانٍ من الإشارة قبل الفلتر وبعده.', specLabel: 'الطيف من 0 إلى 100 هرتز قبل الفلتر وبعده.',
+    timeRaw: 'عشر ثوانٍ من الإشارة كما سُجّلت.', specRaw: 'طيف الإشارة كما سُجّلت، من 0 إلى 100 هرتز.',
   },
   en: {
     title: 'Try the filter', kind: 'Signal', cont: 'Continuous signal', erp: 'Effect on an ERP', hz: 'Hz',
     hpEdge: 'High-pass edge in Hz', lpEdge: 'Low-pass edge in Hz', view: 'View', time: 'Time', spec: 'Spectrum',
     newSig: 'New signal', line: 'Mains frequency', line60: '60 Hz (e.g. Saudi Arabia, the US)',
-    line50: '50 Hz (e.g. Europe, most other Arab countries)', before: 'Before the filter', after: 'After the filter',
+    line50: '50 Hz (e.g. Europe, most other Arab countries)', before: 'Before the filter', after: 'After the filter', sig: 'The signal',
     band: 'Transition band', does: 'What EEGLAB does with this setting', none: 'No filter is on. The signal is as recorded.',
     edge: 'Passband edge (the number you type)', width: 'Transition bandwidth', cut: 'Actual cutoff (−6 dB)',
     order: 'Filter order', note: 'Hamming-windowed FIR, zero-phase (no time shift). One filter per line.',
     erpLabel: 'A simulated ERP. After the filter the P3 peak is {n}% of its original size.',
     timeLabel: 'Ten seconds of the signal before and after the filter.', specLabel: 'Spectrum from 0 to 100 Hz before and after the filter.',
+    timeRaw: 'Ten seconds of the signal as recorded.', specRaw: 'Spectrum of the signal as recorded, from 0 to 100 Hz.',
   },
 }[lang];
 ---
-<filter-demo class="fd" data-err={t(lang, 'interactive.error')} data-mode={mode} data-s={JSON.stringify(S)}>
+<filter-demo class="fd" data-err={t(lang, 'interactive.error')} data-mode={mode} data-filters={filters} data-s={JSON.stringify(S)}>
   <p class="fd-static">{t(lang, 'interactive.noJs')}</p>
   {pipeline && <p class="demo-pipe" data-keep>{t(lang, 'demo.pipelineNote', { value: pipeline })}</p>}
 </filter-demo>
@@ -51,6 +53,8 @@ const S = {
       try {
         this.s = JSON.parse(this.dataset.s!);
         this.mode = this.dataset.mode === 'erp' ? 'erp' : 'cont';
+        // filters="off" starts with both filters off; the learner can still switch them on.
+        if (this.dataset.filters === 'off') this.hpOn = this.lpOn = false;
         this.u = `fd${++uid}`;
         this.build();
         this.newSignal();
@@ -68,9 +72,9 @@ const S = {
       <div class="fdh"><b>${S.title}</b>
         <div class="seg" role="group" aria-label="${S.kind}"><button type="button" data-m="cont">${S.cont}</button><button type="button" data-m="erp">${S.erp}</button></div></div>
       <div class="ctl">
-        <div class="crow"><label class="lab" for="${u}-hp"><span class="sw"><input type="checkbox" role="switch" id="${u}-hp" checked><span></span></span><span lang="en">high-pass</span></label>
+        <div class="crow"><label class="lab" for="${u}-hp"><span class="sw"><input type="checkbox" role="switch" id="${u}-hp"${this.hpOn ? ' checked' : ''}><span></span></span><span lang="en">high-pass</span></label>
           ${opts('hp', [0.1, 0.5, 1, 2], S.hpEdge)}<span class="muted">${S.hz}</span></div>
-        <div class="crow lpRow"><label class="lab" for="${u}-lp"><span class="sw"><input type="checkbox" role="switch" id="${u}-lp" checked><span></span></span><span lang="en">low-pass</span></label>
+        <div class="crow lpRow"><label class="lab" for="${u}-lp"><span class="sw"><input type="checkbox" role="switch" id="${u}-lp"${this.lpOn ? ' checked' : ''}><span></span></span><span lang="en">low-pass</span></label>
           ${opts('lp', [20, 30, 40], S.lpEdge)}<span class="muted">${S.hz}</span></div>
         <div class="crow contOnly"><span class="lab">${S.view}</span><div class="seg" role="group" aria-label="${S.view}"><button type="button" data-view="time">${S.time}</button><button type="button" data-view="spec">${S.spec}</button></div>
           <button type="button" class="btn small sec newSig">${S.newSig}</button></div>
@@ -80,7 +84,7 @@ const S = {
         </fieldset>
       </div>
       <div class="cv" dir="ltr"><canvas role="img"></canvas></div>
-      <div class="lg"><span><i class="lg-raw"></i>${S.before}</span><span><i class="lg-fil"></i>${S.after}</span><span class="bandL"><i class="lg-band"></i>${S.band}</span></div>
+      <div class="lg"><span class="lgF"><i class="lg-raw"></i>${S.before}</span><span class="lgF"><i class="lg-fil"></i>${S.after}</span><span class="lgN"><i class="lg-fil"></i>${S.sig}</span><span class="bandL"><i class="lg-band"></i>${S.band}</span></div>
       <div class="eg"><h4>${S.does}</h4><div class="egb" aria-live="polite"></div></div>`;
       if (keep) this.append(keep);
       this.cv = this.querySelector('canvas')!;
@@ -118,8 +122,12 @@ const S = {
       this.querySelectorAll<HTMLElement>('.contOnly,.lpRow').forEach((r) => (r.style.display = cont ? '' : 'none'));
       this.querySelectorAll<HTMLElement>('[data-g="hp"] button').forEach((b) => b.setAttribute('aria-pressed', String(this.hpOn && +b.dataset.v! === this.hp)));
       this.querySelectorAll<HTMLElement>('[data-g="lp"] button').forEach((b) => b.setAttribute('aria-pressed', String(this.lpOn && +b.dataset.v! === this.lp)));
-      (this.querySelector('.bandL') as HTMLElement).style.display = cont && this.view === 'spec' ? '' : 'none';
       const specs = this.specs(); this.cur = specs;
+      // With no filter on there is only one signal to show, so there is no before/after.
+      const on = specs.length > 0;
+      this.querySelectorAll<HTMLElement>('.lgF').forEach((e) => (e.style.display = on ? '' : 'none'));
+      (this.querySelector('.lgN') as HTMLElement).style.display = on ? 'none' : '';
+      (this.querySelector('.bandL') as HTMLElement).style.display = on && cont && this.view === 'spec' ? '' : 'none';
       if (cont) { const r = applyFilters(this.sig.X, specs); this.y = r.y; this.delay = r.delay; }
       else this.erpCompute(specs);
       this.panel(specs); this.draw();
@@ -176,7 +184,8 @@ const S = {
         const ticks = [-200, 0, 200, 400, 600, 800, 1000]; const yt: number[] = []; for (let v = Math.ceil(lo / 5) * 5; v <= hi; v += 5) yt.push(v);
         axis(ticks.map((t) => (t + 200) / 1200), ticks.map(String), yt.map((v) => (hi - v) / (hi - lo)), yt.map(String), 'ms', 'µV');
         C.strokeStyle = col('--bs'); C.lineWidth = 1; C.beginPath(); C.moveTo(pad.l, ys(0)); C.lineTo(pad.l + pw, ys(0)); C.moveTo(xs(50), pad.t); C.lineTo(xs(50), pad.t + ph); C.stroke();
-        C.setLineDash([5, 4]); line(b, n, xs, ys, col('--bs'), 1.6); C.setLineDash([]); line(y, n, xs, ys, col('--primary'), 2.2);
+        if (this.cur.length) { C.setLineDash([5, 4]); line(b, n, xs, ys, col('--bs'), 1.6); C.setLineDash([]); }
+        line(y, n, xs, ys, col('--primary'), 2.2);
         const pk = b.indexOf(Math.max(...b.slice(100))), r = y[pk] / b[pk];
         label = S.erpLabel.replace('{n}', String(Math.round(r * 100)));
       } else if (this.view === 'time') {
@@ -188,8 +197,8 @@ const S = {
         const xt = [0, 2, 4, 6, 8, 10];
         axis(xt.map((v) => v / 10), xt.map(String), yt.map((v) => (hi - v) / (hi - lo)), yt.map(String), 's', 'µV');
         const xs = (i: number) => pad.l + i / (n - 1) * pw, ys = (v: number) => pad.t + (hi - v) / (hi - lo) * ph;
-        line(raw, n, xs, ys, col('--bs'), 1); line(fil, n, xs, ys, col('--primary'), 1.4);
-        label = S.timeLabel;
+        if (this.cur.length) { line(raw, n, xs, ys, col('--bs'), 1); line(fil, n, xs, ys, col('--primary'), 1.4); label = S.timeLabel; }
+        else { line(raw, n, xs, ys, col('--primary'), 1.4); label = S.timeRaw; }
       } else {
         const P = this.Praw, NFw = 1024, kmax = Math.round(100 * NFw / FS);
         const Hm = new Float64Array(kmax + 1).fill(1);
@@ -203,8 +212,8 @@ const S = {
         C.globalAlpha = 1; C.fillStyle = col('--muted');
         const xt = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100], yt: number[] = []; for (let v = hi; v >= lo; v -= 20) yt.push(v);
         axis(xt.map((v) => v / 100), xt.map((v, i) => (i % 2 ? '' : String(v))), yt.map((v) => (hi - v) / (hi - lo)), yt.map(String), 'Hz', 'dB');
-        line(dbR, kmax + 1, xs, ys, col('--bs'), 1.2); line(dbF, kmax + 1, xs, ys, col('--primary'), 1.8);
-        label = S.specLabel;
+        if (this.cur.length) { line(dbR, kmax + 1, xs, ys, col('--bs'), 1.2); line(dbF, kmax + 1, xs, ys, col('--primary'), 1.8); label = S.specLabel; }
+        else { line(dbR, kmax + 1, xs, ys, col('--primary'), 1.8); label = S.specRaw; }
       }
       this.cv.setAttribute('aria-label', label);
     }

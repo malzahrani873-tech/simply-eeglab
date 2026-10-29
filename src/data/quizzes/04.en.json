@@ -31,7 +31,7 @@
       "answer": [
         "a"
       ],
-      "explanation": "ICA computes weights that unmix the channels into components, each with a scalp map and a time course, and removes no channel and no part of the recording. Removing a component is a decision you make after review, in the ICLabel lesson."
+      "explanation": "ICA computes weights that unmix the channels into components, each with a scalp map and a time course. It does not remove any channel or any part of the recording. Removing a component is a decision you make after review, in the ICLabel lesson."
     },
     {
       "id": "s04-q02",
@@ -68,7 +68,7 @@
         "d",
         "b"
       ],
-      "explanation": "ICA is computed on a 1 Hz copy because slow drift confuses it. Then the weights move to the main dataset that goes on to the ERP. Classification and review come next, and removal is always from the main dataset, not from the 1 Hz copy."
+      "explanation": "ICA is computed on a 1 Hz copy because slow drift confuses it. Then the weights are copied to the main dataset, which goes on to the ERP analysis. Classification and review come next, and removal is always from the main dataset, not from the 1 Hz copy."
     },
     {
       "id": "s04-q03",

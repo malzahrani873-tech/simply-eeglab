@@ -8,7 +8,7 @@ level: recommended
 status: approved
 objectives:
   - Export an ERP plot and a scalp map as vector files (PDF or SVG) at journal column width.
-  - Set the font, line widths, axes and labels so the figure stays readable at final size.
+  - Set the font, line widths, axes, and labels so the figure stays readable at final size.
   - Plot maps of two conditions on one symmetric color scale, and export the numbers behind the figure.
 prerequisites: [topoplot, channel-erp-plot]
 references:
@@ -85,24 +85,26 @@ eeglabVersion: "2026.1"
 updated: 2026-10-28
 ---
 
-## Why this step matters
+## The idea
 
-A figure you understand on your screen is not a figure ready for a paper. The journal shrinks it to about one column wide, small text becomes unreadable, and a screenshot turns blurry when zoomed.
+A figure you understand on screen is not ready for a paper. The journal shrinks it to about one column wide, small text becomes unreadable, and a screenshot turns blurry when zoomed.
 
-Honesty matters even more than looks. Two maps of two conditions drawn on different color scales suggest a difference that is not there, or hide one that is. Reviewers notice.
+Honesty matters even more than looks. Two maps of two conditions drawn on different color scales suggest a difference that is not there, or hide one that is, and journal reviewers notice.
 
-This lesson takes two figures from the previous lessons and prepares them for publication: a vector format, a fixed size, a readable font, one color scale, and a data file that backs up what the figure shows.
+So how do you export an ERP plot and scalp maps from EEGLAB in a format and size a journal accepts, with an honest color scale?
 
-## Before and after
+## How does a screenshot differ from an exported figure?
 
 <BeforeAfter>
 <Figure src="publication-figures/publication-before.png" alt="Pz plot for two conditions captured from the screen and shrunk: the text is unreadable, the lines are thin, the edges are jagged, and the vertical axis has no unit." caption="Before: a shrunk screen capture" source="D1" />
-<Figure src="publication-figures/publication-after.png" alt="The same plot exported with exportgraphics: white background, two lines in two colours and two styles (solid and dashed), the vertical axis labelled Potential (µV), and trial counts in the legend." caption="After: a vector file, shown here as an image" source="D1" />
+<Figure src="publication-figures/publication-after.png" alt="The same plot exported with exportgraphics: white background, two lines in two colors and two styles (solid and dashed), the vertical axis labeled Potential (µV), and trial counts in the legend." caption="After: a vector file, shown here as an image" source="D1" />
 </BeforeAfter>
 
-## Steps in the GUI
+Here you prepare two figures you know from [the scalp maps lesson](/en/lesson/topoplot/) and the "Plotting channel ERPs" lesson, and give each one a vector format, a fixed size, a readable font, one color scale, and a data file that backs up what it shows.
 
-Start with the `D1 epochs clean` dataset loaded, as in "Starting point". For the maps, use `D1 epochs clean scalp`, the 30-channel copy without EOG1 and EOG2. If it is not open, make it as in step 0 of the scalp maps lesson (<MenuPath>Edit > Select data</MenuPath>). The GUI is enough for maps of one dataset. Comparing two conditions in one figure needs the script, as in the channel ERP lesson.
+## How do I fix the scale and export maps and numbers from the menus?
+
+Start with the `D1 epochs clean` dataset loaded. If you don't have it, open "Script to reach this state" at the top of the lesson. For the maps, use `D1 epochs clean scalp`, the 30-channel copy without EOG1 and EOG2. If it is not open, make it as in step 0 of [the scalp maps lesson](/en/lesson/topoplot/) (<MenuPath>Edit > Select data</MenuPath>). The GUI is enough for maps of one dataset. Comparing two conditions in one figure needs the script, as in the "Plotting channel ERPs" lesson.
 
 **1. Find the scale limit**
 
@@ -120,10 +122,10 @@ Start with the `D1 epochs clean` dataset loaded, as in "Starting point". For the
 
 1. Open <MenuPath>File > Export > Data and ICA activity to text file</MenuPath>.
 2. In <UiLabel>Output file name</UiLabel>, enter `erp_all.txt`.
-3. Check <UiLabel>Export ERP average instead of trials:</UiLabel>, and leave <UiLabel>Transpose matrix (elec -> cols):</UiLabel>, <UiLabel>Export channel labels/component numbers:</UiLabel> and <UiLabel>Export time values:</UiLabel> checked as they are. Click <UiLabel>Ok</UiLabel>.
+3. Check <UiLabel>Export ERP average instead of trials:</UiLabel>, and leave <UiLabel>Transpose matrix (elec -> cols):</UiLabel>, <UiLabel>Export channel labels/component numbers:</UiLabel>, and <UiLabel>Export time values:</UiLabel> checked as they are. Click <UiLabel>Ok</UiLabel>.
 4. You get a text file: the first row holds channel names, the first column holds time in milliseconds, and each following row is one time point. Put it in the paper's supplementary material, or plot from it in another program.
 
-## The equivalent script
+## How do I export the waveform figure and both condition maps in a script?
 
 ```matlab
 EEG = pop_loadset('D1_epochs_clean.set', pwd);
@@ -177,11 +179,11 @@ pop_export(EEG_pos1, 'erp_pos1.txt', 'erp', 'on', 'transpose', 'on', 'elec', 'on
 pop_export(EEG_pos2, 'erp_pos2.txt', 'erp', 'on', 'transpose', 'on', 'elec', 'on', 'time', 'on', 'precision', 4);
 ```
 
-## Which value should I choose?
+## Which format, size, and font should I choose?
 
 | Setting | Value | Why |
 |---|---|---|
-| Format | PDF, SVG or EPS (vector) for waveforms, and PNG at 600 dpi for maps if the vector file is heavy | Vector files stay sharp at any zoom, and journals usually accept them. A scalp map holds thousands of colored polygons, so its vector file can get large. Never use JPEG, which adds noise around lines. |
+| Format | PDF, SVG, or EPS (vector) for waveforms, and PNG at 600 dpi for maps if the vector file is heavy | Vector files stay sharp at any zoom, and journals usually accept them. A scalp map holds thousands of colored polygons, so its vector file can get large. Never use JPEG, which adds noise around lines. |
 | Width | About 9 cm for one column, about 18 cm for two | Draw at the final size from the start instead of shrinking later. Check the journal's guide, as sizes differ slightly. |
 | Font size | 8 to 10 pt at final size | Below 7 pt is unreadable in print. Because you draw at final size, what you choose here is what the reader sees. |
 | Lines | 1 to 1.5 pt, with two different styles for two conditions | Line style (solid and dashed) separates the conditions even in black-and-white print, and for readers who have trouble telling colors apart. |
@@ -189,24 +191,24 @@ pop_export(EEG_pos2, 'erp_pos2.txt', 'erp', 'on', 'transpose', 'on', 'elec', 'on
 | Polarity | Positive up, and say so | Some labs plot negative up. Whatever you choose, the reader needs to see it on the axis or in the caption. |
 | `exportgraphics` | Needs MATLAB R2020a or later | On an older release, use `print(fig1, 'fig_pz_erp', '-dpdf', '-painters')`. |
 
-## Common mistakes
-
-- **Screenshots.** They have your screen's resolution and degrade in print. Always export the figure from MATLAB.
-- **Drawing large, then shrinking.** A 10-pt font on a 25-cm figure becomes 3.6 pt once shrunk to 9 cm. Set the size before you plot.
-- **One color scale per map.** If you plot each condition in its own window, EEGLAB picks each window's limits from its own data. Set `maplimits` to the same value in every window.
-- **EEGLAB's light blue background.** EEGLAB plot windows default to a very light blue. Make the background white on export, as the script does.
-- **An incomplete caption.** Under every ERP figure, state the channel, reference, filters, trials per condition and polarity. Without them the figure cannot be interpreted.
-- **Polishing the data.** Do not add smoothing or crop the axis to enlarge a difference. What you export must match the data file.
-
-{/* "From experience" box: waiting for a story from the project owner. Do not write it before it arrives. */}
-
-## How to check it worked
+## How do I check that the files are ready for the journal?
 
 - **Zoom the PDF to 400%**: waveforms and letters stay sharp, and you can select the axis text with the cursor.
 - **The page size** of `fig_pz_erp.pdf` is about 9 × 7 cm in the file properties.
-- **The two maps in `fig_maps_300_500.pdf`** have 30 electrode dots each, none below the eyes, are the same size and share one color bar whose limits match the number printed by the `Shared color scale` line.
+- **The two maps in `fig_maps_300_500.pdf`** each have 30 electrode dots, none below the eyes; they are the same size and share one color bar whose limits match the number printed by the `Shared color scale` line.
 - **`erp_pos1.txt`** has a header row, then 384 rows (one point every 7.8 ms from -1000 to 1992 ms), and 33 columns: time, then 32 channels.
 
 <Methods>
 Figures were exported as vector PDF files with MATLAB exportgraphics; scalp maps of both conditions (30 average-referenced scalp channels) share one symmetric color scale of ±[X] µV (topoplot, EEGLAB 2026.1).
 </Methods>
+
+## Which mistakes spoil a publication figure?
+
+- **Screenshots.** They have your screen's resolution and degrade in print. Always export the figure from MATLAB.
+- **Drawing large, then shrinking.** A 10-pt font on a 25-cm figure becomes 3.6 pt once shrunk to 9 cm. Set the size before you plot.
+- **One color scale per map.** If you plot each condition in its own window, EEGLAB picks each window's limits from its own data. Set `maplimits` to the same value in every window.
+- **EEGLAB's light blue background.** EEGLAB plot windows default to a very light blue. Make the background white on export, as the script does.
+- **An incomplete caption.** Under every ERP figure, state the channel, reference, filters, trials per condition, and polarity. Without them the figure cannot be interpreted.
+- **Polishing the data.** Do not add smoothing or crop the axis to enlarge a difference. What you export must match the data file.
+
+{/* "From experience" box: waiting for a story from the project owner. Do not write it before it arrives. */}

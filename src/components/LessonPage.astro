@@ -7,7 +7,6 @@ import { t, tn, type Lang } from '../i18n';
 import { url } from '../lib/url';
 import { roadmap, datasetByCode, lessons, nodeTitle, stationTitle, nextAvailable, type Lesson } from '../lib/site-data';
 import { site, isProduction } from '../site.config';
-import { LESSON_LAYOUT } from '../lesson-layout.mjs';
 import { components } from './lesson/index';
 
 interface Props { lang: Lang; entry: Lesson; slug: string }
@@ -24,9 +23,22 @@ const minutes = node.minutes;
 const { planned, available } = await nextAvailable(lang, slug);
 const idx = roadmap.nodes.findIndex((n: any) => n.id === slug);
 const prev = roadmap.nodes.slice(0, idx).reverse().find((n: any) => has(n.id));
-const refTypes = (r: any) => r.type ?? (/youtube\.com|youtu\.be/.test(r.url) ? 'video' : /eeglab\.org|sccn\.ucsd\.edu/.test(r.url) ? 'docs' : undefined);
+// What each source is, shown next to it: the frontmatter type, else guessed from the address, else "website".
+const REF_HOSTS: [RegExp, string][] = [
+  [/youtube\.com|youtu\.be/, 'video'], [/doi\.org|acns\.org/, 'paper'], [/libretexts\.org|mitpress/, 'book'],
+  [/github\.com/, 'code'], [/openneuro\.org|physionet\.org/, 'dataset'], [/matlabacademy/, 'course'],
+  [/eeglab\.org|eeglab\.ucsd\.edu|sccn\.ucsd\.edu|fieldtriptoolbox\.org|mne\.tools|mathworks\.com|readthedocs\.io/, 'docs'],
+];
+const refTypes = (r: any) => r.type ?? REF_HOSTS.find(([re]) => re.test(r.url))?.[1] ?? 'site';
+// Previous / next at the end of the lesson: arrows point the reading direction, and the next card says
+// when it opens a new station or when the planned next lesson is not written yet.
+const backIcon = lang === 'ar' ? 'chevEnd' : 'chevStart';
+const fwdIcon = lang === 'ar' ? 'chevStart' : 'chevEnd';
+const nextNode: any = available ? roadmap.byId.get(available) : null;
+const nextLabel = !available ? '' : available !== planned ? t(lang, 'lesson.next.skip')
+  : nextNode.station !== d.station ? t(lang, 'lesson.next.station', { n: nextNode.station }) : t(lang, 'lesson.next');
 const refLang = (r: any) => r.lang ?? 'en';
-const foldTitle = (id: string, fallback: string) => (LESSON_LAYOUT === 'questions' ? t(lang, `fold.${id}.title`) : fallback);
+const foldTitle = (id: string, _fallback: string) => t(lang, `fold.${id}.title`);
 // "تبدأ من: {file} ({dataset}) {applied}": the text before the first colon is bold, tokens become elements.
 const startTpl = t(lang, 'start.line', { file: '{file}', dataset: '{dataset}', applied: '{applied}' });
 const colon = startTpl.indexOf(':');
@@ -85,25 +97,22 @@ const jsonLd = {
             </div>
           )}
         </header>
-        <div class="backnote" hidden data-backnote data-pagefind-ignore>
-          <p>{t(lang, 'tip.back')}</p><button type="button" data-backnote-close aria-label={t(lang, 'common.close')}><Icon name="close" class="ico s20" /></button>
-        </div>
 
         <Content components={components} />
 
         <details class="fold" id="further">
-          <summary><Icon name="books" class="ico fi" /><span class="ft"><h2>{foldTitle('further', t(lang, 'section.further'))}</h2><span class="fh">{tn(lang, 'fold.further.hint', d.references.length)}</span></span><Icon name="down" class="ico s20 cv2" /></summary>
+          <summary><Icon name="books" class="ico fi" /><span class="ft"><h2>{foldTitle('further', t(lang, 'section.further'))}</h2></span><Icon name="down" class="ico s20 cv2" /></summary>
           <div class="fb"><ul class="refs">
             {d.references.map((r) => (
-              <li><a href={r.url} rel="noopener" target="_blank" lang={refLang(r)}>{r.title}</a>{refTypes(r) && <span class="rt">{t(lang, `ref.type.${refTypes(r)}`)}</span>}<span>{r.section}{r.duration && ` · ${r.duration}`}</span></li>
+              <li><a href={r.url} rel="noopener" target="_blank" lang={refLang(r)}>{r.title}</a><span class="rt">{t(lang, `ref.type.${refTypes(r)}`)}{r.duration && ` · ${r.duration}`}</span></li>
             ))}
           </ul><p class="ver">{t(lang, 'lesson.version', { version: d.eeglabVersion })} · {d.updated.toISOString().slice(0, 10)}</p></div>
         </details>
         <div class="print-copy" data-pagefind-ignore><h2>{t(lang, 'section.further')}</h2><ul>{d.references.map((r) => <li>{r.title}: {r.url} ({r.section})</li>)}</ul></div>
 
-        <nav class="pn" aria-label={t(lang, 'section.next')} data-pagefind-ignore>
-          {prev && <a class="pv" href={url(`lesson/${prev.id}/`, lang)}><small>{t(lang, 'lesson.prev')}</small><b><T s={nodeTitle(lang, prev.id)} lang={lang} /></b></a>}
-          {available && <a class="nx" id="next-lesson" href={url(`lesson/${available}/`, lang)}><small>{available === planned ? t(lang, 'lesson.next') : t(lang, 'lesson.next.soon', { title: '' }).replace(/[:：]?\s*$/, '')}</small><b><T s={nodeTitle(lang, available)} lang={lang} /></b></a>}
+        <nav class="pn" aria-label={t(lang, 'lesson.pn')} data-pagefind-ignore>
+          {prev && <a class="pv" href={url(`lesson/${prev.id}/`, lang)} rel="prev"><Icon name={backIcon} class="ico s20 pa" /><span><small>{t(lang, 'lesson.prev')}</small><b><T s={nodeTitle(lang, prev.id)} lang={lang} /></b><span class="pp">{t(lang, 'lesson.position', { station: prev.station, n: prev.order })}</span></span></a>}
+          {available && <a class="nx" id="next-lesson" href={url(`lesson/${available}/`, lang)} rel="next"><span><small>{nextLabel}</small><b><T s={nodeTitle(lang, available)} lang={lang} /></b><span class="pp">{t(lang, 'lesson.position', { station: nextNode.station, n: nextNode.order })}</span></span><Icon name={fwdIcon} class="ico s20 pa" /></a>}
         </nav>
 
         {helpItems.length > 0 && (

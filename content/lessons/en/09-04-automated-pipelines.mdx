@@ -43,17 +43,21 @@ eeglabVersion: "2026.1"
 updated: 2026-10-28
 ---
 
-## Why this step matters
+## The idea
 
-In stations 3 to 5 you built a preprocessing pipeline by hand: filtering, line noise, bad channels, reference, ICA, then epochs. Every lab repeats these steps, so several groups have packaged them into ready-made pipelines that run on all participants without your intervention.
+In stations 3 to 5 you built a preprocessing pipeline by hand. Several groups have packaged these steps into pipelines that run on all participants on their own.
 
-These pipelines save a lot of time, especially with large datasets. But each one makes dozens of decisions for you: which channel is bad, which component is an eye, which segment to delete. If you do not know these decisions, you cannot defend them in your paper or notice when they go wrong.
+They save a lot of time, but each makes dozens of decisions for you: which channel is bad, which component is an eye, which segment goes. If you do not know these decisions, you cannot defend them in your paper or notice when they go wrong.
 
-**A ready-made pipeline saves time, but it does not excuse you from understanding every step in it.**
+So which pipeline fits your data, and how do you check what it decided for you?
 
-That is why this lesson comes after you built the pipeline yourself. In it you compare the six common pipelines, then run one of them (PREP) on D1 and check its output the same way you would check any pipeline.
+## What does PREP change in the D1 spectrum?
 
-### Six pipelines in one table
+<Figure src="automated-pipelines/prep-spectra.png" alt="Two spectra side by side, 1 to 64 Hz. Left, raw data: an alpha peak at 10 Hz and a sharp peak at 60 Hz. Right, after PREP: the 60 Hz peak is still there but smaller, and the alpha peak keeps its shape." caption="Left: raw. Right: after PREP (PrepPipeline 0.57.0)" source="D1" />
+
+PREP is one of the ready-made pipelines, and you will run it on D1 in the steps below. This is what it does: the 60 Hz peak gets smaller but does not disappear, and the alpha peak at 10 Hz keeps its shape. In other words, the pipeline decided for you how far to reduce the noise, and you have to check that yourself.
+
+## Which ready-made pipelines are common, and who is each one for?
 
 All of them are separate tools, not bundled with EEGLAB. Versions are as they were when this lesson was written.
 
@@ -62,30 +66,20 @@ All of them are separate tools, not bundled with EEGLAB. Versions are as they we
 | PREP (PrepPipeline 0.57.0) | Any EEG, especially large datasets | The early stage only: line noise reduction, a robust average reference, bad channel detection and interpolation. It does not run ICA. | EEGLAB plugin: <MenuPath>Tools > Run PREP pipeline</MenuPath> |
 | HAPPE (v4) | Infant and child data, and recordings with few channels | A full pipeline up to clean epochs, with a quality table for each file | MATLAB scripts that use EEGLAB, run from the HAPPE folder |
 | MADE (v1.0) | Infant and child data | A full pipeline with automatic detection of bad channels and artifact components | One MATLAB script that you edit and run |
-| RELAX (2.0.1) | Adult data, for ERPs and oscillations | Cleans eye and muscle artifacts with several methods together (MWF, wICA and ICLabel) | EEGLAB plugin, needs other plugins its guide lists |
+| RELAX (2.0.1) | Adult data, for ERPs and oscillations | Cleans eye and muscle artifacts with several methods together (MWF, wICA and ICLabel) | EEGLAB plugin; needs other plugins listed in its guide |
 | BeMoBIL (2.0.0) | EEG during movement (mobile EEG) with motion data | Import, cleaning, AMICA and analysis with all parameters in one config file | EEGLAB plugin and scripts |
 | Automagic | Large datasets for users who do not want to program | Runs several steps (including PREP), then rates the quality of each file | Its own GUI from the <MenuPath>Automagic</MenuPath> menu in EEGLAB |
 
-Whatever pipeline you choose, check three things in its output before you continue:
-
-1. **The channels:** how many channels were removed or interpolated, and which ones? Compare them with what you see in <MenuPath>Plot > Channel data (scroll)</MenuPath>.
-2. **The spectrum:** compare the spectrum before and after. The line peak should become clearly smaller, and the rest of the spectrum should not collapse.
-3. **The report:** read the pipeline's report for each participant. A participant with too many removed channels or components needs a look, or exclusion.
-
-## Before and after
-
-<Figure src="automated-pipelines/prep-spectra.png" alt="Two spectra side by side, 1 to 64 Hz. Left, raw data: an alpha peak at 10 Hz and a sharp peak at 60 Hz. Right, after PREP: the 60 Hz peak is still there but smaller, and the alpha peak keeps its shape." caption="Left: raw. Right: after PREP (PrepPipeline 0.57.0)" source="D1" />
-
-## Steps in the GUI
+## How do I run PREP on D1 from the menus?
 
 **First: install PREP**
 
 1. Open <MenuPath>File > Manage EEGLAB extensions</MenuPath>, search for PrepPipeline and install it (the latest release when this lesson was written is 0.57.0). Restart `eeglab`, and the item <UiLabel>Run PREP pipeline</UiLabel> appears in the <MenuPath>Tools</MenuPath> menu.
 
-**Second: look at the data before**
+**Second: look at the data before PREP**
 
-2. Start from `D1 raw`, as in "Starting point". These are the data as downloaded, without filtering.
-3. Open <MenuPath>Plot > Channel spectra and maps</MenuPath> and keep the defaults. Note the sharp peak at 60 Hz, as in the line noise lesson.
+2. Start with `D1 raw` open. If you don't have it, open "Script to reach this state" under "Starts from" at the top of the lesson. These are the data as downloaded, without filtering.
+3. Open <MenuPath>Plot > Channel spectra and maps</MenuPath> and keep the defaults. Note the sharp peak at 60 Hz, as in [the line noise lesson](/en/lesson/line-noise/).
 
 **Third: run PREP**
 
@@ -98,11 +92,11 @@ Whatever pipeline you choose, check three things in its output before you contin
 
 8. Open the `.html` summary file in a browser. Look for the list of interpolated channels and the list of channels still noisy after the reference.
 9. Open <MenuPath>Plot > Channel spectra and maps</MenuPath> again on `D1 prep`. The 60 Hz peak is smaller but still there, clearly so in a few channels. PREP's line noise step reduces the peak; it does not remove it completely. If the remaining peak matters for your analysis, add the band-stop filter from the line noise lesson after PREP.
-10. Compare with your result in the bad channels lesson: there clean_rawdata did not remove any channel from D1. If PREP interpolated a channel, open <MenuPath>Plot > Channel data (scroll)</MenuPath> and look at it yourself before you accept the decision.
+10. Compare with your result in [the bad channels lesson](/en/lesson/bad-channels/): there clean_rawdata did not remove any channel from D1. If PREP interpolated a channel, open <MenuPath>Plot > Channel data (scroll)</MenuPath> and look at it yourself before you accept the decision.
 
-## The equivalent script
+## How do I run PREP from a script?
 
-Continues from "Starting point". PREP's own function `prepPipeline` is the clearest way to call it from a script, as in the example that ships with the plugin. The script does not write the report; it prints the results directly.
+This script continues from the state in "Starts from" at the top of the lesson. PREP's own function `prepPipeline` is the clearest way to call it from a script, as in the example that ships with the plugin. The script does not write the report; it prints the results directly.
 
 ```matlab
 % PREP is not bundled with EEGLAB: install it from the extension manager
@@ -150,33 +144,41 @@ EEG.filename = ''; EEG.filepath = ''; EEG.datfile = ''; EEG.saved = 'no';
 eeglab redraw;
 ```
 
-## Which value should I choose?
+## Which PREP settings does this lesson use, and why?
 
 | Setting | Value in this lesson | Why |
 |---|---|---|
 | Reference and evaluation channels | Scalp channels only | EOG channels carry large blinks. If they enter the reference or the bad channel tests, they distort both. |
-| Line frequencies | 60 | D1 was recorded with 60 Hz mains. For data recorded with 50 Hz mains, PREP's default is wrong: set `[50 100 150 200]` up to below Nyquist. |
-| Reference type | robust (the default) | PREP finds bad channels, computes the average reference without them, and repeats until the result stabilises. |
+| Line frequencies | 60 | D1 was recorded with 60 Hz mains. For data recorded with 50 Hz mains, PREP's default is wrong: type the multiples of 50 below Nyquist, such as `[50 100 150 200]`. |
+| Reference type | robust (the default) | PREP finds bad channels, computes the average reference without them, and repeats until the result stabilizes. |
 | Interpolation | post-reference (the default) | Bad channels are interpolated after the reference is computed and stay in the data, so the channel count does not change. |
 | Keep filtered | No (the default) | PREP high-passes a copy at 1 Hz for its tests only. The output stays unfiltered, so the filtering choice remains yours. |
 
-## Common mistakes
+## How do I verify what PREP, or any pipeline, decided?
+
+Whatever pipeline you choose, check three things in its output before you continue:
+
+1. **The channels:** how many channels were removed or interpolated, and which ones? Compare them with what you see in <MenuPath>Plot > Channel data (scroll)</MenuPath>.
+2. **The spectrum:** compare the spectrum before and after. The line peak should become clearly smaller, and the rest of the spectrum should not collapse.
+3. **The report:** read the pipeline's report for each participant. A participant with too many removed channels or components needs a look, or exclusion.
+
+For PREP on D1 specifically:
+
+- The command window prints `PREP version: PrepPipeline0.57.0`.
+- The list of interpolated channels is printed, even if empty. Compare it with what you found in the bad channels lesson.
+- The 60 Hz peak in `D1 prep` is clearly smaller than in the raw spectrum (about 11 dB above its neighbors instead of about 23 dB), and the alpha peak at 10 Hz keeps its shape.
+- The channel count of `D1 prep` is still 32.
+
+## Common mistakes with ready-made pipelines
 
 - **Trusting the pipeline without opening its report.** Every pipeline makes mistakes on some participants. Read the report for each participant, and look at the data of any participant with many removed channels.
 - **Leaving the line frequency at its default for 50 Hz data.** PREP computes multiples of 60 by default. In data recorded with 50 Hz mains, it works on the wrong frequency and leaves the real peak.
 - **Expecting PREP to remove the line peak completely.** In D1 the 60 Hz peak drops by about half in dB and stays visible. Look at the spectrum after PREP, and add a band-stop filter if you need the peak gone.
 - **Assuming PREP filtered the data.** The output of PREP is not high-passed. If you go straight to ICA or epochs, the slow drift is still there.
 - **Changing pipelines between participants.** Every participant in one study goes through the same pipeline with the same settings. If you change a setting, rerun everyone.
-- **Applying a pipeline outside its population.** HAPPE and MADE were designed for children, and BeMoBIL for movement. Their settings may not suit adult data recorded at rest, and the reverse.
+- **Applying a pipeline outside its population.** HAPPE and MADE were designed for children, and BeMoBIL for movement. Their settings may not suit adult data recorded at rest, and vice versa.
 
 {/* "From experience" box: waiting for the project owner's story. Do not write it before it arrives. */}
-
-## How to check it worked
-
-- The command window prints `PREP version: PrepPipeline0.57.0`.
-- The list of interpolated channels is printed, even if empty. Compare it with what you found in the bad channels lesson.
-- The 60 Hz peak in `D1 prep` is clearly smaller than in the raw spectrum (about 11 dB above its neighbours instead of about 23 dB), and the alpha peak at 10 Hz keeps its shape.
-- The channel count of `D1 prep` is still 32.
 
 <Methods>
 Line noise at 60 Hz was attenuated, and robust average referencing with bad channel detection and interpolation was performed, with the PREP pipeline (prepPipeline, PrepPipeline plugin [0.57.0], EEGLAB 2026.1), using the scalp channels as reference and evaluation channels; [n] channels were interpolated.

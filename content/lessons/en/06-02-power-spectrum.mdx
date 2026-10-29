@@ -76,21 +76,27 @@ eeglabVersion: "2026.1"
 updated: 2026-10-28
 ---
 
-## Why this step matters
+## The idea
 
-The ERP answers "what happens after the stimulus?". The power spectrum (<En>PSD</En>) answers a different question: which frequencies are in the signal, and how much <En>power</En> does each one have?
+The ERP answers "What happens after the stimulus?" The power spectrum (<En>PSD</En>) answers another question: which frequencies are in the signal, and how much <En>power</En> does each one have?
 
-The spectrum is a core analysis tool, in resting-state and sleep studies for example. It is also the fastest check of your data quality: a clear alpha peak means a healthy brain signal, and a narrow peak at 50 or 60 Hz means line noise.
+The spectrum is a core analysis tool, for example in resting-state and sleep studies. It is also the fastest data-quality check: a clear alpha peak means a healthy brain signal, and a narrow peak at 50 or 60 Hz means line noise. So how do you plot it in EEGLAB, and how do you read it?
 
-We compute it here on the continuous data after removing ICA components and before the 30 Hz <En>low-pass</En>, so the full spectrum up to 64 Hz is visible.
-
-## Before and after
+## How do I read a spectrum?
 
 <Figure src="power-spectrum/power-spectrum-spectopo-10hz.png" alt="Spectrum of all channels from 1 to 64 Hz with a map at 10 Hz: a peak near 10 Hz, an overall decline with frequency, and a narrow dip at 60 Hz from the line-noise filter." source="D1" />
 
-## Steps in the GUI
+Each line is one channel's spectrum. Read the figure in this order:
 
-Start with the dataset `D1 main clean` open, as in "Starting point". This is a continuous dataset, not epochs. The starting-point script reruns ICA, so it may take a few minutes, unless you use the shortcut line at its top.
+- **Alpha peak:** a clear rise near 10 Hz. The scalp map above it shows where it is strongest.
+- **1/f decline:** power falls gradually as frequency rises. This is the normal shape of every EEG signal.
+- **Narrow peaks or dips:** a narrow peak at 60 Hz in uncleaned data means line noise. In our data you will find the opposite: a narrow dip between 58 and 62 Hz, left by the line-noise filter.
+
+## How do I plot the spectrum from the menus?
+
+We compute the spectrum here on the continuous data after removing ICA components and before the 30 Hz <En>low-pass</En>, so the full spectrum up to 64 Hz is visible.
+
+Start with the dataset `D1 main clean` open; it is continuous, not epoched. If you don't have it, open "Script to reach this state" at the top of the lesson. That script reruns ICA, so it may take a few minutes unless you use the shortcut line at its top.
 
 1. Open <MenuPath>Plot > Channel spectra and maps</MenuPath>.
 2. The <UiLabel>Channel spectra and maps -- pop_spectopo()</UiLabel> window opens. Keep <UiLabel>Epoch time range to analyze [min_ms max_ms]:</UiLabel> at its value, that is, the whole recording.
@@ -98,17 +104,13 @@ Start with the dataset `D1 main clean` open, as in "Starting point". This is a c
 4. In <UiLabel>Frequencies to plot as scalp maps (Hz):</UiLabel>, type `10` instead of the default `6 10 22`.
 5. In <UiLabel>Plotting frequency range [lo_Hz hi_Hz]:</UiLabel>, type `1 64` instead of the default `2 25`. The default hides line noise and everything above 25 Hz.
 6. Keep <UiLabel>Spectral and scalp map options (see topoplot):</UiLabel> as it is, and press <UiLabel>Ok</UiLabel>.
-7. Read the figure in this order:
-   - **Alpha peak:** a clear rise near 10 Hz. The scalp map above it shows where it is strongest.
-   - **1/f decline:** power falls gradually as frequency rises. This is the normal shape of every EEG signal.
-   - **Narrow peaks or dips:** a narrow peak at 60 Hz in uncleaned data means line noise. In our data you will find the opposite: a narrow dip between 58 and 62 Hz, left by the line-noise filter.
-8. Click any line to see its channel name.
+7. Read the figure as shown above: the alpha peak, then the decline, then any narrow peak. Click any line to see its channel name.
 
 <Callout type="note" title="About the scalp map">
-The scalp map in this figure is drawn by <En>topoplot</En>. Its options and how to read it in detail are in the scalp maps lesson in station 7.
+The scalp map in this figure is drawn by <En>topoplot</En>. Its options, and how to read it in detail, are covered in [the scalp maps lesson](/en/lesson/topoplot/) in station 7.
 </Callout>
 
-## The equivalent script
+## How do I compute the spectrum and find the alpha peak in a script?
 
 ```matlab
 % Spectra of all channels from 1 to 64 Hz, with a scalp map at 10 Hz
@@ -131,27 +133,17 @@ fprintf('Alpha peak at Pz: %.0f Hz, %.1f dB\n', alphaFreqs(iPeak), peakPow);
 disp({EEG.chanlocs(order(1:5)).labels});
 ```
 
-## Which value should I choose?
+## Which range and which data should I use?
 
 | Setting | Value | Why |
 |---|---|---|
 | Plotting range | 1 to 64 Hz here (up to half the sampling rate) | The default 2 to 25 Hz hides line noise and muscle activity. To check quality, plot the full range. |
 | Scalp map frequencies | 10 Hz for alpha | You can add others, such as 6 for theta and 20 for beta, depending on your question. |
-| Percent of data | 100 | Lower values are faster, but on continuous data they use only the first part of the recording. D1 is small, so there is no need. |
+| Percent of data | 100 | Lower values are faster, but on continuous data they use only the first part of the recording, and on epoched data a random set of epochs. D1 is small, so you do not need to lower it. |
 | Window length | The default (1 second, 128 points) | Gives a frequency resolution of 1 Hz, enough to see the alpha peak. |
 | Which data | Continuous, clean, before the low-pass | The 30 Hz low-pass removes everything above 30 Hz, so you would not see the full spectrum. |
 
-## Common mistakes
-
-- **Judging the data from the default plotting range.** From 2 to 25 Hz you cannot see 50 or 60 Hz at all. Change the range.
-- **Reading the decline as a problem.** Power naturally falls with frequency (the 1/f decline). The problem is an unexpected narrow peak, or one channel whose spectrum is far from the others.
-- **Forgetting the vertical axis is logarithmic.** A 10 dB difference means 10 times more power, not 10 microvolts.
-- **Computing the spectrum on very short epochs.** Epochs shorter than the computation window lower the resolution. For an overall spectrum, continuous data are better.
-- **Assuming the line frequency.** It is 60 Hz in Saudi Arabia and the US, and 50 Hz in Europe and most other Arab countries. Look at the spectrum before you assume.
-
-{/* "From experience" box: waiting for the project owner's story. Do not write it before it arrives. */}
-
-## How to check it worked
+## How do I check that the spectrum is right?
 
 - `freqs(2) - freqs(1)` equals 1 Hz, and `size(spectra)` gives 32 channels by the number of frequencies.
 - The alpha peak at Pz is at roughly 9 to 11 Hz.
@@ -161,3 +153,13 @@ disp({EEG.chanlocs(order(1:5)).labels});
 <Methods>
 Power spectral density was estimated for each channel from the continuous ICA-cleaned data using Welch's method with 1-s Hamming windows and no overlap (pop_spectopo, EEGLAB 2026.1).
 </Methods>
+
+## Which mistakes are common when reading a spectrum?
+
+- **Judging the data from the default plotting range.** From 2 to 25 Hz you cannot see 50 or 60 Hz at all. Change the range.
+- **Reading the decline as a problem.** Power naturally falls with frequency (the 1/f decline). The problem is an unexpected narrow peak, or one channel whose spectrum is far from the others.
+- **Forgetting that the vertical axis is logarithmic.** A 10 dB difference means 10 times more power, not 10 microvolts.
+- **Computing the spectrum on very short epochs.** Epochs shorter than the computation window lower the resolution. For an overall spectrum, continuous data are better.
+- **Assuming the line frequency.** It is 60 Hz in Saudi Arabia and the US, and 50 Hz in Europe and most other Arab countries. Look at the spectrum before you assume.
+
+{/* "From experience" box: waiting for the project owner's story. Do not write it before it arrives. */}

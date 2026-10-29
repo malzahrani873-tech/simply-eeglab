@@ -2,6 +2,7 @@
 // Reads content/lessons/ and src/data/ only. Any error fails the build; warnings are printed.
 // Usage: node scripts/check-content.mjs
 import { readFileSync, readdirSync, existsSync } from 'node:fs';
+import { sectionsOfMarkdown, legacyTitle } from '../src/lib/lesson-sections.mjs';
 import { load as loadYaml } from 'js-yaml';
 import { loadRoadmap, loadDatasets } from '../src/lib/roadmap.mjs';
 
@@ -15,6 +16,7 @@ const errors = [];
 const warnings = [];
 const err = (file, msg) => errors.push(`${file}: ${msg}`);
 const warn = (file, msg) => warnings.push(`${file}: ${msg}`);
+const sectionCounts = new Map();
 
 const roadmap = loadRoadmap();
 const datasets = new Map(loadDatasets().map((d) => [d.code, d]));
@@ -151,11 +153,25 @@ for (const lang of ['ar', 'en']) {
       if (!where.includes(slugOf(file))) continue;
       for (const m of body.matchAll(new RegExp(`<${demo}\\b([^>]*)>`, 'g'))) if (!/\bpipeline="[^"]+"/.test(m[1])) err(file, `سطر ${lineOf(body, m[0])}: <${demo}> بلا pipeline، وافتراضيه يختلف عن مسار الدرس`);
     }
-    // The idea (first paragraph of "why") is shown whole; past 60 words it reads long (writing warning only).
-    const whyBody = body.split(/^## /m).find((x, i) => i === 1) ?? '';
-    const idea = whyBody.split('\n').slice(1).join('\n').trim().split(/\n\s*\n/)[0] ?? '';
-    const ideaWords = idea.replace(/<[^>]+>/g, ' ').trim().split(/\s+/).filter(Boolean).length;
-    if (ideaWords > 60) warn(file, `فقرة الفكرة ${ideaWords} كلمة (المستحسن 60 أو أقل)`);
+    // Sections (style_guide §2): only the ones the lesson needs. The first is the idea, shown open in full.
+    const secs = sectionsOfMarkdown(body);
+    const words = (x) => x.replace(/<[^>]+>|\{\/\*[\s\S]*?\*\/\}/g, ' ').trim().split(/\s+/).filter(Boolean).length;
+    const ideaWords = secs[0] ? words(secs[0].body) : 0;
+    if (ideaWords > 90) warn(file, `قسم الفكرة ${ideaWords} كلمة (يظهر كاملاً، المستحسن 90 أو أقل)`);
+    for (const x of secs) {
+      const lead = x.body.trim().split(/\n\s*\n/)[0] ?? '';
+      if (/^(لا توجد|لا يوجد|لا خطوات|لا قيمة|There (are|is) no|No (steps|value)s? )/.test(lead)) err(file, `قسم "${x.title}" يبدأ بأنه لا محتوى له: احذفه أو اكتب ما يحتاجه الطالب`);
+      const old = legacyTitle(x.title);
+      if (old?.kind === 'before-after' && !/<(BeforeAfter|FilterDemo|RerefDemo|EpochRejectDemo)\b/.test(x.body)) err(file, `قسم "${x.title}" بلا مقارنة قبل/بعد: اختر عنواناً يصف ما فيه`);
+    }
+    sectionCounts.set(`${lang}/${slugOf(file)}`, secs.map((x) => x.kind).join(' '));
+    // Links to other lessons: the right language, a real lesson, and published whenever this one is.
+    for (const m of body.matchAll(/\]\((\/en)?\/lesson\/([a-z0-9-]+)\/([#?][^)]*)?\)/g)) {
+      if ((m[1] === '/en') !== (lang === 'en')) err(file, `رابط ${m[0]} بلغة غير لغة الدرس`);
+      const target = lessons[lang].get(m[2]);
+      if (!target) err(file, `رابط لدرس غير موجود: ${m[2]}`);
+      else if (fm.status === 'approved' && target.fm.status !== 'approved') err(file, `رابط لدرس لم يُنشر بعد: ${m[2]} (اذكره بلا رابط)`);
+    }
     // Methods (§23.1)
     const methods = body.match(/<Methods>\s*([\s\S]*?)\s*<\/Methods>/)?.[1];
     if (methods) {
@@ -186,6 +202,8 @@ for (const [slug, ar] of lessons.ar) {
   const norm = (s) => s?.replace(/\s+/g, ' ').trim();
   const ma = norm(ar.body.match(/<Methods>([\s\S]*?)<\/Methods>/)?.[1]), me = norm(en.body.match(/<Methods>([\s\S]*?)<\/Methods>/)?.[1]);
   if (ma !== me) err(en.file, 'نص Methods يختلف بين اللغتين');
+  const na = sectionCounts.get(`ar/${slug}`), ne = sectionCounts.get(`en/${slug}`);
+  if (na !== ne) err(en.file, `أقسام الإنجليزية (${ne}) لا تطابق العربية (${na}): النسختان بنفس البنية`);
 }
 for (const [slug, en] of lessons.en) if (!lessons.ar.has(slug)) err(en.file, 'لا توجد نسخة عربية');
 

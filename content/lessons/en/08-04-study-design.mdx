@@ -94,25 +94,53 @@ eeglabVersion: "2026.1"
 updated: 2026-10-28
 ---
 
-## Why this step matters
+## The idea
 
 The STUDY knows each file's subject, condition and group. But it does not know your question. The design is the question written in EEGLAB's terms: which variables you compare, which of their values, and which participants.
 
 Every plot and every test in the next lessons works on the **current design**. If you pick the wrong design, EEGLAB plots and computes without an error, but for a question that is not yours.
 
-The design also decides the kind of test: do the values come from the same participants (paired) or from different participants (unpaired)? This changes the statistical result a lot.
+So how do you write your question as a design, and choose the current one?
 
-## Before and after
+## What does the 2×2 design look like in D6?
 
-<Figure src="study-design/study-design-2x2.svg" alt="A 2×2 grid. The columns animal and distractor are shaded in two colours, a within-subjects factor, with a double arrow between them labelled same participants: paired. The rows F and M are a between-subjects factor, separated by a dividing line labelled different participants: unpaired. Each cell holds small circles with participant codes: seven per row, and the same circles repeat in both columns." caption="Illustration, no data" source="original" />
+<Figure src="study-design/study-design-2x2.svg" alt="A 2×2 grid. The columns animal and distractor are shaded in two colors, a within-subjects factor, with a double arrow between them labeled same participants: paired. The rows F and M are a between-subjects factor, separated by a dividing line labeled different participants: unpaired. Each cell holds small circles with participant codes: seven per row, and the same circles repeat in both columns." caption="Illustration, no data" source="original" />
 
-## Steps in the GUI
+We use the same `animal_mine.study` from the creation lesson. Every participant saw both kinds of picture (animal and distractor), so picture type is **within subjects**. Each participant has one gender (7 women and 7 men), so gender is **between subjects**. Together: a 2×2 mixed design.
 
-**About the data (D6):** the same `animal_mine.study` from the creation lesson. Every participant saw both kinds of picture (animal and distractor), so picture type is **within subjects**. Each participant has one gender (7 women and 7 men), so gender is **between subjects**. Together: a 2×2 mixed design.
+## What is the difference between a within-subject and a between-subject variable?
+
+The kind of variable decides the kind of test: do the values come from the same participants (paired) or from different participants (unpaired)? This changes the statistical result a lot.
+
+| | Within subjects | Between subjects |
+|---|---|---|
+| Meaning | Each participant has every value | Each participant has one value |
+| In D6 | Picture type: animal and distractor | Gender: F and M |
+| Usually stored in | condition | group |
+| Test | paired: compares each participant with themselves, removing differences between people | unpaired: compares two groups of different people |
+| Statistical power | Higher for the same number | Lower, and needs more participants |
+
+You do not choose this yourself. EEGLAB decides paired or unpaired from the data: if every participant has every value, it is paired. The script prints the decision in the line `paired: on` or `paired: off`.
+
+## Which design fits my question?
+
+Each research question has a design that fits it. That is why the steps below create two designs, in addition to design 1, which EEGLAB creates by itself.
+
+| Your question | Design | Why |
+|---|---|---|
+| Does the ERP differ between animal pictures and the others? | 3, `image only` | A direct paired test on 14 participants, and a plot with two curves instead of four. The 2×2 design also computes the main effect of picture, but it is harder to read. |
+| Does the picture effect differ between women and men? | 2, `image x gender` | The interaction between the two variables needs both in one design. |
+| Does the ERP differ between women and men? | A design with group only | An unpaired test, 7 against 7. |
+
+<Callout type="warning">
+7 participants per group is a small number for a between-group comparison. We use gender here to learn the mixed design, not to conclude anything about gender. In your own research, set the number of participants before collecting data, based on the effect size you expect.
+</Callout>
+
+## How do I create the designs from the menus?
 
 **1. Look at the design EEGLAB created**
 
-1. Run the "Starting point" script if the STUDY is not open.
+1. Start with `animal_mine.study` open. If you don't have it, open "Script to reach this state" under "Starts from" at the top of the lesson, and run it.
 2. Open <MenuPath>Study > Select/Edit study design(s)</MenuPath>. The <UiLabel>Edit STUDY design -- pop_studydesign()</UiLabel> window opens.
 3. The <UiLabel>Design name</UiLabel> list holds one design, `STUDY.design 1`. EEGLAB created it by itself when the STUDY was created.
 4. The <UiLabel>Edit the independent variables for this design</UiLabel> part has two lines: `Categorical variable: condition - Values (animal - distractor)` and `Categorical variable: group - Values (F - M)`. EEGLAB puts every standard variable with more than one value into the first design.
@@ -137,10 +165,10 @@ The design also decides the kind of test: do the values come from the same parti
 3. Press <UiLabel>Ok</UiLabel>. The command window shows `Selecting STUDY design 2`, then `Resaving STUDY`.
 
 <Callout type="note">
-**If the STUDY came from BIDS** (the previous lesson), gender is in a field called `gender`, not in `group`. `gender` appears in the same <UiLabel>Select independent variable</UiLabel> list, and works the same way.
+**If the STUDY came from BIDS** (the lesson on creating a STUDY from BIDS), gender is in a field called `gender`, not in `group`. `gender` appears in the same <UiLabel>Select independent variable</UiLabel> list and works the same way.
 </Callout>
 
-## The matching script
+## How do I create the designs with a script?
 
 ```matlab
 % STUDY and ALLEEG come from the starting point script
@@ -173,48 +201,22 @@ fprintf('Current design: %d\n', STUDY.currentdesign);
 eeglab redraw;
 ```
 
-## Which value should I choose?
+## How do I check that the designs were saved correctly?
 
-**Within subjects or between subjects?**
+- **The <UiLabel>Design name</UiLabel> list** holds three designs: `STUDY.design 1`, `image x gender` and `image only`.
+- **The script prints** the two lines `condition   paired: on` and `group   paired: off` for design 2.
+- **The script prints** `Current design: 2`.
+- **After** <MenuPath>File > Clear study / Clear all</MenuPath> **and opening** `animal_mine.study` again, the three designs are still in the window.
 
-| | Within subjects | Between subjects |
-|---|---|---|
-| Meaning | Each participant has every value | Each participant has one value |
-| In D6 | Picture type: animal and distractor | Gender: F and M |
-| Usually stored in | condition | group |
-| Test | paired: compares each participant with themselves, removing differences between people | unpaired: compares two groups of different people |
-| Statistical power | Higher for the same number | Lower, and needs more participants |
-
-EEGLAB decides paired or unpaired by itself from the data: if every participant has every value, it is paired. The script prints the decision in the line `paired: on` or `paired: off`.
-
-**Which design for which question?**
-
-| Your question | Design | Why |
-|---|---|---|
-| Does the ERP differ between animal pictures and the others? | 3, `image only` | A direct paired test on 14 participants, and a plot with two curves instead of four. The 2×2 design also computes the main effect of picture, but it is harder to read. |
-| Does the picture effect differ between women and men? | 2, `image x gender` | The interaction between the two variables needs both in one design. |
-| Does the ERP differ between women and men? | A design with group only | unpaired, 7 against 7. |
-
-<Callout type="warning">
-7 participants per group is a small number for a between-group comparison. We use gender here to learn the mixed design, not to conclude anything about gender. In your own research, set the number of participants before collecting data, based on the effect size you expect.
-</Callout>
-
-## Common mistakes
+## Common mistakes with designs
 
 - **Forgetting to choose the current design.** Plots and statistics work on the design selected in the list at the last <UiLabel>Ok</UiLabel>. The script prints `Current design`.
 - **Putting a between-subject variable in condition.** If you type gender as a condition, EEGLAB treats it as within subjects. The `paired` line reveals this: gender must be `off`.
-- **One design for every question.** The 2×2 design answers the interaction, but the picture effect alone is simpler to read in a one-variable design: two curves instead of four, and a direct paired test.
+- **One design for every question.** The 2×2 design answers the interaction. The picture effect alone is simpler in a one-variable design, as the table in "Which design fits my question?" shows.
 - **Selecting too few values.** If you select only `animal` in <UiLabel>Select variable values</UiLabel>, there is nothing to compare. Make sure both values are selected.
-- **Thinking a new design needs a new precomputation.** Since EEGLAB 2019 trials are saved one by one, and the design selects them at plot time. Do not precompute again because of a new design.
+- **Thinking a new design needs a new precomputation.** Since EEGLAB 2019, trials are saved one by one, and the design selects them at plot time. So do not [precompute](/en/lesson/study-precompute/) again because of a new design.
 
 {/* "From experience" box: waiting for a story from the project owner. Not written before it arrives. */}
-
-## How do you know it worked?
-
-- **The <UiLabel>Design name</UiLabel> list** holds three designs: `STUDY.design 1`, `image x gender` and `image only`.
-- **The script prints** for design 2 the two lines `condition   paired: on` and `group   paired: off`.
-- **The script prints** `Current design: 2`.
-- **After** <MenuPath>File > Clear study / Clear all</MenuPath> **and opening** `animal_mine.study` again, the three designs are still in the window.
 
 <Methods>
 A 2 × 2 mixed design was defined in the STUDY, with image category (animal, distractor) as a within-subject factor and gender ([7] female, [7] male) as a between-subject factor (std_makedesign, EEGLAB 2026.1).

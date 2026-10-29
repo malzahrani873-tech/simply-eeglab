@@ -100,60 +100,68 @@ eeglabVersion: "2026.1"
 updated: 2026-10-28
 ---
 
-## Why this step matters
+## The idea
 
-To plot a group ERP, EEGLAB needs each participant's average in each condition. Computing it from the raw data every time you plot is slow, especially for spectra and ERSPs.
+To plot a group ERP, EEGLAB needs each participant's average in each condition. Computing it from the raw data every time you plot is slow, especially for [spectra](/en/lesson/power-spectrum/) and [ERSPs](/en/lesson/ersp-itc/).
 
 So the STUDY computes each measure once and saves it in a file next to each participant's files. After that, plotting and statistics read straight from these files.
 
-Two points make this step more important than it looks:
+So which measures do you compute, and with which options, so that every later result is right?
 
-- **What you choose here enters every result.** The baseline, interpolation and ICA component removal are applied at compute time. If you change your mind, you compute again.
-- **EEGLAB saves every trial separately, not only the average.** This lets you select trials later in the design, but it takes a lot of space with ERSPs.
+## Which files does precomputing write?
 
-## Before and after
+<Figure src="study-precompute/study-precompute-files.svg" alt="Before precomputing: participant sph's folder holds sphanimal.set and sphdistractor.set with their .fdt data files, and below them, faded, old EEGLAB 6 files such as sphanimal.daterp and sphanimal.icaerp, labeled old, not used. After: the same folder also holds three new shaded files: sph.daterp, sph.datspec and sph.dattimef, each with a bar as long as its size." caption="Illustration; sizes are estimates until measured" source="original" />
 
-<Figure src="study-precompute/study-precompute-files.svg" alt="Before precomputing: participant sph's folder holds sphanimal.set and sphdistractor.set with their .dat data files, and below them, faded, old EEGLAB 6 files such as sphanimal.daterp and sphanimal.icaerp, labelled old, not used. After: the same folder also holds three new shaded files: sph.daterp, sph.datspec and sph.dattimef, each with a bar as long as its size." caption="Illustration; sizes are estimates until measured" source="original" />
+Notice two things about these files:
 
-## Steps in the GUI
+- **Your choices are baked in.** The baseline, interpolation and ICA component removal are applied at compute time, so they enter every later result. If you change your mind, you compute again.
+- **They hold every trial separately, not only the average.** This lets the design select trials later, but it takes a lot of space with ERSPs.
 
-**About the data (D6):** the same `animal_mine.study` from the creation lesson, with design 2, `image x gender`, from the design lesson. The "Starting point" script rebuilds both if it cannot find them.
+## When do I remove ICA components?
+
+The <UiLabel>Remove ICA artifactual components pre-tagged in each dataset</UiLabel> option removes the components flagged as artifacts in each file at compute time, without changing the files themselves. It works only if the files have ICA weights and flags, which you checked in [the STUDY concepts lesson](/en/lesson/study-concepts/).
+
+If ICA weights exist without flags, run ICLabel on all files with the STUDY open: use <MenuPath>Tools > Classify components using ICLabel > Label components</MenuPath>, then <MenuPath>Tools > Classify components using ICLabel > Flag components as artifacts</MenuPath>. These are the same two steps as in [the ICLabel lesson](/en/lesson/iclabel/), and they apply to all selected files. Then tick the option and compute again.
+
+Do not tick it if the components were already removed from the data before the STUDY.
+
+## How do I precompute the measures from the menus?
+
+**About the data (D6):** the same `animal_mine.study` from the lesson on creating a STUDY, with design 2, `image x gender`, from [the design lesson](/en/lesson/study-design/).
 
 **1. Open the compute window**
 
-1. Run the "Starting point" script. The STUDY appears in the main window.
+1. Start with `animal_mine.study` open with design 2. If you don't have it, open "Script to reach this state" under "Starts from" at the top of the lesson, and run it; it rebuilds both if it cannot find them.
 2. Open <MenuPath>Study > Precompute channel measures</MenuPath>. The top of the window reads <UiLabel>Pre-compute channel measures for STUDY 'Go-nogo animal (mine)'</UiLabel>.
 
 **2. Data options (top part)**
 
-1. <UiLabel>Spherical interpolation of missing channels (performed after optional ICA removal below)</UiLabel>: keep it ticked; it is ticked by default in the window. If all files have the same channels, as you checked in the first lesson, it changes nothing.
-2. <UiLabel>Remove ICA artifactual components pre-tagged in each dataset</UiLabel>: leave it unticked for now. See "When do I remove ICA components?" below.
+1. <UiLabel>Spherical interpolation of missing channels (performed after optional ICA removal below)</UiLabel>: keep it ticked (it is ticked by default). If all files have the same channels, as you checked in [the STUDY concepts lesson](/en/lesson/study-concepts/), it changes nothing.
+2. <UiLabel>Remove ICA artifactual components pre-tagged in each dataset</UiLabel>: leave it unticked for now, for the reason in "When do I remove ICA components?" above.
 3. <UiLabel>Remove artifactual ICA cluster or clusters (hold shift key)</UiLabel>: leave it unticked. It needs clusters from the component clustering lesson.
 
 **3. Measures (bottom part)**
 
 1. Tick <UiLabel>ERPs</UiLabel>, then press the <UiLabel>...</UiLabel> button next to it. The <UiLabel>Select parameters for ERP</UiLabel> window opens.
-2. In <UiLabel>Baseline (min max) ("rmbase")</UiLabel> type the epoch start in ms, then 0. Take the start from the <UiLabel>Epoch start (sec)</UiLabel> value you noted in the first lesson and multiply it by 1000. In this copy the start is -1 sec, so type `-1000 0`. Press <UiLabel>Ok</UiLabel>.
+2. In <UiLabel>Baseline (min max) ("rmbase")</UiLabel> type the epoch start in ms, then 0. Take the start from the <UiLabel>Epoch start (sec)</UiLabel> value you noted in [the STUDY concepts lesson](/en/lesson/study-concepts/), and multiply it by 1000. In this copy the start is -1 sec, so type `-1000 0`. Press <UiLabel>Ok</UiLabel>.
 3. Tick <UiLabel>Power spectrum</UiLabel> and keep its default value `'specmode', 'fft', 'logtrials', 'off'`.
 4. **Do not tick** <UiLabel>ERSPs</UiLabel> and <UiLabel>ITCs</UiLabel> here. The window computes them at every channel, which takes a long time and a very large amount of space. With the default grid (100 frequencies and 200 time points) they take about 1.5 GB per participant. We compute them with the script on a lighter grid.
-5. Keep <UiLabel>Overwrite files on disk</UiLabel> ticked, so that an old file with different settings is not used. If files already exist, the window asks `WARNING: SOME DATAFILES ALREADY EXIST, OVERWRITE THEM?` and warns that another STUDY on the same files may be affected. Press <UiLabel>Yes</UiLabel>: the ready `animal.study` and `animal_mine.study` share the folders, and we work on our own copy.
+5. Keep <UiLabel>Overwrite files on disk</UiLabel> ticked, so that an old file with different settings is not used. If files already exist, the window asks `WARNING: SOME DATAFILES ALREADY EXIST, OVERWRITE THEM?` and warns that another STUDY on the same files may be affected. Press <UiLabel>Yes</UiLabel>. The ready `animal.study` and `animal_mine.study` do share the folders, but we work on our own copy only.
 6. Press <UiLabel>Ok</UiLabel>. The computation takes one to two minutes for the 14 participants, and progress lines appear in the command window.
 
 **4. ERSP and ITC with the script**
 
-Run the script below. In one call it recomputes ERPs and spectra with the same choices as the window, and adds ERSP and ITC at every channel with 20 frequencies from 3 to 30 Hz and 50 time points, instead of the default 100 frequencies and 200 time points. Why every channel and not only the two you need? In EEGLAB 2026.1, an ERSP file computed for some channels only cannot be read back: plotting stops with `Unrecognized field name "chan1"`, because the file names each channel by its number in the full list while the reader uses its place in the short list. A lighter grid at every channel avoids this and keeps the files small.
+Run the script below. In one call it recomputes ERPs and spectra with the same choices as the window, and adds ERSP and ITC at every channel on a lighter grid: 20 frequencies from 3 to 30 Hz and 50 time points, instead of the default 100 frequencies and 200 time points.
+
+Why every channel, and not only the two you need? Because in EEGLAB 2026.1 an ERSP file computed for some channels only cannot be read back: plotting stops with `Unrecognized field name "chan1"`. The file names each channel by its number in the full list, while the reader looks it up by its place in the short list. The lighter grid keeps the files for every channel small.
 
 **5. Look at the files**
 
 1. Open the first participant's folder (`cba`). It has three new files named with the participant code only, such as `cba.daterp`: `.daterp` (ERP), `.datspec` (spectrum) and `.dattimef` (the time-frequency decomposition of each trial). ERSP and ITC are both computed from `.dattimef` at plot time, so they have no separate file.
 2. The older files whose names include the condition, such as `cbaanimal.daterp`, are the EEGLAB 6 files from 2007. Their names differ from the new ones, so EEGLAB neither reads nor overwrites them: they stay unused. You can leave them or delete them.
-3. Notice there is one new file per participant, not one per .set file. EEGLAB puts the trials of both conditions in one file, and separates them at plot time according to the design.
+3. Notice that there is one new file per participant, not one per .set file. EEGLAB puts the trials of both conditions in one file, and separates them at plot time according to the design.
 
-<Callout type="note">
-**When do I remove ICA components?** The <UiLabel>Remove ICA artifactual components pre-tagged in each dataset</UiLabel> option removes the components flagged as artifacts in each file at compute time, without changing the files themselves. It works only if the files have ICA weights and flags, which you checked in the first lesson. If ICA weights exist without flags: with the STUDY open, use <MenuPath>Tools > Classify components using ICLabel > Label components</MenuPath>, then <MenuPath>Tools > Classify components using ICLabel > Flag components as artifacts</MenuPath>. They apply to all selected files. Then tick the option and compute again. Do not tick it if the components were already removed from the data before the STUDY.
-</Callout>
-
-## The matching script
+## How do I precompute the measures with a script?
 
 ```matlab
 % STUDY and ALLEEG come from the starting point script
@@ -175,7 +183,7 @@ end
 fprintf('Channel groups in the STUDY: %d\n', numel(STUDY.changrp));
 ```
 
-## Which value should I choose?
+## Which values should I choose for precomputing?
 
 | Option | In this lesson | General rule |
 |---|---|---|
@@ -188,26 +196,26 @@ fprintf('Channel groups in the STUDY: %d\n', numel(STUDY.changrp));
 | Recompute (`recompute`) | on | on whenever you change any option, otherwise EEGLAB reads the old files. |
 
 <Callout type="warning">
-**Disk space.** Because EEGLAB saves every trial, the `.dattimef` file is large: frequencies × time points × trials × channels. With the default settings (100 frequencies and 200 time points) and every channel it reaches about 1.5 GB per participant, about 21 GB for the 14 participants (an estimate from the file layout, measured on the run day). This is why we use a lighter grid: about 75 MB per participant, about 1 GB in all (an estimate, measured on the run day). The file organization lesson in station 9 explains where to keep these files and how to delete them safely.
+**Disk space.** Because EEGLAB saves every trial, the `.dattimef` file is large: frequencies × time points × trials × channels. With the default settings (100 frequencies and 200 time points) and every channel it reaches about 1.5 GB per participant, about 21 GB for the 14 participants (an estimate from the file layout, measured on the run day). This is why we use a lighter grid: about 75 MB per participant, about 1 GB in all (an estimate, measured on the run day). [The file organization lesson](/en/lesson/file-organization/) in station 9 explains where to keep these files and how to delete them safely.
 </Callout>
 
-## Common mistakes
+## How do I check that the precomputing worked?
+
+- **The first participant's folder** has three new files named with the code only, `cba.daterp`, `cba.datspec` and `cba.dattimef`, and no new `.datersp` or `.datitc`. The `cbaanimal.*` and `cbadistractor.*` files are the old ones.
+- **The script prints the size of each file.** Note the numbers to estimate the space all participants need (`.dattimef` about 75 MB, an estimate) {/* daterp and datspec sizes: measured in the combined run */}, because we used a light grid for ERSPs. With the default grid, `.dattimef` would be about 1.5 GB.
+- **The script prints** the number of channel groups, `Channel groups in the STUDY`, which equals the number of channels in the files.
+- **The command window** shows no red errors and no `IMPORTANT WARNING`.
+
+## Common mistakes when precomputing
 
 - **Changing an option without recomputing.** If you untick <UiLabel>Overwrite files on disk</UiLabel>, EEGLAB uses the existing files even if you computed them with another baseline.
-- **Computing ERSPs at every channel from the window.** The disk fills up and the computation takes a long time.
+- **Computing ERSPs from the window with its default grid.** The disk fills up and the computation takes a long time.
 - **Computing ERSPs at a few channels only.** The files are written, but plotting them stops with `Unrecognized field name "chan1"` in EEGLAB 2026.1. Compute at every channel with a lighter grid.
 - **Removing ICA components twice.** If you removed components from each file before the STUDY, do not tick the option here. What is still flagged may be a clean component.
 - **Taking the 2007 files for your results.** They were computed with settings you do not know, and EEGLAB does not read them. Use only the files named by participant code that you computed yourself.
 - **Moving the measure files (`.daterp` and the like) alone.** They belong to the participant's files. Move the whole folder.
 
 {/* "From experience" box: waiting for a story from the project owner. Not written before it arrives. */}
-
-## How do you know it worked?
-
-- **The first participant's folder** has three new files named with the code only, `cba.daterp`, `cba.datspec` and `cba.dattimef`, and no new `.datersp` or `.datitc`. The `cbaanimal.*` and `cbadistractor.*` files are the old ones.
-- **The script prints the size of each file.** The three are close, tens of MB each (`.dattimef` about 75 MB, an estimate) {/* daterp and datspec sizes: measured in the combined run */}, because we used a light grid for ERSPs. With the default grid, `.dattimef` would be about 1.5 GB.
-- **The script prints** the number of channel groups, `Channel groups in the STUDY`, which equals the number of channels in the files.
-- **The command window** shows no red errors and no `IMPORTANT WARNING`.
 
 <Methods>
 Channel ERPs and spectra were precomputed for each participant and condition (std_precomp), with baseline correction from [−1000] to 0 ms; with spherical interpolation of any missing channels enabled; event-related spectral perturbations were computed at every channel for [20] frequencies from [3] to [30] Hz.

@@ -89,7 +89,7 @@
       "answer": [
         "a"
       ],
-      "explanation": "SIFT fits a multivariate autoregressive model and computes directed connectivity measures over time and frequency from it. Read an arrow with care: it means the first improves the prediction of the second in the model, not that one region controls the other. First check that your data are enough for the number of parameters."
+      "explanation": "SIFT fits a multivariate autoregressive model and computes directed connectivity measures over time and frequency from it. Read an arrow with care: it means the first improves the prediction of the second in the model, not that one region controls the other. First check that you have enough data for the number of parameters."
     },
     {
       "id": "s10-q04",
@@ -120,7 +120,7 @@
         "b",
         "c"
       ],
-      "explanation": "Both tools were built for MEG and individual head models, FieldTrip is known for cluster statistics, and MNE-Python connects to scientific Python libraries. Cleaning data with ICA and learning through the GUI is what EEGLAB does best, so there is no need to move. BIDS moves data between all three tools."
+      "explanation": "Both tools were built for MEG and individual head models; FieldTrip is known for cluster statistics, and MNE-Python connects to scientific Python libraries. Cleaning data with ICA and learning through the GUI is what EEGLAB does best, so there is no need to move. BIDS moves data between all three tools."
     }
   ]
 }

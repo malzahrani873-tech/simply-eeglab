@@ -136,38 +136,46 @@ eeglabVersion: "2026.1"
 updated: 2026-10-29
 ---
 
-## لماذا هذه الخطوة مهمة؟
+## الفكرة
 
-في درس الإحصاء أخذ EEGLAB أولاً متوسط محاولات كل مشارك، ثم قارن المتوسطات. أما LIMO فيعمل على **مستويين**:
+في درس الإحصاء والتصحيح المتعدد أخذ EEGLAB أولاً متوسط محاولات كل مشارك، ثم قارن المتوسطات. أما LIMO فيعمل على **مستويين**: نموذج خطي على المحاولات المفردة داخل كل مشارك، ثم اختبار متين عبر المشاركين، مع تصحيح على كل القنوات والنقاط الزمنية معاً.
+
+فكيف تبني نموذج LIMO البسيط لصورتي D6، وتقرأ نتيجته؟
+
+## كيف يعمل LIMO على مستويين؟
+
+<Figure src="limo/limo-two-levels.svg" alt="مستويان في LIMO. في الأعلى 14 مربعاً صغيراً، مربع لكل مشارك من cba إلى wpa، مكتوب على كل منها المستوى الأول، وفيها منحنيات محاولات رفيعة كثيرة تتحول إلى عمودين قصيرين: beta animal و beta distractor. أسهم تنزل إلى مربع عريض: المستوى الثاني، اختبار paired عبر المشاركين، وينتهي بصورة صغيرة للقنوات مقابل الزمن فيها بقع ملوّنة قليلة عليها كتل دالّة. الشكل توضيحي بلا بيانات." caption="رسم توضيحي، بلا بيانات" source="original" />
 
 1. **المستوى الأول، داخل كل مشارك:** يُطابَق نموذج خطي على كل محاولة مفردة، في كل قناة ونقطة زمنية. نتائجه "betas": ERP مقدّر لكل شرط لهذا الشخص.
 2. **المستوى الثاني، عبر المشاركين:** تُختبر betas كل المشاركين بطرق متينة (المتوسطات المشذّبة و bootstrap)، مع تصحيح على كل القنوات والنقاط الزمنية معاً.
 
-مع متغيّر فئوي واحد وأبسط طريقة تقدير، لا يضيف المستوى الأول وحده الكثير هنا: عند كل مشارك، الفرق بين الـ betas الاثنين يساوي الفرق بين المتوسطين. الفائدة تأتي مما يسمح به LIMO بعد ذلك: إعطاء المحاولات المضطربة وزناً أقل، وإضافة متغيّر مستمر لكل محاولة (مثل زمن الاستجابة)، واختبار جماعي لا يعتمد على أن تكون البيانات طبيعية التوزيع. هذا الدرس يبني النموذج البسيط، لتعرف الطريق قبل أن تضيف إليه.
+## ماذا يضيف LIMO على اختبار EEGLAB؟
 
-## قبل وبعد
+مع متغيّر فئوي واحد وأبسط طريقة تقدير، لا يضيف المستوى الأول وحده الكثير هنا: عند كل مشارك، الفرق بين الـ betas الاثنين يساوي الفرق بين المتوسطين.
 
-<Figure src="limo/limo-two-levels.svg" alt="مستويان في LIMO. في الأعلى 14 مربعاً صغيراً، مربع لكل مشارك من cba إلى wpa، مكتوب على كل منها المستوى الأول، وفيها منحنيات محاولات رفيعة كثيرة تتحول إلى عمودين قصيرين: beta animal و beta distractor. أسهم تنزل إلى مربع عريض: المستوى الثاني، اختبار paired عبر المشاركين، وينتهي بصورة صغيرة للقنوات مقابل الزمن فيها بقع ملوّنة قليلة عليها كتل دالّة. الشكل توضيحي بلا بيانات." caption="رسم توضيحي، بلا بيانات" source="original" />
+الفائدة تأتي مما يسمح به LIMO بعد ذلك: إعطاء المحاولات المضطربة وزناً أقل، وإضافة متغيّر مستمر لكل محاولة (مثل زمن الاستجابة)، واختبار جماعي لا يعتمد على أن تكون البيانات طبيعية التوزيع. في هذا الدرس تبني النموذج البسيط، لتعرف الطريق قبل أن تضيف إليه.
 
-## الخطوات من الواجهة
+## لماذا أحتاج STUDY جديدة لـ LIMO؟
 
-**عن البيانات (D6):** LIMO يحتاج **ملفاً واحداً لكل مشارك**. في `animal_mine.study` لكل مشارك ملفان، ملف لكل نوع صور، فيتوقف LIMO بالرسالة `Cannot estimate the model because there is more than 1 dataset per session per subject. Merge datasets for each subject and try again.` لذلك يبني سكربت "نقطة البداية" STUDY ثانية، `animal_limo.study`، في مجلدها الخاص `limo` بجانب `animal_mine.study`:
+**عن البيانات (D6):** LIMO يحتاج **ملفاً واحداً لكل مشارك**. في `animal_mine.study` لكل مشارك ملفان، ملف لكل نوع صورة، فيتوقف LIMO بالرسالة `Cannot estimate the model because there is more than 1 dataset per session per subject. Merge datasets for each subject and try again.` لذلك يبني «سكربت للوصول إلى هذه الحالة» تحت «تبدأ من» أعلى الدرس STUDY ثانية، `animal_limo.study`، في مجلدها الخاص `limo` بجانب `animal_mine.study`:
 
-- لكل مشارك يعلّم كل محاولة بنوع صورتها (حقل حدث جديد `image`)، ثم يدمج الملفين في ملف واحد (مثل `cba_merged.set`). الدمج يحذف ICA، و LIMO لا يحتاجه لـ ERP.
+- لكل مشارك يعلّم كل محاولة بنوع صورتها (حقل حدث جديد `image`)، ثم يدمج الملفين في ملف واحد (مثل `cba_merged.set`). الدمج يحذف ICA، ولا يحتاج LIMO إليه لحساب ERP.
 - الجنس يبقى في `group`. التصميم الوحيد، `image`، فيه متغيّر فئوي واحد على مستوى المحاولة، بالقيمتين `animal` و `distractor`.
-- يحسب ERP المحاولات المفردة لكل القنوات (`savetrials` مفعّل)، كما في درس الحساب المسبق. LIMO لا يعمل بدونها.
+- يحسب ERP المحاولات المفردة لكل القنوات (`savetrials` مفعّل)، كما في [درس الحساب المسبق](/lesson/study-precompute/). LIMO لا يعمل بدونها.
 
 التشغيل الأول يستغرق بضع دقائق ويضيف نحو 1 GB إلى مجلد الدورة (تقدير). `animal_limo.study` نسخة خاصة بهذا الدرس فقط: لا تمس `animal.study` المنزّلة ولا `animal_mine.study`، وبقية الدروس تستمر على `animal_mine.study`.
 
+## كيف أشغّل LIMO من القوائم؟
+
 **أولاً: ثبّت LIMO**
 
-1. LIMO ليست جزءاً من تثبيت EEGLAB الأساسي. افتح <MenuPath>File > Manage EEGLAB extensions</MenuPath>، واضغط `LIMO` في <UiLabel>List of plugins (bolded means installed)</UiLabel>، ثم <UiLabel>Install/Update</UiLabel>.
-2. LIMO تحتاج أيضاً Fieldtrip-lite لبناء جيران القنوات الذي يستخدمه تصحيح العناقيد. ثبّتها بنفس الطريقة إذا لم يثبّتها درس الإحصاء.
-3. بعد التثبيت تظهر في قائمة <MenuPath>Study</MenuPath> قائمة جديدة <UiLabel>LInear MOdeling of EEG Data</UiLabel>، وفي قائمة <MenuPath>Tools</MenuPath> بند LIMO باسم إصدارها.
+1. إضافة LIMO ليست جزءاً من تثبيت EEGLAB الأساسي. افتح <MenuPath>File > Manage EEGLAB extensions</MenuPath>، واضغط `LIMO` في <UiLabel>List of plugins (bolded means installed)</UiLabel>، ثم <UiLabel>Install/Update</UiLabel>.
+2. يحتاج LIMO أيضاً إضافة Fieldtrip-lite، ليبني قائمة جيران القنوات التي يستخدمها تصحيح العناقيد. ثبّتها بالطريقة نفسها إذا لم تثبّتها في درس الإحصاء والتصحيح المتعدد.
+3. بعد التثبيت تظهر في قائمة <MenuPath>Study</MenuPath> قائمة جديدة <UiLabel>LInear MOdeling of EEG Data</UiLabel>، وفي قائمة <MenuPath>Tools</MenuPath> بند LIMO باسم إصداره.
 
 **ثانياً: المستوى الأول، نموذج لكل مشارك**
 
-1. شغّل سكربت "نقطة البداية".
+1. ابدأ و`animal_limo.study` مفتوحة. إن لم تكن عندك، فافتح «سكربت للوصول إلى هذه الحالة» تحت «تبدأ من» أعلى الدرس.
 2. تأكد أن STUDY الظاهرة في نافذة EEGLAB هي `Go-nogo animal (LIMO)`، وفيها 14 ملفاً. تصميمها الوحيد `image` هو التصميم الحالي.
 3. افتح <MenuPath>Study > LInear MOdeling of EEG Data > Estimate Model Parameters (channel)</MenuPath>.
 4. يظهر تحذير يقول إن في STUDY مجموعات من المشاركين، وإن المجموعات تُهمل في المستوى الأول. هذا متوقع: الجنس بين المشاركين، فمكانه المستوى الثاني. اضغط <UiLabel>OK</UiLabel>.
@@ -187,13 +195,9 @@ updated: 2026-10-29
 1. افتح <MenuPath>Study > LInear MOdeling of EEG Data > LIMO EEG results (1st and 2nd level)</MenuPath>. تفتح نافذة <UiLabel>LINEAR MODELING TOOLBOX: Results</UiLabel>.
 2. أبقِ <UiLabel>P value</UiLabel> على `0.05`، واختر `Clustering` في <UiLabel>MC Correction</UiLabel>.
 3. اضغط <UiLabel>Image all</UiLabel> واختر `Paired_Samples_Ttest_parameter_1_2.mat` في مجلد نتيجتك. تظهر صورة: القنوات على محور، والزمن على الآخر، واللون فقط حيث يبقى عنقود بعد التصحيح.
-4. اضغط نقطة تهمك، أو <UiLabel>Course plot</UiLabel>، لترى الشرطين في قناة واحدة عبر الزمن.
+4. اضغط على نقطة تهمك، أو <UiLabel>Course plot</UiLabel>، لترى الشرطين في قناة واحدة عبر الزمن.
 
-<Callout type="note">
-**لماذا OLS هنا؟** نافذة LIMO تعرض `WLS` أولاً، وهي تعطي المحاولات غير المعتادة وزناً أقل، وغالباً هي الاختيار الأفضل. لكن توثيق LIMO يذكر أن WLS تحتاج محاولات أكثر من النقاط الزمنية عند كل مشارك. في إيبوكاتنا 750 نقطة زمنية (3 ثوانٍ بمعدل 250 Hz). في كل ملف أصلي من 87 إلى 192 محاولة، فحتى بعد الدمج لا يزيد ما عند المشارك عن 384 محاولة، أي أقل من النقاط الزمنية. لذلك نستخدم `OLS` التي ليس لها هذا الحد. في بياناتك جرّب `WLS` مع نافذة أقصر (خانة <UiLabel>Options</UiLabel> تقبل مثلاً `'timelim', [-100 600]`).
-</Callout>
-
-## السكربت المقابل
+## كيف أشغّل المستويين بسكربت؟
 
 ```matlab
 % STUDY and ALLEEG come from the starting point script
@@ -238,7 +242,15 @@ fprintf('Significant channel x time points after cluster correction: %d\n', nnz(
 fprintf('Channels inside a significant cluster: %s\n', strjoin(chanNames(any(mask, 2)), ' '));
 ```
 
-## أي قيمة أختار؟
+## لماذا نستخدم OLS لا WLS؟
+
+نافذة LIMO تعرض `WLS` أولاً، وهي تعطي المحاولات غير المعتادة وزناً أقل، وغالباً هي الاختيار الأفضل. لكن توثيق LIMO يذكر أن WLS تحتاج محاولات أكثر من النقاط الزمنية عند كل مشارك.
+
+في إيبوكاتنا 750 نقطة زمنية (3 ثوانٍ بمعدل 250 Hz). في كل ملف أصلي من 87 إلى 192 محاولة، فحتى بعد الدمج لا يزيد ما عند المشارك على 384 محاولة، أي أقل من النقاط الزمنية. لذلك نستخدم `OLS` التي ليس لها هذا الحد.
+
+في بياناتك جرّب `WLS` مع نافذة أقصر (خانة <UiLabel>Options</UiLabel> تقبل مثلاً `'timelim', [-100 600]`).
+
+## أي قيم أختار في LIMO؟
 
 | الخيار | في هذا الدرس | متى تغيّره |
 |---|---|---|
@@ -249,23 +261,23 @@ fprintf('Channels inside a significant cluster: %s\n', strjoin(chanNames(any(mas
 | bootstrap | 1000 | أبقِ 1000 أو أكثر لتصحيح العناقيد. العدد الأقل يجعل قيم p المصحّحة غير مستقرة. |
 | <UiLabel>MC Correction</UiLabel> | `Clustering` | `TFCE` موجود أيضاً في LIMO (يحتاج <UiLabel>Apply TFCE</UiLabel> قبل الاختبار). `Max` أشدّ. `None` للاستكشاف فقط. |
 
-## أخطاء شائعة
-
-- **ملفان لكل مشارك.** يتوقف LIMO بالرسالة `Merge datasets for each subject and try again.` ادمج ملفات كل مشارك أولاً، بعد أن تعلّم كل محاولة بشرطها في حقل حدث، كما يفعل سكربت "نقطة البداية".
-- **لا توجد محاولات مفردة.** LIMO يقرأ المحاولات التي حفظها `savetrials` في درس الحساب المسبق. بدونها يتوقف بالرسالة `Measures must be computed first`.
-- **عدم تحديد مجلد العمل.** LIMO يكتب ملفات المستوى الثاني في المجلد الحالي. اختر مجلداً فارغاً لكل اختبار، وإلا اختلطت نتائج الاختبارات.
-- **أرقام معاملات خاطئة.** ترتيب الـ betas يتبع قيم متغيّر التصميم. تحقق منه بـ <UiLabel>See GLM variables</UiLabel> في نافذة المستوى الأول قبل أن تكتب `1 2`.
-- **توقّع أثر مختلف عن المتوسطات مع OLS ومتغيّر واحد.** في هذه الحالة البسيطة الفرق بين الـ betas هو الفرق بين المتوسطات. الذي يتغيّر هو المستوى الثاني المتين، ثم لاحقاً نماذج المستوى الأول الأغنى.
-- **ترك ملف الجيران.** بدون `limo_gp_level_chanlocs.mat` لا يستطيع LIMO أن يكوّن عناقيد عبر القنوات.
-
-{/* صندوق "من التجربة": بانتظار قصة من صاحب المشروع. لا يُكتب قبل وصولها. */}
-
-## كيف تتأكد أن الخطوة نجحت؟
+## كيف أتأكد أن LIMO نجح؟
 
 - **نافذة الأوامر** تطبع `1st level done: 14 participants listed in` ثم مسار ملف `Beta_files_`.
 - **مجلد النتيجة** فيه `LIMO.mat` و `Paired_Samples_Ttest_parameter_1_2.mat` ومجلد `H0` فيه الـ bootstrap.
 - **السكربت يطبع** عدد نقاط قناة × زمن الدالة بعد تصحيح العناقيد، والقنوات داخل عنقود (وقد تكون القائمة فارغة).
 - **صورة النتيجة** التي يفتحها <UiLabel>Image all</UiLabel> تعرض القنوات مقابل الزمن، واللون فقط داخل العناقيد المصحّحة.
+
+## أخطاء شائعة مع LIMO
+
+- **ملفان لكل مشارك.** يتوقف LIMO بالرسالة `Merge datasets for each subject and try again.` ادمج ملفات كل مشارك أولاً، بعد أن تعلّم كل محاولة بشرطها في حقل حدث، كما في «تبدأ من» أعلى الدرس.
+- **لا توجد محاولات مفردة.** LIMO يقرأ المحاولات التي حفظها `savetrials` في درس الحساب المسبق. بدونها يتوقف بالرسالة `Measures must be computed first`.
+- **عدم تحديد مجلد العمل.** LIMO يكتب ملفات المستوى الثاني في المجلد الحالي. اختر مجلداً فارغاً لكل اختبار، وإلا اختلطت نتائج الاختبارات.
+- **أرقام معاملات خاطئة.** ترتيب الـ betas يتبع قيم متغيّر التصميم. تحقق منه بـ <UiLabel>See GLM variables</UiLabel> في نافذة المستوى الأول قبل أن تكتب `1 2`.
+- **توقّع أثر مختلف عن المتوسطات مع OLS ومتغيّر واحد.** في هذه الحالة البسيطة الفرق بين الـ betas هو الفرق بين المتوسطات. ما يتغيّر هو المستوى الثاني المتين، ثم لاحقاً نماذج المستوى الأول الأغنى.
+- **نسيان ملف الجيران.** بدون `limo_gp_level_chanlocs.mat` لا يستطيع LIMO أن يكوّن عناقيد عبر القنوات.
+
+{/* صندوق "من التجربة": بانتظار قصة من صاحب المشروع. لا يُكتب قبل وصولها. */}
 
 <Methods>
 A two-level hierarchical linear model was estimated with LIMO EEG [version] (Pernet et al., 2011) in EEGLAB 2026.1. At the first level, the animal and distractor epochs of each participant were merged into one dataset, and the single-trial ERPs were modeled at every channel and time point with image category as a categorical regressor (ordinary least squares). At the second level, the animal and distractor parameter estimates were compared across [14] participants with a paired Yuen t-test on 20% trimmed means, with spatio-temporal cluster correction based on [1000] bootstrap samples at a threshold of 0.05.

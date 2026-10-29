@@ -1,7 +1,7 @@
 {
   "source": "plugins_guide.md",
   "intro": {
-    "ar": "EEGLAB فيه أكثر من 200 إضافة. أغلب المستخدمين يحتاجون خمساً أو ستاً فقط. هذه الصفحة تجمع أشهرها حسب مرحلة التحليل: ماذا تفعل كل إضافة، ومتى تحتاجها، وأي درس يشرحها.\n\n**قبل أن تبدأ:**\n- الإضافات تُثبّت من <MenuPath>File > Manage EEGLAB extensions</MenuPath>. شرح ذلك في درس `install-eeglab`.\n- خمس إضافات **مرفقة** مع EEGLAB 2026.1 ولا تحتاج تثبيتاً: `firfilt` و `clean_rawdata` و `ICLabel` و `dipfit` و `EEG-BIDS`.\n- هذه الصفحة دليل للتعريف، لا توصية. الدروس تشرح الإضافات المرتبطة بها فقط. قبل استخدام أي إضافة أخرى، اقرأ صفحتها الرسمية وتأكد أنها تعمل مع إصدارك.",
+    "ar": "لـ EEGLAB أكثر من 200 إضافة، وأغلب المستخدمين يحتاجون خمساً أو ستاً منها فقط. هذه الصفحة تجمع أشهرها حسب مرحلة التحليل: ماذا تفعل كل إضافة، ومتى تحتاجها، وأي درس يشرحها.\n\n**قبل أن تبدأ:**\n- الإضافات تُثبّت من <MenuPath>File > Manage EEGLAB extensions</MenuPath>، ويشرح درس `install-eeglab` ذلك.\n- خمس إضافات **مرفقة** مع EEGLAB 2026.1 ولا تحتاج تثبيتاً: `firfilt` و `clean_rawdata` و `ICLabel` و `dipfit` و `EEG-BIDS`.\n- هذه الصفحة دليل للتعريف، لا توصية. الدروس تشرح الإضافات المرتبطة بها فقط. قبل استخدام أي إضافة أخرى، اقرأ صفحتها الرسمية وتأكد أنها تعمل مع إصدارك.",
     "en": "EEGLAB has more than 200 plugins, and most users need only five or six. This page lists the most widely used ones by analysis stage: what each plugin does, when you need it, and which lesson covers it.\n\n**Before you start:**\n- Install plugins from <MenuPath>File > Manage EEGLAB extensions</MenuPath>. The `install-eeglab` lesson shows how.\n- Five plugins **ship with** EEGLAB 2026.1 and need no installation: `firfilt`, `clean_rawdata`, `ICLabel`, `dipfit` and `EEG-BIDS`.\n- This page is a map, not an endorsement. The lessons cover only the plugins linked to them. Before using any other plugin, read its official page and check that it works with your EEGLAB version."
   },
   "outro": {
@@ -162,7 +162,7 @@
           "url": "https://eeglab.org/plugins/firfilt/",
           "text": {
             "ar": "فلاتر FIR في EEGLAB، ومنها فلتر <MenuPath>Basic FIR filter (new, default)</MenuPath>. تستخدمها في كل تحليل.",
-            "en": "EEGLAB's FIR filters, including <MenuPath>Basic FIR filter (new, default)</MenuPath>. You use it in every analysis."
+            "en": "EEGLAB's FIR filters, including <MenuPath>Basic FIR filter (new, default)</MenuPath>. You use them in every analysis."
           }
         },
         {
@@ -187,7 +187,7 @@
           ],
           "url": "https://eeglab.org/plugins/zapline-plus/",
           "text": {
-            "ar": "تكتشف قمم الضوضاء في الطيف وتزيلها آلياً، ومنها الكهرباء. مفيدة إذا كان تحليلك يحتاج الترددات العالية.",
+            "ar": "تكتشف قمم الضوضاء في الطيف وتزيلها آلياً، ومنها قمة ضوضاء الكهرباء. مفيدة إذا كان تحليلك يحتاج الترددات العالية.",
             "en": "Detects and removes noise peaks in the spectrum automatically, including line noise. Useful when your analysis needs high frequencies."
           }
         },
@@ -293,7 +293,7 @@
           ],
           "url": "https://github.com/irenne/MARA",
           "text": {
-            "ar": "مصنّف آلي قديم لمكوّنات الآرتفاكت. ستراه في أوراق قديمة، و ICLabel هو الشائع اليوم.",
+            "ar": "مصنّف آلي قديم لمكوّنات الآرتفاكت. ستراه في أوراق قديمة، أما الشائع اليوم فهو ICLabel.",
             "en": "An older automatic classifier for artifact components. You will see it in older papers; ICLabel is the common choice today."
           }
         },
@@ -319,7 +319,7 @@
           ],
           "url": "https://github.com/dnacombo/SASICA",
           "text": {
-            "ar": "تساعدك تختار مكوّنات الآرتفاكت بعدة معايير، وتعرض سبب كل اختيار.",
+            "ar": "تساعدك على اختيار مكوّنات الآرتفاكت بعدة معايير، وتعرض سبب كل اختيار.",
             "en": "Helps you select artifact components using several criteria, and shows the reason for each choice."
           }
         }
@@ -580,7 +580,7 @@
         "en": "Specialized fields"
       },
       "note": {
-        "ar": "لا توجد لها دروس في الموقع. نذكرها حتى تعرف أنها موجودة.",
+        "ar": "ليس لها دروس في الموقع. نذكرها حتى تعرف أنها موجودة.",
         "en": "These have no lessons on this site. We list them so you know they exist."
       },
       "items": [
@@ -613,8 +613,8 @@
           "lessons": [],
           "url": "https://www.eyetracking-eeg.org/",
           "text": {
-            "ar": "تربط تتبّع العين مع EEG، وتصحّح آرتفاكت العين بالاستفادة منه.",
-            "en": "Combines eye tracking with EEG, and uses it to correct eye artifacts."
+            "ar": "تربط بيانات تتبّع العين بـ EEG، وتصحّح آرتفاكت العين بالاستفادة منه.",
+            "en": "Combines eye tracking with EEG, and uses the eye-tracking data to correct eye artifacts."
           }
         },
         {
@@ -624,7 +624,7 @@
           "lessons": [],
           "url": "https://eeglab.org/plugins/BrainBeats/",
           "text": {
-            "ar": "تحلّل EEG مع إشارات القلب (ECG أو PPG) معاً.",
+            "ar": "تحلّل EEG وإشارات القلب (ECG أو PPG) معاً.",
             "en": "Analyzes EEG together with heart signals (ECG or PPG)."
           }
         },

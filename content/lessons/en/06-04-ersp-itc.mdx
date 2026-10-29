@@ -91,43 +91,46 @@ eeglabVersion: "2026.1"
 updated: 2026-10-28
 ---
 
-## Why this step matters
+## The idea
 
-The ERP collects what repeats with the same shape and timing in every trial. But some brain activity after the stimulus changes in strength without being in the same phase every time, such as a drop in alpha. That activity cancels out in the average, so you do not see it in the ERP.
+The ERP keeps what repeats with the same shape and timing in every trial. But some activity after the stimulus changes in strength without the same phase in every trial, such as a drop in alpha. It cancels out in the average, so the ERP misses it.
 
-Time-frequency analysis computes two things for each frequency, each moment, and each trial: the power and the phase. Then it gives you two maps:
+Time-frequency analysis computes the power and the phase at each frequency, moment, and trial. They give two maps: the ERSP for power and the ITC for phase. How do you compute them for a channel in EEGLAB, and what do their colors mean?
+
+## How do I read the ERSP and ITC maps?
+
+<Figure src="ersp-itc/ersp-itc-cz.png" alt="Channel time-frequency for Cz, 3 to 30 Hz: ERSP map in dB on top, ITC map below with the ERP under it. A red area in both maps at low frequencies after the stimulus." source="D1" />
+
+- **Top (ERSP):** red is an increase in power over baseline, blue is a decrease, and green is no change. On the left is the spectrum of the baseline period.
+- **Bottom (ITC):** red is consistent phase across trials. Below the map is the ERP of the same channel.
+- Compare the two maps: the red area at low frequencies around 200 to 400 ms appears in both. This is the ERP itself, in the language of frequencies.
+
+## How do ERSP and ITC differ?
 
 - **<En>ERSP</En>:** the change in power at each time and frequency relative to baseline, in dB. It sees activity whether or not it is in the same phase.
 - **<En>ITC</En>:** how consistent the phase is across trials at each time and frequency, from 0 (random phase) to 1 (the same phase in every trial). High ITC is a condition for activity to appear in the ERP: activity with random phase cancels out in the average.
 
-## Before and after
+## How do I compute the two maps from the menus?
 
-<Figure src="ersp-itc/ersp-itc-cz.png" alt="Channel time-frequency for Cz, 3 to 30 Hz: ERSP map in dB on top, ITC map below with the ERP under it. A red area in both maps at low frequencies after the stimulus." source="D1" />
-
-## Steps in the GUI
-
-Start with the dataset `D1 epochs clean` open, as in "Starting point".
+Start with the dataset `D1 epochs clean` open. If you don't have it, open "Script to reach this state" at the top of the lesson.
 
 1. Open the menu. Where it is depends on your settings:
-   - If you turned on the legacy menus in the epoch rejection lesson: <MenuPath>Plot > Time-frequency transforms > Channel time-frequency</MenuPath>.
+   - If you turned on the legacy menus in [the epoch rejection lesson](/en/lesson/epoch-rejection/): <MenuPath>Plot > Time-frequency transforms > Channel time-frequency</MenuPath>.
    - If you did not: <MenuPath>Plot > Channel time-frequency</MenuPath>.
 2. The <UiLabel>Plot channel time frequency -- pop_newtimef()</UiLabel> window opens. In <UiLabel>Channel number</UiLabel>, type `14`, that is, channel <En>Cz</En>, or pick it with the <UiLabel>...</UiLabel> button.
 3. Keep <UiLabel>Sub epoch time limits [min max] (msec)</UiLabel> at its value, that is, the whole epoch.
 4. In <UiLabel>Frequency limits [min max] (Hz) or sequence</UiLabel>, type `3 30`. The data have a 30 Hz low-pass, so there is nothing meaningful above it.
 5. Keep <UiLabel>Baseline limits [min max] (msec) (0->pre-stim.)</UiLabel> at `0`, that is, the whole period before the stimulus.
 6. Keep <UiLabel>Wavelet cycles [min max/fact] or sequence</UiLabel> at `3 0.8`.
-7. In <UiLabel>Optional newtimef() arguments (see Help)</UiLabel>, type `'winsize', 128`, a window 1 second long, so the analysis starts at 3 Hz.
+7. In <UiLabel>Optional newtimef() arguments (see Help)</UiLabel>, type `'winsize', 128`, a 1-second window, so the analysis starts at 3 Hz.
 8. Keep <UiLabel>Plot Event Related Spectral Power</UiLabel> and <UiLabel>Plot Inter Trial Coherence</UiLabel> checked, and press <UiLabel>Ok</UiLabel>. The computation takes a few seconds.
-9. Read the figure:
-   - **Top (ERSP):** red is an increase in power over baseline, blue a decrease, green no change. On the left is the spectrum of the baseline period.
-   - **Bottom (ITC):** red is consistent phase across trials. Below the map is the ERP of the same channel.
-   - Compare the two maps: the red area at low frequencies around 200 to 400 ms appears in both. This is the ERP itself, in the language of frequencies.
+9. Read the figure as shown above: ERSP on top, ITC below.
 
 <Callout type="note" title="The map edges">
-The map does not start at -1000 ms or end at 1992 ms. Each point needs a 1-second window around it, so half a second is lost at each edge. That is why we cut long epochs in the epoching lesson.
+The map does not start at -1000 ms or end at 1992 ms. Each point needs a 1-second window around it, so half a second is lost at each edge. That is why we cut long epochs in [the epoch extraction lesson](/en/lesson/extract-epochs/).
 </Callout>
 
-## The equivalent script
+## How do I compute them in a script and find the strongest phase locking?
 
 ```matlab
 % ERSP and ITC at Cz, 3 to 30 Hz, wavelets from 3 cycles
@@ -148,7 +151,7 @@ fprintf('Frequencies %.1f to %.1f Hz, times %.0f to %.0f ms\n', ...
 fprintf('Max ITC %.2f at %.1f Hz, %.0f ms\n', maxItc, freqs(fi), times(ti));
 ```
 
-## Which value should I choose?
+## How many cycles, and which window and frequencies?
 
 | Setting | Value | Why |
 |---|---|---|
@@ -158,7 +161,18 @@ fprintf('Max ITC %.2f at %.1f Hz, %.0f ms\n', maxItc, freqs(fi), times(ti));
 | Baseline | `0` (everything before the stimulus) | ERSP is relative to this period. Make sure it contains no response. |
 | Channel | Cz here | The ERP in D1 is large at central and parietal channels. For a question about alpha, try posterior channels such as POz. |
 
-## Common mistakes
+## How do I check that the computation is right?
+
+- `freqs(1)` is about 3, `freqs(end)` is about 30, and `times` runs from about -500 to 1500 ms.
+- `size(ersp)` and `size(itc)` are equal: number of frequencies × 200 time points.
+- The highest ITC is at a low frequency (about 3 to 7 Hz) at roughly 200 to 400 ms, with a value of roughly 0.5 to 0.8.
+- In the ERSP, the same area is red: an increase of a few dB over baseline.
+
+<Methods>
+Event-related spectral perturbation and inter-trial coherence were computed at Cz with newtimef using Morlet wavelets whose number of cycles increased linearly from 3 at 3 Hz to 6 at 30 Hz, relative to a −500 to 0 ms prestimulus baseline (EEGLAB 2026.1).
+</Methods>
+
+## Which mistakes are common in time-frequency analysis?
 
 - **Short epochs.** A 1-second window eats half a second at each edge. An epoch from -200 to 800 ms leaves almost nothing. Cut longer epochs for time-frequency analysis.
 - **Always reading red as "more activity".** Red is an increase **relative to baseline**. If the baseline period itself is unusual, the whole map changes.
@@ -167,14 +181,3 @@ fprintf('Max ITC %.2f at %.1f Hz, %.0f ms\n', maxItc, freqs(fi), times(ti));
 - **Judging without statistics.** A map without a test shows every change, even random ones. The <UiLabel>Bootstrap significance level (Ex: 0.01 -> 1%)</UiLabel> box hides what is not significant, and full statistics come in station 8.
 
 {/* "From experience" box: waiting for the project owner's story. Do not write it before it arrives. */}
-
-## How to check it worked
-
-- `freqs(1)` is about 3 and `freqs(end)` about 30, and `times` runs from about -500 to 1500 ms.
-- `size(ersp)` and `size(itc)` are equal: number of frequencies × 200 time points.
-- The highest ITC is at a low frequency (about 3 to 7 Hz) at roughly 200 to 400 ms, with a value of roughly 0.5 to 0.8.
-- In the ERSP, the same area is red: an increase of a few dB over baseline.
-
-<Methods>
-Event-related spectral perturbation and inter-trial coherence were computed at Cz with newtimef using Morlet wavelets whose number of cycles increased linearly from 3 at 3 Hz to 6 at 30 Hz, relative to a −500 to 0 ms prestimulus baseline (EEGLAB 2026.1).
-</Methods>

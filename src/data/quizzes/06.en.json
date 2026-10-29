@@ -83,11 +83,11 @@
         },
         {
           "id": "b",
-          "text": "It becomes half"
+          "text": "It is halved"
         },
         {
           "id": "c",
-          "text": "It becomes a quarter"
+          "text": "It drops to a quarter"
         },
         {
           "id": "d",
@@ -198,7 +198,7 @@
       "answer": [
         "a"
       ],
-      "explanation": "Some books and programs plot negative up. In EEGLAB menus positive is up (the `'ydir', 1` option), but check the axis label of every plot before you say \"positive peak\" or \"negative\"."
+      "explanation": "Some books and programs plot negative up. In EEGLAB menus positive is up (the `'ydir', 1` option), but check the axis label of every plot before you say \"positive peak\" or \"negative peak\"."
     }
   ]
 }

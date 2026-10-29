@@ -95,7 +95,7 @@
         "b",
         "c"
       ],
-      "explanation": "The period is chosen before you see the results and applied unchanged to every participant, because changing it after seeing the waveform changes your result. Correction subtracts a mean from each epoch and removes none, so the count stays the same."
+      "explanation": "The period is chosen before you see the results and applied unchanged to every participant, because changing it after seeing the waveform changes your result. Correction subtracts a mean from each epoch and removes no epochs, so the count stays the same."
     },
     {
       "id": "s05-q04",
@@ -194,7 +194,7 @@
       "answer": [
         "b"
       ],
-      "explanation": "A strict threshold rejects clean epochs because of normal noise and slow waves. Each rejected epoch is one trial less, and an average of fewer trials is noisier. The goal is to reject what actually harms the average, not the smallest possible number."
+      "explanation": "A strict threshold rejects clean epochs because of normal noise and slow waves. Each rejected epoch is one trial less, and an average of fewer trials is noisier. The goal is to reject what actually harms the average, not to pick the strictest possible threshold."
     }
   ]
 }

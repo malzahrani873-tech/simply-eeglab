@@ -2,12 +2,14 @@
 import { t } from '../../i18n';
 import { langOf } from '../../lib/lang';
 import Icon from '../Icon.astro';
-interface Props { slug: string }
-const { slug } = Astro.props;
+// gui / verify: set when the lesson has menu steps / check questions, so the reminder links only to what exists.
+interface Props { slug: string; gui?: boolean; verify?: boolean }
+const { slug, gui = false, verify = false } = Astro.props;
 const lang = langOf(Astro.url);
+const reminder = gui && verify ? 'lesson.markDone.reminder' : gui ? 'lesson.markDone.reminderGui' : verify ? 'lesson.markDone.reminderVerify' : '';
 ---
 <div class="done-box" data-lesson-complete={slug}>
-  <p class="done-rem">{t(lang, 'lesson.markDone.reminder')} <a href="#gui">{t(lang, 'lesson.markDone.toGui')}</a> · <a href="#verify">{t(lang, 'lesson.markDone.toVerify')}</a></p>
+  {reminder && <p class="done-rem">{t(lang, reminder)} {gui && <a href="#gui">{t(lang, 'lesson.markDone.toGui')}</a>}{gui && verify && ' · '}{verify && <a href="#verify">{t(lang, 'lesson.markDone.toVerify')}</a>}</p>}
   <noscript><p class="muted">{t(lang, 'lesson.noJsProgress')}</p></noscript>
   <button type="button" class="btn pri done-btn" aria-pressed="false" hidden
     data-l-mark={t(lang, 'lesson.markDone')} data-l-done={t(lang, 'lesson.isDone')}>

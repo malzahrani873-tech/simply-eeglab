@@ -38,15 +38,17 @@ eeglabVersion: "2026.1"
 updated: 2026-10-28
 ---
 
-## لماذا هذه الخطوة مهمة؟
+## الفكرة
 
-الداتاست (<En>dataset</En>) الآن تعرف أسماء القنوات (<En>channel</En>) فقط. لا تعرف أين يقع كل قطب (<En>electrode</En>) على الرأس. كل خريطة رأس (<En>scalp map</En>)، وكل خطوة تستخدم القنوات المجاورة (مثل الاستيفاء (<En>interpolation</En>) لقناة سيئة)، وخرائط مكوّنات ICA، كلها تحتاج هذه المواقع.
+تعرف الداتاست (<En>dataset</En>) الآن أسماء القنوات (<En>channel</En>) فقط، ولا تعرف أين يقع كل قطب (<En>electrode</En>) على الرأس.
 
-يجد EEGLAB المواقع بمطابقة اسم كل قناة مع ملف قالب فيه الأسماء القياسية، مثل `FC5` أو `Cz`. والمطابقة تنجح فقط إذا كُتبت الأسماء بالطريقة القياسية.
+كل خريطة رأس (<En>scalp map</En>) تحتاج هذه المواقع، وكذلك خرائط مكوّنات ICA، وكل خطوة تستخدم القنوات المجاورة، مثل الاستيفاء (<En>interpolation</En>) لقناة سيئة.
 
-في `S001R03.edf` تنتهي الأسماء بنقاط زائدة: `Fc5.` و `Cz..` و `T10.`. النقاط تكمّل كل اسم إلى أربعة أحرف. واسم مثل `Cz..` لا يطابق `Cz` في القالب، فلا يجد له EEGLAB موقعاً. هذه مشكلة حقيقية ستقابلها مع ملفات أجهزة أخرى، لذلك نصلحها هنا أولاً.
+فكيف تعطي كل قناة في ملفك موقعها الصحيح على الرأس؟
 
-## قبل وبعد
+## ماذا يتغيّر بعد جلب المواقع؟
+
+في النافذة الرئيسية يتحوّل سطر Channel locations من `No (labels only)` إلى `Yes`. وفي رسم الأقطاب يظهر كل اسم في مكانه على الرأس.
 
 <BeforeAfter>
 <ImageSpec>
@@ -57,19 +59,27 @@ updated: 2026-10-28
 </ImageSpec>
 </BeforeAfter>
 
-<Figure src="channel-locations/channel-locations-by-name.png" alt="رسم مواقع القنوات بالأسماء من فوق الرأس والأنف في الأعلى: 64 قطباً، منها Cz في الوسط و Iz و T9 و T10 على حافة الدائرة أو خارجها." caption="64 من 64 موقعاً معروضة، وأقطاب الحافة خارج الدائرة أمر متوقع" source="eeglab-ui" />
+<Figure src="channel-locations/channel-locations-by-name.png" alt="رسم مواقع القنوات بالأسماء من فوق الرأس، والأنف في الأعلى: 64 قطباً، منها Cz في الوسط و Iz و T9 و T10 على حافة الدائرة أو خارجها." caption="64 من 64 موقعاً معروضة، وظهور أقطاب الحافة خارج الدائرة أمر متوقع" source="eeglab-ui" />
 
-## الخطوات من الواجهة
+## لماذا لا يجد EEGLAB مواقع قنوات هذا الملف؟
+
+يجد EEGLAB المواقع بمطابقة اسم كل قناة مع ملف قالب فيه الأسماء القياسية، مثل `FC5` أو `Cz`. والمطابقة تنجح فقط إذا كُتبت الأسماء بالطريقة القياسية.
+
+في `S001R03.edf` تنتهي الأسماء بنقاط زائدة: `Fc5.` و `Cz..` و `T10.`. النقاط تكمّل كل اسم إلى أربعة أحرف. واسم مثل `Cz..` لا يطابق `Cz` في القالب، فلا يجد له EEGLAB موقعاً. هذه مشكلة حقيقية ستقابلها مع ملفات أجهزة أخرى، لذلك نصلحها هنا أولاً.
+
+**الأحرف الكبيرة والصغيرة لا تهم.** يقارن EEGLAB الأسماء بالأحرف الصغيرة، فـ `Fc5` يجد `FC5` في القالب. أما الأحرف الزائدة مثل النقاط أو المسافات فتهم.
+
+## كيف أصلح الأسماء وأجلب المواقع من القوائم؟
 
 ### 1. شاهد المشكلة
 
-1. افتح الداتاست `S001R03.set` التي حفظتها في الدرس السابق.
+1. افتح الداتاست `S001R03.set` التي حفظتها في [درس الاستيراد](/lesson/import-raw/).
 2. في النافذة الرئيسية، سطر <UiLabel>Channel locations</UiLabel> يعرض `No (labels only)`.
 3. اكتب في الـ Command Window: `{EEG.chanlocs(1:3).labels}`. الناتج `'Fc5.'` `'Fc3.'` `'Fc1.'`: كل اسم ينتهي بنقطة.
 
 ### 2. احذف النقاط من الأسماء
 
-تستطيع تغيير اسم واحد يدوياً في <MenuPath>Edit > Channel locations</MenuPath>، في خانة <UiLabel>Channel label ("label")</UiLabel>. لكن الأسماء 64، فالأسرع أن تحذف النقاط منها كلها بأربعة أسطر في الـ Command Window:
+تستطيع تغيير اسم واحد يدوياً في <MenuPath>Edit > Channel locations</MenuPath>، في خانة <UiLabel>Channel label ("label")</UiLabel>. لكن عدد الأسماء 64، فالأسرع أن تحذف النقاط منها كلها بأربعة أسطر في الـ Command Window:
 
 ```matlab
 for iChan = 1:EEG.nbchan
@@ -89,15 +99,11 @@ end
 5. اضغط <UiLabel>OK</UiLabel>. يطبع الـ Command Window السطر `64 channel with the same label found and imported`.
 6. تفتح نافذة تعديل القنوات، وفيها كل قناة بإحداثياتها. اضغط <UiLabel>OK</UiLabel> في أسفلها لتغلقها. التغييرات لا تُطبَّق إلا بعد إغلاق هذه النافذة.
 
-### 4. تحقّق من المواقع على الرأس
+### 4. احفظ
 
-افتح <MenuPath>Plot > Channel locations > By name</MenuPath>. يظهر رأس من الأعلى، والأنف في الأعلى، واسم كل قطب في مكانه.
+افتح <MenuPath>File > Resave current dataset(s)</MenuPath>. يحفظ هذا الأمر الأسماء المصحّحة والمواقع في نفس الملف `S001R03.set` في مجلد الدروس. احتفظ به، فـ[درس الأحداث](/lesson/events/) يكمل عليه.
 
-### 5. احفظ
-
-افتح <MenuPath>File > Resave current dataset(s)</MenuPath>. يكتب هذا الأسماء المصحّحة والمواقع في نفس الملف `S001R03.set` في مجلد الدروس.
-
-## السكربت المقابل
+## كيف أفعل ذلك كله بسكربت؟
 
 ```matlab
 % Start EEGLAB and load the file from the previous lesson
@@ -126,12 +132,10 @@ EEG = pop_saveset(EEG, 'savemode', 'resave');
 eeglab redraw
 ```
 
-- `strrep(text, '.', '')` تستبدل كل نقطة في النص بلا شيء.
+- `strrep(text, '.', '')` تستبدل كل نقطة في النص بنص فارغ، أي تحذفها.
 - `'lookup', 'standard_1005.elc'` هو نفس الاختيار الافتراضي في نافذة الجلب. يجد EEGLAB هذا الملف داخل إضافة (<En>plugin</En>) dipfit التي تأتي مع EEGLAB.
 
-## أي قيمة أختار؟
-
-الاختيار الأساسي: من أين تأتي المواقع؟
+## من أين أجلب المواقع إذا لم تكن قبعتي قياسية؟
 
 | المصدر | متى تستخدمه | كيف |
 |---|---|---|
@@ -139,9 +143,18 @@ eeglab redraw
 | ملف المواقع الخاص بقبعتك (من الشركة المصنّعة) | أسماء القنوات في جهازك غير قياسية، مثل الأرقام `E1` و `E2` | <UiLabel>Read locations</UiLabel> في نافذة تعديل القنوات |
 | مواقع مقيسة على رأس المشارك | قِست مواقع الأقطاب بجهاز تحديد المواقع (<En>digitizer</En>) في جلسة التسجيل | <UiLabel>Read locations</UiLabel> مع ملف ذلك الجهاز |
 
-**الأحرف الكبيرة والصغيرة لا تهم.** يقارن EEGLAB الأسماء بالأحرف الصغيرة، فـ `Fc5` يجد `FC5` في القالب. أما الأحرف الزائدة مثل النقاط أو المسافات فتهم.
+## كيف أتأكد أن لكل قناة موقعاً؟
 
-## أخطاء شائعة
+1. سطر <UiLabel>Channel locations</UiLabel> في النافذة الرئيسية يعرض `Yes`.
+2. طبع الـ Command Window السطر `64 channel with the same label found and imported`.
+3. افتح <MenuPath>Plot > Channel locations > By name</MenuPath>. يظهر الرأس مرسوماً من فوق، والأنف في أعلى الرسم، وفيه 64 قطباً، كلٌّ باسمه في مكانه: `Cz` في الوسط، و `Fpz` في الأمام، و `Oz` في الخلف.
+4. `all(~cellfun(@isempty, {EEG.chanlocs.X}))` يعطي `1`: لكل قناة إحداثيات.
+
+<Methods>
+Channel labels were cleaned of trailing periods and matched to the standard 10-5 template in MNI space (standard_1005.elc) with pop_chanedit (EEGLAB 2026.1).
+</Methods>
+
+## لماذا بقي السطر على No (labels only)؟ أخطاء شائعة في جلب المواقع
 
 - **الجلب قبل حذف النقاط.** لا يطابق أي اسم، ولا يظهر أي تحذير. ويبقى سطر <UiLabel>Channel locations</UiLabel> على `No (labels only)`. احذف النقاط، ثم اجلب المواقع من جديد.
 - **عدم إغلاق نافذة تعديل القنوات بزر OK.** التغييرات لا تُطبَّق إلا بعد إغلاقها.
@@ -150,16 +163,3 @@ eeglab redraw
 - **افتراض أن ترتيب القنوات في الملف يتبع الرأس.** في `S001R03.edf` القناة الأولى `Fc5` لا `Fp1`. ابحث عن القناة باسمها دائماً، لا برقمها.
 
 {/* صندوق "من التجربة": بانتظار قصة من صاحب المشروع. لا يُكتب قبل وصولها. */}
-
-## كيف تتأكد أن الخطوة نجحت؟
-
-1. سطر <UiLabel>Channel locations</UiLabel> في النافذة الرئيسية يعرض `Yes`.
-2. طبع الـ Command Window السطر `64 channel with the same label found and imported`.
-3. <MenuPath>Plot > Channel locations > By name</MenuPath> يعرض 64 قطباً: `Cz` في الوسط، و `Fpz` في الأمام، و `Oz` في الخلف.
-4. `all(~cellfun(@isempty, {EEG.chanlocs.X}))` يعطي `1`: لكل قناة إحداثيات.
-
-<Methods>
-Channel labels were cleaned of trailing periods and matched to the standard 10-5 template in MNI space (standard_1005.elc) with pop_chanedit (EEGLAB 2026.1).
-</Methods>
-
-احتفظ بـ `S001R03.set`. الدرس التالي (الأحداث) يكمل عليه.

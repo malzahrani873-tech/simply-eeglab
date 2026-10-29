@@ -45,23 +45,25 @@ eeglabVersion: "2026.1"
 updated: 2026-10-28
 ---
 
-## Why this step matters
+## The idea
 
-The batch script from the previous lesson runs on your computer, one participant after another. That is enough for most projects. But some steps are slow: ICA on 72 channels and fifty minutes of recording can take a long time per participant, and AMICA and DIPFIT are slower. Multiply that by 18 participants, or by 100, and your computer is busy for days.
+The [batch processing](/en/lesson/batch-processing/) script runs on your computer, one participant after another. That is enough for most projects. But ICA on 72 channels and fifty minutes of recording takes a long time per participant, and AMICA and DIPFIT are slower. Multiply by 18 participants, or 100, and your computer is busy for days.
 
-A computing cluster (<En>HPC</En>, high-performance computing) is a large group of computers that runs your jobs at the same time. Twenty participants become twenty parallel jobs, finishing in about the time of one participant.
+A computing cluster (<En>HPC</En>, high-performance computing) runs many jobs at once. But it shows no windows, and you cannot click anything.
 
-But a cluster shows no windows, and you cannot click anything on it. The script must run from start to end on its own. This lesson prepares your script for that.
+So how do you prepare your script to run alone on a cluster?
 
-**When is it worth it?** Compute: time for one participant × number of participants. If the result is a few hours, run it on your computer overnight. If it is days, or you rerun often, the cluster is worth it.
-
-## Before and after
+## How do your jobs move from your computer to the cluster?
 
 <Figure src="hpc/hpc-flow.svg" alt="Four boxes in a row: your computer with the project folder and script, then the script run_ica_d4.m running without a GUI, then the cluster with three parallel jobs sub-002, sub-003 and sub-004 at your university or NSG, then the results: one ICA weights file per participant and the logs folder." source="original" />
 
-## Steps in the GUI
+Each participant is a separate job. Twenty participants become twenty parallel jobs, finishing in about the time of one participant.
 
-A cluster runs without a GUI, so the steps here are preparation and submission.
+## Is your project worth moving to a cluster?
+
+Multiply the time for one participant by the number of participants. If the result is a few hours, run it on your computer overnight. If it is days, or you rerun often, the cluster is worth it.
+
+## How do I prepare the script and submit it to the cluster?
 
 **First: prepare the script**
 
@@ -97,18 +99,18 @@ module load matlab
 matlab -batch "run_ica_d4"
 ```
 
-6. Submit it with `sbatch job_ica.sh`, and follow it with `squeue -u` and your user name.
+6. Submit it with `sbatch job_ica.sh`, and monitor it with `squeue -u` followed by your user name.
 
 **Third: the NSG portal (a free alternative)**
 
 7. If your university has no cluster, the <En>Neuroscience Gateway</En> (NSG) portal is free for academic researchers, with MATLAB and EEGLAB ready. Register an account on its website.
 8. Install the nsgportal plugin from <MenuPath>File > Manage EEGLAB extensions</MenuPath> (the latest release when this lesson was written is 2.1.1).
 9. Open <MenuPath>Tools > NSG Tools > NSG account info</MenuPath> and enter your user name and password.
-10. Put the script and the data it needs in one folder, then open <MenuPath>Tools > NSG Tools > Manage NSG jobs</MenuPath>, choose the folder, type the script name, and submit the job. From the same window you follow its status and download the results.
+10. Put the script and the data it needs in one folder, then open <MenuPath>Tools > NSG Tools > Manage NSG jobs</MenuPath>, choose the folder, type the script name, and submit the job. From the same window you can follow its status and download the results.
 
-## The equivalent script
+## What does the job script for one participant look like?
 
-The script reads the files that `pop_importbids` wrote to `derivatives/eeglab` in the batch processing lesson, so run that import once first. Run it from inside `faces_project`.
+The script reads the files that `pop_importbids` wrote to `derivatives/eeglab` in [the batch processing lesson](/en/lesson/batch-processing/), so run that import once first. Then run this script from inside `faces_project`.
 
 ```matlab
 % run_ica_d4.m - one subject per job, no display
@@ -160,7 +162,9 @@ try
     % ICA on a 1-Hz high-passed copy (the slow step worth a cluster)
     EEG_ica = pop_eegfiltnew(EEG, 'locutoff', 1);
     tic;
-    EEG_ica = pop_runica(EEG_ica, 'icatype', 'runica', 'extended', 1);
+    % No one watches the job, so give the rank: channels - interpolated - 1 (average reference)
+    expectedRank = EEG_ica.nbchan - numel(badChans) - 1;
+    EEG_ica = pop_runica(EEG_ica, 'icatype', 'runica', 'extended', 1, 'pca', expectedRank);
     fprintf('ICA finished in %.1f min\n', toc / 60);
 
     % Save only the small result: the ICA weights and the bad channel list
@@ -178,7 +182,7 @@ catch err
 end
 ```
 
-## Which value should I choose?
+## Which settings do I request for each job, and why?
 
 | Setting | Value in this lesson | Why |
 |---|---|---|
@@ -186,9 +190,16 @@ end
 | How to run | `matlab -batch` | Runs without a GUI, closes MATLAB at the end, and returns an error code on failure. |
 | Memory | 16G in the example | One D4 participant is about 234 MB on disk, but the filter and ICA create copies in memory. Start with a generous value, then read what was actually used in the job report. |
 | Time limit | 4 hours in the example | Measure one participant on your computer and ask for twice that. A job that exceeds its time is stopped by the cluster. |
-| What is saved | ICA weights only | A small file, quick to move from the cluster. It was computed after the same steps as `process_subject` in the batch lesson (same channels, same reference, same interpolation), so you can copy it into that lesson's main dataset, as in the lesson on copying ICA weights. Weights only fit data with the same channels and spatial processing. |
+| What is saved | ICA weights only | A small file, quick to move from the cluster. It was computed after the same steps as `process_subject` in the batch lesson (same channels, same reference, same interpolation). So you can copy it into that lesson's main dataset, as in [the lesson on the 1 Hz filter and copying ICA weights](/en/lesson/ica-1hz-copy-weights/). Weights fit only data with the same channels and spatial processing. |
 
-## Common mistakes
+## How do I check that it worked on the cluster?
+
+- `matlab -batch "run_ica_d4"` on your computer prints `Job 1: sub-002`, then the ICA duration, and closes MATLAB without error.
+- `derivatives/eeglab/sub-002/eeg` holds the file `sub-002_task-FaceRecognition_desc-ica.mat`.
+- On the cluster: three jobs, three weights files, and no error file in `logs`.
+- `size(icaweights)` in each file is the data rank × 72, that is 71 × 72 if no channel was interpolated (one rank is lost to the average reference).
+
+## Common mistakes when running on a cluster
 
 - **A command that opens a window.** Any `pop_` without enough arguments, or `eeglab` instead of `eeglab nogui`, tries to open a window, so the script stops or fails. Test with `matlab -batch` on your computer before submitting.
 - **Paths from your computer.** `C:\Users\...` does not exist on the cluster. Build every path from the project folder.
@@ -197,13 +208,6 @@ end
 - **Forgetting versions.** The EEGLAB or MATLAB version on the cluster may differ from your computer. Print `eeg_getversion` and `version` at the start of the script, and write them in your Methods.
 
 {/* "From experience" box: waiting for the project owner's story. Do not write it before it arrives. */}
-
-## How to check it worked
-
-- `matlab -batch "run_ica_d4"` on your computer prints `Job 1: sub-002`, then the ICA duration, and closes MATLAB without error.
-- `derivatives/eeglab/sub-002/eeg` holds the file `sub-002_task-FaceRecognition_desc-ica.mat`.
-- On the cluster: three jobs, three weights files, and no error file in `logs`.
-- `size(icaweights)` in each file is the data rank × 72, that is 71 × 72 if no channel was interpolated (one rank is lost to the average reference).
 
 <Methods>
 Independent component analysis (extended Infomax; Lee et al., 1999) was computed with runica (EEGLAB 2026.1) for each participant on a copy of the preprocessed data high-pass filtered at 1 Hz, and the resulting weights were applied to the 0.1 Hz high-pass filtered data; jobs ran one per participant on [computing cluster] with MATLAB [version].

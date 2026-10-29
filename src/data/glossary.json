@@ -391,7 +391,7 @@
     "variants": [],
     "decision": "ع+إ",
     "def": {
-      "ar": "تطبيق نفس السكربت على ملفات عدة مشاركين تلقائياً.",
+      "ar": "تطبيق السكربت نفسه على ملفات عدة مشاركين تلقائياً.",
       "en": "Running the same script automatically on many participants' files."
     }
   },
@@ -492,7 +492,7 @@
     "decision": "ع+إ",
     "def": {
       "ar": "حالة تجريبية نقارن بينها وبين غيرها، مثل \"مألوف\" و\"غير مألوف\".",
-      "en": "An experimental situation compared with others, such as familiar vs unfamiliar."
+      "en": "An experimental situation compared with others, such as familiar vs. unfamiliar."
     }
   },
   {
@@ -604,7 +604,7 @@
     "decision": "ع+إ",
     "def": {
       "ar": "التردد الذي تنخفض عنده سعة الإشارة إلى النصف (−6 dB) في فلاتر FIR.",
-      "en": "The frequency where the filter halves the amplitude (−6 dB) for FIR filters."
+      "en": "In FIR filters, the frequency where the amplitude drops to half (−6 dB)."
     }
   },
   {
@@ -625,7 +625,7 @@
     "variants": [],
     "decision": "ع+إ",
     "def": {
-      "ar": "المسافة بين الترددات المسموحة والمحجوبة حيث يتدرّج الإضعاف.",
+      "ar": "المسافة بين الترددات المسموحة والمحجوبة، وفيها يتدرّج الإضعاف.",
       "en": "The range between passed and blocked frequencies where attenuation ramps up."
     }
   },
@@ -671,7 +671,7 @@
     "variants": [],
     "decision": "ع+إ",
     "def": {
-      "ar": "النقطة التي يُقاس جهد كل قناة بالنسبة لها.",
+      "ar": "النقطة التي يُقاس جهد كل قناة بالنسبة إليها.",
       "en": "The point against which each channel's voltage is measured."
     }
   },
@@ -682,7 +682,7 @@
     "variants": [],
     "decision": "ع+إ",
     "def": {
-      "ar": "تغيير المرجع بعد التسجيل بحساب الجهد بالنسبة لمرجع جديد.",
+      "ar": "تغيير المرجع بعد التسجيل بحساب الجهد بالنسبة إلى مرجع جديد.",
       "en": "Changing the reference after recording by expressing voltages relative to a new one."
     }
   },
@@ -777,7 +777,7 @@
     "decision": "ع+إ",
     "def": {
       "ar": "عدد القنوات المستقلة فعلاً في البيانات، ويقل بعد الاستيفاء أو المرجع المتوسط.",
-      "en": "The number of truly independent channels; it drops after interpolation or average reference."
+      "en": "The number of truly independent channels; it drops after interpolation or average referencing."
     }
   },
   {
@@ -845,7 +845,7 @@
     "decision": "ع",
     "def": {
       "ar": "تحرّك العين يميناً أو يساراً، ويظهر كتغيّر في القنوات الأمامية الجانبية.",
-      "en": "Moving the eyes sideways; seen as steps on the side frontal channels."
+      "en": "Moving the eyes sideways; seen as steps on the lateral frontal channels."
     }
   },
   {
@@ -858,7 +858,7 @@
     "decision": "ع",
     "def": {
       "ar": "نشاط كهربائي من العضلات بترددات عالية، غالباً من الفك والرقبة.",
-      "en": "High-frequency electrical activity from muscles, often jaw and neck."
+      "en": "High-frequency electrical activity from muscles, often from the jaw and neck."
     }
   },
   {
@@ -1011,7 +1011,7 @@
     "variants": [],
     "decision": "ع",
     "def": {
-      "ar": "جمع epochs الشرط الواحد وقسمتها على عددها.",
+      "ar": "جمع epochs الشرط الواحد ثم قسمة المجموع على عددها.",
       "en": "Adding a condition's epochs together and dividing by their number."
     }
   },
@@ -1149,7 +1149,7 @@
     "variants": [],
     "decision": "إ",
     "def": {
-      "ar": "رسم يعرض كل المحاولات كخطوط ملوّنة مرتّبة فوق بعضها.",
+      "ar": "رسم يعرض كل المحاولات خطوطاً ملوّنة مرتّبة بعضها فوق بعض.",
       "en": "A plot showing every trial as a colored row, stacked in order."
     }
   },
@@ -1182,7 +1182,7 @@
     "variants": [],
     "decision": "ع+إ",
     "def": {
-      "ar": "مقارنة شروط سجّلها نفس المشارك.",
+      "ar": "مقارنة شروط سُجّلت من المشارك نفسه.",
       "en": "A comparison between conditions recorded from the same participant."
     }
   },
@@ -1259,7 +1259,7 @@
     "variants": [],
     "decision": "ع+إ",
     "def": {
-      "ar": "قياس كيف تتفاعل إشارات مناطق الدماغ مع بعضها.",
+      "ar": "قياس تفاعل إشارات مناطق الدماغ بعضها مع بعض.",
       "en": "Measuring how signals from brain regions interact with each other."
     }
   },
@@ -1287,7 +1287,7 @@
     "decision": "ع+إ",
     "def": {
       "ar": "تشغيل التحليل على حواسيب قوية مشتركة بدل جهازك.",
-      "en": "Running analysis on shared high-powered computers instead of your own machine."
+      "en": "Running analysis on shared high-performance computers instead of your own machine."
     }
   },
   {

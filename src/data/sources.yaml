@@ -35,4 +35,4 @@
   free: true
   lang: en
   stations: [4, 8, 10]
-  license: { ar: 'فيديوهات وشرائح', en: 'Videos and slides' }
+  license: { ar: 'مقاطع فيديو وشرائح', en: 'Videos and slides' }

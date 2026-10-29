@@ -71,34 +71,21 @@ eeglabVersion: "2026.1"
 updated: 2026-10-28
 ---
 
-## Why this step matters
+## The idea
 
-After running ICA you have about 31 ICA components. Some are brain activity, and some are artifacts: non-brain signals mixed into the recording, such as blinks and muscle activity.
+After ICA you have about 31 components. Some are brain activity; others are artifacts: non-brain signals such as blinks and muscle.
 
-Judging every component by eye takes time and experience. ICLabel is a plugin that ships with EEGLAB. It was trained on thousands of components labeled by hand, and it gives each component a probability for seven classes.
+Judging each component by eye takes experience. ICLabel, a plugin that ships with EEGLAB, was trained on thousands of hand-labeled components, and gives each component a probability for seven classes. But it is an assistant, not a judge: you review its suggestion, then remove artifacts from the main dataset.
 
-ICLabel is an assistant, not a judge. You review its suggestion, then remove the artifact components from the main dataset.
+So when do you accept its suggestion, and how do you remove artifacts without losing brain activity?
 
-## Before and after
-
-Before you trust any automatic classifier, train your own eye to read a component.
-
-<IcaGameTeaser />
+## What changes in the signal after removing the blink component?
 
 <Figure src="iclabel/iclabel-before-after.png" alt="Five seconds of FPz, EOG1, EOG2, F3, Fz and F4, before removing the blink component (black) and after (red). The large blink peaks disappear and the rest of the signal is almost unchanged." source="D1" />
 
-## Steps in the GUI
+Black is before removing the blink component, red is after. The blink peaks disappear from the frontal channels, and the rest of the signal is almost unchanged. This is the result you want.
 
-Start with the main dataset loaded and holding ICA weights, as in the Starting point.
-
-**First: classify the components**
-
-1. Open <MenuPath>Tools > Classify components using ICLabel > Label components</MenuPath>.
-2. In <UiLabel>Select which icversion of ICLabel to use:</UiLabel>, keep <UiLabel>Default (recommended)</UiLabel> and press <UiLabel>OK</UiLabel>.
-3. The component scalp maps appear, each with its most likely class and probability above it.
-4. Click any component to open its panels: scalp map, spectrum, time series, and the probability of each class.
-
-**Second: review by eye**
+## How do I tell by eye that a component is an artifact?
 
 For each component you plan to remove, check the three signs:
 
@@ -109,10 +96,33 @@ For each component you plan to remove, check the three signs:
 | Brain | Broad and smooth | A peak near 10 Hz, or a gradual fall as frequency increases | Ongoing oscillation without sharp peaks |
 
 <Callout type="note" title="The other classes">
-Reading the other classes (heart, line noise, channel noise) is the next lesson: Reading artifact components.
+Reading the other classes (heart, line noise, channel noise) is covered in the next lesson: [Reading artifact components](/en/lesson/ic-artifacts/).
 </Callout>
 
-The component panels you open by clicking a component come from the Viewprops extension, which ships inside ICLabel. You can open them for all components at once from <MenuPath>Tools > Classify components using ICLabel > View extended component properties</MenuPath>; the window title starts with <UiLabel>View components properties - pop_viewprops()</UiLabel>. The Viewprops files are in the folder `<EEGLAB>/plugins/ICLabel/viewprops`. The menu adds this folder to the MATLAB path by itself, but a script must add it with an `addpath` line before `pop_viewprops`, as this lesson's script does.
+## How do I train my eye before trusting the classifier?
+
+<IcaGameTeaser />
+
+Classify the component yourself first. After you answer, the game shows ICLabel's probabilities and the reasons behind them, so you see where your eye agrees with it and where it does not.
+
+## How do I classify and remove components from the menus?
+
+Start with the main dataset open and holding ICA weights. If you don't have it, open "Script to reach this state" under "Starts from" at the top of the lesson.
+
+**First: classify the components**
+
+1. Open <MenuPath>Tools > Classify components using ICLabel > Label components</MenuPath>.
+2. In <UiLabel>Select which icversion of ICLabel to use:</UiLabel>, keep <UiLabel>Default (recommended)</UiLabel> and press <UiLabel>OK</UiLabel>.
+3. The component scalp maps appear, each with its most likely class and probability above it.
+4. Click any component to open its panels: scalp map, spectrum, time series, and the probability of each class.
+
+<Callout type="note" title="Where do the component panels come from?">
+The component panels you open by clicking a component come from the Viewprops extension, which ships inside ICLabel. You can open them for all components at once from <MenuPath>Tools > Classify components using ICLabel > View extended component properties</MenuPath>; the window title starts with <UiLabel>View components properties - pop_viewprops()</UiLabel>. The Viewprops files are in the folder `<EEGLAB>/plugins/ICLabel/viewprops`. The menu adds this folder to the MATLAB path automatically, but a script must add it with an `addpath` line before `pop_viewprops`, as this lesson's script does.
+</Callout>
+
+**Second: review by eye**
+
+For each component you plan to remove, check its scalp map, spectrum and time series, as in the section "How do I tell by eye that a component is an artifact?".
 
 **Third: flag artifact components**
 
@@ -129,13 +139,13 @@ A flag is a mark on the component, not a removal. Removal is the next step.
 3. The <UiLabel>List of component(s) to remove from data</UiLabel> field holds the flagged components. Edit it based on your review: add a component you are sure is an artifact, or delete a number you doubt. Then press <UiLabel>OK</UiLabel>.
 4. A confirmation window appears. Press <UiLabel>Plot single trials</UiLabel>: black is before removal, red is after.
 5. If the blinks are gone and the rest of the signal is unchanged, press <UiLabel>Accept</UiLabel>.
-6. Name the new dataset `D1 main clean` and leave <UiLabel>Overwrite it in memory (set=yes; unset=create a new dataset)</UiLabel> unchecked. Save it with <MenuPath>File > Save current dataset as</MenuPath> as `D1_main_clean.set`; the power spectrum lesson can start from it.
+6. Name the new dataset `D1 main clean` and leave <UiLabel>Overwrite it in memory (set=yes; unset=create a new dataset)</UiLabel> unchecked. Save it with <MenuPath>File > Save current dataset as</MenuPath> as `D1_main_clean.set`; [the power spectrum lesson](/en/lesson/power-spectrum/) can start from it.
 
 **Fifth: apply the postponed low-pass**
 
-Now that the data are clean, apply the 30 Hz low-pass from the filtering lesson: <MenuPath>Tools > Filter the data > Basic FIR filter (new, default)</MenuPath>, and type `30` in <UiLabel>Higher edge of the frequency pass band (Hz)</UiLabel>. Name the resulting dataset `D1 main clean lp30`, then save it with <MenuPath>File > Save current dataset as</MenuPath>. The epoching lesson starts from it.
+Now that the data are clean, apply the 30 Hz low-pass from [the filtering lesson](/en/lesson/filtering/): <MenuPath>Tools > Filter the data > Basic FIR filter (new, default)</MenuPath>, and type `30` in <UiLabel>Higher edge of the frequency pass band (Hz)</UiLabel>. Name the resulting dataset `D1 main clean lp30`, then save it with <MenuPath>File > Save current dataset as</MenuPath>. [The Extracting epochs lesson](/en/lesson/extract-epochs/) starts from it.
 
-## The equivalent script
+## How do I classify and remove components with a script?
 
 ```matlab
 % Classify all components with the default ICLabel classifier
@@ -175,32 +185,22 @@ EEG = pop_saveset(EEG, 'filename', 'D1_main_clean_lp30.set', 'filepath', pwd);
 
 If no component is flagged, the script skips the review and the removal. If your review changes the list, edit `artifactComps` by hand before the removal block.
 
-## Which value should I choose?
+## Which threshold and which ICLabel version should I choose?
 
 | Setting | Value | Why |
 |---|---|---|
 | Classifier version | `Default` | The option recommended in the ICLabel window itself, and the one tested in the published ICLabel paper. |
-| Flagging threshold | Eye and Muscle above 90% | The default in EEGLAB 2026.1 and the official tutorial. A high threshold means ICLabel only flags what it is sure about, and the rest is left for your review. |
-| Other classes (Heart, Line Noise, Channel Noise) | Not flagged automatically | Remove them only after reviewing them yourself. You learn to read them in the next lesson. |
+| Flagging threshold | Eye and Muscle above 90% | The default in EEGLAB 2026.1 and the official tutorial. A high threshold means ICLabel flags only what it is sure about and leaves the rest for your review. |
+| Other classes (Heart, Line Noise, Channel Noise) | Not flagged automatically | Remove them only after reviewing them yourself. You will learn to read them in the next lesson. |
 | ICLabel version | 1.6 or newer | ICLabel 1.5, shipped with EEGLAB 2024.0, has a known bug, and the advice is to upgrade. |
 
 <Callout type="note" title="ICLabel and the reference">
-ICLabel computes its features on average-referenced data. If your data are not average-referenced, it converts a temporary copy internally before computing. On our path the EEG channels are already average-referenced from the re-referencing lesson.
+ICLabel computes its features on average-referenced data. If your data are not average-referenced, it converts a temporary copy internally before computing. On our path the EEG channels are already average-referenced from [the re-referencing lesson](/en/lesson/rereferencing/).
 </Callout>
 
-In older papers you will see other tools for classifying components, such as MARA, ADJUST, and SASICA. These are older tools, and ICLabel is the default today.
+In older papers you will see other tools for classifying components, such as MARA, ADJUST, and SASICA. Today, ICLabel is the default.
 
-## Common mistakes
-
-- **Trusting ICLabel blindly.** It is an automatic classifier and it is sometimes wrong. Review every component with the three signs before removing it.
-- **Removing everything that is not Brain.** A component whose top class is Other may carry part of the brain activity. If you are not sure it is an artifact, keep it.
-- **Removing components from the ICA copy instead of the main dataset.** The 1 Hz copy is only for computing ICA. Remove components from the main dataset filtered at 0.1 Hz.
-- **Copying component numbers.** Component order changes between runs. Component 3 in the official tutorial, or in this lesson's picture, may not be the blink in your data.
-- **An old ICLabel version.** Check its version in <MenuPath>File > Manage EEGLAB extensions</MenuPath>, and update it if it is older than 1.6. EEGLAB 2026.1 ships with version 1.7.
-
-{/* "From experience" box: waiting for the project owner's story. Do not write it before it arrives. */}
-
-## How to check it worked
+## How do I check that the removal worked?
 
 1. **Compare the signal.** Open <MenuPath>Plot > Channel data (scroll)</MenuPath> on `D1 main`, then on `D1 main clean`. Blink peaks should be gone from the frontal channels, and the rest of the signal should be almost identical.
 2. **Count the components.** In the command window, type `size(EEG.icawinv, 2)`. It should be the previous number minus the components you removed.
@@ -209,3 +209,13 @@ In older papers you will see other tools for classifying components, such as MAR
 <Methods>
 Components were classified with ICLabel (version 1.7; Pion-Tonachini et al., 2019), and components with a probability above 0.9 for the Eye or Muscle class were reviewed visually and removed ([N] components). Data were then low-pass filtered (passband edge 30 Hz, cutoff frequency [33.64] Hz at −6 dB, filter length [59] points; pop_eegfiltnew, firfilt plugin 2.8).
 </Methods>
+
+## What are the common mistakes with ICLabel?
+
+- **Trusting ICLabel blindly.** It is an automatic classifier and it is sometimes wrong. Review every component with the three signs before removing it.
+- **Removing everything that is not Brain.** A component whose top class is Other may carry part of the brain activity. If you are not sure it is an artifact, keep it.
+- **Removing components from the ICA copy instead of the main dataset.** The 1 Hz copy is only for computing ICA. Remove components from the main dataset filtered at 0.1 Hz.
+- **Copying component numbers.** Component order changes between runs. Component 3 in the official tutorial, or in this lesson's picture, may not be the blink in your data.
+- **An old ICLabel version.** Check its version in <MenuPath>File > Manage EEGLAB extensions</MenuPath>, and update it if it is older than 1.6. EEGLAB 2026.1 ships with version 1.7.
+
+{/* "From experience" box: waiting for the project owner's story. Do not write it before it arrives. */}
