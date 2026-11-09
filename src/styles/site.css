@@ -382,3 +382,5 @@ filter-demo,reref-demo,epoch-reject-demo{display:block}
 .wrap.lwrap{max-width:calc(42rem + 2 * var(--pad))}
 /* references: the table needs more room than a reading column */
 @container site (min-width:1024px){.refs-page.wrap.narrow{max-width:64rem}}
+/* map hero: room for "Continue learning: <lesson>" on one line in English */
+@container site (min-width:900px){.mbar{max-width:480px}}
