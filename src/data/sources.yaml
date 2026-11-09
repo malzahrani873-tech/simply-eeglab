@@ -4,7 +4,7 @@
   url: https://eeglab.org/tutorials/
   free: true
   lang: en
-  stations: [1, 2, 3, 4, 5, 7, 8, 9]
+  stations: [0, 1, 2, 3, 4, 5, 7, 8, 9]
   license: { ar: 'توثيق رسمي', en: 'Official documentation' }
 - title: "Makoto's preprocessing pipeline"
   url: https://eeglab.ucsd.edu/wiki/Makoto%27s_preprocessing_pipeline
@@ -16,8 +16,8 @@
   url: https://socialsci.libretexts.org/Bookshelves/Psychology/Biological_Psychology/Applied_Event-Related_Potential_Data_Analysis_(Luck)
   free: true
   lang: en
-  stations: [5, 6, 8]
-  license: { ar: 'CC BY-NC 4.0', en: 'CC BY-NC 4.0' }
+  stations: [2, 3, 4, 5, 6, 8]
+  license: { ar: 'CC BY 4.0', en: 'CC BY 4.0' }
 - title: Luck, An Introduction to the Event-Related Potential Technique (2nd ed., MIT Press 2014)
   url: https://mitpressbookstore.mit.edu/book/9780262525855
   free: false
@@ -34,5 +34,181 @@
   url: https://eeglab.org/workshops/
   free: true
   lang: en
-  stations: [4, 8, 10]
+  stations: [0, 1, 2, 3, 4, 8, 10]
   license: { ar: 'مقاطع فيديو وشرائح', en: 'Videos and slides' }
+- title: Pernet et al. (2019), EEG-BIDS, Scientific Data 6:103
+  url: https://doi.org/10.1038/s41597-019-0104-8
+  free: true
+  lang: en
+  stations: [2, 8]
+  license: { ar: 'CC BY 4.0', en: 'CC BY 4.0' }
+- title: Gorgolewski et al. (2016), The brain imaging data structure, Scientific Data 3:160044
+  url: https://doi.org/10.1038/sdata.2016.44
+  free: true
+  lang: en
+  stations: [2]
+  license: { ar: 'CC BY 4.0', en: 'CC BY 4.0' }
+- title: Bigdely-Shamlo et al. (2015), The PREP pipeline, Frontiers in Neuroinformatics 9:16
+  url: https://doi.org/10.3389/fninf.2015.00016
+  free: true
+  lang: en
+  stations: [3]
+  license: { ar: 'CC BY 4.0', en: 'CC BY 4.0' }
+- title: Klug & Kloosterman (2022), Zapline-plus, Human Brain Mapping 43:2743–2758
+  url: https://doi.org/10.1002/hbm.25832
+  free: true
+  lang: en
+  stations: [3]
+  license: { ar: 'CC BY 4.0', en: 'CC BY 4.0' }
+- title: Delorme (2023), EEG is better left alone, Scientific Reports 13:2372
+  url: https://doi.org/10.1038/s41598-023-27528-0
+  free: true
+  lang: en
+  stations: [3, 4, 5]
+  license: { ar: 'CC BY 4.0', en: 'CC BY 4.0' }
+- title: Widmann, Schröger & Maess (2015), Digital filter design for electrophysiological data, J Neurosci Methods 250:34–46
+  url: https://doi.org/10.1016/j.jneumeth.2014.08.002
+  free: false
+  lang: en
+  stations: [3]
+  license: { ar: 'ورقة علمية', en: 'Journal article' }
+- title: Chang et al. (2020), Evaluation of artifact subspace reconstruction, IEEE Trans Biomed Eng 67:1114–1121
+  url: https://doi.org/10.1109/TBME.2019.2930186
+  free: false
+  lang: en
+  stations: [3]
+  license: { ar: 'ورقة علمية', en: 'Journal article' }
+- title: "Delorme & Makeig (2004), EEGLAB: an open source toolbox for analysis of single-trial EEG dynamics. J Neurosci Methods 134(1)"
+  url: https://sccn.ucsd.edu/eeglab/download/eeglab_jnm03.pdf
+  free: true
+  lang: en
+  stations: [1]
+  license: { ar: 'ورقة علمية، نسخة المؤلفين', en: "Paper, authors' copy" }
+- title: "Delorme et al. (2011), EEGLAB, SIFT, NFT, BCILAB, and ERICA: New Tools for Advanced EEG Processing"
+  url: https://pmc.ncbi.nlm.nih.gov/articles/PMC3114412/
+  free: true
+  lang: en
+  stations: [1, 8]
+  license: { ar: 'CC BY 3.0', en: 'CC BY 3.0' }
+- title: "Desjardins & Stephenson, SDC-EEGLAB lesson (The Carpentries Incubator)"
+  url: https://github.com/carpentries-incubator/SDC-EEGLAB
+  free: true
+  lang: en
+  stations: [0, 1]
+  license: { ar: 'CC BY 4.0', en: 'CC BY 4.0' }
+- title: "Desjardins, Stephenson & Collins, SDC-BIDS-EEG-EEGLAB lesson (The Carpentries Incubator)"
+  url: https://github.com/carpentries-incubator/SDC-BIDS-EEG-EEGLAB
+  free: true
+  lang: en
+  stations: [0]
+  license: { ar: 'CC BY 4.0', en: 'CC BY 4.0' }
+- title: "Buzsáki, Anastassiou & Koch (2012), The origin of extracellular fields and currents. Nat Rev Neurosci 13"
+  url: https://pmc.ncbi.nlm.nih.gov/articles/PMC3459239/
+  free: true
+  lang: en
+  stations: [0]
+  license: { ar: 'ورقة علمية', en: 'Paper' }
+- title: "Kappenman et al. (2021), ERP CORE: An open resource for human event-related potential research. NeuroImage 225"
+  url: https://pmc.ncbi.nlm.nih.gov/articles/PMC7909723/
+  free: true
+  lang: en
+  stations: [0]
+  license: { ar: 'ورقة علمية', en: 'Paper' }
+- title: "ACNS Guideline 2: Standard Electrode Position Nomenclature (Acharya et al., 2016)"
+  url: https://acns.org/UserFiles/file/EEGGuideline2Electrodenomenclature_final_v1.pdf
+  free: true
+  lang: en
+  stations: [0]
+  license: { ar: 'دليل علمي', en: 'Guideline' }
+- title: MATLAB Onramp (MathWorks)
+  url: https://matlabacademy.mathworks.com/
+  free: true
+  lang: en
+  stations: [0]
+  license: { ar: 'دورة مجانية', en: 'Free course' }
+# Stations 6-8 (2026-11-09): SCCN workshop slides are linked only (no reuse licence stated).
+# The CC BY papers below are the only sources whose figures the lessons reuse, credited under each figure.
+- title: SCCN workshop slides (PDF archive of the EEGLAB workshops)
+  url: https://sccn.ucsd.edu/githubwiki/files/
+  free: true
+  lang: en
+  stations: [6, 7, 8]
+  license: { ar: 'رابط فقط، بلا رخصة معلنة', en: 'Link only, no licence stated' }
+- title: "Pernet (2015). Robust linear modelling of EEG data: the LIMO EEG plug-in (slides)"
+  url: https://sccn.ucsd.edu/githubwiki/files/hierarchical_linear_modelling_for_meeg.pdf
+  free: true
+  lang: en
+  stations: [8]
+  license: { ar: 'رابط فقط، بلا رخصة معلنة', en: 'Link only, no licence stated' }
+- title: "Pernet et al. (2011). LIMO EEG: a toolbox for hierarchical LInear MOdeling of ElectroEncephaloGraphic data"
+  url: https://doi.org/10.1155/2011/831409
+  free: true
+  lang: en
+  stations: [8]
+  license: { ar: 'CC BY 3.0', en: 'CC BY 3.0' }
+- title: "Makeig et al. (2004). Electroencephalographic brain dynamics following manually responded visual targets"
+  url: https://doi.org/10.1371/journal.pbio.0020176
+  free: true
+  lang: en
+  stations: [7, 8]
+  license: { ar: 'CC BY 4.0', en: 'CC BY 4.0' }
+- title: "Lopez-Calderon & Luck (2014). ERPLAB: an open-source toolbox for the analysis of event-related potentials"
+  url: https://doi.org/10.3389/fnhum.2014.00213
+  free: true
+  lang: en
+  stations: [6]
+  license: { ar: 'CC BY 3.0', en: 'CC BY 3.0' }
+- title: "Grandchamp & Delorme (2011). Single-trial normalization for event-related spectral decomposition reduces sensitivity to noisy trials"
+  url: https://doi.org/10.3389/fpsyg.2011.00236
+  free: true
+  lang: en
+  stations: [6]
+  license: { ar: 'وصول مفتوح، إعادة الاستخدام مع ذكر المصدر', en: 'Open access, reuse with credit' }
+- title: "Pernet et al. (2015). Cluster-based computational methods for mass univariate analyses of event-related brain potentials/fields"
+  url: https://doi.org/10.1016/j.jneumeth.2014.08.003
+  free: true
+  lang: en
+  stations: [8]
+  license: { ar: 'CC BY 3.0', en: 'CC BY 3.0' }
+- title: "Luck et al. (2021). Standardized measurement error: a universal metric of data quality for averaged ERPs"
+  url: https://doi.org/10.1111/psyp.13793
+  free: true
+  lang: en
+  stations: [6]
+  license: { ar: 'ورقة علمية، رابط فقط', en: 'Paper, link only' }
+- title: "Keil et al. (2014). Publication guidelines and recommendations for studies using EEG and MEG"
+  url: https://doi.org/10.1111/psyp.12147
+  free: false
+  lang: en
+  stations: [7]
+  license: { ar: 'ورقة علمية، رابط فقط', en: 'Paper, link only' }
+- title: "Pernet et al. (2020). Issues and recommendations from the OHBM COBIDAS MEEG committee"
+  url: https://doi.org/10.1038/s41593-020-00709-0
+  free: false
+  lang: en
+  stations: [7]
+  license: { ar: 'ورقة علمية، رابط فقط', en: 'Paper, link only' }
+- title: EEGLAB workshop, Aspet 2025 (SCCN), talk slides
+  url: https://eeglab.org/workshops/EEGLAB_2025_Aspet.html
+  free: true
+  lang: en
+  stations: [3, 4, 8, 10]
+  license: { ar: 'شرائح للقراءة، بلا رخصة إعادة نشر', en: 'Slides to read; no reuse licence' }
+- title: ICLabel website, tutorial and practice (SCCN)
+  url: https://labeling.ucsd.edu/tutorial/about
+  free: true
+  lang: en
+  stations: [4]
+  license: { ar: 'للقراءة، بلا رخصة إعادة نشر', en: 'To read; no reuse licence' }
+- title: "Pion-Tonachini, Kreutz-Delgado & Makeig (2019). ICLabel: an automated electroencephalographic independent component classifier, dataset, and website. NeuroImage, 198, 181–197"
+  url: https://doi.org/10.1016/j.neuroimage.2019.05.026
+  free: true
+  lang: en
+  stations: [4]
+  license: { ar: 'ورقة، نسخة المؤلف مجانية في PMC', en: 'Paper; free author manuscript in PMC' }
+- title: "Delorme, Palmer, Onton, Oostenveld & Makeig (2012). Independent EEG sources are dipolar. PLoS ONE, 7(2), e30135"
+  url: https://doi.org/10.1371/journal.pone.0030135
+  free: true
+  lang: en
+  stations: [4]
+  license: { ar: 'CC BY', en: 'CC BY' }

@@ -252,6 +252,7 @@
   "ref.type.dataset": "Dataset",
   "ref.type.docs": "Documentation",
   "ref.type.paper": "Paper",
+  "ref.type.slides": "Slides",
   "ref.type.site": "Website",
   "ref.type.video": "Video",
   "ref.video.duration": "{duration}",

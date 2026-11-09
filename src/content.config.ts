@@ -5,7 +5,7 @@ const reference = z.object({
   title: z.string(),
   url: z.string().url(),
   section: z.string(),
-  type: z.enum(['docs', 'book', 'paper', 'video', 'dataset', 'code']).optional(),
+  type: z.enum(['docs', 'book', 'paper', 'slides', 'video', 'dataset', 'code']).optional(),
   lang: z.enum(['ar', 'en']).optional(),
   duration: z.string().optional(),
 });

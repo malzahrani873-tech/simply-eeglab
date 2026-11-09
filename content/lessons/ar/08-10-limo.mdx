@@ -16,6 +16,18 @@ references:
   - title: EEGLAB Tutorial
     url: https://eeglab.org/tutorials/10_Group_analysis/advanced_statistics.html
     section: "10. Group analysis > g. Advanced statistics"
+  - title: "Pernet (2015). Robust linear modelling of EEG data: the LIMO EEG plug-in. Workshop slides (SCCN wiki)"
+    url: https://sccn.ucsd.edu/githubwiki/files/hierarchical_linear_modelling_for_meeg.pdf
+    section: "الشرائح كاملة"
+    type: slides
+  - title: "Pernet (2021). Hierarchical linear modelling for EEG. EEGLAB workshop slides (SCCN)"
+    url: https://sccn.ucsd.edu/githubwiki/files/2021_HLM_EEGLAB_workshop.pdf
+    section: "الشرائح كاملة"
+    type: slides
+  - title: "Delorme (2021). General linear modeling in EEGLAB/LIMO: basic theory. EEGLAB workshop slides (SCCN)"
+    url: https://sccn.ucsd.edu/githubwiki/files/EEGLAB_LIMO_delorme.pdf
+    section: "الشرائح كاملة"
+    type: slides
   - title: LIMO MEEG documentation
     url: https://github.com/LIMO-EEG-Toolbox/limo_meeg/wiki
     section: "Paired t-test"
@@ -26,6 +38,10 @@ references:
   - title: "Pernet, Chauveau, Gaspar & Rousselet (2011). LIMO EEG: a toolbox for hierarchical LInear MOdeling of ElectroEncephaloGraphic data. Computational Intelligence and Neuroscience, 831409"
     url: https://doi.org/10.1155/2011/831409
     section: "Methods"
+  - title: "Pernet, Latinus, Nichols & Rousselet (2015). Cluster-based computational methods for mass univariate analyses of event-related brain potentials/fields: a simulation study. Journal of Neuroscience Methods 250, 85-93"
+    url: https://doi.org/10.1016/j.jneumeth.2014.08.003
+    section: "الورقة كاملة"
+    type: paper
 datasets: [D6]
 startingPoint:
   dataset: D6
@@ -144,7 +160,7 @@ updated: 2026-10-29
 
 ## كيف يعمل LIMO على مستويين؟
 
-<Figure src="limo/limo-two-levels.svg" alt="مستويان في LIMO. في الأعلى 14 مربعاً صغيراً، مربع لكل مشارك من cba إلى wpa، مكتوب على كل منها المستوى الأول، وفيها منحنيات محاولات رفيعة كثيرة تتحول إلى عمودين قصيرين: beta animal و beta distractor. أسهم تنزل إلى مربع عريض: المستوى الثاني، اختبار paired عبر المشاركين، وينتهي بصورة صغيرة للقنوات مقابل الزمن فيها بقع ملوّنة قليلة عليها كتل دالّة. الشكل توضيحي بلا بيانات." caption="رسم توضيحي، بلا بيانات" source="original" />
+<Figure src="limo/limo-two-levels-2011.webp" alt="مستويا LIMO من الورقة التي قدّمت الأداة. في الأعلى المستوى الأول: بيانات الـ epochs لمشارك واحد، محاولة محاولة، تدخل مصفوفة تصميم أعمدتها stimulus 1 و stimulus 2 و noise level و constant. والنتائج ERP معدَّل، ونموذج للـ ERP حسب المتغيّر المصاحب، ومعاملات beta. في الأسفل المستوى الثاني: معاملات beta للمشاركين من 1 إلى n تدخل مصفوفة تصميم ثانية فيها subject variable و constant. والنتائج خريطة قنوات × زمن لقيم F الدالة، وخرائط رأس من 140 إلى 170 ميلي ثانية، وميل انحدار مع مجال ثقته 95%." caption="المستويان في ورقة LIMO: نموذج لمحاولات كل مشارك (أعلى)، ثم اختبار عبر المشاركين على معاملات beta (أسفل). وفي هذا الدرس للمستوى الأول شرطان هما animal و distractor، والمستوى الثاني اختبار للعينات المترابطة (paired)." source="external" credit="Pernet et al. (2011), Figure 1" creditUrl="https://doi.org/10.1155/2011/831409" license="CC BY 3.0" licenseUrl="https://creativecommons.org/licenses/by/3.0/" />
 
 1. **المستوى الأول، داخل كل مشارك:** يُطابَق نموذج خطي على كل محاولة مفردة، في كل قناة ونقطة زمنية. نتائجه "betas": ERP مقدّر لكل شرط لهذا الشخص.
 2. **المستوى الثاني، عبر المشاركين:** تُختبر betas كل المشاركين بطرق متينة (المتوسطات المشذّبة و bootstrap)، مع تصحيح على كل القنوات والنقاط الزمنية معاً.

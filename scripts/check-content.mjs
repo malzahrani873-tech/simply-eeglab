@@ -21,7 +21,14 @@ const sectionCounts = new Map();
 const roadmap = loadRoadmap();
 const datasets = new Map(loadDatasets().map((d) => [d.code, d]));
 const OFFICIAL = /^https:\/\/([a-z0-9-]+\.)?(eeglab\.org|sccn\.ucsd\.edu|mne\.tools|fieldtriptoolbox\.org)\/|^https:\/\/github\.com\/(sccn|ucdavis\/erplab)\b/;
-const REFERENCE_LIMIT_EXCEPTIONS = { 'install-eeglab': 6, 'run-ica': 5 };
+// Stations 6-8 also list the SCCN workshop slides and the open papers whose figures they reuse (owner's request, 2026-11-09).
+const REFERENCE_LIMIT_EXCEPTIONS = { 'install-eeglab': 6, 'run-ica': 5,
+  'erplab-amplitude-latency': 5, 'ersp-itc': 5, 'study-concepts': 6, 'create-study': 5, 'study-from-bids': 5, 'study-design': 6,
+  'study-precompute': 5, 'study-statistics': 8, 'study-export-results': 5, 'ic-clustering': 6, 'limo': 8 };
+// Stations 2–3 gather the open slides, papers and book sections for each step in one place (owner, 2026-11-09).
+for (const s of ['import-raw', 'events', 'bids-openneuro', 'filtering', 'line-noise', 'bad-channels', 'asr', 'interpolation', 'rereferencing']) REFERENCE_LIMIT_EXCEPTIONS[s] = 7;
+// Stations 4-5: ICA lessons also list the ICLabel paper, site and workshop slides.
+Object.assign(REFERENCE_LIMIT_EXCEPTIONS, { 'ica-concept': 5, iclabel: 6, 'ic-artifacts': 5 });
 const REFERENCE_ORDER_EXCEPTIONS = new Set(['electrode-10-20']);
 const CALLOUT_TYPES = new Set(['note', 'warning', 'expert', 'experience']);
 
@@ -109,6 +116,7 @@ for (const lang of ['ar', 'en']) {
       const src = m[1].match(/source="([^"]+)"/)?.[1];
       if (!src) err(file, `سطر ${lineOf(body, m[0])}: <Figure> بلا source`);
       else if (/^D\d$/.test(src) && !ds.includes(src)) err(file, `سطر ${lineOf(body, m[0])}: source ${src} ليس في datasets الدرس`);
+      else if (src === 'external') for (const k of ['credit', 'creditUrl', 'license', 'licenseUrl']) if (!new RegExp(`\\s${k}="[^"]+"`).test(m[1])) err(file, `سطر ${lineOf(body, m[0])}: صورة من مصدر خارجي بلا ${k}`);
     }
     // a frontmatter key inside code means a YAML indentation slip cut the script short
     const fmKey = /^\s*(title|description|station|order|level|status|prerequisites|objectives|datasets|startingPoint|dataset|file|applied|script|interactive|references|eeglabVersion|updated):(\s|$)/m;

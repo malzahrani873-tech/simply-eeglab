@@ -19,6 +19,14 @@ references:
   - title: EEGLAB Tutorial
     url: https://eeglab.org/tutorials/11_Scripting/command_line_study_functions.html
     section: "11. Scripting > Retrieving statistical results"
+  - title: "Delorme (2013). Robust statistics. EEGLAB workshop slides (SCCN)"
+    url: https://sccn.ucsd.edu/githubwiki/files/plenaryday3_study_statistics_adelorme_v2.pdf
+    section: "الشرائح كاملة"
+    type: slides
+  - title: "Pernet (2016). Robust statistics, confidence intervals and correction for multiple comparisons for EEG data. Workshop slides (SCCN wiki)"
+    url: https://sccn.ucsd.edu/githubwiki/files/robuststats_ci_mcc_for_eeg.pdf
+    section: "الشرائح كاملة"
+    type: slides
   - title: "Robust statistics applied to EEG data #5: Correction for multiple comparisons"
     url: https://www.youtube.com/watch?v=DQQAkID0vNQ
     section: "الفيديو كاملاً"
@@ -26,6 +34,14 @@ references:
   - title: "Thorpe, Fize & Marlot (1996). Speed of processing in the human visual system. Nature 381(6582), 520-522"
     url: https://doi.org/10.1038/381520a0
     section: "Results"
+  - title: "Pernet, Latinus, Nichols & Rousselet (2015). Cluster-based computational methods for mass univariate analyses of event-related brain potentials/fields: a simulation study. Journal of Neuroscience Methods 250, 85-93"
+    url: https://doi.org/10.1016/j.jneumeth.2014.08.003
+    section: "الورقة كاملة"
+    type: paper
+  - title: "Pernet, Chauveau, Gaspar & Rousselet (2011). LIMO EEG: a toolbox for hierarchical LInear MOdeling of ElectroEncephaloGraphic data. Computational Intelligence and Neuroscience, 831409"
+    url: https://doi.org/10.1155/2011/831409
+    section: "Figure 2"
+    type: paper
 datasets: [D6]
 startingPoint:
   dataset: D6
@@ -132,16 +148,15 @@ updated: 2026-10-28
 
 ## كيف تظهر النتيجة الدالة على الرسم؟
 
-{/* صورة من سكربت الدرس يوم التشغيل، لا رسم يدوي. نصوص المحاور والعناوين من EEGLAB بالإنجليزية، ونسخة واحدة تكفي للغتين. */}
-<ImageSpec>
-يسار: ERP المجموعة في Pz للتصميم 3، منحنيا animal و distractor في لوحة واحدة، مع أشرطة داكنة على طول أسفل اللوحة في الأزمنة التي تجتاز تصحيح FDR. يمين: خريطتا الرأس لـ 150 إلى 250 ميلي ثانية لـ animal و distractor، وبجانبهما خريطة قيم p.
-</ImageSpec>
+<Figure src="study-statistics/study-ersp-fdr-2011.webp" alt="ثلاث خرائط زمنية-ترددية من STUDY في EEGLAB لعنقود مكوّنات واحد: ERSP للشرط ignore، و ERSP للشرط memorize، كلاهما بالديسيبل من -3.3 إلى 3.3، وعلى اليمين خريطة قيم p لاختبار تبديل (permutation) مع تصحيح FDR، تحدد فيها المناطق البرتقالية والحمراء الفروق الدالة." caption="هكذا يعرض EEGLAB اختبار المجموعة: الشرطان، ثم خريطة قيم p بجانبهما. وهي هنا لـ ERSP عنقود في STUDY الدليل التعليمي لـ EEGLAB. أما في ERP فتظهر الأزمنة الدالة أشرطةً تحت المنحنيات." source="external" credit="Delorme et al. (2011), Figure 2, cropped" creditUrl="https://doi.org/10.1155/2011/130714" license="CC BY 3.0" licenseUrl="https://creativecommons.org/licenses/by/3.0/" />
 
 ## لماذا أصحّح للمقارنات المتعددة، وما الفرق بين FDR والعناقيد؟
 
 EEGLAB يختبر كل نقطة زمنية وحدها، والـ epoch فيه مئات النقاط. عند عتبة 0.05، إذا اختبرت 100 نقطة زمنية مستقلة لا يوجد فيها فرق حقيقي، فستخرج نحو 5 منها «دالة» بالصدفة. هذه مشكلة **المقارنات المتعددة**. تصحيح مثل FDR يرفع الحد، فتختفي أغلب نقاط الصدفة هذه.
 
 تصحيح العناقيد (cluster correction) لا يحكم على كل نقطة زمنية وحدها. يبحث عن سلاسل من النقاط الدالة المتجاورة، ويسأل: هل سلسلة بهذا الطول نادرة عند التباديل؟ لذلك يكون غالباً أقوى من FDR في كشف أثر يستمر عشرات المللي ثانية. في EEGLAB يأتي من إضافة Fieldtrip-lite، وهي ليست جزءاً من التثبيت الأساسي.
+
+<Figure src="study-statistics/mcc-methods-limo-2011.webp" alt="أربعة صفوف لنتيجة LIMO نفسها، صُحّح كل صف بطريقة مختلفة. في كل صف على اليسار خريطة قنوات × زمن للنقاط الدالة، وعلى اليمين منحنى مع مجال ثقته 95% والأزمنة الدالة مظلّلة. من الأعلى: إحصاء القيمة العظمى وفيه نقاط قليلة جداً، ثم التجميع المكاني-الزمني، ثم التجميع الزمني، ثم بلا تصحيح، أي اختبار كل نقطة وحدها، وفيه أكثر النقاط." caption="البيانات نفسها مع أربعة تصحيحات: التصحيح الذي تختاره يغيّر ما تسميه «دالاً». وبلا تصحيح (الأسفل) تجتاز نقاط أكثر، وبعضها يجتاز بالصدفة." source="external" credit="Pernet et al. (2011), Figure 2" creditUrl="https://doi.org/10.1155/2011/831409" license="CC BY 3.0" licenseUrl="https://creativecommons.org/licenses/by/3.0/" />
 
 ## لماذا أحدد النافذة الزمنية قبل أن أرى الرسم؟
 

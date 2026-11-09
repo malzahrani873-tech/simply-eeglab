@@ -19,9 +19,21 @@ references:
   - title: EEGLAB Tutorial
     url: https://eeglab.org/tutorials/11_Scripting/command_line_study_functions.html
     section: "11. Scripting > Component pre-clustering and clustering"
+  - title: "Onton (2021). STUDY clustering overview. EEGLAB workshop slides (SCCN)"
+    url: https://sccn.ucsd.edu/githubwiki/files/Clustering_Intro_SD-2021-Onton.pdf
+    section: "الشرائح كاملة"
+    type: slides
   - title: Go-nogo categorization and detection task (OpenNeuro ds002680)
     url: https://openneuro.org/datasets/ds002680
     section: "README"
+  - title: "Makeig, Delorme, Westerfield, Jung, Townsend, Courchesne & Sejnowski (2004). Electroencephalographic brain dynamics following manually responded visual targets. PLoS Biology 2(6), e176"
+    url: https://doi.org/10.1371/journal.pbio.0020176
+    section: "Figures 5 and 6"
+    type: paper
+  - title: "Delorme, Mullen, Kothe, Akalin Acar, Bigdely-Shamlo, Vankov & Makeig (2011). EEGLAB, SIFT, NFT, BCILAB, and ERICA: new tools for advanced EEG processing. Computational Intelligence and Neuroscience, 130714"
+    url: https://doi.org/10.1155/2011/130714
+    section: "Figure 2"
+    type: paper
 datasets: [D6]
 startingPoint:
   dataset: D6
@@ -175,10 +187,9 @@ updated: 2026-10-28
 
 ## كيف تبدو مجموعة مكوّنات واحدة؟
 
-{/* صورة من سكربت الدرس يوم التشغيل، لا رسم يدوي. نصوص الخرائط وثنائيات القطب من EEGLAB بالإنجليزية، ونسخة واحدة تكفي للغتين. */}
-<ImageSpec>
-يسار: خرائط الرأس لمكوّنات المجموعة التي فيها أكبر عدد من المشاركين، وعنوان كل خريطة مشاركها ومكوّنها (مثل `cba IC6`)، وخريطة متوسط المجموعة أولاً. يمين: ثنائيات أقطاب نفس المجموعة في الرأس القالب، الأعضاء بالأزرق ومتوسط المجموعة بالأحمر.
-</ImageSpec>
+<Figure src="ic-clustering/cluster-scalp-maps-2011.webp" alt="خرائط الرأس لعنقود مكوّنات واحد في STUDY في EEGLAB: خريطة متوسط كبيرة عنوانها Cls 5 (6 Ss, 8 ICs)، ثم المكوّنات الثمانية الأعضاء، وعنوان كل منها اسم المشارك ورقم المكوّن، مثل S01/IC7 و S13/IC19. كلها تتشابه في النمط، مع أزرق في الخلف على اليسار." caption="عنقود واحد في STUDY الدليل التعليمي لـ EEGLAB: خريطة المتوسط أولاً، ثم كل عضو. في عناقيد D6 عندك تبدو العناوين مثل cba IC6." source="external" credit="Delorme et al. (2011), Figure 2, cropped" creditUrl="https://doi.org/10.1155/2011/130714" license="CC BY 3.0" licenseUrl="https://creativecommons.org/licenses/by/3.0/" />
+
+<Figure src="ic-clustering/cluster-dipoles-2004.webp" alt="ثنائيات القطب المكافئة لعناقيد مكوّنات من دراسة منشورة، في رأس قياسي يُرى من الأعلى ومن الخلف ومن الجانب. كل نقطة هي متوسط ثنائي القطب لعنقود، مع خط قصير لاتجاهه، وحولها شكل بيضاوي يبيّن مدى انتشار ثنائيات القطب الأعضاء. ومن التسميات FM و CM و P3b و P3f و mu يساراً ويميناً وثلاثة عناقيد ألفا." caption="ثنائيات القطب للعناقيد: متوسط كل عنقود نقطة، والشكل البيضاوي يبيّن مدى انتشار أعضائه." source="external" credit="Makeig et al. (2004), Figure 5" creditUrl="https://doi.org/10.1371/journal.pbio.0020176" license="CC BY 4.0" licenseUrl="https://creativecommons.org/licenses/by/4.0/" />
 
 ## متى يكون مكوّنان من شخصين «نفس المصدر»؟
 

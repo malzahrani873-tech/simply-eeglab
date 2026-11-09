@@ -18,6 +18,10 @@ references:
   - title: EEGLAB Tutorial
     url: https://eeglab.org/tutorials/11_Scripting/command_line_study_functions.html
     section: "11. Scripting > Creating a STUDY"
+  - title: "Delorme (2021). STUDY design and plotting overview. EEGLAB workshop slides (SCCN)"
+    url: https://sccn.ucsd.edu/githubwiki/files/EEGLAB2021_AD_STUDY_design_newreduced.pdf
+    section: "Step 2: build designs"
+    type: slides
   - title: "Introduction to the EEGLAB STUDY and Study Design by Arnaud Delorme"
     url: https://www.youtube.com/watch?v=HAGrNeh-kgA
     section: "الفيديو كاملاً"
@@ -25,6 +29,10 @@ references:
   - title: Go-nogo categorization and detection task (OpenNeuro ds002680)
     url: https://openneuro.org/datasets/ds002680
     section: "participants.tsv"
+  - title: "Delorme, Mullen, Kothe, Akalin Acar, Bigdely-Shamlo, Vankov & Makeig (2011). EEGLAB, SIFT, NFT, BCILAB, and ERICA: new tools for advanced EEG processing. Computational Intelligence and Neuroscience, 130714"
+    url: https://doi.org/10.1155/2011/130714
+    section: "Figure 2"
+    type: paper
 datasets: [D6]
 startingPoint:
   dataset: D6
@@ -171,6 +179,8 @@ updated: 2026-10-28
 <Callout type="note">
 **إذا جاءت الـ STUDY من BIDS** (درس الإنشاء من BIDS)، فالجنس في حقل اسمه `gender` لا في `group`. يظهر `gender` في نفس قائمة <UiLabel>Select independent variable</UiLabel>، ويعمل بنفس الطريقة.
 </Callout>
+
+<Figure src="study-design/study-design-window-2011.webp" alt="نافذة Edit STUDY design (الدالة pop_studydesign) على STUDY الدليل التعليمي لـ EEGLAB: تصميم واحد في القائمة هو ignore vs. memorize، والمشاركون من S01 إلى S13 كلهم محددون، والمتغيّر المستقل الأول condition وقيمتاه ignore و memorize محددتان مع Paired statistics، والمتغيّر الثاني None، وخانة Save the STUDY مفعّلة." caption="نافذة التصميم في إصدار أقدم من EEGLAB وعلى STUDY أخرى. فيها الأجزاء نفسها التي في الخطوات أعلاه: المشاركون، ومتغيّران مستقلان، وقيمهما." source="external" credit="Delorme et al. (2011), Figure 2, cropped" creditUrl="https://doi.org/10.1155/2011/130714" license="CC BY 3.0" licenseUrl="https://creativecommons.org/licenses/by/3.0/" />
 
 ## كيف أُنشئ التصاميم بسكربت؟
 

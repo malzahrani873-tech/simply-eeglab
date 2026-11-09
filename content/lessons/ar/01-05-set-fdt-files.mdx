@@ -15,6 +15,12 @@ references:
   - title: EEGLAB Tutorial
     url: https://eeglab.org/tutorials/03_Dataset_management/datasets.html
     section: "3. Dataset management: Saving a dataset; Dataset and file preferences"
+  - title: "EEGLAB Tutorial"
+    url: https://eeglab.org/tutorials/ConceptsGuide/Data_Structures.html
+    section: "EEGLAB Data Structures: Saved .set files"
+  - title: "EEGLAB Tutorial"
+    url: https://eeglab.org/tutorials/misc/EEGLAB_option_menu.html
+    section: "EEGLAB memory and other options"
 datasets: [D1]
 startingPoint:
   dataset: D1
@@ -40,7 +46,7 @@ updated: 2026-10-28
 
 ## كيف يبدو الملفان في المجلد؟
 
-<ImageSpec>صورة حقيقية من MATLAB أو EEGLAB قريباً.</ImageSpec>
+<Figure src="set-fdt-files/sdc-set-fdt-folder.webp" alt="على اليسار Current Folder في MATLAB، وداخل المجلد eeg ملفان بنفس الاسم: sub-s01_task-faceO_eeg.fdt و sub-s01_task-faceO_eeg.set. على اليمين نافذة Load dataset(s) -- pop_loadset() ولا يظهر فيها إلا ملف .set." caption="داتاست محفوظة في ملفين بنفس الاسم وفي نفس المجلد. نافذة الفتح تعرض ملف .set فقط، و EEGLAB يجد ملف .fdt بجانبه." source="external" credit="من درس SDC-EEGLAB في The Carpentries Incubator (Desjardins و Stephenson)، محوّلة إلى WebP" creditUrl="https://github.com/carpentries-incubator/SDC-EEGLAB" license="CC BY 4.0" licenseUrl="https://creativecommons.org/licenses/by/4.0/" />
 
 ما يربط الملفين شيئان فقط: الاسم نفسه، والمجلد نفسه. إذا افترقا، لا يجد EEGLAB الإشارة.
 

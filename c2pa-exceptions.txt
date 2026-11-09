@@ -38,8 +38,6 @@ assets-src/lessons/iclabel/iclabel-before-after.ar.svg
 assets-src/lessons/iclabel/iclabel-before-after.en.svg
 assets-src/lessons/import-raw/import-formats.ar.svg
 assets-src/lessons/import-raw/import-formats.en.svg
-assets-src/lessons/limo/limo-two-levels.ar.svg
-assets-src/lessons/limo/limo-two-levels.en.svg
 assets-src/lessons/matlab-basics/matlab-window.ar.svg
 assets-src/lessons/matlab-basics/matlab-window.en.svg
 assets-src/lessons/merge-select-data/merge-select-timeline.ar.svg

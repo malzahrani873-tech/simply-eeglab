@@ -19,9 +19,21 @@ references:
   - title: EEGLAB Tutorial
     url: https://eeglab.org/tutorials/11_Scripting/command_line_study_functions.html
     section: "11. Scripting > Component pre-clustering and clustering"
+  - title: "Onton (2021). STUDY clustering overview. EEGLAB workshop slides (SCCN)"
+    url: https://sccn.ucsd.edu/githubwiki/files/Clustering_Intro_SD-2021-Onton.pdf
+    section: "Full slides"
+    type: slides
   - title: Go-nogo categorization and detection task (OpenNeuro ds002680)
     url: https://openneuro.org/datasets/ds002680
     section: "README"
+  - title: "Makeig, Delorme, Westerfield, Jung, Townsend, Courchesne & Sejnowski (2004). Electroencephalographic brain dynamics following manually responded visual targets. PLoS Biology 2(6), e176"
+    url: https://doi.org/10.1371/journal.pbio.0020176
+    section: "Figures 5 and 6"
+    type: paper
+  - title: "Delorme, Mullen, Kothe, Akalin Acar, Bigdely-Shamlo, Vankov & Makeig (2011). EEGLAB, SIFT, NFT, BCILAB, and ERICA: new tools for advanced EEG processing. Computational Intelligence and Neuroscience, 130714"
+    url: https://doi.org/10.1155/2011/130714
+    section: "Figure 2"
+    type: paper
 datasets: [D6]
 startingPoint:
   dataset: D6
@@ -175,10 +187,9 @@ So how do you group the participants' components that stand for the same source,
 
 ## What does one component cluster look like?
 
-{/* An image from the lesson script on the run day, not a hand drawing. Map and dipole text come from EEGLAB in English, so one version serves both languages. */}
-<ImageSpec>
-Left: the scalp maps of the components in the cluster with the most participants, each titled with its participant and component (for example `cba IC6`), with the cluster mean map first. Right: the dipoles of the same cluster in the template head, blue for members and red for the cluster mean.
-</ImageSpec>
+<Figure src="ic-clustering/cluster-scalp-maps-2011.webp" alt="Scalp maps of one component cluster in an EEGLAB STUDY: a large mean map titled Cls 5 (6 Ss, 8 ICs), then the eight member components, each titled with its subject and component, such as S01/IC7 and S13/IC19. All of them share a similar pattern, with blue at the back on the left." caption="One cluster in the EEGLAB tutorial STUDY: the mean map first, then each member. In your D6 clusters the titles look like cba IC6." source="external" credit="Delorme et al. (2011), Figure 2, cropped" creditUrl="https://doi.org/10.1155/2011/130714" license="CC BY 3.0" licenseUrl="https://creativecommons.org/licenses/by/3.0/" />
+
+<Figure src="ic-clustering/cluster-dipoles-2004.webp" alt="Equivalent dipoles of component clusters from a published study, in a template head seen from above, from behind and from the side. Each dot is the mean dipole of one cluster, with a short line for its direction, and an ellipse around it shows how far its member dipoles spread. Labels include FM, CM, P3b, P3f, left and right mu, and three alpha clusters." caption="Cluster dipoles: the mean of each cluster is a dot, and the ellipse shows how far its members spread." source="external" credit="Makeig et al. (2004), Figure 5" creditUrl="https://doi.org/10.1371/journal.pbio.0020176" license="CC BY 4.0" licenseUrl="https://creativecommons.org/licenses/by/4.0/" />
 
 ## When are two components from two people "the same source"?
 

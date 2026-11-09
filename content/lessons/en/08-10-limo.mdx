@@ -16,6 +16,18 @@ references:
   - title: EEGLAB Tutorial
     url: https://eeglab.org/tutorials/10_Group_analysis/advanced_statistics.html
     section: "10. Group analysis > g. Advanced statistics"
+  - title: "Pernet (2015). Robust linear modelling of EEG data: the LIMO EEG plug-in. Workshop slides (SCCN wiki)"
+    url: https://sccn.ucsd.edu/githubwiki/files/hierarchical_linear_modelling_for_meeg.pdf
+    section: "Full slides"
+    type: slides
+  - title: "Pernet (2021). Hierarchical linear modelling for EEG. EEGLAB workshop slides (SCCN)"
+    url: https://sccn.ucsd.edu/githubwiki/files/2021_HLM_EEGLAB_workshop.pdf
+    section: "Full slides"
+    type: slides
+  - title: "Delorme (2021). General linear modeling in EEGLAB/LIMO: basic theory. EEGLAB workshop slides (SCCN)"
+    url: https://sccn.ucsd.edu/githubwiki/files/EEGLAB_LIMO_delorme.pdf
+    section: "Full slides"
+    type: slides
   - title: LIMO MEEG documentation
     url: https://github.com/LIMO-EEG-Toolbox/limo_meeg/wiki
     section: "Paired t-test"
@@ -26,6 +38,10 @@ references:
   - title: "Pernet, Chauveau, Gaspar & Rousselet (2011). LIMO EEG: a toolbox for hierarchical LInear MOdeling of ElectroEncephaloGraphic data. Computational Intelligence and Neuroscience, 831409"
     url: https://doi.org/10.1155/2011/831409
     section: "Methods"
+  - title: "Pernet, Latinus, Nichols & Rousselet (2015). Cluster-based computational methods for mass univariate analyses of event-related brain potentials/fields: a simulation study. Journal of Neuroscience Methods 250, 85-93"
+    url: https://doi.org/10.1016/j.jneumeth.2014.08.003
+    section: "Full paper"
+    type: paper
 datasets: [D6]
 startingPoint:
   dataset: D6
@@ -144,7 +160,7 @@ So how do you build the simple LIMO model for the two D6 picture types, and read
 
 ## How does LIMO work in two levels?
 
-<Figure src="limo/limo-two-levels.svg" alt="Two levels in LIMO. At the top, 14 small boxes, one per participant from cba to wpa, each labeled 1st level, with many thin trial curves turning into two short bars, beta animal and beta distractor. Arrows lead down to one wide box, 2nd level: paired test across participants, which ends in a small channels by time image with a few colored patches marked significant clusters. Illustrative, no data." caption="Illustration, no data" source="original" />
+<Figure src="limo/limo-two-levels-2011.webp" alt="The two LIMO levels, from the toolbox paper. Top, 1st level: the epoched data of one subject, trial by trial, go into a design matrix with the columns stimulus 1, stimulus 2, noise level and constant. The results are an adjusted ERP, a model of the ERP by covariate, and beta parameters. Bottom, 2nd level: the beta parameters of subjects 1 to n go into a second design matrix, subject variable and constant. The results are a channels by time map of significant F values, scalp maps from 140 to 170 ms, and a regression slope with its 95% interval." caption="The two levels in the LIMO paper: a model for each participant's trials (top), then a test across participants on their betas (bottom). In this lesson the 1st level has two conditions, animal and distractor, and the 2nd level is a paired test." source="external" credit="Pernet et al. (2011), Figure 1" creditUrl="https://doi.org/10.1155/2011/831409" license="CC BY 3.0" licenseUrl="https://creativecommons.org/licenses/by/3.0/" />
 
 1. **First level, within each participant:** a linear model is fitted to every single trial, at every channel and time point. Its results are "betas": one estimated ERP per condition for this person.
 2. **Second level, across participants:** the betas of all participants are tested, with robust methods (trimmed means and bootstrap) and a correction over all channels and time points together.

@@ -19,7 +19,7 @@ references:
     url: https://eeglab.ucsd.edu/wiki/Makoto%27s_preprocessing_pipeline
     section: "§10 Epoch data"
   - title: Applied Event-Related Potential Data Analysis (Luck)
-    url: https://socialsci.libretexts.org/Bookshelves/Psychology/Biological_Psychology/Applied_Event-Related_Potential_Data_Analysis_(Luck)
+    url: "https://socialsci.libretexts.org/Bookshelves/Psychology/Biological_Psychology/Applied_Event-Related_Potential_Data_Analysis_(Luck)/02%3A_Processing_the_Data_from_One_Participant_in_the_ERP_CORE_N400_Experiment/2.07%3A_Exercise-_Epoching_and_Baseline_Correction"
     section: "2.07 Exercise: Epoching and Baseline Correction"
 datasets: [D1]
 startingPoint:
@@ -90,7 +90,7 @@ So how do you cut around one event type, and with which time window?
 
 ## How do continuous data become epochs?
 
-<ImageSpec>Real screenshot from MATLAB or EEGLAB coming soon.</ImageSpec>
+<Figure src="extract-epochs/luck-epoched-eeg.webp" alt="EEGLAB scroll window showing five epochs side by side, numbered 1 to 5 at the top. Each epoch has its event at 0 on the time axis, and dashed vertical lines mark the boundaries between epochs. Labels added by the book's author name each epoch, the time-locking event, a response and a blink in epoch 5." caption="Epoched data in the EEGLAB scroll window: each epoch sits between dashed lines, with its event at 0. From Luck's book on ERP CORE data; the event names differ from D1." source="external" credit="Luck (2022), Applied Event-Related Potential Data Analysis, Figure 2.4; converted to WebP" creditUrl="https://doi.org/10.18115/D5QG92" license="CC BY 4.0" licenseUrl="https://creativecommons.org/licenses/by/4.0/" />
 
 D1 has two event types: the square appearing on the screen (`square`, 80 times), and a button press after some of them (`rt`). Our question is about the brain's response to the square, so we cut around the squares only.
 

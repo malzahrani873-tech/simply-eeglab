@@ -18,6 +18,12 @@ references:
   - title: EEGLAB Tutorial
     url: https://eeglab.org/tutorials/02_Quickstart/quickstart.html
     section: "Exploring event values"
+  - title: "EEGLAB Tutorial"
+    url: https://eeglab.org/tutorials/ConceptsGuide/EEGLAB_functions.html
+    section: "EEGLAB functions"
+  - title: "Desjardins & Stephenson, SDC-EEGLAB (The Carpentries Incubator, CC BY 4.0)"
+    url: https://carpentries-incubator.github.io/SDC-EEGLAB/03-data_structures/index.html
+    section: "Data structures"
 datasets: [D1]
 startingPoint:
   dataset: D1
@@ -43,9 +49,9 @@ So which fields do you need to check any step yourself?
 
 ## What does EEG look like inside?
 
-<ImageSpec>Real screenshot from MATLAB or EEGLAB coming soon.</ImageSpec>
+<Figure src="eeg-struct/sdc-eeg-structure.webp" alt="The output of typing EEG in the Command Window: a list of fields and their values, including setname, nbchan: 128, pnts: 286464, srate: 256, data: [128×286464 double], chanlocs: [128×1 struct], event: [1×1586 struct] and an empty icaweights: [] because ICA has not been computed." caption="EEGLAB 2019.1 with a 128-channel dataset. The main fields are the same in EEGLAB 2026.1." source="external" credit="From the SDC-EEGLAB lesson, The Carpentries Incubator (Desjardins and Stephenson), converted to WebP" creditUrl="https://github.com/carpentries-incubator/SDC-EEGLAB" license="CC BY 4.0" licenseUrl="https://creativecommons.org/licenses/by/4.0/" />
 
-Each branch of the tree is a field. The signal itself sits in one field, `data`, a table of numbers with one row per channel. The other fields describe that table: how many channels, at what sampling rate, where the events are, and whether ICA has been computed.
+Each line in the list is a field. The signal itself sits in one field, `data`, a table of numbers with one row per channel. The other fields describe that table: how many channels, at what sampling rate, where the events are, and whether ICA has been computed.
 
 ## Which fields will I come back to in every lesson?
 

@@ -256,6 +256,7 @@
   "ref.type.dataset": "بيانات",
   "ref.type.docs": "توثيق",
   "ref.type.paper": "ورقة علمية",
+  "ref.type.slides": "شرائح عرض",
   "ref.type.site": "موقع",
   "ref.type.video": "فيديو",
   "ref.video.duration": "{duration}",

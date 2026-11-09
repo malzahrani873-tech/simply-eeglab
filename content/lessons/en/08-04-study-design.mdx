@@ -18,6 +18,10 @@ references:
   - title: EEGLAB Tutorial
     url: https://eeglab.org/tutorials/11_Scripting/command_line_study_functions.html
     section: "11. Scripting > Creating a STUDY"
+  - title: "Delorme (2021). STUDY design and plotting overview. EEGLAB workshop slides (SCCN)"
+    url: https://sccn.ucsd.edu/githubwiki/files/EEGLAB2021_AD_STUDY_design_newreduced.pdf
+    section: "Step 2: build designs"
+    type: slides
   - title: "Introduction to the EEGLAB STUDY and Study Design by Arnaud Delorme"
     url: https://www.youtube.com/watch?v=HAGrNeh-kgA
     section: "Full video"
@@ -25,6 +29,10 @@ references:
   - title: Go-nogo categorization and detection task (OpenNeuro ds002680)
     url: https://openneuro.org/datasets/ds002680
     section: "participants.tsv"
+  - title: "Delorme, Mullen, Kothe, Akalin Acar, Bigdely-Shamlo, Vankov & Makeig (2011). EEGLAB, SIFT, NFT, BCILAB, and ERICA: new tools for advanced EEG processing. Computational Intelligence and Neuroscience, 130714"
+    url: https://doi.org/10.1155/2011/130714
+    section: "Figure 2"
+    type: paper
 datasets: [D6]
 startingPoint:
   dataset: D6
@@ -171,6 +179,8 @@ Each research question has a design that fits it. That is why the steps below cr
 <Callout type="note">
 **If the STUDY came from BIDS** (the lesson on creating a STUDY from BIDS), gender is in a field called `gender`, not in `group`. `gender` appears in the same <UiLabel>Select independent variable</UiLabel> list and works the same way.
 </Callout>
+
+<Figure src="study-design/study-design-window-2011.webp" alt="The Edit STUDY design window, pop_studydesign, on the EEGLAB tutorial STUDY: one design in the list, ignore vs. memorize; subjects S01 to S13 all selected; independent variable 1 is condition, with the values ignore and memorize selected and paired statistics; independent variable 2 is None; and the Save the STUDY box is checked." caption="The design window in an older EEGLAB version, on another STUDY. It has the same parts as in the steps above: the subjects, two independent variables and their values." source="external" credit="Delorme et al. (2011), Figure 2, cropped" creditUrl="https://doi.org/10.1155/2011/130714" license="CC BY 3.0" licenseUrl="https://creativecommons.org/licenses/by/3.0/" />
 
 ## How do I create the designs with a script?
 

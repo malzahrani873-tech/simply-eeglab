@@ -25,6 +25,18 @@ references:
   - title: Face processing EEG dataset for EEGLAB (OpenNeuro ds002718)
     url: https://openneuro.org/datasets/ds002718
     section: "README; dataset_description.json"
+  - title: "Pernet et al. (2019), EEG-BIDS, Scientific Data 6:103"
+    url: https://doi.org/10.1038/s41597-019-0104-8
+    section: "Fig. 1; Methods"
+    type: paper
+  - title: "Gorgolewski et al. (2016), The brain imaging data structure, Scientific Data 3:160044"
+    url: https://doi.org/10.1038/sdata.2016.44
+    section: "Full paper"
+    type: paper
+  - title: "BIDS specification: Electroencephalography"
+    url: https://bids-specification.readthedocs.io/en/stable/modality-specific-files/electroencephalography.html
+    section: "EEG files"
+    type: docs
 datasets: [D4]
 startingPoint:
   dataset: D4
@@ -62,7 +74,7 @@ updated: 2026-10-28
 
 في الجذر ملفات تصف الداتاست كلها. وداخل مجلد كل مشارك ملف الإشارة، ومعه ملفات جانبية للقنوات والأقطاب والأحداث.
 
-<ImageSpec>صورة حقيقية من MATLAB أو EEGLAB قريباً.</ImageSpec>
+<Figure src="bids-openneuro/eeg-bids-tree-pernet2019.webp" alt="مثال لشجرة مجلدات EEG-BIDS. في الجذر: README وCHANGES وdataset_description.json وparticipants.tsv وparticipants.json. وداخل sub-01/eeg: ملف الإشارة (_eeg.edf) ومعه الملفات الجانبية _eeg.json و_events.tsv و_channels.tsv و_electrodes.tsv و_coordsystem.json. وتشير الأسهم إلى معاينة لكل ملف: إعدادات التسجيل، وأزمنة الأحداث، وقائمة القنوات مع تعليم القنوات السيئة، وإحداثيات الأقطاب." caption="مثال لداتاست EEG-BIDS: كل ملف جانبي وما بداخله" source="external" credit="Pernet et al. (2019), Scientific Data 6:103, Fig. 1" creditUrl="https://doi.org/10.1038/s41597-019-0104-8" license="CC BY 4.0" licenseUrl="https://creativecommons.org/licenses/by/4.0/" />
 
 ## كيف أستورد مشاركاً من القوائم؟
 

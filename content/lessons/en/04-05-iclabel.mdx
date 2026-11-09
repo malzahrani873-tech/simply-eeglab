@@ -18,9 +18,15 @@ references:
   - title: EEGLAB Tutorial
     url: https://eeglab.org/tutorials/06_RejectArtifacts/RunICA.html
     section: "Subtracting ICA components from data"
+  - title: "EEGLAB workshop, Aspet 2025"
+    url: "https://eeglab.org/workshops/EEGLAB_2025_Aspet.html"
+    section: "ICA decomposition practicum (Claire Braboszcz): ICLabel slides (PDF)"
   - title: ICLabel Tutorial
     url: https://labeling.ucsd.edu/tutorial/about
     section: "ICLabel Tutorial"
+  - title: "Pion-Tonachini et al. (2019), ICLabel, NeuroImage"
+    url: "https://doi.org/10.1016/j.neuroimage.2019.05.026"
+    section: "The paper behind ICLabel: its seven classes and how it was trained"
   - title: "ICA applied to EEG part 9: Automatically detecting ICA component classes"
     url: https://www.youtube.com/watch?v=Gi-0KiV_Az8
     section: "Full video"
@@ -83,7 +89,7 @@ So when do you accept its suggestion, and how do you remove artifacts without lo
 
 ## What changes in the signal after removing the blink component?
 
-<ImageSpec>Real screenshot from MATLAB or EEGLAB coming soon.</ImageSpec>
+<Figure src="iclabel/luck-ica-blink-before-after.webp" alt="EEGLAB scroll window titled «Black = channel before rejection; red = after rejection -- eegplot()», 10 seconds of 11 channels. Large blink peaks near 2.2, 4.5 and 9.8 seconds appear in the black traces of the top channels and are gone from the red traces; elsewhere black and red overlap." caption="The confirmation window after removing the blink component (before is dark blue here, after is red), from Luck's book on ERP CORE data, not D1. You will see the same window with D1." source="external" credit="Luck (2022), Applied Event-Related Potential Data Analysis, Screenshot 9.5; converted to WebP" creditUrl="https://doi.org/10.18115/D5QG92" license="CC BY 4.0" licenseUrl="https://creativecommons.org/licenses/by/4.0/" />
 
 Black is before removing the blink component, red is after. The blink peaks disappear from the frontal channels, and the rest of the signal is almost unchanged. This is the result you want.
 

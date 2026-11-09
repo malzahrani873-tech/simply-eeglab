@@ -18,6 +18,10 @@ references:
   - title: EEGLAB Concepts Guide
     url: https://eeglab.org/tutorials/ConceptsGuide/erp_image_background.html
     section: "ERP image"
+  - title: "Makeig, Delorme, Westerfield, Jung, Townsend, Courchesne & Sejnowski (2004). Electroencephalographic brain dynamics following manually responded visual targets. PLoS Biology 2(6), e176"
+    url: https://doi.org/10.1371/journal.pbio.0020176
+    section: "Figure 2"
+    type: paper
 datasets: [D1]
 startingPoint:
   dataset: D1
@@ -114,6 +118,8 @@ After: the same channel, frame and axes, but trials sorted by the latency of the
 - **Repeating diagonal stripes of alternating color that follow nothing:** An ongoing oscillation (such as alpha near 10 Hz) with a different phase on each trial. It largely cancels out in the average.
 - **One row with an extreme color unlike its neighbors:** A noisy trial. With smoothing it spreads into the neighboring rows.
 - **Empty corners at the bottom left and top right after Align:** No data there after the shift. EEGLAB colors them as zero.
+
+<Figure src="erp-image/erp-image-rt-sorted-2004.webp" alt="Figure from a published study. Top: grand mean ERPs at all channels with scalp maps at 352, 450 and 600 ms, locked to the stimulus (left) and to the response (right). Below: ERP images at Fz and Pz with thousands of trials sorted by reaction time, each with its average under it. In the stimulus-locked images a black dashed curve marks the response on each trial and part of the activity follows it. In the response-locked images that activity stands as a straight vertical band." caption="The same trials locked to the stimulus (left) and to the response (right). Activity tied to the response follows the reaction-time curve in the first, and stands straight in the second." source="external" credit="Makeig et al. (2004), Figure 2" creditUrl="https://doi.org/10.1371/journal.pbio.0020176" license="CC BY 4.0" licenseUrl="https://creativecommons.org/licenses/by/4.0/" />
 
 ## How do I plot and sort the image from the menus?
 

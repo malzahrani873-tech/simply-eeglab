@@ -18,9 +18,15 @@ references:
   - title: EEGLAB Tutorial
     url: https://eeglab.org/tutorials/06_RejectArtifacts/RunICA.html
     section: "Subtracting ICA components from data"
+  - title: "EEGLAB workshop, Aspet 2025"
+    url: "https://eeglab.org/workshops/EEGLAB_2025_Aspet.html"
+    section: "ICA decomposition practicum (Claire Braboszcz): شرائح ICLabel (PDF)"
   - title: ICLabel Tutorial
     url: https://labeling.ucsd.edu/tutorial/about
     section: "ICLabel Tutorial"
+  - title: "Pion-Tonachini et al. (2019), ICLabel, NeuroImage"
+    url: "https://doi.org/10.1016/j.neuroimage.2019.05.026"
+    section: "الورقة الأصلية لـ ICLabel: أصنافه السبعة وكيف دُرِّب"
   - title: "ICA applied to EEG part 9: Automatically detecting ICA component classes"
     url: https://www.youtube.com/watch?v=Gi-0KiV_Az8
     section: "الفيديو كاملاً"
@@ -83,7 +89,7 @@ updated: 2026-10-28
 
 ## ماذا يتغيّر في الإشارة بعد حذف مكوّن الرمش؟
 
-<ImageSpec>صورة حقيقية من MATLAB أو EEGLAB قريباً.</ImageSpec>
+<Figure src="iclabel/luck-ica-blink-before-after.webp" alt="نافذة التمرير في EEGLAB وعنوانها «Black = channel before rejection; red = after rejection -- eegplot()»، فيها 10 ثوانٍ من 11 قناة. قمم رمش كبيرة قرب الثانية 2.2 و4.5 و9.8 تظهر في الخطوط السوداء للقنوات العليا وتختفي من الخطوط الحمراء، وفي باقي الأماكن يتطابق الأسود والأحمر." caption="نافذة التأكيد بعد حذف مكوّن الرمش (قبل الحذف بالأزرق الداكن هنا، وبعده بالأحمر)، من كتاب Luck على بيانات ERP CORE، لا على D1. سترى النافذة نفسها مع D1." source="external" credit="Luck (2022)، Applied Event-Related Potential Data Analysis، Screenshot 9.5، محوّلة إلى WebP" creditUrl="https://doi.org/10.18115/D5QG92" license="CC BY 4.0" licenseUrl="https://creativecommons.org/licenses/by/4.0/" />
 
 الأسود قبل حذف مكوّن الرمش، والأحمر بعده. قمم الرمش تختفي من القنوات الأمامية، وباقي الإشارة يبقى تقريباً كما هو. هذه هي النتيجة التي تريدها.
 

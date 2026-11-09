@@ -30,6 +30,7 @@
 .fig{margin:20px 0}
 .fig-img{background:#fff;border:1px solid var(--sep);border-radius:var(--r3);overflow:hidden;padding:8px}
 .fig-img img{display:block;width:100%;height:auto}
+.fig.fig-narrow .fig-img{max-width:480px;margin-inline:auto}
 .fig figcaption{font-size:15px;color:var(--muted);margin-top:8px;display:grid;gap:2px;line-height:1.7}
 .fig .credit{font-size:13px}
 .ph .pt{margin:0 0 10px!important}

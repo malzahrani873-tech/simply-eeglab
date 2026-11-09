@@ -24,6 +24,10 @@ references:
   - title: Applied ERP Data Analysis, data master folder
     url: https://doi.org/10.18115/D50056
     section: "Chapter_10 folder"
+  - title: "Lopez-Calderon & Luck (2014). ERPLAB: an open-source toolbox for the analysis of event-related potentials. Frontiers in Human Neuroscience 8, 213"
+    url: https://doi.org/10.3389/fnhum.2014.00213
+    section: "Measurement"
+    type: paper
 datasets: [D3]
 startingPoint:
   dataset: D3
@@ -104,6 +108,8 @@ ERPLAB has its own chain for building an ERPset: EventList, then BINLISTER, then
 <Callout type="note" title="After exporting">
 The txt files hold one value per participant and bin. Open them in Excel or any statistics program, then compare the two conditions with a paired t test. Statistics are outside this lesson.
 </Callout>
+
+<Figure src="erplab-amplitude-latency/erplab-measurement-gui-2014.webp" alt="Two ERPLAB windows from an older version, 4.0.2.1. Top: the ERP Measurements window, with the measurement type, the bins and channels, a measurement window from 300 to 798 ms, the baseline and the output file. Bottom: its viewer, with one waveform, the measurement window shaded from 300 ms, the area of the positive part filled, and a vertical line at the measured latency." caption="The measurement window and its viewer in an older ERPLAB version. In ERPLAB 13 the fields have moved, but the parts are the same." source="external" credit="Lopez-Calderon & Luck (2014), Figure 5" creditUrl="https://doi.org/10.3389/fnhum.2014.00213" license="CC BY 3.0" licenseUrl="https://creativecommons.org/licenses/by/3.0/" />
 
 ## How do I score all three in a script, and see the peak bias?
 

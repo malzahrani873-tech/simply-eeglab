@@ -19,6 +19,14 @@ references:
   - title: EEGLAB Tutorial
     url: https://eeglab.org/tutorials/11_Scripting/command_line_study_functions.html
     section: "11. Scripting > Retrieving statistical results"
+  - title: "Delorme (2013). Robust statistics. EEGLAB workshop slides (SCCN)"
+    url: https://sccn.ucsd.edu/githubwiki/files/plenaryday3_study_statistics_adelorme_v2.pdf
+    section: "Full slides"
+    type: slides
+  - title: "Pernet (2016). Robust statistics, confidence intervals and correction for multiple comparisons for EEG data. Workshop slides (SCCN wiki)"
+    url: https://sccn.ucsd.edu/githubwiki/files/robuststats_ci_mcc_for_eeg.pdf
+    section: "Full slides"
+    type: slides
   - title: "Robust statistics applied to EEG data #5: Correction for multiple comparisons"
     url: https://www.youtube.com/watch?v=DQQAkID0vNQ
     section: "Full video"
@@ -26,6 +34,14 @@ references:
   - title: "Thorpe, Fize & Marlot (1996). Speed of processing in the human visual system. Nature 381(6582), 520-522"
     url: https://doi.org/10.1038/381520a0
     section: "Results"
+  - title: "Pernet, Latinus, Nichols & Rousselet (2015). Cluster-based computational methods for mass univariate analyses of event-related brain potentials/fields: a simulation study. Journal of Neuroscience Methods 250, 85-93"
+    url: https://doi.org/10.1016/j.jneumeth.2014.08.003
+    section: "Full paper"
+    type: paper
+  - title: "Pernet, Chauveau, Gaspar & Rousselet (2011). LIMO EEG: a toolbox for hierarchical LInear MOdeling of ElectroEncephaloGraphic data. Computational Intelligence and Neuroscience, 831409"
+    url: https://doi.org/10.1155/2011/831409
+    section: "Figure 2"
+    type: paper
 datasets: [D6]
 startingPoint:
   dataset: D6
@@ -132,16 +148,15 @@ So how do you run this test in EEGLAB without being fooled by chance points?
 
 ## How does a significant result appear on the plot?
 
-{/* An image from the lesson script on the run day, not a hand drawing. Axis text and titles come from EEGLAB in English, so one version serves both languages. */}
-<ImageSpec>
-Left: the group ERP at Pz for design 3, the two curves animal and distractor on one panel, with dark bars along the bottom of the panel at the times that pass the FDR correction. Right: the 150 to 250 ms scalp maps for animal and distractor, with the p-value map next to them.
-</ImageSpec>
+<Figure src="study-statistics/study-ersp-fdr-2011.webp" alt="Three EEGLAB STUDY time-frequency maps for one component cluster: the ERSP for ignore, the ERSP for memorize, both in dB from -3.3 to 3.3, and on the right the p-value map of a permutation test with FDR correction, where orange and red areas mark the significant differences." caption="This is how EEGLAB shows a group test: the two conditions, then a map of p-values beside them. Here it is for the ERSP of a cluster in the EEGLAB tutorial STUDY. For an ERP, the significant times appear as bars under the curves." source="external" credit="Delorme et al. (2011), Figure 2, cropped" creditUrl="https://doi.org/10.1155/2011/130714" license="CC BY 3.0" licenseUrl="https://creativecommons.org/licenses/by/3.0/" />
 
 ## Why correct for multiple comparisons, and how do FDR and clusters differ?
 
 EEGLAB tests every time point on its own, and an epoch holds hundreds of time points. At a threshold of 0.05, if you test 100 independent time points where there is no real difference, about 5 of them will come out "significant" by chance. This is the **multiple comparisons** problem. A correction such as FDR raises the bar, so most of these chance points disappear.
 
 Cluster correction does not judge each time point alone. It looks for runs of neighboring significant points, and asks whether a run this long is rare under permutation. So it is often better than FDR at detecting an effect that lasts tens of milliseconds. In EEGLAB it comes from the Fieldtrip-lite plugin, which is not part of the base install.
+
+<Figure src="study-statistics/mcc-methods-limo-2011.webp" alt="Four rows of the same LIMO result, each corrected in a different way. In each row, on the left a channels by time map of the significant points, and on the right a curve with its 95% interval and the significant times shaded. From the top: max statistic, with very few points; spatial-temporal clustering; temporal clustering; and no correction, with a test at each point on its own and the most points." caption="The same data with four corrections: the correction you choose changes what you call significant. With no correction (bottom), more points pass, and some of them pass by chance." source="external" credit="Pernet et al. (2011), Figure 2" creditUrl="https://doi.org/10.1155/2011/831409" license="CC BY 3.0" licenseUrl="https://creativecommons.org/licenses/by/3.0/" />
 
 ## Why choose the time window before looking at the plot?
 
