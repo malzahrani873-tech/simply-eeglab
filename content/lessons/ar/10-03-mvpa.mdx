@@ -20,8 +20,16 @@ references:
     url: https://github.com/lucklab/ERP_CORE
     section: "N170/EEG_ERP_Processing: BDF_N170.txt and 5_Elist_Bin_Epoch.m"
   - title: Luck, Applied Event-Related Potential Data Analysis (2nd ed.)
-    url: https://socialsci.libretexts.org/Bookshelves/Psychology/Book%3A_Applied_Event-Related_Potential_Data_Analysis_(Luck)
+    url: https://socialsci.libretexts.org/Bookshelves/Psychology/Biological_Psychology/Applied_Event-Related_Potential_Data_Analysis_2e/12%3A_Multivariate_Pattern_Classification_(Decoding)
     section: "Chapter 12: Multivariate Pattern Classification (Decoding)"
+  - title: "Carrasco et al. (2024), Using multivariate pattern analysis to increase effect sizes for event-related potential analyses"
+    url: https://doi.org/10.1111/psyp.14570
+    section: "Psychophysiology 61:e14570"
+    type: paper
+  - title: "Kappenman et al. (2021), ERP CORE: an open resource for human event-related potential research"
+    url: https://doi.org/10.1016/j.neuroimage.2020.117465
+    section: "NeuroImage 225:117465"
+    type: paper
 datasets: [D3]
 startingPoint:
   dataset: D3
@@ -55,9 +63,7 @@ updated: 2026-10-28
 
 ## ماذا يقول منحنى دقة التصنيف؟
 
-<ImageSpec>
-منحنى دقة التصنيف من نافذة ERPLAB > Multivariate Pattern Classification (MVPC) Tools > Plot MVPC Results للمشارك 2 من تجربة N170 في ERP CORE (وجوه مقابل سيارات): المحور الأفقي الزمن من -200 إلى 800 ميلي ثانية، والعمودي نسبة الإجابات الصحيحة من 0 إلى 1، وخط أفقي متقطّع عند 0.5 (الصدفة)، وخط عمودي عند الصفر. المنحنى يبقى قرب 0.5 قبل الصفر، ويرتفع إلى قمته بين 130 و250 ميلي ثانية تقريباً. المصدر: لقطة من EEGLAB 2026.1 مع ERPLAB 13.10 على جهاز صاحب المشروع. نسبة التعليق: ERP CORE (Kappenman و Luck)، CC BY-SA 4.0.
-</ImageSpec>
+<Figure src="mvpa/n170-decoding-luck.webp" alt="رسمان لدقة التصنيف من ERPLAB، الدقة مقابل الزمن من -200 إلى 800 ميلي ثانية، مع خط متقطّع عند 0.5. في الأعلى (A) منحنى ملوّن لكل مشارك، تتذبذب المنحنيات حول 0.5 قبل الصفر وأغلبها يقفز عالياً قرب 100 إلى 150 ميلي ثانية. وفي الأسفل (B) متوسطها منحنى أسود بشريط رمادي، يبقى قرب 0.5 قبل الصفر ثم يرتفع بحدة إلى نحو 0.87 قرب 130 ميلي ثانية، ثم ينزل ببطء ويبقى فوق الصدفة." caption="الوجوه مقابل السيارات في بيانات N170 من ERP CORE، من كتاب Luck: (A) كل مشارك، و(B) المتوسط عبر المشاركين. منحنى المشارك الواحد فيه ضوضاء، فتوقّع أن يتذبذب منحناك أكثر من المتوسط." source="external" credit="Luck, Applied Event-Related Potential Data Analysis (2nd ed.), §12.8, Screenshot 12.12 A and B (cropped)" creditUrl="https://socialsci.libretexts.org/Bookshelves/Psychology/Biological_Psychology/Applied_Event-Related_Potential_Data_Analysis_2e/12%3A_Multivariate_Pattern_Classification_(Decoding)/12.08%3A_Exercise-_Using_Decoding_in_Place_of_Conventional_Mean_Amplitude_Analyses" license="CC BY-NC 4.0" licenseUrl="https://creativecommons.org/licenses/by-nc/4.0/" />
 
 خط الصدفة (0.5) هو ما يصيبه التخمين مع شرطين. قبل ظهور المثير يجب أن يبقى المنحنى قربه. وإذا ارتفع فوقه بعد المثير، فنشاط الدماغ يحمل معلومة تميّز الشرطين في تلك اللحظة.
 

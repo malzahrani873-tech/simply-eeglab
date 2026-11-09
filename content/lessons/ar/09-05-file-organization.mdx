@@ -19,6 +19,14 @@ references:
   - title: EEG-BIDS (GitHub)
     url: https://github.com/sccn/EEG-BIDS
     section: "bids_export.m, bids_export_example.m"
+  - title: "EEG-BIDS plugin documentation"
+    url: https://eeglab.org/plugins/EEG-BIDS/
+    section: "EEGLAB plugins > EEG-BIDS"
+    type: docs
+  - title: "EEGLAB workshop slides: Making data FAIR with BIDS (Oostenveld, 2023)"
+    url: https://github.com/sccn/sccn.github.io/files/11954944/fair.and.bids.pdf
+    section: "Slides (PDF)"
+    type: docs
   - title: BIDS specification
     url: https://bids-specification.readthedocs.io/
     section: "Derivatives"
@@ -26,6 +34,14 @@ references:
     url: https://www.youtube.com/watch?v=LIiRj8-BVk4
     section: "الفيديو كاملاً"
     duration: "22:58"
+  - title: "Pernet et al. (2019), EEG-BIDS, an extension to the brain imaging data structure for electroencephalography"
+    url: https://doi.org/10.1038/s41597-019-0104-8
+    section: "Sci Data 6:103"
+    type: paper
+  - title: "Gorgolewski et al. (2016), The brain imaging data structure"
+    url: https://doi.org/10.1038/sdata.2016.44
+    section: "Sci Data 3:160044"
+    type: paper
 datasets: [D4, D1]
 startingPoint:
   dataset: D4
@@ -55,9 +71,22 @@ updated: 2026-10-28
 
 ## كيف يبدو مجلد مشروع منظّم؟
 
-<ImageSpec>صورة حقيقية من MATLAB أو EEGLAB قريباً.</ImageSpec>
+```text
+faces_project/
+├── rawdata/            ← للقراءة فقط
+│   └── sub-002/eeg/sub-002_task-FaceRecognition_eeg.set
+├── derivatives/
+│   └── eeglab/
+│       ├── batch_summary.csv
+│       └── sub-002/eeg/
+│           ├── sub-002_task-FaceRecognition_desc-clean_eeg.set
+│           └── sub-002_task-FaceRecognition_desc-epochs_eeg.set
+├── code/               batch_d4.m
+├── figures/
+└── logs/               batch_log.txt
+```
 
-القفل على `rawdata` يعني أنه للقراءة فقط. اجعله كذلك من خصائص المجلد في نظام التشغيل، فلا يكتب فيه أي سكربت بالخطأ. كل ما تنتجه المعالجة يذهب إلى `derivatives/eeglab`، بمجلد لكل مشارك.
+المجلد `rawdata` للقراءة فقط. اجعله كذلك من خصائص المجلد في نظام التشغيل، فلا يكتب فيه أي سكربت بالخطأ. كل ما تنتجه المعالجة يذهب إلى `derivatives/eeglab`، بمجلد لكل مشارك.
 
 ## كيف أبني المجلدات والأسماء، وأقرّر ما أحفظه؟
 
@@ -71,6 +100,8 @@ updated: 2026-10-28
    - `logs`: ملفات الأخطاء التي يكتبها سكربت الدفعات من [الدرس السابق](/lesson/batch-processing/).
 
 هذا نفس منطق BIDS: البيانات الخام في مكان، والمشتقات (<En>derivatives</En>) في مكان آخر، بنفس أسماء المشاركين.
+
+<Figure src="file-organization/eeg-bids-pernet2019.webp" alt="مجموعة بيانات EEG بصيغة BIDS. على اليسار شجرة المجلدات: في الجذر README وCHANGES وdataset_description.json وparticipants.tsv وparticipants.json، ثم المجلد sub-01 وفيه مجلد eeg يضم الملف الخام وملف json وملفات الأحداث والقنوات والأقطاب ونظام الإحداثيات، ومجلد anat، ثم stimuli وsourcedata. وعلى اليمين أسهم مرقّمة تعرض لمحة مما في كل ملف من ملفات eeg: الإشارة، وإعدادات التسجيل، وجدول الأحداث، وجدول القنوات، ومواقع الأقطاب، ونظام الإحداثيات." caption="صيغة BIDS كما نُشرت في مواصفات EEG: كل مشارك في مجلد يبدأ بـ sub-، وكل ملف يُسمّى من الأجزاء نفسها." source="external" credit="Pernet et al. (2019), Scientific Data 6:103, Figure 1" creditUrl="https://doi.org/10.1038/s41597-019-0104-8" license="CC BY 4.0" licenseUrl="https://creativecommons.org/licenses/by/4.0/" />
 
 **ثانياً: الأسماء**
 

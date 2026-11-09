@@ -29,6 +29,8 @@ const REFERENCE_LIMIT_EXCEPTIONS = { 'install-eeglab': 6, 'run-ica': 5,
 for (const s of ['import-raw', 'events', 'bids-openneuro', 'filtering', 'line-noise', 'bad-channels', 'asr', 'interpolation', 'rereferencing']) REFERENCE_LIMIT_EXCEPTIONS[s] = 7;
 // Stations 4-5: ICA lessons also list the ICLabel paper, site and workshop slides.
 Object.assign(REFERENCE_LIMIT_EXCEPTIONS, { 'ica-concept': 5, iclabel: 6, 'ic-artifacts': 5 });
+// Stations 9-10 also list the open papers, plugin manuals and workshop slides on each topic.
+Object.assign(REFERENCE_LIMIT_EXCEPTIONS, { 'single-subject-script': 6, 'automated-pipelines': 6, 'file-organization': 8, hpc: 6, dipfit: 8, sift: 7, mvpa: 5, 'mne-fieldtrip': 5 });
 const REFERENCE_ORDER_EXCEPTIONS = new Set(['electrode-10-20']);
 const CALLOUT_TYPES = new Set(['note', 'warning', 'expert', 'experience']);
 

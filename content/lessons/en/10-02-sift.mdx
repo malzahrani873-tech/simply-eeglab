@@ -19,6 +19,14 @@ references:
   - title: SIFT scripting example (epoched data)
     url: https://github.com/sccn/SIFT/blob/master/scripts/ScriptingExample_2_0_forEpoched.m
     section: "STEP 1 to STEP 7"
+  - title: "SIFT manual"
+    url: https://eeglab.org/plugins/SIFT/Chapter-5.4.-Model-Fitting-and-Validation.html
+    section: "Chapter 5.4 Model fitting and validation; Chapter 6 Visualization"
+    type: docs
+  - title: "EEGLAB workshop slides: SIFT practicum (Mullen, 2019)"
+    url: https://sccn.ucsd.edu/githubwiki/files/sift_i_practicum.pdf
+    section: "Slides (PDF)"
+    type: docs
   - title: Makoto's preprocessing pipeline
     url: https://eeglab.ucsd.edu/wiki/Makoto%27s_preprocessing_pipeline
     section: "SIFT tips"
@@ -26,6 +34,10 @@ references:
     url: https://www.youtube.com/watch?v=6_WW6EMHmWo
     section: "Full video"
     duration: "13:34"
+  - title: "Delorme et al. (2011), EEGLAB, SIFT, NFT, BCILAB, and ERICA: new tools for advanced EEG processing"
+    url: https://doi.org/10.1155/2011/130714
+    section: "Comput Intell Neurosci 2011:130714"
+    type: paper
 datasets: [D1]
 startingPoint:
   dataset: D1
@@ -99,9 +111,7 @@ So how do you build a model with enough data, and check that it is valid before 
 
 ## What does the SIFT time-frequency grid show?
 
-<ImageSpec>
-The SIFT grid from Visualization > Time-Frequency Grid for four ICA components of D1 after epoching: a 4 × 4 matrix, each off-diagonal cell a time-frequency plot of dDTF08 from the column component to the row component, time across the epoch (window centers from about -0.75 to 1.75 seconds), frequency from 2 to 30 Hz, with a vertical line at zero. Above each column and left of each row, the component's scalp map. Source: screenshot from EEGLAB 2026.1 with SIFT on the project owner's computer.
-</ImageSpec>
+<Figure src="sift/sift-grid-delorme2011.webp" alt="A SIFT time-frequency grid for eight ICA components, with a small brain image for each component above the columns and left of the rows. Each off-diagonal cell is a time-frequency map of dDTF from the column component to the row component, time from -0.5 to 0.5 seconds and frequency up to 50 Hz; most cells are pale green, and a few show red or blue patches at low frequencies. A red arrow points to one cell opened in its own window, from component 8 to component 13." caption="An example from a published study (eight components, error trials), not from D1. Your grid from step 12 has four components, but you read it the same way: from the column to the row." source="external" credit="Delorme et al. (2011), Computational Intelligence and Neuroscience 2011:130714, Figure 4a (cropped)" creditUrl="https://doi.org/10.1155/2011/130714" license="CC BY" licenseUrl="https://pmc.ncbi.nlm.nih.gov/articles/PMC3114412/" />
 
 Each off-diagonal cell shows the connectivity from the column component to the row component, over time and frequency. Do not read this grid before you have confirmed that the model is valid, as you will in step 10. The diagonal cells show a component with itself, not a connection between two components, so do not read them as arrows.
 

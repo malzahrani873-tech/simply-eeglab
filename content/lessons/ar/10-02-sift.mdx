@@ -19,6 +19,14 @@ references:
   - title: SIFT scripting example (epoched data)
     url: https://github.com/sccn/SIFT/blob/master/scripts/ScriptingExample_2_0_forEpoched.m
     section: "STEP 1 to STEP 7"
+  - title: "SIFT manual"
+    url: https://eeglab.org/plugins/SIFT/Chapter-5.4.-Model-Fitting-and-Validation.html
+    section: "Chapter 5.4 Model fitting and validation; Chapter 6 Visualization"
+    type: docs
+  - title: "EEGLAB workshop slides: SIFT practicum (Mullen, 2019)"
+    url: https://sccn.ucsd.edu/githubwiki/files/sift_i_practicum.pdf
+    section: "Slides (PDF)"
+    type: docs
   - title: Makoto's preprocessing pipeline
     url: https://eeglab.ucsd.edu/wiki/Makoto%27s_preprocessing_pipeline
     section: "SIFT tips"
@@ -26,6 +34,10 @@ references:
     url: https://www.youtube.com/watch?v=6_WW6EMHmWo
     section: "الفيديو كاملاً"
     duration: "13:34"
+  - title: "Delorme et al. (2011), EEGLAB, SIFT, NFT, BCILAB, and ERICA: new tools for advanced EEG processing"
+    url: https://doi.org/10.1155/2011/130714
+    section: "Comput Intell Neurosci 2011:130714"
+    type: paper
 datasets: [D1]
 startingPoint:
   dataset: D1
@@ -99,9 +111,7 @@ updated: 2026-10-28
 
 ## ماذا تعرض شبكة SIFT الزمنية-الترددية؟
 
-<ImageSpec>
-شبكة SIFT من نافذة Visualization > Time-Frequency Grid لأربعة مكوّنات ICA من D1 بعد التقطيع: مصفوفة 4 × 4، في كل خلية خارج القطر رسم زمني-ترددي لمقياس dDTF08 من مكوّن العمود إلى مكوّن الصف، الزمن عبر الـ epoch (مراكز النوافذ من نحو -0.75 إلى 1.75 ثانية)، والتردد من 2 إلى 30 هرتز، وخط عمودي عند الصفر. فوق كل عمود وعلى يسار كل صف خريطة رأس المكوّن. المصدر: لقطة من EEGLAB 2026.1 مع SIFT على جهاز صاحب المشروع.
-</ImageSpec>
+<Figure src="sift/sift-grid-delorme2011.webp" alt="شبكة SIFT زمنية-ترددية لثمانية مكوّنات ICA، فوق كل عمود وعلى يسار كل صف صورة دماغ صغيرة للمكوّن. كل خلية خارج القطر خريطة زمنية-ترددية لمقياس dDTF من مكوّن العمود إلى مكوّن الصف، الزمن من -0.5 إلى 0.5 ثانية والتردد حتى 50 هرتز. أغلب الخلايا أخضر باهت، وفي بعضها بقع حمراء أو زرقاء عند الترددات المنخفضة. وسهم أحمر يشير إلى خلية مفتوحة في نافذة مستقلة، من المكوّن 8 إلى المكوّن 13." caption="مثال من دراسة منشورة (ثمانية مكوّنات، محاولات الخطأ)، لا من D1. شبكتك في الخطوة 12 فيها أربعة مكوّنات، لكنك تقرؤها بالطريقة نفسها: من العمود إلى الصف." source="external" credit="Delorme et al. (2011), Computational Intelligence and Neuroscience 2011:130714, Figure 4a (cropped)" creditUrl="https://doi.org/10.1155/2011/130714" license="CC BY" licenseUrl="https://pmc.ncbi.nlm.nih.gov/articles/PMC3114412/" />
 
 كل خلية خارج القطر تعرض قوة الاتصال من مكوّن العمود إلى مكوّن الصف، عبر الزمن والتردد. لا تقرأ هذه الشبكة قبل أن تتأكد أن النموذج صالح، كما ستفعل في الخطوة 10. أما خلايا القطر فتعرض المكوّن مع نفسه، لا اتصالاً بين مكوّنين، فلا تقرأها كسهم.
 

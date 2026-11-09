@@ -16,6 +16,10 @@ references:
   - title: EEGLAB Tutorial
     url: https://eeglab.org/tutorials/11_Scripting/automated_pipeline.html
     section: "11. Scripting > e. Automated pipeline"
+  - title: "EEGLAB workshop slides: Scripting (Delorme, 2018)"
+    url: https://sccn.ucsd.edu/githubwiki/files/eeglab2018_scripting5.pdf
+    section: "Slides (PDF)"
+    type: docs
   - title: Luck, Applied Event-Related Potential Data Analysis
     url: https://socialsci.libretexts.org/Bookshelves/Psychology/Book%3A_Applied_Event-Related_Potential_Data_Analysis_(Luck)
     section: "Chapter 11: EEGLAB and ERPLAB Scripting"
@@ -23,6 +27,14 @@ references:
     url: https://www.youtube.com/watch?v=yaA1wq2nSIc
     section: "الفيديو كاملاً"
     duration: "9:41"
+  - title: "Luck, Applied Event-Related Potential Data Analysis"
+    url: https://socialsci.libretexts.org/Bookshelves/Psychology/Biological_Psychology/Applied_Event-Related_Potential_Data_Analysis_(Luck)/11%3A_EEGLAB_and_ERPLAB_Scripting/11.08%3A_Exercise-_From_the_Command_Line_to_a_Script
+    section: "11.8: From the command line to a script"
+    type: book
+  - title: "Luck, Applied Event-Related Potential Data Analysis"
+    url: https://socialsci.libretexts.org/Bookshelves/Psychology/Biological_Psychology/Applied_Event-Related_Potential_Data_Analysis_(Luck)/11%3A_EEGLAB_and_ERPLAB_Scripting/11.16%3A_Exercise-_Building_an_Entire_EEG_Processing_Pipeline
+    section: "11.16: Building an entire EEG processing pipeline"
+    type: book
 datasets: [D1]
 startingPoint:
   dataset: D1
@@ -46,7 +58,7 @@ updated: 2026-10-28
 
 ## من أي درس يأتي كل قسم في السكربت؟
 
-<ImageSpec>صورة حقيقية من MATLAB أو EEGLAB قريباً.</ImageSpec>
+<Figure src="single-subject-script/script-sections-luck.webp" alt="محرر MATLAB وفيه سكربت قصير من ثلاثة أقسام. كل قسم يبدأ بسطر أخضر أوله %%: Create a variable named DIR، ثم Load data from Subject 1، ثم Load data from Subject 2. يرسم المحرر خطاً رفيعاً فوق كل سطر %%، والقسم الذي فيه المؤشر مظلّل بالأصفر. وفي الأعلى أزرار Run وRun Section وRun and Advance." caption="مثال من دورة أخرى: كل سطر %% يبدأ قسماً، والزر Run Section يشغّل القسم الذي أنت فيه فقط. سكربتك بالشكل نفسه، بقسم لكل محطة." source="external" credit="Luck, Applied Event-Related Potential Data Analysis, §11.8, Screenshot 11.4" creditUrl="https://socialsci.libretexts.org/Bookshelves/Psychology/Biological_Psychology/Applied_Event-Related_Potential_Data_Analysis_(Luck)/11%3A_EEGLAB_and_ERPLAB_Scripting/11.08%3A_Exercise-_From_the_Command_Line_to_a_Script" license="CC BY 4.0" licenseUrl="https://creativecommons.org/licenses/by/4.0/" />
 
 كل قسم يبدأ بسطر `%%`، وعنوانه يذكر المحطة التي جاء منها.
 

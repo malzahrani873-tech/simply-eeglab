@@ -15,10 +15,6 @@ content/lessons/ar/08-02-create-study.mdx 1
 content/lessons/ar/08-03-study-from-bids.mdx 1
 content/lessons/ar/08-05-study-precompute.mdx 1
 content/lessons/ar/08-06-study-plot-channels.mdx 1
-content/lessons/ar/09-02-single-subject-script.mdx 1
-content/lessons/ar/09-05-file-organization.mdx 1
-content/lessons/ar/10-02-sift.mdx 1
-content/lessons/ar/10-03-mvpa.mdx 1
 content/lessons/ar/10-04-write-plugin.mdx 1
 content/lessons/en/01-02-eeglab-gui.mdx 2
 content/lessons/en/02-02-channel-locations.mdx 2
@@ -35,8 +31,4 @@ content/lessons/en/08-02-create-study.mdx 1
 content/lessons/en/08-03-study-from-bids.mdx 1
 content/lessons/en/08-05-study-precompute.mdx 1
 content/lessons/en/08-06-study-plot-channels.mdx 1
-content/lessons/en/09-02-single-subject-script.mdx 1
-content/lessons/en/09-05-file-organization.mdx 1
-content/lessons/en/10-02-sift.mdx 1
-content/lessons/en/10-03-mvpa.mdx 1
 content/lessons/en/10-04-write-plugin.mdx 1

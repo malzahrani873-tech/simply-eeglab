@@ -20,8 +20,16 @@ references:
     url: https://github.com/lucklab/ERP_CORE
     section: "N170/EEG_ERP_Processing: BDF_N170.txt and 5_Elist_Bin_Epoch.m"
   - title: Luck, Applied Event-Related Potential Data Analysis (2nd ed.)
-    url: https://socialsci.libretexts.org/Bookshelves/Psychology/Book%3A_Applied_Event-Related_Potential_Data_Analysis_(Luck)
+    url: https://socialsci.libretexts.org/Bookshelves/Psychology/Biological_Psychology/Applied_Event-Related_Potential_Data_Analysis_2e/12%3A_Multivariate_Pattern_Classification_(Decoding)
     section: "Chapter 12: Multivariate Pattern Classification (Decoding)"
+  - title: "Carrasco et al. (2024), Using multivariate pattern analysis to increase effect sizes for event-related potential analyses"
+    url: https://doi.org/10.1111/psyp.14570
+    section: "Psychophysiology 61:e14570"
+    type: paper
+  - title: "Kappenman et al. (2021), ERP CORE: an open resource for human event-related potential research"
+    url: https://doi.org/10.1016/j.neuroimage.2020.117465
+    section: "NeuroImage 225:117465"
+    type: paper
 datasets: [D3]
 startingPoint:
   dataset: D3
@@ -55,9 +63,7 @@ So how do you train a classifier that tells, moment by moment, whether the parti
 
 ## What does the decoding accuracy curve tell you?
 
-<ImageSpec>
-The decoding accuracy curve from ERPLAB > Multivariate Pattern Classification (MVPC) Tools > Plot MVPC Results for ERP CORE N170 participant 2 (faces against cars): horizontal axis time from -200 to 800 ms, vertical axis proportion correct from 0 to 1, a dashed horizontal line at 0.5 (chance), and a vertical line at zero. The curve stays near 0.5 before zero and rises to its peak between about 130 and 250 ms. Source: screenshot from EEGLAB 2026.1 with ERPLAB 13.10 on the project owner's computer. Caption credit: ERP CORE (Kappenman and Luck), CC BY-SA 4.0.
-</ImageSpec>
+<Figure src="mvpa/n170-decoding-luck.webp" alt="Two ERPLAB decoding plots, decoding accuracy against time from -200 to 800 ms, with a dashed line at 0.5. Top, A: one coloured curve per participant; the curves wander around 0.5 before zero and most jump high near 100 to 150 ms. Bottom, B: their average as a black curve with a grey band; it stays near 0.5 before zero, rises sharply to about 0.87 near 130 ms, then falls slowly and stays above chance." caption="Faces against cars in the ERP CORE N170 data, from Luck's book: A, each participant; B, the average across participants. One participant's curve is noisy, so expect yours to jump around more than the average does." source="external" credit="Luck, Applied Event-Related Potential Data Analysis (2nd ed.), §12.8, Screenshot 12.12 A and B (cropped)" creditUrl="https://socialsci.libretexts.org/Bookshelves/Psychology/Biological_Psychology/Applied_Event-Related_Potential_Data_Analysis_2e/12%3A_Multivariate_Pattern_Classification_(Decoding)/12.08%3A_Exercise-_Using_Decoding_in_Place_of_Conventional_Mean_Amplitude_Analyses" license="CC BY-NC 4.0" licenseUrl="https://creativecommons.org/licenses/by-nc/4.0/" />
 
 The chance line (0.5) is what guessing achieves with two conditions. Before the stimulus, the curve should stay near it. If it rises above it after the stimulus, brain activity carries information that separates the two conditions at that moment.
 

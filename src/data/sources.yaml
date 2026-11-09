@@ -16,7 +16,7 @@
   url: https://socialsci.libretexts.org/Bookshelves/Psychology/Biological_Psychology/Applied_Event-Related_Potential_Data_Analysis_(Luck)
   free: true
   lang: en
-  stations: [2, 3, 4, 5, 6, 8]
+  stations: [2, 3, 4, 5, 6, 8, 9]
   license: { ar: 'CC BY 4.0', en: 'CC BY 4.0' }
 - title: Luck, An Introduction to the Event-Related Potential Technique (2nd ed., MIT Press 2014)
   url: https://mitpressbookstore.mit.edu/book/9780262525855
@@ -34,25 +34,25 @@
   url: https://eeglab.org/workshops/
   free: true
   lang: en
-  stations: [0, 1, 2, 3, 4, 8, 10]
+  stations: [0, 1, 2, 3, 4, 8, 9, 10]
   license: { ar: 'مقاطع فيديو وشرائح', en: 'Videos and slides' }
 - title: Pernet et al. (2019), EEG-BIDS, Scientific Data 6:103
   url: https://doi.org/10.1038/s41597-019-0104-8
   free: true
   lang: en
-  stations: [2, 8]
+  stations: [2, 8, 9]
   license: { ar: 'CC BY 4.0', en: 'CC BY 4.0' }
 - title: Gorgolewski et al. (2016), The brain imaging data structure, Scientific Data 3:160044
   url: https://doi.org/10.1038/sdata.2016.44
   free: true
   lang: en
-  stations: [2]
+  stations: [2, 9]
   license: { ar: 'CC BY 4.0', en: 'CC BY 4.0' }
 - title: Bigdely-Shamlo et al. (2015), The PREP pipeline, Frontiers in Neuroinformatics 9:16
   url: https://doi.org/10.3389/fninf.2015.00016
   free: true
   lang: en
-  stations: [3]
+  stations: [3, 9]
   license: { ar: 'CC BY 4.0', en: 'CC BY 4.0' }
 - title: Klug & Kloosterman (2022), Zapline-plus, Human Brain Mapping 43:2743–2758
   url: https://doi.org/10.1002/hbm.25832
@@ -64,7 +64,7 @@
   url: https://doi.org/10.1038/s41598-023-27528-0
   free: true
   lang: en
-  stations: [3, 4, 5]
+  stations: [3, 4, 5, 9]
   license: { ar: 'CC BY 4.0', en: 'CC BY 4.0' }
 - title: Widmann, Schröger & Maess (2015), Digital filter design for electrophysiological data, J Neurosci Methods 250:34–46
   url: https://doi.org/10.1016/j.jneumeth.2014.08.002
@@ -88,7 +88,7 @@
   url: https://pmc.ncbi.nlm.nih.gov/articles/PMC3114412/
   free: true
   lang: en
-  stations: [1, 8]
+  stations: [1, 8, 10]
   license: { ar: 'CC BY 3.0', en: 'CC BY 3.0' }
 - title: "Desjardins & Stephenson, SDC-EEGLAB lesson (The Carpentries Incubator)"
   url: https://github.com/carpentries-incubator/SDC-EEGLAB
@@ -112,7 +112,7 @@
   url: https://pmc.ncbi.nlm.nih.gov/articles/PMC7909723/
   free: true
   lang: en
-  stations: [0]
+  stations: [0, 10]
   license: { ar: 'ورقة علمية', en: 'Paper' }
 - title: "ACNS Guideline 2: Standard Electrode Position Nomenclature (Acharya et al., 2016)"
   url: https://acns.org/UserFiles/file/EEGGuideline2Electrodenomenclature_final_v1.pdf
@@ -210,5 +210,78 @@
   url: https://doi.org/10.1371/journal.pone.0030135
   free: true
   lang: en
-  stations: [4]
+  stations: [4, 10]
   license: { ar: 'CC BY', en: 'CC BY' }
+# Stations 9-10: papers, plugin manuals and workshop slides (checked 2026-11-09).
+- title: "Luck, Applied Event-Related Potential Data Analysis (2nd ed.)"
+  url: https://socialsci.libretexts.org/Bookshelves/Psychology/Biological_Psychology/Applied_Event-Related_Potential_Data_Analysis_2e
+  free: true
+  lang: en
+  stations: [10]
+  license: { ar: 'CC BY-NC 4.0', en: 'CC BY-NC 4.0' }
+- title: "Martínez-Cancino et al. (2021). The Open EEGLAB Portal Interface: high-performance computing with EEGLAB. NeuroImage 224:116778"
+  url: https://doi.org/10.1016/j.neuroimage.2020.116778
+  free: true
+  lang: en
+  stations: [9]
+  license: { ar: 'مفتوحة للقراءة', en: 'Free to read' }
+- title: "Carrasco et al. (2024). Using multivariate pattern analysis to increase effect sizes for event-related potential analyses. Psychophysiology 61:e14570"
+  url: https://doi.org/10.1111/psyp.14570
+  free: true
+  lang: en
+  stations: [10]
+  license: { ar: 'مفتوحة للقراءة', en: 'Free to read' }
+- title: "Oostenveld et al. (2011). FieldTrip: open source software for advanced analysis of MEG, EEG, and invasive electrophysiological data. Comput Intell Neurosci 2011:156869"
+  url: https://doi.org/10.1155/2011/156869
+  free: true
+  lang: en
+  stations: [10]
+  license: { ar: 'CC BY', en: 'CC BY' }
+- title: "Gramfort et al. (2013). MEG and EEG data analysis with MNE-Python. Front Neurosci 7:267"
+  url: https://doi.org/10.3389/fnins.2013.00267
+  free: true
+  lang: en
+  stations: [10]
+  license: { ar: 'CC BY', en: 'CC BY' }
+- title: "SIFT manual (EEGLAB plugin documentation)"
+  url: https://eeglab.org/plugins/SIFT/
+  free: true
+  lang: en
+  stations: [10]
+  license: { ar: 'توثيق رسمي', en: 'Official documentation' }
+- title: "nsgportal documentation (EEGLAB on the Neuroscience Gateway)"
+  url: https://eeglab.org/plugins/nsgportal/
+  free: true
+  lang: en
+  stations: [9]
+  license: { ar: 'توثيق رسمي', en: 'Official documentation' }
+- title: "EEGLAB workshop slides: Scripting (Delorme, 2018)"
+  url: https://sccn.ucsd.edu/githubwiki/files/eeglab2018_scripting5.pdf
+  free: true
+  lang: en
+  stations: [9]
+  license: { ar: 'شرائح، بلا رخصة معلنة (للقراءة فقط)', en: 'Slides, no stated licence (read only)' }
+- title: "EEGLAB workshop slides: Using the DIPFIT plugin (Delorme, 2019)"
+  url: https://sccn.ucsd.edu/githubwiki/files/delorme2019_dipfit.pdf
+  free: true
+  lang: en
+  stations: [10]
+  license: { ar: 'شرائح، بلا رخصة معلنة (للقراءة فقط)', en: 'Slides, no stated licence (read only)' }
+- title: "EEGLAB workshop slides: Forward and inverse models (Oostenveld, 2019)"
+  url: https://sccn.ucsd.edu/githubwiki/files/dipfit-oostenveld.pdf
+  free: true
+  lang: en
+  stations: [10]
+  license: { ar: 'شرائح، بلا رخصة معلنة (للقراءة فقط)', en: 'Slides, no stated licence (read only)' }
+- title: "EEGLAB workshop slides: SIFT practicum (Mullen, 2019)"
+  url: https://sccn.ucsd.edu/githubwiki/files/sift_i_practicum.pdf
+  free: true
+  lang: en
+  stations: [10]
+  license: { ar: 'شرائح، بلا رخصة معلنة (للقراءة فقط)', en: 'Slides, no stated licence (read only)' }
+- title: "EEGLAB workshop slides: Making data FAIR with BIDS (Oostenveld, 2023)"
+  url: https://github.com/sccn/sccn.github.io/files/11954944/fair.and.bids.pdf
+  free: true
+  lang: en
+  stations: [9]
+  license: { ar: 'شرائح، بلا رخصة معلنة (للقراءة فقط)', en: 'Slides, no stated licence (read only)' }

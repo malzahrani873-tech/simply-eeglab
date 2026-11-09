@@ -19,6 +19,14 @@ references:
   - title: EEG-BIDS (GitHub)
     url: https://github.com/sccn/EEG-BIDS
     section: "bids_export.m, bids_export_example.m"
+  - title: "EEG-BIDS plugin documentation"
+    url: https://eeglab.org/plugins/EEG-BIDS/
+    section: "EEGLAB plugins > EEG-BIDS"
+    type: docs
+  - title: "EEGLAB workshop slides: Making data FAIR with BIDS (Oostenveld, 2023)"
+    url: https://github.com/sccn/sccn.github.io/files/11954944/fair.and.bids.pdf
+    section: "Slides (PDF)"
+    type: docs
   - title: BIDS specification
     url: https://bids-specification.readthedocs.io/
     section: "Derivatives"
@@ -26,6 +34,14 @@ references:
     url: https://www.youtube.com/watch?v=LIiRj8-BVk4
     section: "Full video"
     duration: "22:58"
+  - title: "Pernet et al. (2019), EEG-BIDS, an extension to the brain imaging data structure for electroencephalography"
+    url: https://doi.org/10.1038/s41597-019-0104-8
+    section: "Sci Data 6:103"
+    type: paper
+  - title: "Gorgolewski et al. (2016), The brain imaging data structure"
+    url: https://doi.org/10.1038/sdata.2016.44
+    section: "Sci Data 3:160044"
+    type: paper
 datasets: [D4, D1]
 startingPoint:
   dataset: D4
@@ -55,9 +71,22 @@ So how do you arrange your folders and file names, and decide in advance what to
 
 ## What does an organized project folder look like?
 
-<ImageSpec>Real screenshot from MATLAB or EEGLAB coming soon.</ImageSpec>
+```text
+faces_project/
+├── rawdata/            ← read-only
+│   └── sub-002/eeg/sub-002_task-FaceRecognition_eeg.set
+├── derivatives/
+│   └── eeglab/
+│       ├── batch_summary.csv
+│       └── sub-002/eeg/
+│           ├── sub-002_task-FaceRecognition_desc-clean_eeg.set
+│           └── sub-002_task-FaceRecognition_desc-epochs_eeg.set
+├── code/               batch_d4.m
+├── figures/
+└── logs/               batch_log.txt
+```
 
-The lock on `rawdata` means it is read-only. Make it so in the folder's properties in your operating system, so no script writes to it by mistake. Everything processing produces goes to `derivatives/eeglab`, with one folder per participant.
+`rawdata` is read-only. Make it so in the folder's properties in your operating system, so no script writes to it by mistake. Everything processing produces goes to `derivatives/eeglab`, with one folder per participant.
 
 ## How do I set up the folders and names, and decide what to save?
 
@@ -71,6 +100,8 @@ The lock on `rawdata` means it is read-only. Make it so in the folder's properti
    - `logs`: the error files written by the batch script from [the previous lesson](/en/lesson/batch-processing/).
 
 This is the same logic as BIDS: raw data in one place, <En>derivatives</En> in another, with the same participant names.
+
+<Figure src="file-organization/eeg-bids-pernet2019.webp" alt="An EEG dataset in BIDS. On the left the folder tree: README, CHANGES, dataset_description.json, participants.tsv and participants.json at the root, then sub-01 with an eeg folder holding the raw file, its json, events, channels, electrodes and coordsystem files, and an anat folder, then stimuli and sourcedata. On the right, numbered arrows show a preview of what each eeg file holds: the signal, the recording settings, the events table, the channels table, the electrode positions and the coordinate system." caption="BIDS as published in its EEG specification: each participant in a sub- folder, and each file named from the same parts." source="external" credit="Pernet et al. (2019), Scientific Data 6:103, Figure 1" creditUrl="https://doi.org/10.1038/s41597-019-0104-8" license="CC BY 4.0" licenseUrl="https://creativecommons.org/licenses/by/4.0/" />
 
 **Second: the names**
 
