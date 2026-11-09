@@ -99,7 +99,7 @@ const jsonLd = {
             {d.references.map((r) => (
               <li><a href={r.url} rel="noopener" target="_blank" lang={refLang(r)}>{r.title}</a><span class="rt">{t(lang, `ref.type.${refTypes(r)}`)}{r.duration && ` · ${r.duration}`}</span></li>
             ))}
-          </ul><p data-pagefind-ignore><a href={url(`lesson/${slug}/card/`, lang)}>{t(lang, 'card.link')}</a></p><p class="ver">{t(lang, 'lesson.version', { version: d.eeglabVersion })} · {d.updated.toISOString().slice(0, 10)}</p></div>
+          </ul><p class="ver">{t(lang, 'lesson.version', { version: d.eeglabVersion })} · {d.updated.toISOString().slice(0, 10)}</p></div>
         </details>
         <div class="print-copy" data-pagefind-ignore><h2>{t(lang, 'section.further')}</h2><ul>{d.references.map((r) => <li>{r.title}: {r.url} ({r.section})</li>)}</ul></div>
 

@@ -2,3 +2,5 @@
 /en/map/ /en/ 301
 /ica-game/ / 301
 /en/ica-game/ /en/ 301
+/lesson/:slug/card/ /lesson/:slug/ 301
+/en/lesson/:slug/card/ /en/lesson/:slug/ 301

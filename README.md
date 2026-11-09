@@ -4,8 +4,7 @@ A free, bilingual (Arabic and English) site that teaches EEGLAB as a roadmap:
 11 stations and 62 short lessons, each one step of a single analysis project,
 from a raw recording to group statistics. Each lesson shows the menu path, the
 matching script, the values to choose, common mistakes and how to check the
-result. There are interactive demos, end-of-station quizzes and a printable reference card
-for every lesson.
+result. There are interactive demos and end-of-station quizzes.
 
 There are no accounts and no server. Progress is stored in the learner's browser
 and moves between devices with a short code, a link or a file.

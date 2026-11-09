@@ -1,5 +1,5 @@
 // Fails when a lesson component tag or its name leaks into the text a reader sees or prints,
-// e.g. "<UiLabel>Max window</UiLabel>" shown literally on a reference card.
+// e.g. "<UiLabel>Max window</UiLabel>" shown literally on a page.
 import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 
