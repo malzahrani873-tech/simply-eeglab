@@ -6,7 +6,6 @@ content/lessons/ar/01-02-eeglab-gui.mdx 2
 content/lessons/ar/01-03-eeg-struct.mdx 1
 content/lessons/ar/01-05-set-fdt-files.mdx 1
 content/lessons/ar/02-02-channel-locations.mdx 2
-content/lessons/ar/02-03-events.mdx 1
 content/lessons/ar/03-01-resampling.mdx 1
 content/lessons/ar/03-05-asr.mdx 1
 content/lessons/ar/04-04-ica-1hz-copy-weights.mdx 1
@@ -35,7 +34,6 @@ content/lessons/en/01-02-eeglab-gui.mdx 2
 content/lessons/en/01-03-eeg-struct.mdx 1
 content/lessons/en/01-05-set-fdt-files.mdx 1
 content/lessons/en/02-02-channel-locations.mdx 2
-content/lessons/en/02-03-events.mdx 1
 content/lessons/en/03-01-resampling.mdx 1
 content/lessons/en/03-05-asr.mdx 1
 content/lessons/en/04-04-ica-1hz-copy-weights.mdx 1
