@@ -9,8 +9,38 @@ svg.classList.add('links'); svg.setAttribute('aria-hidden', 'true');
 rm.prepend(svg);
 let hl: string | null = null, raf = 0;
 
+// Packing on wide screens: lessons alternate sides, so a station only has to clear the station above it
+// and the lessons two stations up (same side). Rows are placed absolutely from measured heights;
+// without JS, or on narrow screens, the list keeps its normal flow.
+const GAP_STATION = 28, GAP_SIDE = 20;
+let packedWidth = -1;
+function pack() {
+  const rows = [...rm.querySelectorAll<HTMLElement>('.rs')];
+  if (!wide.matches) { rm.classList.remove('packed'); rm.style.height = ''; rows.forEach((r) => (r.style.top = '')); packedWidth = -1; return; }
+  const w = rm.clientWidth;
+  if (w === packedWidth) return;
+  rm.classList.remove('packed'); rm.style.height = '';
+  const m = rows.map((r) => {
+    const top = r.getBoundingClientRect().top;
+    const s = r.querySelector('.sbox')!.getBoundingClientRect(), l = r.querySelector('.cl')!.getBoundingClientRect();
+    return { s: s.top - top, sb: s.bottom - top, l: l.top - top, lb: l.bottom - top, h: r.getBoundingClientRect().height };
+  });
+  const T: number[] = [];
+  m.forEach((x, i) => {
+    let y = 0;
+    if (i > 0) y = Math.max(y, T[i - 1] + m[i - 1].sb + GAP_STATION - x.s);
+    if (i > 1) y = Math.max(y, T[i - 2] + m[i - 2].lb + GAP_SIDE - x.l);
+    T.push(y);
+  });
+  rows.forEach((r, i) => (r.style.top = `${T[i]}px`));
+  rm.style.height = `${Math.max(...m.map((x, i) => T[i] + x.h))}px`;
+  rm.classList.add('packed');
+  packedWidth = rm.clientWidth;
+}
+
 function draw() {
   raf = 0;
+  pack();
   if (!wide.matches || getComputedStyle(svg).display === 'none') { svg.replaceChildren(); return; }
   const R = rm.getBoundingClientRect();
   const box = (el: Element) => { const r = el.getBoundingClientRect(); return { l: r.left - R.left, r: r.right - R.left, t: r.top - R.top, b: r.bottom - R.top }; };
@@ -36,6 +66,7 @@ rm.addEventListener('pointerover', (e) => setHl(nodeOf(e)?.id ?? null));
 rm.addEventListener('pointerleave', () => setHl(null));
 rm.addEventListener('focusin', (e) => setHl(nodeOf(e)?.id ?? null));
 rm.addEventListener('focusout', () => setHl(null));
-addEventListener('map-changed', queue);
+addEventListener('map-changed', () => { packedWidth = -1; queue(); });
+document.fonts?.ready.then(() => { packedWidth = -1; queue(); });
 new ResizeObserver(queue).observe(rm);
 wide.addEventListener('change', queue);

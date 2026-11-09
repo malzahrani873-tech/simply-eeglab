@@ -45,7 +45,6 @@ const outcomes = lang === 'ar' ? text.outcomes : text.outcomesEn;
       <span aria-current="page">{t(lang, 'station.label', { n: station })}</span>
     </nav>
     <header class="shead" data-station={station}>
-      <span class="ch" aria-hidden="true">{t(lang, 'station.channel', { nn: pad(station) })}</span>
       <h1><T s={title} lang={lang} /> <span class="st-done" hidden><Icon name="check" class="ico s20" />{t(lang, 'station.complete')}</span></h1>
       <p class="lead" set:html={qtext(lang === 'ar' ? text.description : text.descriptionEn, lang)} />
       <p class="muted">{counts}
