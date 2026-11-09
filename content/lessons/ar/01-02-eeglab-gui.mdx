@@ -35,14 +35,14 @@ updated: 2026-10-28
 
 قبل أي معالجة، اعرف ماذا فتحت: كم قناة (<En>channel</En>)، وبأي معدل عيّنات (<En>sampling rate</En>)، وكم دقيقة. هذه الأرقام تتغيّر مع كل خطوة، ومراقبتها أسرع طريقة لاكتشاف خطأ.
 
-ستتدرّب على عيّنة EEGLAB الرسمية `eeglab_data.set`، وهي في مجلد `sample_data` داخل EEGLAB. فكيف تفتحها وتقرأ ما تقوله النافذة عنها؟
+ستتدرّب على الداتاست التعليمية الرسمية في EEGLAB `eeglab_data.set`، وهي في مجلد `sample_data` داخل EEGLAB. فكيف تفتحها وتقرأ ما تقوله النافذة عنها؟
 
 ## كيف تتغيّر النافذة الرئيسية عندما تفتح داتاست؟
 
 <BeforeAfter>
 <Figure src="eeglab-gui/S2-eeglab-empty.png" alt="نافذة EEGLAB الرئيسية قبل فتح أي ملف: تظهر عبارة No current dataset وتحتها خطوات مقترحة للبدء." caption="قبل فتح البيانات، EEGLAB 2026.1" source="eeglab-ui" />
 <ImageSpec>
-بعد: نفس نافذة EEGLAB الرئيسية بعد فتح eeglab_data.set. في الأعلى السطر #1: Continuous EEG Data ثم سطر Filename، وتحتهما الأسطر بقيمها: Channels per frame = 32، Frames per epoch = 30504، Epochs = 1، Events = 154، Sampling rate (Hz) = 128، Epoch start (sec) = 0.000، Epoch end (sec) = 238.305، Reference = unknown، Channel locations = Yes، ICA weights = No، Dataset size (Mb). كل سطر عليه رقم صغير يقابل صفاً في جدول «ماذا يعني كل سطر في النافذة الرئيسية؟». بنفس حجم النافذة وإطارها في صورة "قبل" تماماً. لقطة واجهة حقيقية من EEGLAB 2026.1 (source: eeglab-ui).
+بعد: نفس نافذة EEGLAB الرئيسية بعد فتح eeglab_data.set. في الأعلى السطر #1: Continuous EEG Data ثم سطر Filename، وتحتهما الأسطر بقيمها: Channels per frame = 32، Frames per epoch = 30504، Epochs = 1، Events = 154، Sampling rate (Hz) = 128، Epoch start (sec) = 0.000، Epoch end (sec) = 238.305، Reference = unknown، Channel locations = Yes، ICA weights = No، Dataset size (Mb). كل سطر عليه رقم صغير يقابل صفاً في جدول «ماذا يعني كل سطر في النافذة الرئيسية؟».
 </ImageSpec>
 </BeforeAfter>
 
@@ -56,7 +56,7 @@ updated: 2026-10-28
 |---|---|
 | <UiLabel>File</UiLabel> | فتح البيانات واستيرادها وحفظها، والإضافات، والإعدادات. |
 | <UiLabel>Edit</UiLabel> | معلومات الداتاست، والأحداث (<En>event</En>)، ومواقع الأقطاب (<En>electrode</En>)، واختيار جزء من البيانات. |
-| <UiLabel>Tools</UiLabel> | خطوات المعالجة: الفلترة، و ICA، والتقطيع وغيرها. |
+| <UiLabel>Tools</UiLabel> | خطوات المعالجة: الفلترة، وتحليل المكوّنات المستقلة (<En>ICA</En>)، والتقطيع إلى مقاطع زمنية (<En>epochs</En>)، وغيرها. |
 | <UiLabel>Plot</UiLabel> | الرسوم: الإشارة، والطيف، وخرائط الرأس. |
 | <UiLabel>Study</UiLabel> | تحليل مجموعة مشاركين معاً (المحطة 8). |
 | <UiLabel>Datasets</UiLabel> | التنقّل بين الداتاست المفتوحة في الذاكرة. |
@@ -79,10 +79,10 @@ updated: 2026-10-28
 3. تنقّل بأزرار الأسهم في الأسفل: السهم المفرد (`>` أو `<`) ينقلك خُمس النافذة، أي ثانية واحدة مع النافذة الافتراضية (5 ثوانٍ)، والسهم المزدوج (`>>` أو `<<`) ينقلك 90% من النافذة.
 4. كبّر الإشارة أو صغّرها بزرّي <UiLabel>+</UiLabel> و <UiLabel>-</UiLabel>. الرقم بجوارهما هو المسافة بين القنوات بالميكروفولت.
 5. الخطوط العمودية الملوّنة هي الأحداث، واسم كل حدث فوقها (`square` أو `rt`).
-6. لتغيير طول النافذة الزمنية أو عدد القنوات المعروضة، استخدم قائمة <MenuPath>Settings > Time range to display</MenuPath> داخل نافذة التمرير.
+6. لتغيير طول النافذة الزمنية استخدم <MenuPath>Settings > Time range to display</MenuPath>، ولتغيير عدد القنوات المعروضة استخدم <MenuPath>Settings > Number of channels to display</MenuPath>. كلاهما داخل نافذة التمرير.
 
 <ImageSpec>
-نافذة Channel data (scroll) بعد فتح eeglab_data.set: القنوات بأسمائها على اليسار، وخطوط عمودية للأحداث square و rt، وأزرار الأسهم الأربعة للتنقّل في الأسفل، وخانة المقياس بين زرّي + و -. تُعلَّم بأسهم: قناة واحدة، وحدث واحد، وأزرار التنقّل، والمقياس. لقطة واجهة حقيقية من EEGLAB 2026.1 (source: eeglab-ui).
+نافذة Channel data (scroll) بعد فتح eeglab_data.set: القنوات بأسمائها على اليسار، وخطوط عمودية للأحداث square و rt، وأزرار الأسهم الأربعة للتنقّل في الأسفل، وخانة المقياس بين زرّي + و -. الأسهم تشير إلى قناة واحدة، وحدث واحد، وأزرار التنقّل، والمقياس.
 </ImageSpec>
 
 ## ماذا يعني كل سطر في النافذة الرئيسية؟
@@ -131,12 +131,12 @@ pop_eegplot(EEG, 1, 1, 1);
 3. **نافذة التمرير** تعرض 32 قناة بأسمائها، وتظهر فيها خطوط أحداث `square` و `rt`.
 4. **من الـ Command Window:** اكتب `EEG.setname`. يجب أن يظهر `'Continuous EEG Data'`.
 
-## قوائم رمادية وحفظ فوق العيّنة: ما أخطاء أول استخدام للواجهة؟
+## قوائم رمادية وحفظ فوق الداتاست التعليمية: ما أخطاء أول استخدام للواجهة؟
 
 - **القوائم رمادية ولا تستجيب.** لم تفتح داتاست بعد، أو أن الداتاست المفتوحة لا تناسب هذه القائمة. افتح داتاست أولاً.
 - **قراءة <UiLabel>Frames per epoch</UiLabel> على أنه زمن.** هذا عدد عيّنات، لا ثوانٍ. اقسمه على معدل العيّنات لتحصل على الثواني.
-- **اختيار ملف `.fdt` في نافذة الفتح.** افتح ملف `.set` دائماً. ملف `.fdt` يحمل الإشارة فقط، و EEGLAB يقرؤه تلقائياً مع ملف `.set` (التفصيل في [درس ملفات .set و .fdt](/lesson/set-fdt-files/)، وهو درس اختياري).
-- **الحفظ فوق ملف العيّنة.** لا تستخدم <MenuPath>File > Resave current dataset(s)</MenuPath> بعد تعديل `eeglab_data.set`. احفظ أي نسخة معدّلة باسم جديد في مجلدك من <MenuPath>File > Save current dataset as</MenuPath>، حتى تبقى العيّنة الأصلية سليمة لبقية الدروس.
+- **اختيار ملف `.fdt` في نافذة الفتح.** افتح ملف `.set` دائماً. ملف `.fdt` يحمل الإشارة فقط، و EEGLAB يقرؤه تلقائياً مع ملف `.set` (التفصيل في [درس ملفات `.set` و `.fdt`](/lesson/set-fdt-files/)، وهو درس اختياري).
+- **الحفظ فوق ملف الداتاست التعليمية.** لا تستخدم <MenuPath>File > Resave current dataset(s)</MenuPath> بعد تعديل `eeglab_data.set`. احفظ أي نسخة معدّلة باسم جديد في مجلدك من <MenuPath>File > Save current dataset as</MenuPath>، حتى يبقى الملف الأصلي سليماً لبقية الدروس.
 - **إغلاق النافذة الرئيسية بالخطأ.** البيانات تبقى في الذاكرة. اكتب `eeglab redraw` في الـ Command Window لتعود النافذة بنفس البيانات.
 
 {/* صندوق "من التجربة": بانتظار قصة من صاحب المشروع. لا يُكتب قبل وصولها. */}

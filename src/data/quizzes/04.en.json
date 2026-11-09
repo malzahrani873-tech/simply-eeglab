@@ -132,7 +132,7 @@
         "b",
         "c"
       ],
-      "explanation": "ICLabel is an assistant, not a judge. Removal is from the main dataset at 0.1 Hz, because the 1 Hz copy is only for computing the weights. Component order changes between runs, so find a component by its shape, not its number."
+      "explanation": "ICLabel is an assistant, not a judge. Removal is from the main dataset at 0.1 Hz, because the 1 Hz copy is only for computing the weights. Component order changes between runs, so find a component by its shape, not its number. A component at 55% Eye and 40% Brain sits near the border between the two classes, so removing it may remove brain activity."
     },
     {
       "id": "s04-q05",

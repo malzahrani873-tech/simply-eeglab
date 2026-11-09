@@ -41,9 +41,9 @@ updated: 2026-10-28
 
 ## الفكرة
 
-كثير من التجارب تُسجَّل على عدة أجزاء (<En>runs</En>) لنفس المشارك، مع استراحة بينها. لتحلّلها معاً، تدمجها في داتاست (<En>dataset</En>) واحدة. وأحياناً تحتاج العكس: جزءاً واحداً فقط من التسجيل.
+كثير من التجارب تُسجَّل على عدة جولات تسجيل (<En>runs</En>) لنفس المشارك، مع استراحة بينها. لتحلّلها معاً، تدمجها في داتاست (<En>dataset</En>) واحدة. وأحياناً تحتاج العكس: جزءاً واحداً فقط من التسجيل.
 
-عند نقطة الوصل تنقطع الإشارة. لذلك يضع EEGLAB تلقائياً حدثاً (<En>event</En>) خاصاً اسمه `boundary` عند كل وصل أو قصّ، والفلترة والتقطيع يحترمانه لاحقاً.
+عند نقطة الوصل تنقطع الإشارة. لذلك يضع EEGLAB تلقائياً حدثاً (<En>event</En>) خاصاً اسمه `boundary` عند كل وصل أو قصّ، وتتعامل معه الفلترة والتقطيع إلى مقاطع زمنية (<En>epochs</En>) لاحقاً على أنه حدّ فاصل لا تعبره.
 
 فكيف تقصّ الداتاست وتدمجها، وأين يظهر `boundary`؟
 
@@ -57,9 +57,9 @@ updated: 2026-10-28
 
 ### 1. قُصّ الجزء الأول
 
-1. و `eeglab_data.set` مفتوحة بصفتها الداتاست 1، افتح <MenuPath>Edit > Select data</MenuPath>.
+1. تأكّد أن `eeglab_data.set` مفتوحة وأنها الداتاست 1، ثم افتح <MenuPath>Edit > Select data</MenuPath>.
 2. في صف <UiLabel>Time range [min max] (s)</UiLabel> اكتب `0 120`. اترك الخانة تحت <UiLabel>on->remove these</UiLabel> في نفس الصف غير مفعّلة.
-3. اضغط <UiLabel>OK</UiLabel>. في نافذة <UiLabel>What do you want to do with the new dataset?</UiLabel>، اكتب في <UiLabel>Name it:</UiLabel> الاسم `D1 part 1`، ثم <UiLabel>OK</UiLabel>.
+3. اضغط <UiLabel>OK</UiLabel>. في نافذة <UiLabel>What do you want to do with the new dataset?</UiLabel>، اكتب في <UiLabel>Name it:</UiLabel> الاسم `D1 part 1`، ثم اضغط <UiLabel>OK</UiLabel>.
 4. السطر الأول في النافذة الرئيسية الآن `#2: D1 part 1`، و <UiLabel>Frames per epoch</UiLabel> يعرض 15361.
 
 ### 2. قُصّ الجزء الثاني
@@ -77,14 +77,14 @@ updated: 2026-10-28
 1. افتح <MenuPath>Edit > Append datasets</MenuPath>.
 2. في <UiLabel>Dataset indices to merge</UiLabel> اكتب `2 3`. الترتيب مهم: الداتاست الأولى تأتي أولاً في الزمن.
 3. اترك <UiLabel>Preserve ICA weights of the first dataset ?</UiLabel> غير مفعّلة، واضغط <UiLabel>OK</UiLabel>.
-4. يقترح EEGLAB الاسم `Merged datasets`. غيّره إلى `D1 merged`، ثم <UiLabel>OK</UiLabel>.
+4. يقترح EEGLAB الاسم `Merged datasets`. غيّره إلى `D1 merged`، ثم اضغط <UiLabel>OK</UiLabel>.
 5. النافذة الرئيسية تعرض `#4: D1 merged`: 30504 عيّنة كالأصل، و <UiLabel>Events</UiLabel> يعرض 155 بدل 154.
 
 قد يطبع الـ Command Window السطر `Warning: duplicate boundary event removed`. هذا طبيعي: كل جزء كان يحمل حدث `boundary` عند طرف القصّ، و EEGLAB يُبقي واحداً فقط عند نقطة الوصل.
 
 ### 4. اعثر على نقطة الوصل
 
-1. و `D1 merged` هي الحالية، افتح <MenuPath>Plot > Channel data (scroll)</MenuPath>.
+1. تأكّد أن `D1 merged` هي الداتاست الحالية، ثم افتح <MenuPath>Plot > Channel data (scroll)</MenuPath>.
 2. في الخانة بين السهمين في أسفل النافذة اكتب `118`، واضغط Enter.
 3. عند 120 ثانية ترى خطاً أحمر سميكاً مكتوباً عليه `boundary`. هذا هو الحدث الإضافي: رقم 155.
 
@@ -147,12 +147,12 @@ eeglab redraw;
 | جزء واحد متصل من التسجيل | <MenuPath>Edit > Select data</MenuPath> | المدى بالثواني في <UiLabel>Time range [min max] (s)</UiLabel>، والخانة غير مفعّلة. |
 | حذف جزء متصل (بداية أو نهاية أو استراحة) | <MenuPath>Edit > Select data</MenuPath> | نفس المدى، مع تفعيل الخانة تحت <UiLabel>on->remove these</UiLabel>. |
 | البيانات حول نوع حدث واحد | <MenuPath>Edit > Select data using events</MenuPath> | نوع الحدث، والحدود بالثواني حوله، و <UiLabel>Keep selected</UiLabel>. |
-| حذف البيانات حول حدث، مثل نبضة TMS تشبّع المضخّم | <MenuPath>Edit > Select data using events</MenuPath> | نوع الحدث، وحدود قصيرة حوله، و <UiLabel>Remove selected</UiLabel>. التوتوريال الرسمي يذكر هذا المثال. |
-| عدة runs لنفس المشارك في داتاست واحدة | <MenuPath>Edit > Append datasets</MenuPath> | أرقام الداتاست بترتيب تسجيلها. |
+| حذف البيانات حول حدث، مثل نبضة TMS تشبّع المضخّم | <MenuPath>Edit > Select data using events</MenuPath> | نوع الحدث، وحدود قصيرة حوله، و <UiLabel>Remove selected</UiLabel>. توتوريال EEGLAB يذكر هذا المثال. |
+| عدة جولات تسجيل لنفس المشارك في داتاست واحدة | <MenuPath>Edit > Append datasets</MenuPath> | أرقام الداتاست بترتيب تسجيلها. |
 
-**متى تدمج؟** عادة بعد الاستيراد ومواقع القنوات مباشرة، وقبل الفلترة وICA. يحتاج ICA إلى بيانات كثيرة، و runs الجلسة الواحدة تشترك في الأقطاب نفسها.
+**متى تدمج؟** عادة بعد الاستيراد وإضافة مواقع القنوات مباشرة، وقبل الفلترة وتحليل المكوّنات المستقلة (<En>ICA</En>). يحتاج ICA إلى بيانات كثيرة، وجولات التسجيل في الجلسة الواحدة تشترك في الأقطاب نفسها.
 
-في التجارب الحقيقية، كثيراً ما يُسجَّل كل مشارك على عدة runs. مثلاً، النسخة الخام من بيانات المحطة 8 على OpenNeuro (ds002680) فيها لكل مشارك جلستان، في كل منهما 12 أو 13 run. أما النسخة الجاهزة التي نستعملها في المحطة 8 فمحضّرة مسبقاً، بملف لكل حالة.
+في التجارب الحقيقية، كثيراً ما يُسجَّل كل مشارك على عدة جولات تسجيل. مثلاً، النسخة الخام من بيانات المحطة 8 على OpenNeuro (ds002680) فيها لكل مشارك جلستان، في كل منهما 12 أو 13 جولة تسجيل. أما النسخة الجاهزة التي نستعملها في المحطة 8 فمحضّرة مسبقاً، بملف لكل شرط (<En>condition</En>).
 
 جملة Methods في آخر الدرس مكتوبة للاستعمال الحقيقي، حين تدمج عدة runs لمشارك واحد، لا لتمرين النصفين في هذا الدرس.
 
@@ -174,7 +174,7 @@ Data from the [N] recording runs were concatenated into a single continuous data
 
 - **دمج داتاست بعدد قنوات أو معدل عيّنات مختلف.** يتوقف <MenuPath>Edit > Append datasets</MenuPath> بخطأ `The two datasets must have the same number of channels` أو `The two datasets must have the same sampling rate`. وحّد القنوات والمعدل قبل الدمج.
 - **دمج داتاست قنواتها بنفس العدد لكن بترتيب مختلف.** EEGLAB يتحقق من العدد فقط، لا من الأسماء. فقد تُلصق إشارة `Cz` من run تحت اسم `Pz` من run آخر بلا أي تحذير. قارن `{EEG.chanlocs.labels}` في الداتاستين قبل الدمج.
-- **حذف أحداث `boundary` أو تجاهلها في سكربت قديم.** فلاتر EEGLAB تفلتر كل جزء بين حدثي `boundary` وحده، والتقطيع لا يأخذ epoch يعبر نقطة وصل. إذا حذفتها، أو فلترت `EEG.data` مباشرة بدالة من MATLAB، تُعامَل نقطة الوصل على أنها إشارة متصلة، فتظهر قفزة كاذبة.
+- **حذف أحداث `boundary` أو تجاهلها في سكربت قديم.** فلاتر EEGLAB تفلتر كل جزء بين حدثي `boundary` وحده، والتقطيع لا يأخذ مقطعاً زمنياً (<En>epoch</En>) يعبر نقطة وصل. إذا حذفتها، أو فلترت `EEG.data` مباشرة بدالة من MATLAB، تُعامَل نقطة الوصل على أنها إشارة متصلة، فتظهر قفزة كاذبة.
 - **نسيان أن كل قصّ وكل دمج ينتج داتاست جديدة.** <MenuPath>Edit > Select data</MenuPath> و <MenuPath>Edit > Append datasets</MenuPath> يضيفان داتاست جديدة إلى `ALLEEG`، والأصل يبقى كما هو. سمِّ كل نسخة باسم واضح، وانظر إلى السطر الأول في النافذة الرئيسية قبل كل خطوة.
 - **القصّ من الجزء الأول بدل الأصل.** في الخطوة 2، إذا بقيت `D1 part 1` هي الحالية، فستحذف أول 120 ثانية منها هي، فلا يبقى شيء تقريباً. ارجع إلى الداتاست 1 أولاً.
 

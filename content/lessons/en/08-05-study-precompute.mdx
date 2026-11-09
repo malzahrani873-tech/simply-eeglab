@@ -110,7 +110,7 @@ So which measures do you compute, and with which options, so that every later re
 
 ## Which files does precomputing write?
 
-<Figure src="study-precompute/study-precompute-files.svg" alt="Before precomputing: participant sph's folder holds sphanimal.set and sphdistractor.set with their .fdt data files, and below them, faded, old EEGLAB 6 files such as sphanimal.daterp and sphanimal.icaerp, labeled old, not used. After: the same folder also holds three new shaded files: sph.daterp, sph.datspec and sph.dattimef, each with a bar as long as its size." caption="Illustration; sizes are estimates until measured" source="original" />
+<Figure src="study-precompute/study-precompute-files.svg" alt="Before precomputing: participant sph's folder holds sphanimal.set and sphdistractor.set with their .fdt data files, and below them, faded, old EEGLAB 6 files such as sphanimal.daterp and sphanimal.icaerp, labeled old, not used. After: the same folder also holds three new shaded files: sph.daterp, sph.datspec and sph.dattimef, each with a bar as long as its size." caption="Illustration; sizes are approximate" source="original" />
 
 Notice two things about these files:
 
@@ -196,7 +196,7 @@ fprintf('Channel groups in the STUDY: %d\n', numel(STUDY.changrp));
 | Recompute (`recompute`) | on | on whenever you change any option, otherwise EEGLAB reads the old files. |
 
 <Callout type="warning">
-**Disk space.** Because EEGLAB saves every trial, the `.dattimef` file is large: frequencies × time points × trials × channels. With the default settings (100 frequencies and 200 time points) and every channel it reaches about 1.5 GB per participant, about 21 GB for the 14 participants (an estimate from the file layout, measured on the run day). This is why we use a lighter grid: about 75 MB per participant, about 1 GB in all (an estimate, measured on the run day). [The file organization lesson](/en/lesson/file-organization/) in station 9 explains where to keep these files and how to delete them safely.
+**Disk space.** Because EEGLAB saves every trial, the `.dattimef` file is large: frequencies × time points × trials × channels. With the default settings (100 frequencies and 200 time points) and every channel it reaches about 1.5 GB per participant, about 21 GB for the 14 participants (a rough estimate from the data size; it may differ a little on your computer). This is why we use a lighter grid: about 75 MB per participant, about 1 GB in all (a rough estimate). [The file organization lesson](/en/lesson/file-organization/) in station 9 explains where to keep these files and how to delete them safely.
 </Callout>
 
 ## How do I check that the precomputing worked?

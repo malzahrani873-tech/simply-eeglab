@@ -31,7 +31,7 @@
       "answer": [
         "a"
       ],
-      "explanation": "The extension manager is in the File menu: search for Biosig and click `Install/Update`; it needs an internet connection. `Edit > Preferences` holds EEGLAB options, not plugins."
+      "explanation": "The extension manager is in the File menu: search for Biosig and click `Install/Update`; it needs an internet connection. `Edit > Preferences` does not exist in EEGLAB at all: EEGLAB options are in `File > Preferences`, and the extension manager is not there."
     },
     {
       "id": "s01-q02",

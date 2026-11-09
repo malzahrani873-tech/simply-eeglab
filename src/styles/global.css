@@ -340,7 +340,7 @@ code.i{font-family:var(--mono);font-size:.84em;background:var(--surface-2);paddi
 .fd .lg{display:flex;gap:16px;font-size:14px;color:var(--muted);padding:2px 14px 10px;flex-wrap:wrap}
 .fd .lg i{display:inline-block;width:18px;height:3px;vertical-align:middle;margin-inline-end:6px;border-radius:2px}
 .fd .eg{border-top:1px solid var(--sep);padding:12px 14px;background:var(--bg)}
-.fd .eg h4{margin:0 0 6px;font-size:15px;font-weight:600}
+.fd .eg h3{margin:0 0 6px;font-size:15px;font-weight:600}
 .fd .eg dl{display:grid;grid-template-columns:auto auto;justify-content:start;gap:2px 16px;margin:0 0 8px;font-size:15px}
 .fd .eg dt{color:var(--muted)}
 .fd .eg dd{margin:0;direction:ltr;text-align:end;font-family:var(--mono);font-size:14px}

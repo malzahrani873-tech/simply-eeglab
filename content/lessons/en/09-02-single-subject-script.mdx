@@ -67,7 +67,7 @@ Each section starts with a `%%` line, and its title names the station it comes f
 **Third: run it from scratch**
 
 7. Close EEGLAB, type `clear` in the command window, then run the whole file with <UiLabel>Run</UiLabel> in the editor or by typing `d1_pipeline`.
-8. Do not click anything while it runs. If a window opens and waits for you, there is a line without enough arguments: fix it.
+8. Do not click anything while it runs. If a window opens and waits for you, there is a line without enough arguments. Press <UiLabel>Cancel</UiLabel>, read the window title to learn the function name, then copy that function's full line, with its arguments, from the script section of its lesson.
 9. Compare the output with what you made in the GUI in station 5: the same number of channels, and about the same number of epochs.
 
 ## What does the full script look like, from raw data to clean epochs?
@@ -81,7 +81,7 @@ eeglab nogui
 eeglabRoot = fileparts(which('eeglab'));
 dataDir    = fullfile(eeglabRoot, 'sample_data');
 outDir     = pwd;
-lineFreq   = 60;   % 60 Hz in Saudi Arabia and the US, 50 Hz in Europe
+lineFreq   = 60;   % 60 Hz in Saudi Arabia and the US, 50 Hz in Europe and most other Arab countries
 
 %% Load (station 1)
 EEG = pop_loadset('filename', 'eeglab_data.set', 'filepath', dataDir);

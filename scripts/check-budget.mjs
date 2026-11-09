@@ -1,6 +1,6 @@
 // Page-weight budget and external-resource check on the build output. Exits 1 on any violation.
 import { readdir, readFile, stat } from 'node:fs/promises';
-import { join, extname, dirname } from 'node:path';
+import { join, extname, dirname, sep } from 'node:path';
 import { gzipSync } from 'node:zlib';
 
 const DIST = process.argv[2] ?? 'dist';
@@ -25,7 +25,7 @@ async function* walk(d) {
 
 // 1) Images: format and size
 for await (const f of walk(DIST)) {
-  const rel = f.slice(DIST.length + 1), ext = extname(f).toLowerCase();
+  const rel = f.slice(DIST.length + 1).split(sep).join('/'), ext = extname(f).toLowerCase();
   if (!['.png', '.jpg', '.jpeg', '.gif', '.avif', '.webp', '.svg'].includes(ext)) continue;
   if (EXCEPT.some((r) => r.test(rel)) || LISTED.has(rel)) continue;
   if (!IMG_OK.has(ext)) errors.push(`image format not allowed: ${rel}`);
@@ -36,7 +36,7 @@ for await (const f of walk(DIST)) {
 
 // 1b) Component JS files (Pagefind excluded), gzip
 for await (const f of walk(DIST)) {
-  const rel = f.slice(DIST.length + 1);
+  const rel = f.slice(DIST.length + 1).split(sep).join('/');
   if (!f.endsWith('.js') || rel.startsWith('pagefind/')) continue;
   const size = await gz(f);
   const max = STRICT_JS.find(([re]) => re.test(rel))?.[1] ?? JS_FILE_KB;

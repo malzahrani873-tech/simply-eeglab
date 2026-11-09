@@ -125,8 +125,9 @@ updated: 2026-10-28
 
 ## كيف يبدو ERP المجموعة وخريطة الرأس؟
 
+{/* صورة من سكربت الدرس يوم التشغيل، لا رسم يدوي. نصوص المحاور والعناوين من EEGLAB بالإنجليزية، ونسخة واحدة تكفي للغتين. */}
 <ImageSpec>
-صورة من سكربت الدرس يوم التشغيل، لا رسم يدوي. يسار: نافذة ERP المجموعة في Pz للتصميم 2، لوحتان (F و M)، وفي كل لوحة منحنيان animal و distractor بلونين ونمطي خط مختلفين. يمين: خريطتا رأس لمتوسط 150 إلى 250 ms للتصميم 3 (animal و distractor) بمقياس ألوان واحد. نصوص المحاور والعناوين من EEGLAB بالإنجليزية، ونسخة واحدة تكفي للغتين.
+يسار: نافذة ERP المجموعة في Pz للتصميم 2، لوحتان (F و M)، وفي كل لوحة منحنيان animal و distractor بلونين ونمطي خط مختلفين. يمين: خريطتا رأس لمتوسط 150 إلى 250 ms للتصميم 3 (animal و distractor) بمقياس ألوان واحد.
 </ImageSpec>
 
 ## لماذا لا أكتفي بمنحنى المتوسط؟
@@ -149,7 +150,7 @@ updated: 2026-10-28
 
 1. اختر `Pz` في القائمة اليسرى.
 2. اضغط <UiLabel>Params</UiLabel> بجانب <UiLabel>Plot ERPs</UiLabel>. تفتح <UiLabel>ERP plotting options -- pop_erpparams()</UiLabel>.
-3. فعّل <UiLabel>Plot first variable on the same panel</UiLabel>، فيظهر animal و distractor في لوحة واحدة. اترك <UiLabel>Plot second variable on the same panel</UiLabel> غير مفعّل، فتظهر كل مجموعة في لوحة. اترك <UiLabel>Time range (ms) [low high]</UiLabel> فارغاً لكل الإيبوك. اضغط <UiLabel>Ok</UiLabel>.
+3. فعّل <UiLabel>Plot first variable on the same panel</UiLabel>، فيظهر animal و distractor في لوحة واحدة. اترك <UiLabel>Plot second variable on the same panel</UiLabel> غير مفعّل، فتظهر كل مجموعة في لوحة. اترك <UiLabel>Time range (ms) [low high]</UiLabel> فارغاً لكل الـ epoch. اضغط <UiLabel>Ok</UiLabel>.
 4. اضغط <UiLabel>Plot ERPs</UiLabel>. تظهر لوحتان: F و M، وفي كل منهما منحنيا الصورتين.
 5. اقرأها كما في درس رسم ERP للقنوات: انظر أولاً إلى محور y واتجاهه. ثم اسأل: أين يبدأ المنحنيان بالافتراق؟ وهل الفرق متشابه في اللوحتين؟
 
@@ -207,7 +208,7 @@ STUDY = std_erspplot(STUDY, ALLEEG, 'channels', pz, 'design', 3);
 | التصميم | 2 لمقارنة الصورتين داخل كل جنس، و 3 للخرائط والطيف و ERSP | ارسم دائماً التصميم الذي سيدخل الإحصاء. |
 | الشرطان في لوحة واحدة | نعم (`plotconditions` = `together`) | لوحات منفصلة عندما تريد رؤية شكل كل منحنى وحده. |
 | المجموعتان في لوحة واحدة | لا (`plotgroups` = `apart`) | لوحة واحدة تزدحم بأربعة منحنيات. |
-| نطاق الزمن | فارغ، أي كل الإيبوك | ضيّقه للنشر فقط، بعد أن ترى الإيبوك كاملاً. |
+| نطاق الزمن | فارغ، أي كل الـ epoch | ضيّقه للنشر فقط، بعد أن ترى الـ epoch كاملاً. |
 | حدود y (<UiLabel>Plot limits [low high]</UiLabel>) | فارغة | ثبّتها عندما تقارن رسوماً مختلفة، حتى لا يخدعك تغيّر المقياس. |
 | <UiLabel>Lowpass plotted data [Hz]</UiLabel> | فارغ | يغيّر الرسم فقط، لا البيانات. لا تستخدمه لتجميل منحنى ضعيف. |
 | نافذة الخريطة | 150 إلى 250 ms (مثال) | من سؤالك أو دراسات سابقة، قبل النظر إلى النتيجة. |

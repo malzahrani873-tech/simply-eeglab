@@ -104,8 +104,8 @@ Run "Script to reach this state" under "Starts from" at the top of the lesson. I
 **Second: interpolation on your own data**
 
 1. Make the dataset you removed bad channels from the current one, then open <MenuPath>Tools > Interpolate electrodes</MenuPath>.
-2. Press <UiLabel>Use all channels from other dataset</UiLabel> and type the number of the dataset from before the removal. The names of the removed channels appear.
-3. Keep <UiLabel>Spherical</UiLabel> and press <UiLabel>OK</UiLabel>. Name the result `D1 interp` and save it.
+2. Press <UiLabel>Use all channels from other dataset</UiLabel>, type in <UiLabel>Dataset index</UiLabel> the number of the dataset that has all channels from before the removal, then press <UiLabel>OK</UiLabel>. The names of the removed channels appear.
+3. Keep <UiLabel>Spherical</UiLabel> and press <UiLabel>OK</UiLabel>. Name the result `D1 interp` and save it with <MenuPath>File > Save current dataset as</MenuPath> as `D1_interp.set`.
 4. In D1, no channel was removed, so if you try, EEGLAB says `No new channels selected`. The main dataset stays `D1 badch`, and [the re-referencing lesson](/en/lesson/rereferencing/) starts from it.
 
 <Callout type="warning">

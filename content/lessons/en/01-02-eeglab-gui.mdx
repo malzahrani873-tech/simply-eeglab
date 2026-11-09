@@ -42,7 +42,7 @@ You will practice on the official EEGLAB sample, `eeglab_data.set`, in the `samp
 <BeforeAfter>
 <Figure src="eeglab-gui/S2-eeglab-empty.png" alt="The EEGLAB main window before any dataset is opened: it shows &quot;No current dataset&quot; and a list of suggested first steps." caption="Before loading data, EEGLAB 2026.1" source="eeglab-ui" />
 <ImageSpec>
-After: the same EEGLAB main window after opening eeglab_data.set. At the top the line #1: Continuous EEG Data, then a Filename line, and below them the lines with their values: Channels per frame = 32, Frames per epoch = 30504, Epochs = 1, Events = 154, Sampling rate (Hz) = 128, Epoch start (sec) = 0.000, Epoch end (sec) = 238.305, Reference = unknown, Channel locations = Yes, ICA weights = No, Dataset size (Mb). Each line carries a small number matching a row in the "What does each line in the main window mean?" table. Same window size and frame as the "before" image exactly. Real screenshot from EEGLAB 2026.1 (source: eeglab-ui).
+After: the same EEGLAB main window after opening eeglab_data.set. At the top the line #1: Continuous EEG Data, then a Filename line, and below them the lines with their values: Channels per frame = 32, Frames per epoch = 30504, Epochs = 1, Events = 154, Sampling rate (Hz) = 128, Epoch start (sec) = 0.000, Epoch end (sec) = 238.305, Reference = unknown, Channel locations = Yes, ICA weights = No, Dataset size (Mb). Each line carries a small number matching a row in the "What does each line in the main window mean?" table.
 </ImageSpec>
 </BeforeAfter>
 
@@ -79,10 +79,10 @@ The main window fills with the dataset summary, and the menus become available.
 3. Move with the arrow buttons at the bottom: the single arrow (`>` or `<`) moves one fifth of the window, which is one second with the default 5-second window, and the double arrow (`>>` or `<<`) moves 90% of the window.
 4. Zoom the signal in or out with the <UiLabel>+</UiLabel> and <UiLabel>-</UiLabel> buttons. The number next to them is the spacing between channels in microvolts.
 5. The colored vertical lines are the events, with each event's name above it (`square` or `rt`).
-6. To change the time window length or the number of channels shown, use <MenuPath>Settings > Time range to display</MenuPath> inside the scrolling window.
+6. To change the time window length, use <MenuPath>Settings > Time range to display</MenuPath>. To change the number of channels shown, use <MenuPath>Settings > Number of channels to display</MenuPath>. Both are inside the scrolling window.
 
 <ImageSpec>
-The Channel data (scroll) window after opening eeglab_data.set: channel names on the left, vertical event lines for square and rt, the four arrow buttons for moving at the bottom, and the scale box between the + and - buttons. Arrows mark one channel, one event, the move buttons, and the scale. Real screenshot from EEGLAB 2026.1 (source: eeglab-ui).
+The Channel data (scroll) window after opening eeglab_data.set: channel names on the left, vertical event lines for square and rt, the four arrow buttons for moving at the bottom, and the scale box between the + and - buttons. Arrows mark one channel, one event, the move buttons, and the scale.
 </ImageSpec>
 
 ## What does each line in the main window mean?

@@ -5,7 +5,7 @@
   description: "الأساس الذي يجعل باقي المسار مفهوماً: من أين تأتي إشارة EEG، وأين توضع الأقطاب، وكيف تقرأ سطر MATLAB، وماذا يُظهر الطيف."
   descriptionEn: "The groundwork that makes the rest of the path make sense: where the EEG signal comes from, where electrodes go, how to read a line of MATLAB, and what a spectrum shows."
   outcomes:
-    - "تشرح لماذا يقيس EEG نشاط مجموعات كبيرة من الخلايا لا خلية واحدة"
+    - "تشرح لماذا يقيس EEG نشاط مجموعات كبيرة من الخلايا تعمل معاً في الوقت نفسه، لا خلية واحدة"
     - "تحدد موقع أي قطب من اسمه في نظام 10-20"
     - "تشغّل سطر MATLAB وتقرأ متغيّراً من الـ Workspace"
     - "تقرأ رسماً بسيطاً للطيف"
@@ -15,7 +15,7 @@
     - "Run a MATLAB line and read a variable"
     - "Read a simple spectrum"
 - station: 1
-  description: "تثبّت EEGLAB وتفتح أول داتاست، وتتعرّف على المكان الذي تعيش فيه بياناتك: الـ `EEG` struct."
+  description: "تثبّت EEGLAB وتفتح أول داتاست، وتتعرّف على المكان الذي تُحفظ فيه بياناتك داخل MATLAB: الـ `EEG` struct."
   descriptionEn: "Install EEGLAB, open your first dataset, and meet the place where your data live: the `EEG` structure."
   outcomes:
     - "تثبّت EEGLAB وتضيف plugin"
@@ -40,15 +40,15 @@
   description: "تنظيف الإشارة الخام خطوة خطوة قبل أي تحليل: معدل العيّنات، والفلترة، وضوضاء الكهرباء، والقنوات السيئة، والاستيفاء، والمرجع."
   descriptionEn: "Clean the raw signal step by step before any analysis: sampling rate, filtering, line noise, bad channels, interpolation and reference."
   outcomes:
-    - "تطبّق بايبلاين معالجة مسبقة كاملاً على مشارك واحد"
+    - "تطبّق سلسلة معالجة مسبقة كاملة (pipeline) على مشارك واحد"
     - "تختار قيم الفلترة حسب نوع التحليل"
-    - "تحذف القنوات السيئة وتستوفيها، ثم تعيد المرجع إلى المتوسط، بالترتيب الصحيح"
+    - "تحذف القنوات السيئة ثم تعوّضها بالاستيفاء (interpolation)، ثم تعيد المرجع إلى المرجع المتوسط، بالترتيب الصحيح"
   outcomesEn:
     - "Run a full preprocessing pipeline on one participant"
     - "Choose filter settings for your analysis"
     - "Remove and interpolate bad channels, then re-reference to the average, in the right order"
 - station: 4
-  description: "أقوى أداة في EEGLAB لتنظيف البيانات من الرمش والعضلات والقلب دون أن تحذف منها شيئاً. وفيها أصعب مهارة على المبتدئين: قراءة المكوّنات."
+  description: "ICA أقوى أداة في EEGLAB لتنظيف البيانات من الرمش والعضلات والقلب دون أن تحذف منها مقاطع. وفيها أصعب مهارة على المبتدئين: قراءة مكوّنات ICA."
   descriptionEn: "EEGLAB's strongest tool for removing blinks, muscle and heart artifacts without discarding data, and the hardest beginner skill: reading components."
   outcomes:
     - "تشغّل ICA على نسخة مفلترة عند 1 هرتز وتنسخ الأوزان إلى بياناتك الأصلية"
@@ -59,7 +59,7 @@
     - "Classify components with ICLabel and check its decision yourself"
     - "Remove artifact components and verify the signal improved"
 - station: 5
-  description: "تقصّ الإشارة المستمرة إلى مقاطع حول كل حدث، وتجهّزها لحساب المتوسطات."
+  description: "تقصّ الإشارة المستمرة إلى مقاطع زمنية حول كل حدث (epochs)، وتجهّزها لحساب المتوسطات."
   descriptionEn: "Cut the continuous signal into segments around each event and prepare them for averaging."
   outcomes:
     - "تستخرج epochs حول نوع حدث محدد بنافذة مناسبة"
@@ -75,7 +75,7 @@
   outcomes:
     - "تحسب ERP لشرط وتقرأ مكوّناته"
     - "تحسب الطيف PSD وتفسّر قمة ألفا"
-    - "تقيس سعة مكوّن ERP وكمونه بطريقة قابلة للتكرار"
+    - "تقيس سعة مكوّن ERP وكمونه (latency) بطريقة قابلة للتكرار"
   outcomesEn:
     - "Compute an ERP for a condition and read its components"
     - "Compute a PSD and interpret the alpha peak"
@@ -96,7 +96,7 @@
   descriptionEn: "From one participant to a group: preparing files, creating a STUDY from files or BIDS, designing conditions, precomputing and plotting measures, statistics, and exporting results."
   outcomes:
     - "تتحقق أن ملفات المشاركين جاهزة لـ STUDY"
-    - "تنشئ STUDY وتعرّف تصميماً داخل المشارك وبين المجموعات"
+    - "تنشئ STUDY وتعرّف تصاميم بمتغيّر داخل المشارك (within-subject) ومتغيّر بين المشاركين (between-subject)"
     - "تحسب ERP والطيف للمجموعة وترسمهما"
     - "تختبر الفروق مع تصحيح المقارنات المتعددة"
     - "تصدّر الأرقام إلى جدول لبرنامج الإحصاء"
@@ -107,7 +107,7 @@
     - "Test differences with a multiple-comparisons correction"
     - "Export values to a table for your stats software"
 - station: 9
-  description: "تحويل كل ضغطة في الواجهة إلى سطر كود، ثم تشغيل البايبلاين على كل المشاركين دون تدخّل منك."
+  description: "تحويل كل ضغطة في الواجهة إلى سطر كود، ثم تشغيل سلسلة المعالجة (pipeline) على كل المشاركين دون تدخّل منك."
   descriptionEn: "Turn every GUI click into a line of code, then run the pipeline on all participants unattended."
   outcomes:
     - "تستخرج الكود من `eegh` لأي خطوة نفّذتها"
@@ -120,7 +120,7 @@
     - "Run it on all participants and organize files without exhausting your storage"
     - "Know when a ready-made pipeline fits and what to check before trusting it"
 - station: 10
-  description: "فروع متخصّصة لمن يحتاجها: مصادر الإشارة، والاتصال الوظيفي، والتصنيف الآلي، وكتابة plugin، والمقارنة مع الأدوات البديلة."
+  description: "فروع متخصّصة لمن يحتاجها: مصادر الإشارة، والاتصال الوظيفي، والتصنيف الآلي (decoding / MVPA)، وكتابة plugin، والمقارنة مع الأدوات البديلة."
   descriptionEn: "Specialized branches for those who need them: source localization, connectivity, decoding, writing plugins, and how EEGLAB compares with other tools."
   outcomes:
     - "تحدد أي فرع متقدّم يخدم سؤالك البحثي"

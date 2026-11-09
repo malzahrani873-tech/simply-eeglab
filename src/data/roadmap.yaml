@@ -17,16 +17,16 @@
   nodes:
     - { id: "install-eeglab", title: "التثبيت والإضافات", titleEn: "Installing EEGLAB & plugins", level: "core", minutes: 12 }
     - { id: "eeglab-gui", title: "الواجهة والقوائم", titleEn: "The EEGLAB window & menus", level: "core", minutes: 12 }
-    - { id: "eeg-struct", title: "بنية EEG struct", titleEn: "The EEG structure", level: "core", minutes: 12 }
+    - { id: "eeg-struct", title: "بنية المتغيّر EEG", titleEn: "The EEG structure", level: "core", minutes: 12 }
     - { id: "alleeg-datasets", title: "ALLEEG وإدارة الداتاست", titleEn: "ALLEEG & dataset management", level: "recommended", minutes: 10 }
-    - { id: "set-fdt-files", title: "ملفات .set و .fdt", titleEn: ".set and .fdt files", level: "recommended", minutes: 8 }
+    - { id: "set-fdt-files", title: "ملفات ‎.set و ‎.fdt", titleEn: ".set and .fdt files", level: "recommended", minutes: 8 }
     - { id: "merge-select-data", title: "دمج الداتاست وتقسيمها", titleEn: "Merging & selecting data", level: "recommended", minutes: 12 }
 - station: 2
   title: "استيراد البيانات"
   titleEn: "Importing data"
   nodes:
     - { id: "import-raw", title: "استيراد ملف خام: EDF و BDF و BrainVision", titleEn: "Importing raw files: EDF, BDF & BrainVision", level: "core", minutes: 15 }
-    - { id: "channel-locations", title: "مواقع الأقطاب", titleEn: "Channel locations", level: "core", minutes: 12 }
+    - { id: "channel-locations", title: "مواقع القنوات (channel locations)", titleEn: "Channel locations", level: "core", minutes: 12 }
     - { id: "events", title: "الأحداث (events)", titleEn: "Events", level: "core", minutes: 12 }
     - { id: "bids-openneuro", title: "بيانات BIDS و OpenNeuro", titleEn: "BIDS & OpenNeuro data", level: "recommended", minutes: 15 }
 - station: 3
@@ -85,7 +85,7 @@
     - { id: "study-design", title: "التصميم والمتغيّرات", titleEn: "STUDY designs & variables", level: "core", minutes: 15 }
     - { id: "study-precompute", title: "حساب المقاييس مسبقاً (precompute)", titleEn: "Precomputing measures", level: "core", minutes: 15 }
     - { id: "study-plot-channels", title: "رسم نتائج المجموعة للقنوات", titleEn: "Plotting group channel measures", level: "core", minutes: 15 }
-    - { id: "study-statistics", title: "الإحصاء والتصحيح المتعدد", titleEn: "Statistics & multiple comparisons", level: "core", minutes: 15 }
+    - { id: "study-statistics", title: "الإحصاء وتصحيح المقارنات المتعددة", titleEn: "Statistics & multiple comparisons", level: "core", minutes: 15 }
     - { id: "study-export-results", title: "إخراج النتائج للورقة والتحليل الإحصائي", titleEn: "Exporting results for papers & stats software", level: "recommended", minutes: 12 }
     - { id: "ic-clustering", title: "تجميع مكوّنات ICA (clustering)", titleEn: "IC clustering", level: "recommended", minutes: 15 }
     - { id: "limo", title: "LIMO", titleEn: "LIMO EEG", level: "recommended", minutes: 15 }

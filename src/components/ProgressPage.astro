@@ -32,10 +32,10 @@ const L = (k: string, v?: Record<string, string>) => t(lang, k, v);
     <noscript><p>{L('progress.unavailable')}</p></noscript>
 
     <div class="pgrid">
-      <section aria-labelledby="pp-sum" class="pcard js-only" hidden>
+      <section aria-labelledby="pp-sum" class="pcard js-only">
         <h2 id="pp-sum">{L('progressPage.summary')}</h2>
-        <p class="big" data-sum-count></p>
-        <p data-sum-core></p>
+        <p class="big" data-sum-count>&nbsp;</p>
+        <p data-sum-core>&nbsp;</p>
         <p data-sum-games hidden></p>
         <p data-sum-streak hidden></p>
       </section>
@@ -45,7 +45,7 @@ const L = (k: string, v?: Record<string, string>) => t(lang, k, v);
         <ul>{['1', '2', '3', '4'].map((n) => <li set:html={iso(L(`progressPage.where.${n}`), lang)} />)}</ul>
       </section>
 
-      <section aria-labelledby="pp-move" class="pcard js-only" hidden>
+      <section aria-labelledby="pp-move" class="pcard js-only">
         <h2 id="pp-move">{L('progressPage.move')}</h2>
         <p class="muted">{L('progressPage.holds')}</p>
         <p class="lbl2">{L('progressPage.code')}</p>
@@ -64,7 +64,7 @@ const L = (k: string, v?: Record<string, string>) => t(lang, k, v);
         </div>
       </section>
 
-      <section aria-labelledby="pp-restore" class="pcard js-only" hidden>
+      <section aria-labelledby="pp-restore" class="pcard js-only">
         <h2 id="pp-restore">{L('progressPage.restore')}</h2>
         <form class="restore" data-restore-form>
           <label for="pp-code">{L('progressPage.codeInput')}</label>
@@ -80,7 +80,7 @@ const L = (k: string, v?: Record<string, string>) => t(lang, k, v);
       </section>
     </div>
 
-    <section aria-labelledby="pp-reset" class="js-only reset-sec" hidden>
+    <section aria-labelledby="pp-reset" class="js-only reset-sec">
       <h2 id="pp-reset">{L('progressPage.reset')}</h2>
       <ResetProgress lang={lang} />
     </section>

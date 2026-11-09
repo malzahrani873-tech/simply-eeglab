@@ -3,12 +3,14 @@
 const esc = (s: string) => s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]!);
 // Short terms without spaces ("high-pass") never break across lines; longer runs may wrap.
 export const nowrap = (run: string) => !/\s/.test(run) && run.length <= 24;
-export const RUN = /[A-Za-z0-9_.][A-Za-z0-9 ._\-/+&]*[A-Za-z0-9_]|[A-Za-z]/g;
+export const RUN = /[-−±+]?[A-Za-z0-9_.][A-Za-z0-9 ._\-−/+&=×:%<>≈±]*[A-Za-z0-9_+%]|[-−±]?[A-Za-z0-9]/g;
+// Latin words, and numbers with a sign or an operator ("-200", "n = 1", "30504 / 961"), keep their order.
+export const needsIso = (run: string) => /[A-Za-z]/.test(run) || /^[-−±+]\d|\d\s*[=/×<>≈±−-]\s*\d/.test(run);
 export function iso(s: string, lang: 'ar' | 'en' = 'ar'): string {
   if (lang === 'en') return esc(s);
   let out = '', last = 0;
   for (const m of s.matchAll(RUN)) {
-    if (!/[A-Za-z]/.test(m[0])) continue;
+    if (!needsIso(m[0])) continue;
     out += esc(s.slice(last, m.index)) + `<bdi lang="en"${nowrap(m[0]) ? ' class="nw"' : ''}>${esc(m[0])}</bdi>`;
     last = m.index! + m[0].length;
   }

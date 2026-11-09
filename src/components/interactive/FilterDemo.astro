@@ -50,6 +50,14 @@ const S = {
     connectedCallback() {
       if (this.ready) return;
       this.ready = true;
+      // The signal work is heavy, so it starts only when the demo comes close to the screen.
+      const io = new IntersectionObserver((es) => {
+        if (es.some((e) => e.isIntersecting)) { io.disconnect(); this.start(); }
+      }, { rootMargin: '300px 0px' });
+      io.observe(this);
+    }
+
+    start() {
       try {
         this.s = JSON.parse(this.dataset.s!);
         this.mode = this.dataset.mode === 'erp' ? 'erp' : 'cont';
@@ -85,7 +93,7 @@ const S = {
       </div>
       <div class="cv" dir="ltr"><canvas role="img"></canvas></div>
       <div class="lg"><span class="lgF"><i class="lg-raw"></i>${S.before}</span><span class="lgF"><i class="lg-fil"></i>${S.after}</span><span class="lgN"><i class="lg-fil"></i>${S.sig}</span><span class="bandL"><i class="lg-band"></i>${S.band}</span></div>
-      <div class="eg"><h4>${S.does}</h4><div class="egb" aria-live="polite"></div></div>`;
+      <div class="eg"><h3>${S.does}</h3><div class="egb" aria-live="polite"></div></div>`;
       if (keep) this.append(keep);
       this.cv = this.querySelector('canvas')!;
       this.addEventListener('click', (e) => {

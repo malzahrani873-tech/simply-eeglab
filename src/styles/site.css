@@ -357,7 +357,7 @@ bdi.nw{white-space:nowrap}
 .card-wrap{padding-block:16px 48px}
 .card-bar{display:flex;justify-content:space-between;align-items:center;gap:12px;max-width:210mm;margin:0 auto 12px}
 .card-bar .btn{min-height:44px;font-size:15px}
-.a4{color-scheme:light;--text:#111114;--muted:#5C5C66;--sep:#C6C6C8;--surface-2:#EFEFF2;--code-bg:#F7F7FA;background:#fff;color:#111114;max-width:210mm;margin:0 auto;border:1px solid var(--sep);border-radius:var(--r1);padding:12mm;font-size:15px;line-height:1.6}
+.a4{color-scheme:light;--text:#111114;--muted:#5C5C66;--sep:#C6C6C8;--surface-2:#EFEFF2;--code-bg:#F7F7FA;background:#fff;color:#111114;max-width:210mm;margin:0 auto;border:1px solid var(--sep);border-radius:var(--r1);padding:12mm;font-size:15px;line-height:1.6;overflow-x:auto}
 .a4 .wm{display:flex;align-items:center;gap:6px;font-weight:700;font-size:13px;margin:0}
 .a4 .wm svg{width:18px;height:18px}
 .a4 h1{font-size:23px;font-weight:700;margin:6px 0 2px;line-height:1.4}

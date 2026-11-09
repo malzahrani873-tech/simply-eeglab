@@ -125,7 +125,7 @@ The table gives the shortest recording for k = 30. Treat it as a minimum, becaus
 | Case | What to do | Why |
 |---|---|---|
 | Average reference or interpolated channels | Components = channels − interpolated − 1 | The data rank is lower, as in [the Running ICA lesson](/en/lesson/run-ica/). |
-| The recording is too short for all components | Reduce the number with `'pca'`, for example `'pca', 20` | Fewer components need fewer data points. |
+| The recording is too short for all components | Add `'pca'` in the <UiLabel>Commandline options (See help messages)</UiLabel> field after the option already there, for example `'extended', 1, 'pca', 20` | Fewer components need fewer data points. |
 | Enough data and full rank | Do not reduce | Official tutorial: PCA slightly corrupts the data, so the full-rank data are better whenever possible. |
 
 ## How do I verify that my decision rests on the right numbers?

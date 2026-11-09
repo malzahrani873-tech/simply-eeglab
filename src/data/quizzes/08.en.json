@@ -45,7 +45,7 @@
       "type": "single",
       "lesson": "create-study",
       "objective": 2,
-      "prompt": "In the `pop_studywizard` window you typed `cba` for a participant's first file, and `CBA ` (capitals and a trailing space) for their second file. What happens?",
+      "prompt": "In a STUDY of 14 participants, in the `pop_studywizard` window you typed `cba` for a participant's first file, and `CBA ` (capitals and a trailing space) for their second file. What happens?",
       "options": [
         {
           "id": "a",
@@ -67,7 +67,7 @@
       "answer": [
         "b"
       ],
-      "explanation": "The STUDY builds every design, plot and statistic on these words, and a one-letter difference creates a new participant with no warning. So type one fixed code per participant in all their files, and check the counts in the main window after creating it."
+      "explanation": "The STUDY builds every design, plot and statistic on these participant codes, and a one-letter difference creates a new participant with no warning. So type one fixed code per participant in all their files, and check the counts in the main window after creating it."
     },
     {
       "id": "s08-q03",
@@ -201,7 +201,7 @@
       "type": "single",
       "lesson": "study-statistics",
       "objective": 2,
-      "prompt": "You test 200 time points at a 0.05 threshold, and there is no real difference between the conditions. Without correction, about how many \"significant\" points do you expect by chance?",
+      "prompt": "You test 200 time points at a 0.05 significance level, and there is no real difference between the conditions. Without correction, about how many \"significant\" points do you expect by chance?",
       "options": [
         {
           "id": "a",
@@ -223,7 +223,7 @@
       "answer": [
         "c"
       ],
-      "explanation": "200 × 0.05 = about 10 points by chance alone. This is the multiple comparisons problem. FDR correction makes the threshold stricter so that most chance points disappear, so the corrected count is less than or equal to the uncorrected one. Short isolated bars, especially before the stimulus, are usually chance findings like these."
+      "explanation": "200 × 0.05 = about 10 points by chance alone. This is the multiple comparisons problem. FDR correction makes the threshold stricter so that most chance points disappear, so the corrected count is less than or equal to the uncorrected one. Short isolated bars marking significant points under the plot, especially before the stimulus, are usually chance findings like these."
     }
   ]
 }

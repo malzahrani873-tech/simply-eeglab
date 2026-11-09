@@ -45,8 +45,8 @@
     "variants": [],
     "decision": "ع",
     "def": {
-      "ar": "طريقة قياسية لتوزيع الأقطاب على الرأس بمسافات نسبتها 10% و20%.",
-      "en": "A standard scheme for placing electrodes at 10% and 20% distances over the head."
+      "ar": "طريقة قياسية لتوزيع الأقطاب على الرأس، المسافة بين كل قطبين فيها 10% أو 20% من طول الرأس من الأمام إلى الخلف أو من أذن إلى أذن.",
+      "en": "A standard scheme for placing electrodes on the head, with neighbouring electrodes 10% or 20% of the front-to-back or ear-to-ear head distance apart."
     }
   },
   {
@@ -177,8 +177,10 @@
   {
     "id": "psd",
     "en": "power spectral density (PSD)",
-    "ar": "الطيف الترددي (PSD)",
+    "ar": "كثافة القدرة الطيفية (PSD)",
     "variants": [
+      "الطيف الترددي (PSD)",
+      "الطيف الترددي",
       "PSD"
     ],
     "decision": "ع+إ",
@@ -230,8 +232,8 @@
     "variants": [],
     "decision": "ع+إ",
     "def": {
-      "ar": "تداخل من شبكة الكهرباء عند 60 هرتز في السعودية أو 50 هرتز في بلدان أخرى.",
-      "en": "Interference from the mains supply at 60 Hz in Saudi Arabia or 50 Hz elsewhere."
+      "ar": "تداخل من شبكة الكهرباء: 60 هرتز في السعودية وأمريكا، و50 هرتز في أوروبا وأغلب الدول العربية الأخرى.",
+      "en": "Interference from the mains supply: 60 Hz in Saudi Arabia and the US, 50 Hz in Europe and most other Arab countries."
     }
   },
   {
@@ -888,7 +890,7 @@
   {
     "id": "iclabel-classes",
     "en": "Brain / Eye / Muscle / Heart / Line Noise / Channel Noise / Other",
-    "ar": "دماغ / العين / عضلة / قلب / ضوضاء الكهرباء / ضوضاء قناة / أخرى",
+    "ar": "دماغ / عين / عضلة / قلب / ضوضاء الكهرباء / ضوضاء قناة / أخرى",
     "variants": [],
     "decision": "ع+إ",
     "def": {
@@ -1051,8 +1053,10 @@
   {
     "id": "peak-amplitude",
     "en": "peak amplitude",
-    "ar": "قمة السعة",
-    "variants": [],
+    "ar": "سعة القمة",
+    "variants": [
+      "قمة السعة"
+    ],
     "decision": "ع+إ",
     "def": {
       "ar": "أعلى قيمة (أو أدنى قيمة) للإشارة داخل نافذة زمنية.",
@@ -1189,8 +1193,10 @@
   {
     "id": "between-subject",
     "en": "between-subject",
-    "ar": "بين المجموعات",
-    "variants": [],
+    "ar": "بين المشاركين",
+    "variants": [
+      "بين المجموعات"
+    ],
     "decision": "ع+إ",
     "def": {
       "ar": "مقارنة مجموعات مختلفة من المشاركين.",

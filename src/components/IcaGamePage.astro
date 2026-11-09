@@ -39,7 +39,7 @@ const btnList = (daily: boolean) => classes.filter((c) => !daily || c !== 'other
 
     {icaAvailable && (
       <div id="ica" data-src={data} data-daily={daily ? dailyBase : undefined} data-lang={lang} data-epoch={site.dailyEpoch} data-url={pageUrl}
-        data-names={JSON.stringify(names)} data-panels={JSON.stringify(panels)} data-s={JSON.stringify(strings)} hidden>
+        data-names={JSON.stringify(names)} data-panels={JSON.stringify(panels)} data-s={JSON.stringify(strings)}>
         {daily && (
         <section class="daily gcard" id="daily" aria-labelledby="daily-t" data-budget-include="ica-game/daily/*.json ica/*.webp">
           <div class="dh"><h2 id="daily-t">{L('daily.title')} <span data-d-num></span></h2><span class="muted" data-d-streak></span></div>
@@ -96,7 +96,7 @@ const btnList = (daily: boolean) => classes.filter((c) => !daily || c !== 'other
   </div>
   <dialog class="zoomd" data-zoomd aria-label={L('game.zoom')}>
     <button type="button" class="zx" data-zclose aria-label={t(lang, 'common.close')}><Icon name="close" class="ico s20" /></button>
-    <div class="zbox"><img alt="" /></div>
+    <div class="zbox"><img alt="" width="720" height="280" /></div>
   </dialog>
   <script>
     import '../scripts/ica-game.ts';

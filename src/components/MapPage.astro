@@ -13,6 +13,7 @@ const prereq = (id: string) => (all.get(`ar/${id}`)?.data.prerequisites ?? []);
 const glyph: Record<string, string> = { core: '●', recommended: '◐', optional: '○' };
 const cls: Record<string, string> = { core: 'c', recommended: 'r', optional: 'o' };
 const total = roadmap.nodes.length;
+const publishedCount = roadmap.nodes.filter((n: any) => all.has(`${lang}/${n.id}`)).length;
 const core = roadmap.nodes.filter((n: any) => n.level === 'core');
 const first = core[0];
 // Data the page script needs: order, level and title of every node, for "continue" and counters.
@@ -38,7 +39,7 @@ const nodeLabel = (n: any, published: boolean) => {
         data-l-st={t(lang, 'map.station.progress', { n: '{n}', total: '{total}' })} data-l-next={t(lang, 'status.next')} data-l-done-sr={t(lang, 'status.done.sr')}
         data-progress-url={url('progress/', lang)} data-lesson-url={url('lesson/', lang)}>
         <a class="btn pri" href={url(`lesson/${first.id}/`, lang)}><T s={t(lang, 'map.startHere', { title: title(first) })} lang={lang} /></a>
-        <span class="muted" style="font-size:15px">{t(lang, 'map.newVisitor', { n: total, stations: roadmap.stations.length })}</span>
+        <span class="muted" style="font-size:15px">{t(lang, 'map.newVisitor', { n: publishedCount, stations: roadmap.stations.length, soon: total - publishedCount })}</span>
         <a href={url('progress/', lang)} class="mmanage" hidden>{t(lang, 'progress.manage')}</a>
       </div>
       <div class="mtools">

@@ -57,7 +57,7 @@ So how do you arrange your folders and file names, and decide in advance what to
 
 <Figure src="file-organization/project-tree.svg" alt="Folder tree of faces_project: rawdata for raw data with a lock because it is read-only, derivatives/eeglab with sub-002/eeg holding the desc-clean and desc-epochs files, code for the scripts, figures for the figures and logs for error files." source="original" />
 
-The lock on `rawdata` means it is read-only. Everything processing produces goes to `derivatives/eeglab`, with one folder per participant.
+The lock on `rawdata` means it is read-only. Make it so in the folder's properties in your operating system, so no script writes to it by mistake. Everything processing produces goes to `derivatives/eeglab`, with one folder per participant.
 
 ## How do I set up the folders and names, and decide what to save?
 
@@ -157,7 +157,7 @@ bids_export(data, 'targetdir', fullfile(projectRoot, 'd1_bids'), ...
 
 - The project folder holds the five folders, and no file in `rawdata` has changed since you downloaded it.
 - The script prints the number of participants, the size of their raw data, and the total estimate.
-- Every file in `derivatives` has a name that starts with `sub-` and contains `desc-` with its stage name.
+- Every file that a processing stage wrote in `derivatives` has a name that starts with `sub-` and contains `desc-` with its stage name. The files written by the BIDS import, the STUDY file and `batch_summary.csv` do not need `desc-`.
 - The `d1_bids` folder holds `dataset_description.json` and a `sub-001` folder.
 
 ## Common mistakes in organizing files

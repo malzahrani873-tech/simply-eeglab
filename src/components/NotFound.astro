@@ -5,7 +5,7 @@ import { url } from '../lib/url';
 interface Props { lang: Lang }
 const { lang } = Astro.props;
 ---
-<Base lang={lang} title={t(lang, '404.title')} path="404/" noindex>
+<Base lang={lang} title={t(lang, '404.title')} path="" noindex>
   <div class="wrap narrow simple">
     <h1>{t(lang, '404.title')}</h1>
     <p class="lead">{t(lang, '404.body')}</p>

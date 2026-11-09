@@ -120,7 +120,7 @@ The main dataset is already filtered at 0.1 Hz. A 1 Hz filter on top of it gives
 2. Open <MenuPath>Edit > Dataset info</MenuPath>.
 3. Next to <UiLabel>ICA weights array or text/binary file (if any):</UiLabel>, press <UiLabel>from other dataset</UiLabel>, type `2`, then <UiLabel>OK</UiLabel>. Three fields fill in automatically: `ALLEEG(2).icaweights`, `ALLEEG(2).icasphere`, and `ALLEEG(2).icachansind`.
 4. Press <UiLabel>OK</UiLabel> to close the window.
-5. Save the main dataset with <MenuPath>File > Save current dataset as</MenuPath>. The ICLabel lesson starts from it.
+5. Save the main dataset with <MenuPath>File > Save current dataset as</MenuPath> as `D1_main_ica.set`. The ICLabel lesson starts from it.
 
 ## What do I see in the component maps?
 
@@ -163,7 +163,7 @@ pop_topoplot(EEG, 0, 1:20);
 EEG = pop_saveset(EEG, 'filename', 'D1_main_ica.set', 'filepath', pwd);
 ```
 
-In a script, the rank window does not appear. `pop_runica` tries to detect the reduced rank, but its estimate can fail. When it detects it, it prints a line such as `Data rank (31) is smaller than the number of channels (32)`. Compare that number with the `Expected data rank` the script printed. If the line is missing or the numbers differ, use the commented line that passes `'pca'` with the expected value. If your data have interpolated channels, for example 32 channels with 2 interpolated, the expected rank is 29.
+In a script, the rank window does not appear. `pop_runica` tries to detect the reduced rank, but its estimate can fail. When it detects it, it prints a line such as `Data rank (31) is smaller than the number of channels (32)`. Compare that number with the `Expected data rank` the script printed. If the line is missing or the numbers differ, use the line that passes `'pca'` with the expected value: remove the % at its start, add a % at the start of the line above it, and run the script again. If your data have interpolated channels, for example 32 channels with 2 interpolated, the expected rank is 29.
 
 ## Which ICA settings should I choose?
 
@@ -189,7 +189,7 @@ Independent component analysis (extended Infomax; Lee et al., 1999) was computed
 ## What are the common mistakes when running ICA?
 
 - **Computing ICA on 0.1 Hz data, or continuing the ERP analysis on the 1 Hz copy.** The first gives a weaker decomposition, the second distorts P3 and N400. The two copies together are the solution.
-- **Trusting the automatic rank estimate.** `pop_runica` tries to detect the rank, but the estimate can fail. Signs of a missed rank: several components that look almost identical or like pure noise, or ICA that does not converge. Always compare the printed `Data rank` with the expected rank (channels minus interpolated channels minus 1). If they differ, type `'pca', 31` in the options field, with your expected number instead of 31.
+- **Trusting the automatic rank estimate.** `pop_runica` tries to detect the rank, but the estimate can fail. Signs of a missed rank: several components that look almost identical or like pure noise, or ICA that does not converge. Always compare the printed `Data rank` with the expected rank (channels minus interpolated channels minus 1). If they differ, add `'pca'` in the <UiLabel>Commandline options (See help messages)</UiLabel> field after what is already there, so it reads `'extended', 1, 'pca', 31`, and put your expected rank instead of 31.
 - **Non-brain channels slipping in by accident.** Exclude EOG and ECG channels according to your goal, and never let them in without a decision. Use <UiLabel>Use only channel type(s) or indices</UiLabel> to choose the channels. In D1 we decided to keep the two eye channels for a clear reason.
 - **Expecting the same result every time.** ICA shuffles the data order at random during training, so the order and shape of components vary slightly between runs. Your component order may not match the picture in this lesson: the blink may be component 1 here and component 3 for you. Find a component by its shape, not its number.
 - **Changing the reference after ICA.** The weights are tied to the reference used when ICA was computed. Re-reference before ICA and leave it unchanged afterward. EEGLAB itself warns you if you change it.

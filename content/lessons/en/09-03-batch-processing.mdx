@@ -55,8 +55,8 @@ Here we process only three participants from D4 (about 700 MB to download). The 
 
 **First: download three participants from D4**
 
-1. Create a folder named `faces_project` with a `rawdata` folder inside it, and make `faces_project` the MATLAB working folder (`cd`). Run every script in station 9 from inside this folder. [The file organization lesson](/en/lesson/file-organization/) explains the other folders.
-2. From the ds002718 page on OpenNeuro, download into `rawdata` the top-level files (`dataset_description.json`, `README` and `task-FaceRecognition_events.json`) and the full `sub-002`, `sub-003` and `sub-004` folders. Or, from the system command line, if you have the AWS CLI:
+1. Create a folder named `faces_project` with a `rawdata` folder inside it, and make `faces_project` the MATLAB working folder: in the Command Window type `cd`, a space and the folder path, or pick it in the <UiLabel>Current Folder</UiLabel> panel. Run every script in station 9 from inside this folder. [The file organization lesson](/en/lesson/file-organization/) explains the other folders.
+2. Open [ds002718 on OpenNeuro](https://openneuro.org/datasets/ds002718) and download into `rawdata` the three top-level files (`dataset_description.json`, `README` and `task-FaceRecognition_events.json`), then the full `sub-002`, `sub-003` and `sub-004` folders, keeping their names and layout, as in [the BIDS & OpenNeuro lesson](/en/lesson/bids-openneuro/). Or, from the system command line, if you have the AWS CLI:
 
 ```text
 aws s3 sync --no-sign-request s3://openneuro.org/ds002718 rawdata --exclude "sub-*" --include "sub-002/*" --include "sub-003/*" --include "sub-004/*"
@@ -64,7 +64,7 @@ aws s3 sync --no-sign-request s3://openneuro.org/ds002718 rawdata --exclude "sub
 
 **Second: try the pipeline on one participant in the GUI**
 
-3. Open <MenuPath>File > Import data > Using EEGLAB functions and plugins > From BIDS folder structure</MenuPath> and choose the `rawdata` folder. Enable importing events and electrode locations from the BIDS files, and take the event type from the `trial_type` column. In <UiLabel>Study output folder</UiLabel>, change the folder to `faces_project/derivatives/eeglab`: the default puts it inside `rawdata`, while the script and the cluster lesson look for the files in `faces_project/derivatives/eeglab`. Click <UiLabel>Ok</UiLabel>. A STUDY is created with the three participants.
+3. Open <MenuPath>File > Import data > Using EEGLAB functions and plugins > From BIDS folder structure</MenuPath> and choose the `rawdata` folder. Make sure <UiLabel>Use BIDS electrode.tsv files (when present) for channel locations; off: look up locations using channel labels</UiLabel> is checked, so electrode locations come from the BIDS files. Check <UiLabel>Use BIDS event.tsv files for events and use the following BIDS field for event type</UiLabel> and choose `trial_type` in the list next to it. In <UiLabel>Study output folder</UiLabel>, change the folder to `faces_project/derivatives/eeglab`: the default puts it inside `rawdata`, while the script and [the HPC lesson](/en/lesson/hpc/) look for the files in `derivatives/eeglab`. Click <UiLabel>Ok</UiLabel>. A STUDY is created with the three participants.
 4. Pick one participant from the <MenuPath>Datasets</MenuPath> menu and apply the steps in the GUI as in stations 3 to 5, changing only three settings: mains power in the UK is 50 Hz, not 60; the eye channels are `EEG061` and `EEG062`; and the heart channels `EEG063` and `EEG064` are removed.
 5. Type `eegh` and compare the lines with the single-subject script. The steps are the same; only the three settings differ. Those settings are what you will put in `cfg` at the top of the file.
 
@@ -222,7 +222,7 @@ end
 
 | Setting | Value in this lesson | Why |
 |---|---|---|
-| Line frequency | 50 Hz | D4 was recorded in Cambridge, UK, and `PowerLineFrequency` in the `eeg.json` file is 50. Data recorded in Saudi Arabia use 60 Hz. This setting is the clearest difference between D1 and D4. |
+| Line frequency | 50 Hz | D4 was recorded in Cambridge, UK, and `PowerLineFrequency` in the `eeg.json` file is 50. The line frequency is 60 Hz in Saudi Arabia and the US, and 50 Hz in Europe and most other Arab countries, so check the spectrum before you assume. This setting is the clearest difference between D1 and D4. |
 | Eye and heart channels | `EEG061` and `EEG062` for the eyes, `EEG063` and `EEG064` for the heart | From the `channels.tsv` file in D4. Heart channels are removed; eye channels stay to help ICA and do not enter the reference. |
 | Events for epoching | `famous_new`, `unfamiliar_new` and `scrambled_new` | The first presentation of each image, 150 of each type in sub-002. Repetitions have other names (`_second_early` and `_second_late`). |
 | Import | `pop_importbids` once before the loop | Reads events from `events.tsv` and electrode locations from `electrodes.tsv`, as in the official EEGLAB tutorial on the same data. |

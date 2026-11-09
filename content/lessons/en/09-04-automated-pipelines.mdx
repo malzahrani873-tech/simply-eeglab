@@ -70,6 +70,8 @@ All of them are separate tools, not bundled with EEGLAB. Versions are as they we
 | BeMoBIL (2.0.0) | EEG during movement (mobile EEG) with motion data | Import, cleaning, AMICA and analysis with all parameters in one config file | EEGLAB plugin and scripts |
 | Automagic | Large datasets for users who do not want to program | Runs several steps (including PREP), then rates the quality of each file | Its own GUI from the <MenuPath>Automagic</MenuPath> menu in EEGLAB |
 
+Use a ready-made pipeline if it was designed for your type of data and you have many participants, as long as you read its report for each participant. Write your own script if no pipeline was designed for your data, or if you need to explain every decision in your paper.
+
 ## How do I run PREP on D1 from the menus?
 
 **First: install PREP**
@@ -159,8 +161,8 @@ eeglab redraw;
 Whatever pipeline you choose, check three things in its output before you continue:
 
 1. **The channels:** how many channels were removed or interpolated, and which ones? Compare them with what you see in <MenuPath>Plot > Channel data (scroll)</MenuPath>.
-2. **The spectrum:** compare the spectrum before and after. The line peak should become clearly smaller, and the rest of the spectrum should not collapse.
-3. **The report:** read the pipeline's report for each participant. A participant with too many removed channels or components needs a look, or exclusion.
+2. **The spectrum:** compare the spectrum before and after. The line peak should become clearly smaller, and the rest of the spectrum should keep roughly its shape, especially the alpha peak at 10 Hz.
+3. **The report:** read the pipeline's report for each participant. A participant with many removed channels or ICA components needs a review, and you may decide to exclude them.
 
 For PREP on D1 specifically:
 

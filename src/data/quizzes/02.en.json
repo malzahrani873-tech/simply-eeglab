@@ -54,7 +54,7 @@
         },
         {
           "id": "d",
-          "text": "If you untick `Import EDF+ annotations`, the event count may drop to zero"
+          "text": "If you untick `Import EDF+ annotations (try also mexSLOAD below)`, the event count may drop to zero"
         }
       ],
       "answer": [
@@ -62,7 +62,7 @@
         "b",
         "d"
       ],
-      "explanation": "A Neuroscan `.cnt` and an ANT `.cnt` are two different formats with the same extension, so choose the plugin by the system, not the extension. BioSemi data are recorded reference-free and lose much of their signal quality if left without a reference."
+      "explanation": "A Neuroscan `.cnt` and an ANT `.cnt` are two different formats with the same extension, so choose the plugin by the system, not the extension. BioSemi data are recorded reference-free and lose much of their signal quality if left without a reference. Events in EDF+ files are stored as annotations, so if you untick `Import EDF+ annotations (try also mexSLOAD below)`, no event may be read at all."
     },
     {
       "id": "s02-q03",

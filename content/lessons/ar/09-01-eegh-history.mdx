@@ -1,14 +1,14 @@
 ---
 title: الأمر eegh وسجل الأوامر
 titleEn: eegh & the command history
-description: كيف تستخرج بالأمر eegh سطر الكود المقابل لكل ضغطة في واجهة EEGLAB، وتحفظ سجلك كسكربت يعيد نفس النتيجة.
+description: كيف تستخرج بالأمر eegh سطر الكود المقابل لكل ضغطة في واجهة EEGLAB، وتحفظ سجلك في سكربت يعيد النتيجة نفسها.
 station: 9
 order: 1
 level: core
 status: approved
 objectives:
   - يعرض بالأمر eegh سطر الكود المقابل لكل خطوة نفّذها من الواجهة.
-  - يحفظ سجل الجلسة وسجل الداتاست في ملف .m ويميّز بينهما.
+  - يحفظ سجل الجلسة وسجل الداتاست في ملف سكربت من MATLAB، ويميّز بينهما.
   - ينظّف سكربت السجل من المسارات الثابتة والأسطر الزائدة، ويشغّله فيعطي نفس النتيجة.
 prerequisites: [extract-epochs]
 references:
@@ -33,7 +33,7 @@ updated: 2026-10-28
 
 ## الفكرة
 
-كل ضغطة في واجهة EEGLAB تنفّذ في الخلفية سطراً من MATLAB. يحفظ EEGLAB هذه الأسطر بالترتيب في سجل الأوامر (<En>command history</En>)، والأمر `eegh` يعرضها لك.
+كل ضغطة في واجهة EEGLAB (<En>GUI</En>) تنفّذ في الخلفية سطراً من MATLAB. يحفظ EEGLAB هذه الأسطر بالترتيب في سجل الأوامر (<En>command history</En>)، والأمر `eegh` يعرضها لك.
 
 هذا السجل هو أول سكربت لك، ولم تكتب منه حرفاً. تحفظه في ملف، فتعيد التحليل نفسه بضغطة، أو تطبّقه على مشارك آخر. وهو أيضاً توثيق دقيق: بعد شهر لن تتذكر حد الفلتر الذي اخترته، لكن السجل يتذكر.
 
@@ -43,23 +43,23 @@ updated: 2026-10-28
 
 <Figure src="eegh-history/S6-filter-dialog.png" alt="نافذة Filter the data -- pop_eegfiltnew() وفي خانة Lower edge of the frequency pass band (Hz) القيمة 0.1، وخانة Plot frequency response مفعّلة." caption="EEGLAB 2026.1" source="eeglab-ui" />
 
-بعد أن تضغط <UiLabel>Ok</UiLabel> في هذه النافذة، اكتب `eegh` في نافذة الأوامر. السطر المقابل هو:
+بعد أن تضغط <UiLabel>Ok</UiLabel> في هذه النافذة، اكتب `eegh` في نافذة الأوامر (<UiLabel>Command Window</UiLabel>). السطر المقابل هو:
 
 ```matlab
 EEG = pop_eegfiltnew(EEG, 'locutoff',0.1,'plotfreqz',1);
 ```
 
-كل خانة ملأتها في النافذة موجودة في السطر: `'locutoff',0.1` هو الحد الأدنى، و `'plotfreqz',1` هو خانة <UiLabel>Plot frequency response</UiLabel> المفعّلة.
+كل خانة ملأتها في النافذة موجودة في السطر: `'locutoff',0.1` هو الحافة الدنيا للنطاق المسموح (<En>passband edge</En>)، و `'plotfreqz',1` هو خانة <UiLabel>Plot frequency response</UiLabel> المفعّلة.
 
 ## كيف أعرض السجل وأحفظه وأشغّله من القوائم؟
 
-ابدأ بجلسة جديدة: الأمر `clear` ثم `eeglab`. إن لم تكن قد فعلت، فافتح «سكربت للوصول إلى هذه الحالة» تحت «تبدأ من» أعلى الدرس. تشغيل `eeglab` يبدأ سجلاً جديداً فارغاً، فلا يختلط بأوامر جلسة سابقة.
+ابدأ بجلسة جديدة: اكتب `clear` ثم `eeglab` في نافذة الأوامر. هذان السطران هما «سكربت للوصول إلى هذه الحالة» تحت «تبدأ من» أعلى الدرس. تشغيل `eeglab` يبدأ سجلاً جديداً فارغاً، فلا يختلط بأوامر جلسة سابقة.
 
 **أولاً: نفّذ بعض الخطوات من الواجهة**
 
 1. افتح <MenuPath>File > Load existing dataset</MenuPath>، واختر `eeglab_data.set` من مجلد `sample_data` داخل مجلد EEGLAB.
-2. افتح <MenuPath>Tools > Filter the data > Basic FIR filter (new, default)</MenuPath>. اكتب `0.1` في <UiLabel>Lower edge of the frequency pass band (Hz)</UiLabel>، واضغط <UiLabel>Ok</UiLabel>. أغلق نافذة استجابة الفلتر، ثم سمِّ الداتاست الجديدة `D1 hp0.1` في النافذة التي تظهر بعدها.
-3. افتح نفس القائمة مرة ثانية لإزالة ضوضاء الكهرباء عند 60 هرتز. اكتب `58` في <UiLabel>Lower edge of the frequency pass band (Hz)</UiLabel> و`62` في <UiLabel>Higher edge of the frequency pass band (Hz)</UiLabel>، وفعّل <UiLabel>Notch filter the data instead of pass band</UiLabel>. اضغط <UiLabel>Ok</UiLabel>، وسمِّ الداتاست الجديدة `D1 hp0.1 notch60`.
+2. افتح <MenuPath>Tools > Filter the data > Basic FIR filter (new, default)</MenuPath>. اكتب `0.1` في <UiLabel>Lower edge of the frequency pass band (Hz)</UiLabel>، واضغط <UiLabel>Ok</UiLabel>. أغلق نافذة استجابة الفلتر، ثم اكتب `D1 hp0.1` في خانة <UiLabel>Name it:</UiLabel> في النافذة التي تظهر بعدها، فهذا اسم الداتاست (<En>dataset</En>) الجديدة، واضغط <UiLabel>Ok</UiLabel>.
+3. افتح نفس القائمة مرة ثانية لإزالة ضوضاء الكهرباء (<En>line noise</En>) عند 60 هرتز، لأن D1 مسجّلة على شبكة 60 هرتز. تردد الكهرباء 60 هرتز في السعودية وأمريكا، و50 هرتز في أوروبا وأغلب الدول العربية الأخرى، فتحقّق من الطيف قبل أن تفترض. اكتب `58` في <UiLabel>Lower edge of the frequency pass band (Hz)</UiLabel> و`62` في <UiLabel>Higher edge of the frequency pass band (Hz)</UiLabel>، وفعّل <UiLabel>Notch filter the data instead of pass band</UiLabel>. اضغط <UiLabel>Ok</UiLabel>، وسمِّ الداتاست الجديدة `D1 hp0.1 notch60`.
 4. افتح <MenuPath>Plot > Channel data (scroll)</MenuPath>، ثم أغلق النافذة.
 
 **ثانياً: اعرض السجل**
@@ -82,7 +82,7 @@ pop_eegplot( EEG, 1, 1, 1);
 **ثالثاً: احفظ السجل في ملف**
 
 7. افتح <MenuPath>File > History scripts > Save session history script</MenuPath>. الاسم المقترح `eeglabhist.m`. غيّره إلى `my_first_history.m` واحفظه في مجلد عملك.
-8. اكتب في نافذة الأوامر `EEG.history`. هذا **سجل الداتاست**: أوامر الداتاست الحالية فقط، بلا أوامر إدارة الداتاست. في أوله أسطر لم تكتبها أنت، بمسارات مثل `/Users/arno/...`. هذه أسطر من تاريخ الملف عند من صنعه، لأن السجل يُحفظ داخل ملف `.set` وينتقل معه. بعدها سطر يسجّل إصدار EEGLAB، ثم سطرا الفلتر، ثم سطر `pop_eegplot` لأنك فتحت نافذة العرض من القائمة.
+8. اكتب في نافذة الأوامر `EEG.history`. هذا **سجل الداتاست** (<En>dataset history</En>): الأوامر التي غيّرت الداتاست الحالية فقط، بلا أوامر إدارة الداتاست. أما ما حفظته في الخطوة 7 فهو سجل الجلسة (<En>session history</En>). في أوله أسطر لم تكتبها أنت، بمسارات مثل `/Users/arno/...`. هذه أسطر من تاريخ الملف عند من صنعه، لأن السجل يُحفظ داخل ملف `.set` وينتقل معه. بعدها سطر يسجّل إصدار EEGLAB، ثم سطرا الفلتر، ثم سطر `pop_eegplot` لأنك فتحت نافذة العرض من القائمة.
 9. لحفظه في ملف، افتح <MenuPath>File > History scripts > Save dataset history script</MenuPath>.
 
 **رابعاً: شغّل السجل**
@@ -137,7 +137,7 @@ pop_saveh(EEG.history, 'D1_hp0.1_notch60_history.m', pwd);
 |---|---|---|
 | تعيد كل ما فعلته اليوم، بكل الداتاست | سجل الجلسة: `eegh` أو <UiLabel>Save session history script</UiLabel> | فيه أوامر التحميل والحفظ وإدارة الداتاست، فيعيد الجلسة كاملة. |
 | تعرف كيف صُنع ملف `.set` معيّن | سجل الداتاست: `EEG.history` | يُحفظ داخل الملف نفسه، فيبقى مع البيانات (توثيق EEGLAB الرسمي، قسم EEGLAB dataset history). |
-| تبني سكربتاً لمشاركين آخرين | سجل الداتاست بعد تنظيفه | أقصر، ولا يحوي أوامر الواجهة، فيسهل وضعه داخل حلقة تمرّ على المشاركين ([درس معالجة الدفعات](/lesson/batch-processing/)). |
+| تبني سكربتاً لمشاركين آخرين | سجل الداتاست بعد تنظيفه | أقصر، ولا يحوي أوامر الواجهة، فيسهل وضعه داخل حلقة (<En>loop</En>) تمرّ على المشاركين ([درس معالجة الدفعات](/lesson/batch-processing/)). |
 
 ## كيف تتأكد أن سكربت السجل يعيد النتيجة نفسها؟
 

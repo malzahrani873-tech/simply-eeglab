@@ -37,7 +37,7 @@ updated: 2026-10-28
 
 ## The idea
 
-Almost every menu in EEGLAB comes from a <En>plugin</En>: DIPFIT, ICLabel and firfilt are all plugins. If you write a tool you use in every project, turning it into a plugin makes it a menu item like any official tool, and your colleagues can use it the same way.
+Many items in the EEGLAB menus come from plugins (<En>plugin</En>): DIPFIT, ICLabel and firfilt are all plugins. If you write a tool you use in every project, turning it into a plugin makes it a menu item like any official tool, and your colleagues can use it the same way.
 
 A plugin is simpler than you might expect: a folder with two files.
 
@@ -46,7 +46,7 @@ So how do you write these two files, so that your tool appears in the menu and i
 ## What does a plugin look like on disk and in the menu?
 
 <ImageSpec>
-Two screenshots side by side. Left: the `plugins` folder inside the EEGLAB folder, holding the `chanvar1.0` folder with the two files `eegplugin_chanvar.m` and `pop_chanvar.m`. Right: the EEGLAB Plot menu open, ending with the new Channel variance item below a separator line. Source: screenshot from EEGLAB 2026.1 on the project owner's computer.
+Two screenshots side by side. Left: the `chanvar1.0` folder inside the `plugins` folder, holding the two files `eegplugin_chanvar.m` and `pop_chanvar.m`. Right: the Plot menu open, ending with the new Channel variance item.
 </ImageSpec>
 
 Left: the plugin folder and its two files. Right: the item one of them adds to the Plot menu.
@@ -75,7 +75,7 @@ mkdir(pluginDir); cd(pluginDir);
 
 The folder name carries the version: EEGLAB reads `chanvar1.0` as a plugin named `chanvar`, version 1.0.
 
-**Second: write the pop_ function**
+**Second: write the function `pop_chanvar.m`**
 
 2. Type `edit pop_chanvar.m`, paste this code, and save:
 
@@ -141,7 +141,7 @@ end
 com = sprintf('pop_chanvar(EEG, %g);', zThresh);
 ```
 
-**Third: write the eegplugin_ file**
+**Third: write the file `eegplugin_chanvar.m`**
 
 3. Type `edit eegplugin_chanvar.m`, paste this code, and save:
 

@@ -84,7 +84,7 @@ How do you fit a dipole to each component and read its residual variance?
 
 <Figure src="dipfit/dipfit-dipplot.png" alt="The dipplot window: a template MRI head in three views (top, back and side) with the numbered dipoles of the components." source="D1" />
 
-Above each map are the component number and its residual variance. The lower it is, the closer the component is to a single source in the brain, and the usual acceptance limit is 15%. The model works because a brain component usually comes from a small patch of cortex whose pyramidal cells are active together and point the same way, so their currents add up like one source, as in [the EEG origin lesson](/en/lesson/eeg-origin/). This helps you recognize brain components, and you will need it later when clustering ICA components across participants. The second figure places all dipoles on a template MRI in three views.
+Above each map are the component number and its residual variance. The lower it is, the closer the component is to a single source in the brain, and the usual acceptance limit is 15%. The model works because a brain component usually comes from a small patch of cortex whose pyramidal cells are active together and point the same way, so their currents add up like one source, as in [the EEG origin lesson](/en/lesson/eeg-origin/). This helps you recognize brain components, and you will need it later when clustering ICA components across participants.
 
 The second figure places all dipoles on a template MRI in three views, so you see where each source sits.
 
@@ -100,7 +100,7 @@ If you have an MRI scan for each participant, the NFT plugin builds a head model
 
 ## How do I fit a dipole to each component from the menus?
 
-Start with the main dataset open, with its ICA weights. If you don't have it, open "Script to reach this state" under "Starts from" at the top of the lesson.
+Start with the main dataset `D1 main` open, with its ICA weights. If you don't have it, open "Script to reach this state" under "Starts from" at the top of the lesson.
 
 Step 4 changes the channel locations of the open dataset, so in step 17 you save the result to a new file, not over your main dataset.
 
@@ -137,7 +137,7 @@ exist('ft_dipolefitting', 'file')
 
 **Fifth: read the result**
 
-14. Open <MenuPath>Plot > Component maps > In 2-D</MenuPath>, type `1:12` for the component numbers, and check <UiLabel>Plot associated dipole(s) (if present)</UiLabel>.
+14. Open <MenuPath>Plot > Component maps > In 2-D</MenuPath>, type `1:12` in <UiLabel>Component numbers</UiLabel>, check <UiLabel>Plot associated dipole(s) (if present)</UiLabel>, and press <UiLabel>Ok</UiLabel>.
 15. Open <MenuPath>Tools > Source localization using DIPFIT > Component dipole plot</MenuPath>, check <UiLabel>Plot summary mode</UiLabel>, and click <UiLabel>Ok</UiLabel>. One window shows all the dipoles in three views (top, back and side), with the list of components and their residual variance.
 16. For each component: is the dipole inside the brain? What is its residual variance? Compare the blink component you identified in [the ICLabel lesson](/en/lesson/iclabel/) with a brain component such as the posterior alpha component.
 17. Save with <MenuPath>File > Save current dataset as</MenuPath> as `D1_dipfit.set`.

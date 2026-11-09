@@ -6,6 +6,9 @@ import { t, dir, otherLang, type Lang } from '../i18n';
 import { url, asset } from '../lib/url';
 import Icon from '../components/Icon.astro';
 import Logo from '../components/Logo.astro';
+import arabic400 from '../fonts/vazirmatn-arabic-400-normal.woff2?url';
+import latin400 from '../fonts/vazirmatn-latin-400-normal.woff2?url';
+import arabic700 from '../fonts/vazirmatn-arabic-700-normal.woff2?url';
 import { roadmap } from '../lib/site-data';
 
 interface Props {
@@ -42,6 +45,10 @@ const themeScript = asset('scripts/theme.js');
 <html lang={lang} dir={dir(lang)}>
 <head>
   <meta charset="utf-8" />
+  {/* The text fonts load first and are used only if they arrive in time (font-display: optional), so text never jumps. */}
+  {lang === 'ar' && <link rel="preload" href={arabic400} as="font" type="font/woff2" crossorigin />}
+  {lang === 'ar' && <link rel="preload" href={arabic700} as="font" type="font/woff2" crossorigin />}
+  <link rel="preload" href={latin400} as="font" type="font/woff2" crossorigin />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <script is:inline>try{var t=localStorage.getItem('simplyeeglab:theme');if(t==='dark'||t==='light')document.documentElement.setAttribute('data-theme',t)}catch(e){}</script>
   <title>{fullTitle}</title>
@@ -60,6 +67,8 @@ const themeScript = asset('scripts/theme.js');
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="color-scheme" content="light dark" />
   <link rel="icon" href={asset('favicon.svg')} type="image/svg+xml" />
+  {/* Parts that work only with scripts are shown from the start so the page does not jump; without scripts this sheet hides them. */}
+  <noscript><link rel="stylesheet" href={asset('nojs.css')} /></noscript>
   <slot name="head" />
 </head>
 <body class={bodyClass}>

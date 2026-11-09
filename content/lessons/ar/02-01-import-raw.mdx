@@ -8,7 +8,7 @@ level: core
 status: approved
 objectives:
   - تستورد ملف EDF إلى EEGLAB من الواجهة ومن السكربت.
-  - تحدد القائمة أو الـ plugin المناسب لملف BDF ولملف BrainVision.
+  - تحدد القائمة أو الإضافة (plugin) المناسبة لملف BDF ولملف BrainVision.
   - تتحقق بعد الاستيراد من عدد القنوات ومعدل العيّنات ووجود الأحداث.
 prerequisites: [eeg-struct]
 references:
@@ -51,7 +51,7 @@ updated: 2026-10-28
 
 ## ماذا يتغيّر في نافذة EEGLAB بعد الاستيراد؟
 
-قبل الاستيراد تقول النافذة إنه لا توجد داتاست. بعده تظهر تحت اسم الداتاست أرقامها: عدد القنوات، ومعدل العيّنات، وعدد الأحداث.
+قبل الاستيراد تقول النافذة إنه لا توجد داتاست (<En>dataset</En>). بعده تظهر تحت اسم الداتاست أرقامها: عدد القنوات، ومعدل العيّنات، وعدد الأحداث.
 
 <BeforeAfter>
 <Figure src="import-raw/S2-eeglab-empty.png" alt="نافذة EEGLAB الرئيسية قبل الاستيراد: لا توجد بيانات، وتظهر عبارة No current dataset." caption="قبل الاستيراد" source="eeglab-ui" />
@@ -62,7 +62,7 @@ updated: 2026-10-28
 
 ### 1. نزّل ملف التمرين
 
-نستخدم ملفاً واحداً من داتاست (<En>dataset</En>) PhysioNet المفتوحة لحركة اليد وتخيّلها: `S001R03.edf`. فيه 64 قناة بمعدل 160 هرتز، ومدته حوالي دقيقتين، وأحداثه مخزّنة داخل الملف.
+نستخدم ملفاً واحداً من داتاست PhysioNet المفتوحة لحركة اليد وتخيّلها: `S001R03.edf`. فيه 64 قناة بمعدل 160 هرتز، ومدته حوالي دقيقتين، وأحداثه مخزّنة داخل الملف.
 
 1. افتح صفحة الداتاست: [EEG Motor Movement/Imagery Dataset](https://physionet.org/content/eegmmidb/1.0.0/).
 2. ادخل مجلد `S001` ونزّل الملف `S001R03.edf`.
@@ -144,17 +144,17 @@ EEG = pop_loadbv(dataFolder, 'sub01.vhdr');
 | أي جهاز يصدّر الإشارة نصاً أو أرقاماً، أو بيانات عندك في MATLAB | ملف ASCII أو float، أو مصفوفة MATLAB | لا شيء، مدمج في EEGLAB | <UiLabel>From ASCII/float file or MATLAB array</UiLabel> | `pop_importdata` |
 
 - ملف `.cnt` من Neuroscan وملف `.cnt` من ANT صيغتان مختلفتان بنفس الامتداد. اختر حسب الجهاز، لا حسب الامتداد.
-- **BDF (أجهزة BioSemi):** نفس الإضافة من <MenuPath>File > Import data > Using EEGLAB functions and plugins > From Biosemi BDF file (BIOSIG toolbox)</MenuPath>. اكتب رقم قناة مرجع في خانة <UiLabel>Reference chan(s) indices - recommended for BIOSEMI</UiLabel>، مثل قناتي الماستويد. رقم القناة يختلف حسب ترتيب أقطابك (<En>electrode</En>)، فارجع إلى ملف التخطيط (montage) الخاص بجهازك. السبب: صفحة المساعدة في `pop_biosig` تحذّر من أن بيانات BioSemi تُسجَّل بلا مرجع، وتفقد حوالي 40 ديسيبل من نسبة الإشارة إلى الضوضاء إذا بقيت بلا مرجع. هذا مرجع مؤقت، وتختار المرجع النهائي في [درس إعادة المرجع](/lesson/rereferencing/). أما في ملف EDF فاترك الخانة فارغة.
+- **BDF (أجهزة BioSemi):** نفس الإضافة من <MenuPath>File > Import data > Using EEGLAB functions and plugins > From Biosemi BDF file (BIOSIG toolbox)</MenuPath>. اكتب رقم قناة مرجع (<En>reference</En>) في خانة <UiLabel>Reference chan(s) indices - recommended for BIOSEMI</UiLabel>، مثل قناتي الماستويد. رقم القناة يختلف حسب ترتيب أقطابك (<En>electrode</En>)، فارجع إلى ملف ترتيب الأقطاب (<En>montage</En>) الخاص بجهازك. السبب: صفحة المساعدة في `pop_biosig` تحذّر من أن بيانات BioSemi تُسجَّل بلا مرجع، وتفقد حوالي 40 ديسيبل (<En>dB</En>) من نسبة الإشارة إلى الضوضاء إذا بقيت بلا مرجع. هذا مرجع مؤقت، وتختار المرجع النهائي في [درس إعادة المرجع](/lesson/rereferencing/). أما في ملف EDF فاترك الخانة فارغة.
 - **BrainVision (أجهزة Brain Products):** التسجيل ثلاثة ملفات بنفس الاسم: `.vhdr` و `.vmrk` و `.eeg`. افتح <MenuPath>File > Import data > Using EEGLAB functions and plugins > From Brain Vis. Rec. .vhdr file</MenuPath> واختر ملف `.vhdr`.
 - **صيغة لا تعرفها:** جرّب <MenuPath>File > Import data > Using the FILE-IO interface</MenuPath> ثم <MenuPath>File > Import data > Using the BIOSIG interface</MenuPath>. وإذا فشل الاثنان، ابحث باسم جهازك أو صيغته في <MenuPath>File > Manage EEGLAB extensions</MenuPath>. يقول التوثيق إن هذه الخطوات تكفي في حوالي 90% من الحالات.
 
 ## كيف أتأكد أن الاستيراد نجح؟
 
-1. **النافذة الرئيسية:** تحت اسم الداتاست تقرأ <UiLabel>Channels per frame</UiLabel> = 64، و <UiLabel>Sampling rate (Hz)</UiLabel> = 160، و <UiLabel>Events</UiLabel> أكبر من صفر. أما <UiLabel>Channel locations</UiLabel> فقيمتها `No (labels only)`، أي أن أسماء القنوات موجودة بلا مواقع. هذا متوقع الآن، ونضيف المواقع في [درس مواقع الأقطاب](/lesson/channel-locations/).
+1. **النافذة الرئيسية:** تحت اسم الداتاست تقرأ <UiLabel>Channels per frame</UiLabel> = 64، و <UiLabel>Sampling rate (Hz)</UiLabel> = 160، و <UiLabel>Events</UiLabel> أكبر من صفر. أما <UiLabel>Channel locations</UiLabel> فقيمتها `No (labels only)`، أي أن أسماء القنوات موجودة بلا مواقع. هذا متوقع الآن، ونضيف المواقع في [درس مواقع القنوات](/lesson/channel-locations/).
 2. **من الـ Command Window:** `EEG.nbchan` يعطي `64`، و `EEG.srate` يعطي `160`، و `EEG.pnts / EEG.srate` يعطي الطول بالثواني (حوالي دقيقتين).
 3. **الأحداث:** `eeg_eventtypes(EEG)` يعرض الرموز الثلاثة `T0` (راحة)، و `T1` و `T2` (حركتان حسب المهمة). إذا كان عدد الأحداث صفراً، أعد الاستيراد وتأكد من تفعيل خانة الـ annotations.
 4. **بالعين:** افتح <MenuPath>Plot > Channel data (scroll)</MenuPath>. يجب أن ترى القنوات بإشارة متغيّرة، وخطوطاً عمودية ملوّنة عند الأحداث.
-5. **الملف المحفوظ:** يجب أن يظهر `S001R03.set` في مجلد الدروس. احتفظ به، فالدرسان التاليان ([مواقع الأقطاب](/lesson/channel-locations/) و[الأحداث](/lesson/events/)) يكملان عليه.
+5. **الملف المحفوظ:** يجب أن يظهر `S001R03.set` في مجلد الدروس. احتفظ به، فالدرسان التاليان ([مواقع القنوات](/lesson/channel-locations/) و[الأحداث](/lesson/events/)) يبدآن منه.
 
 <Methods>
 EEG recordings in EDF+ format (64 channels, 160 Hz) were imported into EEGLAB 2026.1 with pop_biosig (Biosig plugin [version]), and event markers were read from the EDF+ annotations.
@@ -163,9 +163,9 @@ EEG recordings in EDF+ format (64 channels, 160 Hz) were imported into EEGLAB 20
 ## لماذا لا تظهر الأحداث أو تضعف الإشارة؟ أخطاء الاستيراد الشائعة
 
 - **اختيار الملف الخطأ في BrainVision.** افتح ملف `.vhdr` دائماً، لا `.eeg` ولا `.vmrk`. ولا تغيّر اسم أحد الملفات الثلاثة يدوياً، لأن ملف `.vhdr` يحفظ أسماء الملفين الآخرين بداخله. إذا احتجت إعادة التسمية، استخدم <MenuPath>File > Export > Copy and Rename Brain Vis. exchange files</MenuPath> بعد تثبيت bva-io.
-- **ملف BDF بلا مرجع.** تفقد جزءاً كبيراً من جودة الإشارة، كما في قسم «وإذا كان ملفي من جهاز آخر؟». اختر قناة مرجع عند الاستيراد.
-- **إلغاء استيراد الأحداث.** في نافذة Biosig خانتان للأحداث، وكلتاهما مفعّلة افتراضياً لكل الصيغ: <UiLabel>Import EDF+ annotations</UiLabel>، و <UiLabel>Extract event from marker channel</UiLabel>. إذا ألغيتهما، قد يصبح عدد الأحداث صفراً، فلا تستطيع التقطيع لاحقاً.
+- **ملف BDF بلا مرجع.** تفقد جزءاً كبيراً من جودة الإشارة، كما شرحنا في قسم «وإذا كان ملفي من جهاز آخر؟». اختر قناة مرجع عند الاستيراد.
+- **إلغاء استيراد الأحداث.** في نافذة Biosig خانتان للأحداث، وكلتاهما مفعّلة افتراضياً لكل الصيغ: <UiLabel>Import EDF+ annotations</UiLabel>، و <UiLabel>Extract event from marker channel</UiLabel>. إذا ألغيتهما، قد يصبح عدد الأحداث صفراً، فلا تستطيع تقطيع البيانات إلى epochs لاحقاً.
 - **عدم الحفظ بعد الاستيراد.** ستعيد الاستيراد كل مرة. احفظ نسخة `.set` واحدة بعد الاستيراد، ولا تكتب فوق الملف الأصلي.
-- **أسماء قنوات غريبة في هذا الملف.** أسماء القنوات في هذه الداتاست تنتهي بنقاط، مثل `Fc5.` و `C3..`. هذا ليس خطأ في الاستيراد، لكنه يمنع EEGLAB من التعرّف على مواقع الأقطاب. نصلحه في [درس مواقع الأقطاب](/lesson/channel-locations/).
+- **أسماء قنوات غريبة في هذا الملف.** أسماء القنوات في هذه الداتاست تنتهي بنقاط، مثل `Fc5.` و `C3..`. هذا ليس خطأ في الاستيراد، لكنه يمنع EEGLAB من التعرّف على مواقع الأقطاب. نصلحه في [درس مواقع القنوات](/lesson/channel-locations/).
 
 {/* صندوق "من التجربة": بانتظار قصة من صاحب المشروع. لا يُكتب قبل وصولها. */}

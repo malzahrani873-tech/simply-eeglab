@@ -109,7 +109,8 @@ function styleTables(tree) {
 }
 
 // Arabic lessons: each Latin run in running text is isolated, so "الـ high-pass" and "(L1، الفصل 4)" keep their order.
-const RUN = /[A-Za-z0-9_.][A-Za-z0-9 ._\-/+&]*[A-Za-z0-9_]|[A-Za-z]/g;
+const RUN = /[-−±+]?[A-Za-z0-9_.][A-Za-z0-9 ._\-−/+&=×:%<>≈±]*[A-Za-z0-9_+%]|[-−±]?[A-Za-z0-9]/g;
+const needsIso = (run) => /[A-Za-z]/.test(run) || /^[-−±+]\d|\d\s*[=/×<>≈±−-]\s*\d/.test(run);
 const SKIP_ISO = new Set(['code', 'pre', 'bdi', 'script', 'style', 'svg', 'kbd', 'samp']);
 function isolateLatin(n) {
   if (n.type !== 'element' && n.type !== 'root' && !n.type?.startsWith('mdxJsx')) return;
@@ -120,7 +121,7 @@ function isolateLatin(n) {
     if (c.type !== 'text') { isolateLatin(c); out.push(c); continue; }
     let last = 0;
     for (const m of c.value.matchAll(RUN)) {
-      if (!/[A-Za-z]/.test(m[0])) continue;
+      if (!needsIso(m[0])) continue;
       if (m.index > last) out.push(text(c.value.slice(last, m.index)));
       const nw = !/\s/.test(m[0]) && m[0].length <= 24;
       out.push(el('bdi', nw ? { lang: 'en', className: ['nw'] } : { lang: 'en' }, [text(m[0])]));

@@ -146,7 +146,7 @@ fprintf('Baseline points: %d, largest baseline mean: %.2g uV\n', sum(blIdx), max
 ## How do I check that the correction worked?
 
 - Run the check lines at the end of the script: there are 26 baseline points, and the largest mean is very close to zero (below 0.001 µV).
-- Open <MenuPath>Plot > Channel data (scroll)</MenuPath>: every epoch starts near the zero line in every channel.
+- Open <MenuPath>Plot > Channel data (scroll)</MenuPath>: in every channel, the traces gather around zero in the 200 ms before each `square` event.
 - The number of epochs did not change: <UiLabel>Epochs</UiLabel> in the main window is still 80.
 
 ## What are the common mistakes in baseline correction?

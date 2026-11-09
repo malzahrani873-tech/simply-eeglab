@@ -71,7 +71,7 @@ At the root are files that describe the whole dataset. Inside each participant's
 We use dataset `ds002718` (Wakeman and Henson): participants viewed famous, unfamiliar and scrambled faces. The whole dataset is about 4 GB, so we download one participant only, `sub-002`, about 235 MB.
 
 1. Open the dataset page: [ds002718 on OpenNeuro](https://openneuro.org/datasets/ds002718).
-2. In the file list, download these files, and keep the same folder structure on your computer, in a folder named `ds002718`:
+2. On your computer, create a folder named `ds002718`, inside it a folder `sub-002`, and inside that a folder `eeg`. Then download these files from the file list and put each one in its place:
    - At the top level: `dataset_description.json`, `README` and `task-FaceRecognition_events.json`.
    - In `sub-002/eeg/`: the five files that start with `sub-002_task-FaceRecognition_`.
 3. You do not need the `anat` folder (the MRI) for this lesson.
@@ -139,7 +139,7 @@ eeg_eventtypes(EEG(1))       % right_sym 500, famous_new 150, ...
 ## How do I verify that the events and positions arrived?
 
 1. The <UiLabel>Datasets</UiLabel> menu lists dataset 1, and choosing it shows 74 channels, 250 Hz and 1479 events.
-2. `eeg_eventtypes(EEG(1))` lists names such as `right_sym`, `famous_new` and `boundary`, not numbers.
+2. `eeg_eventtypes(EEG(1))` lists names such as `right_sym` and `famous_new`, not numbers. You may also see `boundary`, an event that marks a break in the recording.
 3. The <UiLabel>Channel locations</UiLabel> line shows `Yes`, and <MenuPath>Plot > Channel locations > By name</MenuPath> shows the electrodes on the head. You also see points for the eye and heart channels, because the file gives them positions too.
 4. The folder `ds002718/derivatives/eeglab/sub-002/eeg/` has the imported `.set` file.
 

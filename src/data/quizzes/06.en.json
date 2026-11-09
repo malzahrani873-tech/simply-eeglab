@@ -169,7 +169,7 @@
         "b",
         "c"
       ],
-      "explanation": "The vertical axis is logarithmic, so a difference in dB is a ratio, not units. The default range stops at 25 Hz, so 50 and 60 are not visible; widen it. After a 30 Hz low-pass everything above it is gone, so compute the spectrum before it."
+      "explanation": "The vertical axis is logarithmic, so a difference in dB expresses a ratio between two powers, not a difference in µV²/Hz: every 10 dB means ten times the power. The default range stops at 25 Hz, so 50 and 60 Hz are not visible; widen it, for example to 64 Hz. After a 30 Hz low-pass everything above it is gone, so compute the spectrum before it."
     },
     {
       "id": "s06-q06",

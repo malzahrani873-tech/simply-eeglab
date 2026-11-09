@@ -1,15 +1,15 @@
 ---
-title: ملفات .set و .fdt
+title: ملفات ‎.set و ‎.fdt
 titleEn: .set and .fdt files
-description: ماذا يحمل ملفا .set و .fdt في داتاست EEGLAB، ولماذا يحفظ EEGLAB 2026.1 ملفين، وكيف تنقل الداتاست دون أن تفقد إشارتها.
+description: ماذا يحمل ملفا ‎.set و ‎.fdt في داتاست EEGLAB، ولماذا يحفظ EEGLAB 2026.1 ملفين، وكيف تنقل الداتاست دون أن تفقد إشارتها.
 station: 1
 order: 5
 level: recommended
 status: approved
 objectives:
-  - تشرح أن EEGLAB 2026.1 يحفظ الداتاست افتراضياً في ملفين، .set و .fdt، وماذا يحمل كل منهما.
+  - تشرح أن EEGLAB 2026.1 يحفظ الداتاست افتراضياً في ملفين، ‎.set و ‎.fdt، وماذا يحمل كل منهما.
   - تحفظ داتاست في ملف واحد عند الحاجة، من File > Preferences أو من السكربت.
-  - تنقل داتاست من ملفين أو تشاركها دون أن تفقد ملف .fdt.
+  - تنقل داتاست من ملفين أو تشاركها دون أن تفقد ملف ‎.fdt.
 prerequisites: [eeg-struct]
 references:
   - title: EEGLAB Tutorial
@@ -34,7 +34,7 @@ updated: 2026-10-28
 
 لداتاست (<En>dataset</En>) EEGLAB جزآن: الوصف (أسماء القنوات ومواقعها، والأحداث، ومعدل العيّنات، وسجل المعالجة)، والإشارة نفسها (الأرقام في `EEG.data`).
 
-في EEGLAB 2026.1 يكتب الحفظ الافتراضي الجزأين في ملفين بنفس الاسم: ملف `.set` فيه الوصف، وملف `.fdt` فيه الإشارة. وعيّنة `eeglab_data.set` محفوظة بنفس الطريقة.
+في EEGLAB 2026.1 يحفظ البرنامج الجزأين افتراضياً في ملفين بنفس الاسم: ملف `.set` فيه الوصف، وملف `.fdt` فيه الإشارة. والداتاست التعليمية `eeglab_data.set` محفوظة بنفس الطريقة.
 
 ملف `.set` بلا ملف `.fdt` الخاص به لا إشارة فيه، ومن يحاول فتحه يحصل على رسالة خطأ. فكيف تعرف كيف حُفظت داتاست، وتُبقي ملفيها معاً؟
 
@@ -46,15 +46,15 @@ updated: 2026-10-28
 
 ## كيف أرى الملفين وأحفظ نسخة من الواجهة؟
 
-### 1. شاهد ملفي العيّنة
+### 1. شاهد ملفي الداتاست التعليمية
 
 1. افتح مجلد `sample_data` داخل مجلد EEGLAB، من File Explorer في Windows أو Finder في macOS.
 2. ستجد `eeglab_data.set` (حوالي 0.35 ميغابايت) و `eeglab_data.fdt` (حوالي 3.9 ميغابايت). ملف `.fdt` هو الأكبر لأنه يحمل الإشارة: 32 قناة (<En>channel</En>) × 30504 عيّنة × 4 بايت لكل رقم.
 
 ### 2. احفظ نسخة في مجلدك
 
-1. و `eeglab_data.set` مفتوحة في EEGLAB، افتح <MenuPath>File > Save current dataset as</MenuPath>.
-2. اذهب إلى مجلد الدروس الخاص بك، لا إلى `sample_data`، واكتب الاسم `D1_copy.set`.
+1. بعد أن تفتح `eeglab_data.set` في EEGLAB، افتح <MenuPath>File > Save current dataset as</MenuPath>.
+2. اذهب إلى مجلد خاص بدروسك (أنشئه الآن إن لم يكن موجوداً، مثل `Documents/eeg-course`)، لا إلى `sample_data`، واكتب الاسم `D1_copy.set`.
 3. اضغط <UiLabel>Save</UiLabel>.
 4. انظر في مجلدك: فيه ملفان، `D1_copy.set` (حوالي 0.35 ميغابايت) و `D1_copy.fdt` (حوالي 3.9 ميغابايت). كتبتَ اسماً واحداً، و EEGLAB كتب الملفين.
 
@@ -107,20 +107,20 @@ dir(fullfile(myFolder, 'D1_onefile.*'))        % D1_onefile.set only, about 4 MB
 
 ## كيف تتأكد أن الحفظ نجح؟
 
-1. في `sample_data` الملفان `eeglab_data.set` و `eeglab_data.fdt`، و `EEG.datfile` يعطي `'eeglab_data.fdt'` بعد تحميل العيّنة.
+1. في `sample_data` الملفان `eeglab_data.set` و `eeglab_data.fdt`، و `EEG.datfile` يعطي `'eeglab_data.fdt'` بعد تحميل الداتاست التعليمية.
 2. في مجلدك `D1_copy.set` (حوالي 0.35 ميغابايت) و `D1_copy.fdt` (حوالي 3.9 ميغابايت).
 3. إذا شغّلت السكربت: `D1_onefile.set` وحده، بحجم حوالي 4 ميغابايت.
 4. `D1_copy.set` يُفتح من <MenuPath>File > Load existing dataset</MenuPath> ويعرض 32 قناة و 154 حدثاً.
 
 تستطيع حذف `D1_copy.*` و `D1_onefile.set` بعد الدرس. الدروس التالية لا تستخدمها.
 
-## لماذا لا تُفتح داتاستي؟ أخطاء شائعة مع ملفات .set و .fdt
+## لماذا لا تُفتح داتاستي؟ أخطاء شائعة مع ملفات `.set` و `.fdt`
 
 - **نسخ ملف `.set` وحده أو إرساله بالبريد.** انقل الملفين دائماً، بنفس الاسم، إلى نفس المجلد.
 - **إعادة تسمية أحد الملفين من مستكشف الملفات.** ملف `.set` يتذكّر اسم ملف `.fdt` الخاص به. لتغيير اسم داتاست، افتحها في EEGLAB واستخدم <MenuPath>File > Save current dataset as</MenuPath> بالاسم الجديد.
 - **فتح ملف `.fdt`.** افتح ملف `.set` دائماً. و EEGLAB يقرأ ملف `.fdt` معه.
-- **خطأ يبدأ بـ `file` وينتهي بـ `you must also rename/move the associated data file.`** ملف `.fdt` ليس بجانب ملف `.set`، فلا تُفتح الداتاست. ابحث عنه وضعه في نفس المجلد. والعيّنة `eeglab_data.set` استثناء: EEGLAB يضع مجلد `sample_data` في مسار MATLAB، فيجد MATLAB ملف `eeglab_data.fdt` هناك حتى لو نسخت ملف `.set` وحده. ملفاتك أنت لا تُعامَل بهذه الطريقة.
+- **خطأ يبدأ بـ `file` وينتهي بـ `you must also rename/move the associated data file.`** ملف `.fdt` ليس بجانب ملف `.set`، فلا تُفتح الداتاست. ابحث عنه وضعه في نفس المجلد. والداتاست التعليمية `eeglab_data.set` استثناء: EEGLAB يضع مجلد `sample_data` في مسار MATLAB، فيجد MATLAB ملف `eeglab_data.fdt` هناك حتى لو نسخت ملف `.set` وحده. ملفاتك أنت لا تُعامَل بهذه الطريقة.
 - **ضغط <UiLabel>OK</UiLabel> في <MenuPath>File > Preferences</MenuPath> دون قصد.** إذا كانت خانة الملفين غير مفعّلة، يصير الحفظ بعدها ملفاً واحداً. لا مشكلة في ذلك، لكن لا تستغرب حين تتغيّر ملفاتك.
-- **الاستغراب من اختفاء ملف `.fdt` القديم.** إذا حفظت داتاست من ملفين في ملف واحد بنفس الاسم في نفس المجلد، يحذف EEGLAB ملف `.fdt` القديم، لأن الإشارة أصبحت داخل ملف `.set`. ويطبع `Old .fdt file detected on disk, deleting file since the Matlab file now contains all the data`. لهذا احفظ نسخك في مجلدك، لا فوق العيّنة أبداً.
+- **الاستغراب من اختفاء ملف `.fdt` القديم.** إذا حفظت داتاست من ملفين في ملف واحد بنفس الاسم في نفس المجلد، يحذف EEGLAB ملف `.fdt` القديم، لأن الإشارة أصبحت داخل ملف `.set`. ويطبع `Old .fdt file detected on disk, deleting file since the Matlab file now contains all the data`. لهذا احفظ نسخك في مجلدك، لا فوق الداتاست التعليمية أبداً.
 
 {/* صندوق "من التجربة": بانتظار قصة من صاحب المشروع. لا يُكتب قبل وصولها. */}

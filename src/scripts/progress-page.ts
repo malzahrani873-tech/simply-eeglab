@@ -140,9 +140,9 @@ async function importFile(file: File) {
 }
 
 if (!storageOk()) {
+  root.querySelectorAll<HTMLElement>('.js-only').forEach((e) => (e.hidden = true));
   $('[data-unavail]').hidden = false;
 } else {
-  root.querySelectorAll<HTMLElement>('.js-only').forEach((e) => (e.hidden = false));
   render();
   $('[data-copy-code]').addEventListener('click', () => copy(code()));
   $('[data-copy-link]').addEventListener('click', () => copy(`${L.baseUrl}#c=${code().replace(/-/g, '')}`));

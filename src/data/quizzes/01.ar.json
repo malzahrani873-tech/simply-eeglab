@@ -9,7 +9,7 @@
       "type": "single",
       "lesson": "install-eeglab",
       "objective": 3,
-      "prompt": "تحتاج إضافة Biosig لتقرأ ملف EDF. من أين تثبّتها داخل EEGLAB؟",
+      "prompt": "تحتاج الإضافة (plugin) المسمّاة Biosig لتقرأ ملف EDF. من أين تثبّتها داخل EEGLAB؟",
       "options": [
         {
           "id": "a",
@@ -31,7 +31,7 @@
       "answer": [
         "a"
       ],
-      "explanation": "مدير الإضافات في قائمة File: ابحث عن Biosig واضغط `Install/Update`. والتثبيت يحتاج اتصالاً بالإنترنت. أما `Edit > Preferences` ففيه خيارات EEGLAB، لا الإضافات."
+      "explanation": "مدير الإضافات في قائمة File: ابحث عن Biosig واضغط `Install/Update`. والتثبيت يحتاج اتصالاً بالإنترنت. أما `Edit > Preferences` فلا يوجد في EEGLAB أصلاً: خيارات EEGLAB في `File > Preferences`، وليس فيها مدير الإضافات."
     },
     {
       "id": "s01-q02",
@@ -68,7 +68,7 @@
       "answer": [
         "a"
       ],
-      "explanation": "`Epochs` عدد المقاطع، والقيمة 1 تعني تسجيلاً مستمراً واحداً لم يُقطّع. أما عدد القنوات ففي سطر `Channels per frame`، وعدد الأحداث في سطر `Events`، والطول في سطر `Epoch end (sec)`."
+      "explanation": "`Epochs` عدد المقاطع الزمنية حول الأحداث (epochs)، والقيمة 1 تعني تسجيلاً مستمراً واحداً لم يُقطّع. أما عدد القنوات ففي سطر `Channels per frame`، وعدد الأحداث في سطر `Events`، والطول في سطر `Epoch end (sec)`."
     },
     {
       "id": "s01-q03",
@@ -132,7 +132,7 @@
         "b",
         "d"
       ],
-      "explanation": "`EEG.times` بالميلي ثانية، بينما `EEG.xmin` و `EEG.xmax` بالثواني. و `EEG.icaweights` فارغ حتى تحسب ICA في المحطة 4. ولتحويل التوقيت إلى ثوانٍ: (رقم العيّنة − 1) ÷ معدل العيّنات."
+      "explanation": "`EEG.times` بالميلي ثانية، بينما `EEG.xmin` و `EEG.xmax` بالثواني. و `EEG.icaweights` فارغ حتى تحسب ICA في المحطة 4. ولتحويل توقيت الحدث (latency) إلى ثوانٍ: (رقم العيّنة − 1) ÷ معدل العيّنات."
     },
     {
       "id": "s01-q05",

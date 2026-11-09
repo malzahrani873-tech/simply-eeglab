@@ -31,7 +31,7 @@
       "answer": [
         "a"
       ],
-      "explanation": "Decoding trains a classifier on part of the trials and tests it on unseen trials at every time point, giving an accuracy curve over time that you compare with the chance line. You do not need to know in advance which channel carries the difference."
+      "explanation": "Decoding trains a classifier on part of the trials and tests it on unseen trials at every time point, giving an accuracy curve over time that you compare with the chance level, 50% for two classes. You do not need to know in advance which channel carries the difference."
     },
     {
       "id": "s10-q02",

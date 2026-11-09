@@ -49,7 +49,7 @@ updated: 2026-10-28
 
 The [batch processing](/en/lesson/batch-processing/) script runs on your computer, one participant after another. That is enough for most projects. But ICA on 72 channels and fifty minutes of recording takes a long time per participant, and AMICA and DIPFIT are slower. Multiply by 18 participants, or 100, and your computer is busy for days.
 
-A computing cluster (<En>HPC</En>, high-performance computing) runs many jobs at once. But it shows no windows, and you cannot click anything.
+A computing cluster runs many jobs at once on many computers. It is the most common form of high-performance computing (<En>HPC</En>). But it shows no windows, and you cannot click anything.
 
 So how do you prepare your script to run alone on a cluster?
 
@@ -72,7 +72,7 @@ Multiply the time for one participant by the number of participants. If the resu
    - It does not plot, or it saves the plot to a file with `print` and then closes it.
    - All paths are built from the project folder with `fullfile`, not paths from your computer such as `C:\Users\...`.
    - It processes **one participant**, chosen from a number the cluster gives it. This way the cluster sends the same script twenty times with different numbers.
-2. Test it on your computer from the system command line (not from MATLAB):
+2. Save the job script from the section "What does the job script for one participant look like?" below as `run_ica_d4.m` inside `faces_project`, and make sure you ran the import step from [the batch processing lesson](/en/lesson/batch-processing/) once. Then open the system command line (Terminal on macOS and Linux, or Command Prompt on Windows), go to `faces_project`, and test it on your computer (not from MATLAB):
 
 ```text
 matlab -batch "run_ica_d4"
@@ -84,7 +84,7 @@ matlab -batch "run_ica_d4"
 
 3. Ask your university computing department: is MATLAB installed? Which job scheduler do they use (SLURM is the most common)? Where should you put EEGLAB?
 4. Copy the project folder, the script and EEGLAB to your account on the cluster.
-5. Write the job file. This is a SLURM example for three jobs, one per participant. Names and values differ between universities, so adjust them to their instructions:
+5. Write the job file, save it as `job_ica.sh` in `faces_project`, and make sure a `logs` folder exists there before you submit. This is a SLURM example for three jobs, one per participant. Names and values differ between universities, so adjust them to their instructions:
 
 ```text
 #!/bin/bash
@@ -103,10 +103,10 @@ matlab -batch "run_ica_d4"
 
 **Third: the NSG portal (a free alternative)**
 
-7. If your university has no cluster, the <En>Neuroscience Gateway</En> (NSG) portal is free for academic researchers, with MATLAB and EEGLAB ready. Register an account on its website.
+7. If your university has no cluster, the <En>Neuroscience Gateway</En> (NSG) portal is free for academic researchers, with MATLAB and EEGLAB ready. Register an account on [the NSG website](https://www.nsgportal.org/).
 8. Install the nsgportal plugin from <MenuPath>File > Manage EEGLAB extensions</MenuPath> (the latest release when this lesson was written is 2.1.1).
 9. Open <MenuPath>Tools > NSG Tools > NSG account info</MenuPath> and enter your user name and password.
-10. Put the script and the data it needs in one folder, then open <MenuPath>Tools > NSG Tools > Manage NSG jobs</MenuPath>, choose the folder, type the script name, and submit the job. From the same window you can follow its status and download the results.
+10. Put the script and the data it needs in one folder, then open <MenuPath>Tools > NSG Tools > Manage NSG jobs</MenuPath>, choose the folder, type the script name, and submit the job. From the same window you can follow its status and download the results. NSG does not give the script a participant number, so the script processes only the first participant: submit one job per participant after changing the value 1 in the `taskId` line.
 
 ## What does the job script for one participant look like?
 
@@ -197,7 +197,7 @@ end
 - `matlab -batch "run_ica_d4"` on your computer prints `Job 1: sub-002`, then the ICA duration, and closes MATLAB without error.
 - `derivatives/eeglab/sub-002/eeg` holds the file `sub-002_task-FaceRecognition_desc-ica.mat`.
 - On the cluster: three jobs, three weights files, and no error file in `logs`.
-- `size(icaweights)` in each file is the data rank × 72, that is 71 × 72 if no channel was interpolated (one rank is lost to the average reference).
+- Load each file with `load`, then type `size(icaweights)`: the result is the data rank × 72, that is 71 × 72 if no channel was interpolated, because the average reference lowers the rank by one.
 
 ## Common mistakes when running on a cluster
 
