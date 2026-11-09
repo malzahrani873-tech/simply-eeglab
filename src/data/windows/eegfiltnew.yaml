@@ -1,0 +1,68 @@
+id: eegfiltnew
+func: pop_eegfiltnew
+source: "firfilt plugin, pop_eegfiltnew.m (uilist and help text)"
+title: "Filter the data -- pop_eegfiltnew()"
+menu: "Tools > Filter the data > Basic FIR filter (new, default)"
+shot: eegfiltnew-dialog
+intro:
+  ar: "نافذة الفلتر الأساسي في EEGLAB. تكتب فيها حدّ الترددات التي تبقى، ويحسب EEGLAB الباقي."
+  en: "EEGLAB's basic filter window. You type the edge of the frequencies you keep, and EEGLAB works out the rest."
+fields:
+  - key: locutoff
+    label: "Lower edge of the frequency pass band (Hz)"
+    kind: edit
+    default: ""
+    ar: "أقل تردد يبقى في البيانات. إذا كتبت رقماً هنا وحده صار الفلتر high-pass يحذف ما تحته. اتركها فارغة إذا لم تُرد high-pass."
+    en: "The lowest frequency that stays in the data. A number here on its own makes a high-pass filter that removes what is below it. Leave it empty if you don't want a high-pass."
+  - key: hicutoff
+    label: "Higher edge of the frequency pass band (Hz)"
+    kind: edit
+    default: ""
+    ar: "أعلى تردد يبقى. إذا كتبت رقماً هنا وحده صار الفلتر low-pass يحذف ما فوقه. إذا ملأت الخانتين صار الفلتر band-pass يبقي ما بينهما."
+    en: "The highest frequency that stays. A number here on its own makes a low-pass filter that removes what is above it. Fill both boxes and you get a band-pass filter that keeps what is between them."
+  - key: filtorder
+    label: "FIR Filter order (Mandatory even. Default is automatic*)"
+    kind: edit
+    default: ""
+    ar: "طول الفلتر بعدد النقاط. إذا تركتها فارغة يحسبه EEGLAB تلقائياً من حدّ التردد ومعدل العيّنات، وهذا المناسب للمبتدئ. إذا كتبت رقماً فيجب أن يكون زوجياً."
+    en: "The filter length in points. Leave it empty and EEGLAB computes it from the edge and the sampling rate, which suits beginners. A number you type must be even."
+  - key: note
+    label: "*See help text for a description of the default filter order heuristic. Manual definition is recommended."
+    kind: text
+    ar: "تذكير بأن الطول التلقائي يُحسب بقاعدة تقريبية، وأن تحديده يدوياً مفضّل لمن يفهم عرض نطاق الانتقال. لا تكتب فيه شيئاً."
+    en: "A reminder that the automatic length comes from a rule of thumb, and that setting it by hand is preferred once you understand the transition band. Nothing to type here."
+  - key: revfilt
+    label: "Notch filter the data instead of pass band"
+    kind: checkbox
+    default: "unchecked"
+    ar: "يعكس الفلتر: بدل أن يُبقي ما بين الحدّين يحذفه. تستخدمه مثلاً لحذف نطاق ضيّق حول 50 أو 60 هرتز."
+    en: "Reverses the filter: instead of keeping what is between the two edges, it removes it. You use it, for example, to remove a narrow band around 50 or 60 Hz."
+  - key: minphase
+    label: "Use minimum-phase converted causal filter (non-linear!; beta)"
+    kind: checkbox
+    default: "unchecked"
+    ar: "فلتر سببي لا ينظر إلى المستقبل، لكنه يزيح التوقيت ويشوّه الشكل. تجريبي، فاتركه بلا علامة."
+    en: "A causal filter that does not look ahead in time, but it shifts timing and distorts shape. It is experimental, so leave it unchecked."
+  - key: plotfreqz
+    label: "Plot frequency response"
+    kind: checkbox
+    default: "checked"
+    ar: "بعد الضغط على OK يفتح رسماً يبيّن أي الترددات بقيت وأيها حُذفت. مفيد لترى أثر الفلتر قبل أن تكمل."
+    en: "After you press OK, it opens a plot showing which frequencies stayed and which were removed. Useful to see the filter's effect before you go on."
+  - key: chantypes
+    label: "Channel type(s)"
+    kind: edit
+    default: ""
+    ar: "تفلتر أنواع قنوات معيّنة فقط، مثل `EEG`. زر النقاط الثلاث بجانبها يعرض الأنواع الموجودة. فارغة تعني كل القنوات."
+    en: "Filters only some channel types, such as `EEG`. The `...` button next to it lists the types in your data. Empty means all channels."
+  - key: channels
+    label: "OR channel labels or indices"
+    kind: edit
+    default: ""
+    ar: "بدل الأنواع، تكتب أسماء قنوات أو أرقامها لتفلترها وحدها. زر النقاط الثلاث بجانبها يفتح قائمة القنوات. فارغة تعني كل القنوات."
+    en: "Instead of types, type channel names or numbers to filter only those. The `...` button opens the channel list. Empty means all channels."
+  - key: buttons
+    label: "Help · Cancel · OK"
+    kind: button
+    ar: "«Help» يفتح شرح الدالة. «Cancel» يغلق النافذة بلا تغيير. «OK» يطبّق الفلتر ثم تفتح نافذة تسمية الداتاست الجديدة."
+    en: "Help opens the function's help. Cancel closes the window with no change. OK applies the filter, then the window for naming the new dataset opens."

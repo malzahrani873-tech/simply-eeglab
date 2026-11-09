@@ -1,0 +1,43 @@
+id: multifit
+func: pop_multifit
+source: "dipfit plugin, pop_multifit.m (uilist, lines 65-78)"
+title: "Fit multiple ICA components -- pop_multifit()"
+menu: "Tools > Source localization using DIPFIT > Component dipole autofit"
+shot: multifit-dialog
+intro:
+  ar: "توطّن dipole لكل مكوّن ICA تلقائياً. قد يأخذ دقائق."
+  en: "Fits a dipole to each ICA component automatically. It can take minutes."
+fields:
+  - key: comps
+    label: "Component indices (default:all)"
+    default: ""
+    ar: "أرقام المكوّنات. فارغة تعني كلها."
+    en: "The component numbers. Empty means all."
+  - key: rv
+    label: "Rejection threshold RV (%)"
+    default: "`100`"
+    ar: "يحذف الـ dipole إذا زاد التباين المتبقي (RV) عن هذه النسبة. `100` يُبقي الكل لتقرأ الـ RV بنفسك."
+    en: "Drops a dipole if its residual variance (RV) is above this percentage. `100` keeps them all so you read the RV yourself."
+  - key: outside
+    label: "Remove dipoles outside the head"
+    kind: checkbox
+    default: unchecked
+    ar: "يحذف الـ dipoles التي تقع خارج الرأس."
+    en: "Drops dipoles that fall outside the head."
+  - key: bilateral
+    label: "Fit bilateral dipoles (check)"
+    kind: checkbox
+    default: unchecked
+    ar: "يوطّن dipoleين متناظرين في نصفي الدماغ. فقط عندما تكون الخريطة متناظرة."
+    en: "Fits two mirror-image dipoles in the two hemispheres. Only when the map is symmetric."
+  - key: plot
+    label: "Plot resulting dipoles using dipplot (check)"
+    kind: checkbox
+    default: unchecked
+    ar: "يرسم النتائج على صورة MRI بعد الانتهاء. «plotting options» بجانبه خيارات الرسم."
+    en: "Plots the results on an MRI image when done. «plotting options» next to it holds the plot options."
+  - key: buttons
+    label: "Help · Cancel · OK"
+    kind: button
+    ar: "«OK» يبدأ التوطين، وتتابع تقدّمه في الـ Command Window."
+    en: "OK starts the fit; follow its progress in the Command Window."

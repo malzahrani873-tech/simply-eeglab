@@ -77,6 +77,8 @@ updated: 2026-10-27
 
 **ثانياً: انظر إلى الطيف**
 
+<EeglabWindow id="prop" use={{ chan: "رقم القناة المشكوك فيها" }} />
+
 1. افتح <MenuPath>Plot > Channel spectra and maps</MenuPath>.
 2. غيّر <UiLabel>Plotting frequency range [lo_Hz hi_Hz]:</UiLabel> إلى `1 64`، ثم اضغط <UiLabel>OK</UiLabel>.
 3. تظهر القناة السيئة على شكل خط بعيد عن مجموعة الخطوط: أعلى بكثير، أو أدنى بكثير إذا كانت مسطّحة.
@@ -85,6 +87,8 @@ updated: 2026-10-27
 6. لتنظر عن قرب إلى قناة مشكوك فيها، افتح <MenuPath>Plot > Channel properties</MenuPath> واكتب رقمها. تعرض النافذة موقع القناة على الرأس، ونشاطها عبر الزمن، وطيفها معاً.
 
 **ثالثاً: افحص بمعايير clean_rawdata للقنوات فقط**
+
+<EeglabWindow id="clean_rawdata" use={{ filter: "اتركها بلا علامة", chanrm: "أبقِ العلامة", chanignore: "ضع علامة، و `EOG1 EOG2`", rmflat: "بعلامة، `5`", rmnoise: "بعلامة، `4`", rmcorr: "بعلامة، `0.8`", asr: "أزل العلامة", rejwin: "أزل العلامة" }} />
 
 1. افتح <MenuPath>Tools > Reject data using Clean Rawdata and ASR</MenuPath>.
 2. اترك <UiLabel>Remove channel drift (data not already high-pass filtered)</UiLabel> غير مفعّل، لأن البيانات مفلترة أصلاً.

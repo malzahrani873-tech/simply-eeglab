@@ -1,0 +1,107 @@
+id: clean_rawdata
+func: pop_clean_rawdata
+source: "clean_rawdata plugin, pop_clean_rawdata.m (uilist)"
+title: "pop_clean_rawdata()"
+menu: "Tools > Reject data using Clean Rawdata and ASR"
+shot: clean-rawdata-dialog
+intro:
+  ar: "نافذة واحدة فيها أربعة أقسام بخط عريض. كل قسم يعمل فقط إذا عليه علامة: إزالة الانجراف، حذف القنوات السيئة، ASR، وحذف فترات إضافية."
+  en: "One window with four bold sections. Each section runs only if it is checked: drift removal, bad channel removal, ASR, and extra removal of bad periods."
+fields:
+  - key: filter
+    label: "Remove channel drift (data not already high-pass filtered)"
+    kind: checkbox
+    default: unchecked
+    ar: "يطبّق high-pass قبل التنظيف. اتركه بلا علامة إذا فلترت البيانات من قبل، حتى لا تُفلتر مرتين."
+    en: "Applies a high-pass before cleaning. Leave it unchecked if you already filtered, so the data are not filtered twice."
+  - key: filterfreqs
+    label: "Linear filter (FIR) transition band [lo hi] in Hz"
+    default: "`0.25 0.75`"
+    ar: "نطاق الانتقال لهذا الفلتر. يعمل فقط مع الخيار السابق."
+    en: "The transition band of that filter. Active only with the option above."
+  - key: chanrm
+    label: "Process/remove channels"
+    kind: checkbox
+    default: checked
+    ar: "يفعّل قسم حذف القنوات السيئة بالمعايير الثلاثة تحته."
+    en: "Turns on the bad channel section, with the three criteria below it."
+  - key: chanuse
+    label: "Only consider these channels"
+    kind: checkbox
+    default: unchecked
+    ar: "يفحص القنوات المكتوبة بجانبه فقط."
+    en: "Checks only the channels typed next to it."
+  - key: chanignore
+    label: "Ignore these channels (ECG, EMG, ...)"
+    kind: checkbox
+    default: unchecked
+    ar: "يتخطّى القنوات المكتوبة بجانبه، مثل قنوات العين `EOG1 EOG2`، فلا يحذفها ولا يصحّحها."
+    en: "Skips the channels typed next to it, such as the eye channels `EOG1 EOG2`, so it neither removes nor corrects them."
+  - key: rmflat
+    label: "Remove channel if it is flat for more than (seconds)"
+    kind: checkbox
+    default: "checked, `5`"
+    ar: "يحذف القناة إذا بقيت مسطّحة أطول من هذه المدة بالثواني."
+    en: "Removes a channel that stays flat for longer than this many seconds."
+  - key: rmnoise
+    label: "Max acceptable high-frequency noise std dev"
+    kind: checkbox
+    default: "checked, `4`"
+    ar: "يحذف القناة إذا كان ضجيجها العالي التردد أكبر من هذا العدد من الانحرافات المعيارية مقارنة ببقية القنوات."
+    en: "Removes a channel whose high-frequency noise is more than this many standard deviations above the other channels."
+  - key: rmcorr
+    label: "Min acceptable correlation with nearby chans [0-1]"
+    kind: checkbox
+    default: "checked, `0.8`"
+    ar: "يحذف القناة إذا قلّ ارتباطها بما تتوقعه القنوات المجاورة عن هذا الرقم."
+    en: "Removes a channel whose correlation with what its neighbours predict falls below this number."
+  - key: asr
+    label: "Perform Artifact Subspace Reconstruction bad burst correction/rejection"
+    kind: checkbox
+    default: checked
+    ar: "يفعّل ASR، الذي يكشف الفترات القصيرة الشديدة الضجيج."
+    en: "Turns on ASR, which detects short, very noisy bursts."
+  - key: asrstdval
+    label: "Max acceptable 0.5 second window std dev"
+    default: "`20`"
+    ar: "عتبة ASR: كلما صغر الرقم صار أشد. `20` هي القيمة الافتراضية، وهي محافظة."
+    en: "The ASR threshold: the smaller the number, the stricter. `20` is the default, and it is conservative."
+  - key: distance
+    label: "Use Riemanian distance metric (not Euclidean) - beta"
+    kind: checkbox
+    default: unchecked
+    ar: "طريقة حساب تجريبية. اتركه بلا علامة."
+    en: "An experimental way of computing. Leave it unchecked."
+  - key: asrrej
+    label: "Remove bad data periods (when uncheck, correct using ASR)"
+    kind: checkbox
+    default: checked
+    ar: "بعلامة: يحذف الفترات السيئة. بلا علامة: يصحّحها ويُبقي طول البيانات كما هو."
+    en: "Checked: removes the bad periods. Unchecked: corrects them and keeps the data length."
+  - key: rejwin
+    label: "Additional removal of bad data periods"
+    kind: checkbox
+    default: checked
+    ar: "فحص إضافي بعد ASR يحذف النوافذ الزمنية التي بقيت فيها قنوات كثيرة خارج الحدود."
+    en: "An extra check after ASR that removes time windows where many channels are still out of bounds."
+  - key: rejwinval1
+    label: "Acceptable [min max] channel RMS range (+/- std dev)"
+    default: "`-Inf 7`"
+    ar: "حدود قوة الإشارة المقبولة لكل قناة بالانحرافات المعيارية."
+    en: "The accepted range of each channel's signal power, in standard deviations."
+  - key: rejwinval2
+    label: "Maximum out-of-bound channels (%)"
+    default: "`25`"
+    ar: "إذا خرجت نسبة أكبر من هذه من القنوات عن الحدود في نافذة زمنية، تُحذف النافذة."
+    en: "If more than this share of channels is out of bounds in a time window, the window is removed."
+  - key: vis
+    label: "Pop up scrolling data window with rejected data highlighted"
+    kind: checkbox
+    default: checked
+    ar: "بعد التنفيذ يفتح عرض الإشارة ويلوّن ما حُذف، لتراه قبل أن تكمل."
+    en: "After it runs, it opens the scrolling view with the removed data coloured, so you can see it before going on."
+  - key: buttons
+    label: "Help · Cancel · OK"
+    kind: button
+    ar: "«OK» يشغّل التنظيف ثم تفتح نافذة تسمية الداتاست الجديدة."
+    en: "OK runs the cleaning, then the window for naming the new dataset opens."

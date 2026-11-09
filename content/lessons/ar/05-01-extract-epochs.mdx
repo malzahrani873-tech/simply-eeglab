@@ -98,6 +98,8 @@ updated: 2026-10-28
 
 ابدأ والداتاست `D1 main clean lp30` مفتوحة: افتح الملف `D1_main_clean_lp30.set` الذي حفظته في آخر [درس ICLabel](/lesson/iclabel/) من <MenuPath>File > Load existing dataset</MenuPath>. إن لم يكن عندك، فافتح «سكربت للوصول إلى هذه الحالة» في آخر الدرس. قبل تشغيل السكربت اجعل مجلد عملك `eeg-course` هو مجلد MATLAB الحالي (<En>Current Folder</En>)، لأن السكربت يقرأ ملفاتك ويحفظها فيه.
 
+<EeglabWindow id="epoch" use={{ events: "`square`", limits: "`-1 2`", name: "`D1 epochs`", valuelim: "اتركها فارغة" }} />
+
 1. افتح <MenuPath>Tools > Extract epochs</MenuPath>.
 2. تظهر نافذة <UiLabel>Extract data epochs - pop_epoch()</UiLabel>. اضغط الزر <UiLabel>...</UiLabel> بجانب <UiLabel>Time-locking event type(s) ([]=all)</UiLabel>.
 3. تظهر قائمة أنواع الأحداث: `rt` و `square`. اختر `square` واضغط <UiLabel>Ok</UiLabel>. يمكنك أيضاً كتابة `square` في الخانة مباشرة.

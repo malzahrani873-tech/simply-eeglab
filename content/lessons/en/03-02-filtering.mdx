@@ -71,6 +71,8 @@ Start with `eeglab_data.set` open. If you don't have it, open "Script to reach t
 
 **First: high-pass filter**
 
+<EeglabWindow id="eegfiltnew" use={{ locutoff: "`0.1`", hicutoff: "leave it empty", filtorder: "leave it empty", plotfreqz: "keep it checked" }} />
+
 1. Open <MenuPath>Tools > Filter the data > Basic FIR filter (new, default)</MenuPath>.
 2. In <UiLabel>Lower edge of the frequency pass band (Hz)</UiLabel>, type `0.1`.
 3. Leave <UiLabel>Higher edge of the frequency pass band (Hz)</UiLabel> empty.
@@ -80,6 +82,8 @@ Start with `eeglab_data.set` open. If you don't have it, open "Script to reach t
 7. A window asks what to do with the new dataset. In <UiLabel>Name it:</UiLabel>, type a clear name such as `D1 hp0.1`.
 8. Leave <UiLabel>Overwrite it in memory (set=yes; unset=create a new dataset)</UiLabel> unchecked, so the original stays available for comparison. Press <UiLabel>OK</UiLabel>.
 9. Save this dataset now with <MenuPath>File > Save current dataset as</MenuPath> as `D1_hp0.1.set` in your work folder (`eeg-course`). It is the main dataset of the path and the starting point of the next lesson.
+
+<EeglabWindow id="newset" use={{ name: "`D1 hp0.1`", overwrite: "leave it unchecked" }} compact />
 
 **Second, exercise: low-pass filter** on the new dataset
 
@@ -137,6 +141,8 @@ In a script, the frequency response window does not open, because `'plotfreqz'` 
 </Callout>
 
 ## How do I check the filtering worked?
+
+<EeglabWindow id="spectopo" use={{ freqrange: "`1 64`" }} />
 
 1. **Read what EEGLAB printed in the Command Window.** With D1 (128 Hz), the high-pass prints a line such as `performing 4225 point highpass filtering`, with an actual cutoff of `0.05` Hz. The low-pass uses a 59-point filter with an actual cutoff of about `33.64` Hz.
 2. **Compare the spectrum.** Open <MenuPath>Plot > Channel spectra and maps</MenuPath> on the original dataset, then on `D1 hp0.1 lp30`. Switch between datasets from the <MenuPath>Datasets</MenuPath> menu. Change <UiLabel>Plotting frequency range [lo_Hz hi_Hz]:</UiLabel> from `2 25` to `1 64`, because the default range hides everything above 25 Hz. Keep the other fields as they are.

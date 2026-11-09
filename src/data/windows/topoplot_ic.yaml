@@ -1,0 +1,42 @@
+id: topoplot_ic
+func: pop_topoplot
+source: "EEGLAB pop_topoplot.m (uilist, typeplot = 0)"
+title: "Plot component scalp maps in 2-D -- pop_topoplot()"
+menu: "Plot > Component maps > In 2-D"
+shot: topoplot-ic-dialog
+intro:
+  ar: "ترسم خريطة رأس لكل مكوّن ICA."
+  en: "Plots a scalp map for each ICA component."
+fields:
+  - key: comps
+    label: "Component numbers"
+    default:
+      ar: "كل المكوّنات"
+      en: "all components"
+    ar: "أرقام المكوّنات، مثل `1:20` لأول عشرين. السطر تحتها يشرح أن الرقم السالب يقلب الإشارة."
+    en: "Component numbers, such as `1:20` for the first twenty. The line below explains that a negative number flips the sign."
+  - key: title
+    label: "Plot title"
+    ar: "العنوان فوق الرسم."
+    en: "The title above the plot."
+  - key: geom
+    label: "Plot geometry (rows,col.); [] -> near square"
+    default: "`[]`"
+    ar: "ترتيب الخرائط. `[]` يرتّبها تلقائياً."
+    en: "How the maps are arranged. `[]` arranges them automatically."
+  - key: dipole
+    label: "Plot associated dipole(s) (if present)"
+    kind: checkbox
+    default: unchecked
+    ar: "يرسم الـ dipole فوق الخريطة إذا كنت شغّلت DIPFIT."
+    en: "Draws the dipole on the map if you ran DIPFIT."
+  - key: options
+    label: "-> Additional topoplot() (and dipole) options (see Help)"
+    default: "`'electrodes', 'on'`"
+    ar: "خيارات الرسم. اتركها كما هي."
+    en: "Plot options. Leave as is."
+  - key: buttons
+    label: "Help · Cancel · OK"
+    kind: button
+    ar: "«OK» يرسم الخرائط. لا تتغيّر البيانات."
+    en: "OK draws the maps. The data do not change."

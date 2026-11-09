@@ -1,0 +1,46 @@
+---
+// One EEGLAB window, explained: the menu that opens it, a real screenshot of it (when captured),
+// and every field and button in the order they appear, with the value this lesson uses.
+// Usage in a lesson: <EeglabWindow id="eegfiltnew" use={{ locutoff: '`0.1`', hicutoff: 'leave it empty' }} />
+import { t } from '../../i18n';
+import { langOf } from '../../lib/lang';
+import { asset } from '../../lib/url';
+import { mdInline } from '../../lib/mini-md';
+import { loadWindows, windowShot } from '../../lib/windows.mjs';
+import MenuPath from './MenuPath.astro';
+import WindowFields from './WindowFields.astro';
+// compact: for a window already explained fully in an earlier lesson. The fields this lesson sets stay
+// visible; the full list folds into a toggle.
+interface Props { id: string; use?: Record<string, string>; menu?: string; compact?: boolean }
+const { id, use = {}, menu, compact } = Astro.props;
+const lang = langOf(Astro.url);
+const w = loadWindows().get(id);
+if (!w) throw new Error(`EeglabWindow: no src/data/windows/${id}.yaml`);
+for (const k of Object.keys(use)) {
+  if (!w.fields.some((f: any) => f.key === k)) throw new Error(`EeglabWindow ${id}: unknown field "${k}" in use`);
+}
+const shot = windowShot(w);
+const path = menu ?? w.menu;
+const md = (s: string) => mdInline(String(s), lang);
+const alt = t(lang, 'win.alt', { title: w.title });
+---
+<section class="win" aria-label={t(lang, 'win.label', { title: w.title })}>
+  <p class="win-h">
+    <span class="win-k">{t(lang, 'win.opens')}</span>
+    <span class="ui">{w.title}</span>
+  </p>
+  {path && <p class="win-m"><span class="win-k">{t(lang, 'win.from')}</span> <MenuPath>{path}</MenuPath></p>}
+  {w.intro && <p class="win-i" set:html={md(w.intro[lang])} />}
+  {shot && (
+    <figure class="fig win-shot">
+      <div class="fig-img"><img src={asset(`img/lessons/${shot.file}`)} alt={alt} width={shot.width} height={shot.height} loading="lazy" decoding="async" /></div>
+      <figcaption><span class="credit">{t(lang, 'win.credit')}</span></figcaption>
+    </figure>
+  )}
+  {compact ? (
+    <>
+      {Object.keys(use).length > 0 && <WindowFields fields={w.fields.filter((f: any) => f.key in use)} use={use} lang={lang} />}
+      <details class="inline-fold win-more"><summary><span>{t(lang, 'win.allFields')}</span></summary><WindowFields fields={w.fields} use={use} lang={lang} /></details>
+    </>
+  ) : <WindowFields fields={w.fields} use={use} lang={lang} />}
+</section>

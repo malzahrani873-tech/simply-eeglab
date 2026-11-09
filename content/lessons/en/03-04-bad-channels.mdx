@@ -77,6 +77,8 @@ Start with the main dataset `D1 hp0.1 notch60` open. If you don't have it, open 
 
 **Second: look at the spectrum**
 
+<EeglabWindow id="prop" use={{ chan: "the number of the suspect channel" }} />
+
 1. Open <MenuPath>Plot > Channel spectra and maps</MenuPath>.
 2. Change <UiLabel>Plotting frequency range [lo_Hz hi_Hz]:</UiLabel> to `1 64`, then press <UiLabel>OK</UiLabel>.
 3. A bad channel shows up as a line far from the group: much higher, or much lower if it is flat.
@@ -85,6 +87,8 @@ Start with the main dataset `D1 hp0.1 notch60` open. If you don't have it, open 
 6. To look closely at one suspect channel, open <MenuPath>Plot > Channel properties</MenuPath> and type its number. The window shows the channel's location on the head, its activity over time, and its spectrum together.
 
 **Third: check with the clean_rawdata channel criteria only**
+
+<EeglabWindow id="clean_rawdata" use={{ filter: "leave it unchecked", chanrm: "keep it checked", chanignore: "check it, `EOG1 EOG2`", rmflat: "checked, `5`", rmnoise: "checked, `4`", rmcorr: "checked, `0.8`", asr: "uncheck it", rejwin: "uncheck it" }} />
 
 1. Open <MenuPath>Tools > Reject data using Clean Rawdata and ASR</MenuPath>.
 2. Leave <UiLabel>Remove channel drift (data not already high-pass filtered)</UiLabel> unchecked, because the data are already filtered.

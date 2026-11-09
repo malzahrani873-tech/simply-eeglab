@@ -1,0 +1,35 @@
+id: icflag
+func: pop_icflag
+source: "ICLabel plugin, pop_icflag.m (allRows)"
+title: "pop_icflag()"
+menu: "Tools > Classify components using ICLabel > Flag components as artifacts"
+shot: S8-icflag-dialog
+intro:
+  ar: "تعلّم المكوّنات للحذف حسب احتمالات ICLabel. لكل فئة سطر فيه حدّ أدنى وأعلى. هذه النافذة تعلّم فقط ولا تحذف شيئاً."
+  en: "Flags components for removal from the ICLabel probabilities. Each class has a row with a minimum and a maximum. This window only flags; it removes nothing."
+fields:
+  - key: brain
+    label: "Probability range for \"Brain\""
+    default: ""
+    ar: "اتركه فارغاً، فلا تريد تعليم مكوّنات الدماغ."
+    en: "Leave it empty; you don't want to flag brain components."
+  - key: muscle
+    label: "Probability range for \"Muscle\""
+    default: "`0.9` – `1`"
+    ar: "يعلّم المكوّن إذا كان احتمال أنه عضلي بين الرقمين. `0.9` إلى `1` يعني أن ICLabel شبه متأكد."
+    en: "Flags a component if its muscle probability is between the two numbers. `0.9` to `1` means ICLabel is nearly sure."
+  - key: eye
+    label: "Probability range for \"Eye\""
+    default: "`0.9` – `1`"
+    ar: "مثل السابق لمكوّنات العين (الرمش وحركة العين)."
+    en: "The same, for eye components (blinks and eye movements)."
+  - key: others
+    label: "Probability range for \"Heart\" · \"Line Noise\" · \"Channel Noise\" · \"Other\""
+    default: ""
+    ar: "فارغة افتراضياً. تملؤها إذا أردت تعليم هذه الفئات أيضاً."
+    en: "Empty by default. Fill them if you also want to flag these classes."
+  - key: buttons
+    label: "Help · Cancel · OK"
+    kind: button
+    ar: "«OK» يعلّم المكوّنات. الحذف الفعلي يكون بعدها من Tools > Remove components from data."
+    en: "OK flags the components. The actual removal comes after, from Tools > Remove components from data."

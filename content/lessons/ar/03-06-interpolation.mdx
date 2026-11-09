@@ -92,6 +92,10 @@ updated: 2026-10-29
 
 **أولاً: تمرين على قناة سليمة**
 
+<EeglabWindow id="select" use={{ chans: "`C3`", remove: "ضع علامة في صف Channel(s)" }} compact />
+
+<EeglabWindow id="interp" use={{ uselist: "اضغطه ثم اكتب رقم `D1 badch`", method: "Spherical", trange: "اتركها فارغة" }} />
+
 1. تأكد أن `D1 badch` هي الداتاست الحالية، ثم افتح <MenuPath>Edit > Select data</MenuPath>. اكتب `C3` في خانة <UiLabel>Channel(s)</UiLabel>، وفعّل المربع تحت <UiLabel>on->remove these</UiLabel>، ثم اضغط <UiLabel>OK</UiLabel>.
 2. سمِّ الداتاست الجديدة `D1 noC3`. في النافذة الرئيسية صار <UiLabel>Channels per frame</UiLabel> يساوي 31.
 3. افتح <MenuPath>Tools > Interpolate electrodes</MenuPath>. تظهر نافذة بعنوان <UiLabel>Interpolate channel(s) -- pop_interp()</UiLabel>.

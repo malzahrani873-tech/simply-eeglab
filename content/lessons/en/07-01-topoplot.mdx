@@ -131,6 +131,8 @@ Use this dataset for every map in this lesson.
 
 **1. The waveforms and their maps together**
 
+<EeglabWindow id="timtopo" use={{ timerange: "`-200 800`", topotime: "`NaN`", winsize: "`0`" }} />
+
 1. Open <MenuPath>Plot > Channel ERPs > With scalp maps</MenuPath>.
 2. In <UiLabel>Plotting time range (ms):</UiLabel>, type `-200 800`.
 3. Leave <UiLabel>Scalp map latencies (ms, NaN -> max-RMS)</UiLabel> at `NaN`. EEGLAB then picks the time at which the ERP is strongest across channels.
@@ -139,6 +141,8 @@ Use this dataset for every map in this lesson.
 6. Repeat the steps, this time typing `100 200 400` in the latency box to see three maps above the waveforms.
 
 **2. A map series on one scale**
+
+<EeglabWindow id="topoplot_erp" use={{ latencies: "`0:100:500`", geom: "`[2 3]`" }} />
 
 1. Open <MenuPath>Plot > ERP map series > In 2-D</MenuPath>.
 2. In <UiLabel>Plotting ERP scalp maps at these latencies</UiLabel>, type `0:100:500`. The box accepts any MATLAB expression, so this means 0, 100, 200, 300, 400 and 500 ms.

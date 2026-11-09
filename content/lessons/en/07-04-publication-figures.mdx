@@ -110,6 +110,8 @@ Start with the `D1 epochs clean` dataset loaded. If you don't have it, open "Scr
 
 **1. Find the scale limit**
 
+<EeglabWindow id="topoplot_erp" use={{ latencies: "`100 200 300 400`", geom: "`[1 4]`" }} compact />
+
 1. With `D1 epochs clean scalp` selected, open <MenuPath>Plot > ERP map series > In 2-D</MenuPath>.
 2. Enter `100 200 300 400` in <UiLabel>Plotting ERP scalp maps at these latencies</UiLabel> and `[1 4]` in <UiLabel>Plot geometry (rows,col.); [] -> near square</UiLabel>. Click <UiLabel>Ok</UiLabel>.
 3. Read the top value on the color bar and round it up to a whole number. That is your limit.
@@ -121,6 +123,8 @@ Start with the `D1 epochs clean` dataset loaded. If you don't have it, open "Scr
 3. Open the file and zoom in: lines and letters stay sharp, and you can select the label text. That is what "vector" means.
 
 **3. Export the numbers behind the figure**
+
+<EeglabWindow id="export" use={{ file: "`erp_all.txt`", erp: "check it" }} />
 
 1. Open <MenuPath>File > Export > Data and ICA activity to text file</MenuPath>.
 2. In <UiLabel>Output file name</UiLabel>, enter `erp_all.txt`. The file is saved in MATLAB's Current Folder, which is your work folder (`eeg-course`).

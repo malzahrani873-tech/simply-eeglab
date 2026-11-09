@@ -112,6 +112,8 @@ updated: 2026-10-28
 
 **أولاً: اعرف حدود المقياس**
 
+<EeglabWindow id="topoplot_erp" use={{ latencies: "`100 200 300 400`", geom: "`[1 4]`" }} compact />
+
 1. تأكد أن الداتاست `D1 epochs clean scalp` هي المختارة، ثم افتح <MenuPath>Plot > ERP map series > In 2-D</MenuPath>.
 2. اكتب `100 200 300 400` في <UiLabel>Plotting ERP scalp maps at these latencies</UiLabel>، و `[1 4]` في <UiLabel>Plot geometry (rows,col.); [] -> near square</UiLabel>. اضغط <UiLabel>Ok</UiLabel>.
 3. اقرأ أعلى رقم على شريط الألوان، وقرّبه لأعلى إلى عدد صحيح. هذا حدّك.
@@ -123,6 +125,8 @@ updated: 2026-10-28
 3. افتح الملف وكبّره: الخطوط والحروف حادة، ونص العناوين يمكن تحديده. هذا معنى «متّجهة».
 
 **ثالثاً: صدّر الأرقام التي وراء الرسمة**
+
+<EeglabWindow id="export" use={{ file: "`erp_all.txt`", erp: "ضع علامة" }} />
 
 1. افتح <MenuPath>File > Export > Data and ICA activity to text file</MenuPath>.
 2. في <UiLabel>Output file name</UiLabel> اكتب `erp_all.txt`. يُحفظ الملف في مجلد MATLAB الحالي، وهو مجلد عملك (`eeg-course`).

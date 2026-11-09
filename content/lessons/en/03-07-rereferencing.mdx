@@ -86,6 +86,8 @@ Try the references in the simulation, then compare real D1 channels before and a
 
 Start with the main dataset after interpolation open. If you don't have it, open "Script to reach this state" at the end of the lesson. In D1, this is `D1 badch` from [the bad channels lesson](/en/lesson/bad-channels/), because there was nothing to interpolate. If you ran the script, it is named `D1 interp`, and it is the same data.
 
+<EeglabWindow id="reref" use={{ ave: "keep it checked", huber: "leave it unchecked", exclude: "`EOG1 EOG2` from the `...` list", refloc: "leave it empty" }} />
+
 1. First, make sure the channel count is complete: <UiLabel>Channels per frame</UiLabel> is 32 in D1.
 2. Open <MenuPath>Tools > Re-reference the data</MenuPath>. A window titled <UiLabel>pop_reref - average reference or re-reference data</UiLabel> appears.
 3. The first line, <UiLabel>Current data reference state is:</UiLabel>, shows the current reference. In D1, it may show `unknown`, because the file does not store the reference name for each channel.

@@ -78,12 +78,16 @@ updated: 2026-10-28
 
 **أولاً: ابحث عن القمة في الطيف**
 
+<EeglabWindow id="spectopo" use={{ freqs: "`10 60`", freqrange: "`1 64`" }} compact />
+
 1. افتح <MenuPath>Plot > Channel spectra and maps</MenuPath>.
 2. غيّر خانة <UiLabel>Plotting frequency range [lo_Hz hi_Hz]:</UiLabel> من `2 25` إلى `1 64`. النطاق الافتراضي يتوقف عند 25 هرتز، فلا يُظهر قمة الكهرباء أبداً.
 3. في <UiLabel>Frequencies to plot as scalp maps (Hz):</UiLabel> اكتب `10 60`، واترك باقي الخانات كما هي، ثم اضغط <UiLabel>OK</UiLabel>.
 4. انظر إلى الطيف: تظهر قمة حادة ضيّقة عند 60 هرتز. وخريطة الرأس (<En>scalp map</En>) عند 60 هرتز تبيّن القنوات الأكثر ضوضاء.
 
 **ثانياً: طبّق فلتر <En>notch</En>**
+
+<EeglabWindow id="eegfiltnew" use={{ locutoff: "`58`", hicutoff: "`62`", revfilt: "ضع علامة" }} compact />
 
 1. افتح <MenuPath>Tools > Filter the data > Basic FIR filter (new, default)</MenuPath>.
 2. في <UiLabel>Lower edge of the frequency pass band (Hz)</UiLabel> اكتب `58`.

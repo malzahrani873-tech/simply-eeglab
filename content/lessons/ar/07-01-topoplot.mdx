@@ -131,6 +131,8 @@ updated: 2026-10-28
 
 **أولاً: الموجة وخرائطها معاً**
 
+<EeglabWindow id="timtopo" use={{ timerange: "`-200 800`", topotime: "`NaN`", winsize: "`0`" }} />
+
 1. افتح <MenuPath>Plot > Channel ERPs > With scalp maps</MenuPath>.
 2. في <UiLabel>Plotting time range (ms):</UiLabel> اكتب `-200 800`.
 3. اترك <UiLabel>Scalp map latencies (ms, NaN -> max-RMS)</UiLabel> على `NaN`. بهذا يختار EEGLAB الزمن الذي يكون فيه الـ ERP أقوى عبر القنوات.
@@ -139,6 +141,8 @@ updated: 2026-10-28
 6. أعد الخطوات، واكتب هذه المرة `100 200 400` في خانة <UiLabel>Scalp map latencies (ms, NaN -> max-RMS)</UiLabel> لترى ثلاث خرائط فوق الموجات.
 
 **ثانياً: سلسلة خرائط بمقياس واحد**
+
+<EeglabWindow id="topoplot_erp" use={{ latencies: "`0:100:500`", geom: "`[2 3]`" }} />
 
 1. افتح <MenuPath>Plot > ERP map series > In 2-D</MenuPath>.
 2. في <UiLabel>Plotting ERP scalp maps at these latencies</UiLabel> اكتب `0:100:500`. الخانة تقبل أي تعبير MATLAB، فهذا يعني 0 و100 و200 و300 و400 و500 ميلي ثانية.

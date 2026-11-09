@@ -101,6 +101,8 @@ updated: 2026-10-28
 
 هذا الدرس يحتاج الداتاست (<En>dataset</En>) المتصلة، لا الـ epochs التي استعملتها في الدرس السابق.
 
+<EeglabWindow id="spectopo" use={{ freqs: "`10`", freqrange: "`1 64`" }} compact />
+
 1. افتح الملف `D1_main_clean.set` (المتصل، قبل التقطيع إلى epochs) من <MenuPath>File > Load existing dataset</MenuPath>، من مجلد عملك (`eeg-course`). حفظته في [درس ICLabel](/lesson/iclabel/)، واسمه في قائمة <UiLabel>Datasets</UiLabel> هو `D1 main clean`. إن لم يكن عندك، فشغّل «سكربت للوصول إلى هذه الحالة» في آخر الدرس. السكربت يحمّل `D1_main_ica.set` إن وجده في مجلد عملك، وإلا يعيد تشغيل ICA، وهذا يأخذ بضع دقائق.
 2. افتح <MenuPath>Plot > Channel spectra and maps</MenuPath>.
 3. تظهر نافذة <UiLabel>Channel spectra and maps -- pop_spectopo()</UiLabel>. اترك <UiLabel>Epoch time range to analyze [min_ms max_ms]:</UiLabel> على قيمته الافتراضية، أي كل التسجيل.

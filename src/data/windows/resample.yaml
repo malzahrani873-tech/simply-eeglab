@@ -1,0 +1,22 @@
+id: resample
+func: pop_resample
+source: "EEGLAB pop_resample.m (inputdlg2)"
+title: "Resample current dataset -- pop_resample()"
+menu: "Tools > Change sampling rate"
+shot: resample-dialog
+intro:
+  ar: "نافذة بخانة واحدة لتغيير عدد العيّنات في الثانية."
+  en: "A one-box window to change the number of samples per second."
+fields:
+  - key: srate
+    label: "New sampling rate"
+    default:
+      ar: "المعدل الحالي"
+      en: "the current rate"
+    ar: "المعدل الجديد بالهرتز. EEGLAB يطبّق فلتر anti-aliasing قبل التخفيض تلقائياً."
+    en: "The new rate in Hz. EEGLAB applies an anti-aliasing filter before downsampling, automatically."
+  - key: buttons
+    label: "Help · Cancel · OK"
+    kind: button
+    ar: "«OK» يعيد التعيين ثم تفتح نافذة تسمية الداتاست الجديدة."
+    en: "OK resamples, then the window for naming the new dataset opens."

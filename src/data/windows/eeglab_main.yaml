@@ -1,0 +1,75 @@
+id: eeglab_main
+func: eeglab
+source: "EEGLAB eeglab.m (main window menus, lines 760-940; dataset panel, lines 1425-1960)"
+title: "EEGLAB v2026.1"
+menu: ""
+shot: main-with-d1
+intro:
+  ar: "النافذة الرئيسية تفتح عندما تكتب `eeglab` في الـ Command Window. في أعلاها القوائم، وتحتها لوحة «Parameters of the current set» التي تلخّص الداتاست الحالية."
+  en: "The main window opens when you type `eeglab` in the Command Window. The menus are at the top, and under them the «Parameters of the current set» panel summarises the current dataset."
+fields:
+  - key: menus
+    label: "File · Edit · Tools · Plot · Study · Datasets · Help"
+    kind: menu
+    ar: "File للفتح والحفظ والاستيراد والإعدادات. Edit لتعديل الداتاست واختيار أجزائها. Tools للمعالجة (الفلترة وICA والتقطيع). Plot للرسوم. Study للتحليل الجماعي. Datasets للتنقّل بين الداتاست المفتوحة. Help للتوثيق."
+    en: "File to open, save, import and set preferences. Edit to change the dataset and select parts of it. Tools for processing (filtering, ICA, epoching). Plot for figures. Study for group analysis. Datasets to switch between open datasets. Help for documentation."
+  - key: title
+    label: "#1: (dataset name)"
+    kind: text
+    ar: "رقم الداتاست الحالية واسمها. الرقم هو ما تكتبه في نوافذ مثل Append datasets."
+    en: "The current dataset's number and name. The number is what you type in windows such as Append datasets."
+  - key: filename
+    label: "Filename:"
+    kind: text
+    ar: "اسم الملف على القرص، أو `none` إذا لم تُحفظ بعد."
+    en: "The file name on disk, or `none` if it has not been saved yet."
+  - key: chans
+    label: "Channels per frame"
+    kind: text
+    ar: "عدد القنوات."
+    en: "The number of channels."
+  - key: frames
+    label: "Frames per epoch"
+    kind: text
+    ar: "عدد العيّنات في كل epoch، أو في التسجيل كله إذا كان مستمراً."
+    en: "The number of samples per epoch, or in the whole recording if it is continuous."
+  - key: epochs
+    label: "Epochs"
+    kind: text
+    ar: "عدد الـ epochs. `1` يعني بيانات مستمرة."
+    en: "The number of epochs. `1` means continuous data."
+  - key: events
+    label: "Events"
+    kind: text
+    ar: "عدد الأحداث، ومنها أحداث `boundary` التي تُضاف عند حذف أجزاء."
+    en: "The number of events, including the `boundary` events added when parts are removed."
+  - key: srate
+    label: "Sampling rate (Hz)"
+    kind: text
+    ar: "عدد العيّنات في الثانية."
+    en: "Samples per second."
+  - key: times
+    label: "Epoch start (sec) · Epoch end (sec)"
+    kind: text
+    ar: "بداية الـ epoch ونهايتها بالثواني. في البيانات المستمرة هما بداية التسجيل ونهايته."
+    en: "The epoch start and end in seconds. In continuous data, the start and end of the recording."
+  - key: ref
+    label: "Reference"
+    kind: text
+    ar: "المرجع الحالي، مثل `average` أو `unknown`."
+    en: "The current reference, such as `average` or `unknown`."
+  - key: chanlocs
+    label: "Channel locations"
+    kind: text
+    ar: "`Yes` إذا كانت للقنوات مواقع، و`No (labels only)` إذا كانت أسماء فقط."
+    en: "`Yes` if the channels have positions, `No (labels only)` if they have names only."
+  - key: ica
+    label: "ICA weights"
+    kind: text
+    ar: "`Yes` بعد تشغيل ICA أو نسخ نتيجتها."
+    en: "`Yes` after you run ICA or copy its result."
+  - key: size
+    label: "Dataset size (Mb)"
+    kind: text
+    ar: "حجم الداتاست في الذاكرة بالميغابايت."
+    en: "The dataset's size in memory, in megabytes."

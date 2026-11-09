@@ -1,0 +1,45 @@
+id: plugin_menu
+func: plugin_menu
+source: "EEGLAB plugin_menu.m (uilist, lines 140-160)"
+title: "plugin_menu()"
+menu: "File > Manage EEGLAB extensions"
+shot: S3-extensions-biosig
+intro:
+  ar: "مدير الإضافات (extensions). منه تثبّت الإضافات وتحدّثها وتحذفها. يحتاج اتصالاً بالإنترنت."
+  en: "The extension manager. From here you install, update and remove extensions. It needs an internet connection."
+fields:
+  - key: filter1
+    label: "No install status filter"
+    kind: menu
+    ar: "يعرض كل الإضافات، أو المثبّتة فقط («Show installed only»)، أو غير المثبّتة فقط."
+    en: "Shows all extensions, only installed ones («Show installed only»), or only the ones not installed."
+  - key: filter2
+    label: "No topic filter"
+    kind: menu
+    ar: "يحصر القائمة في موضوع، مثل «Filter by import» لإضافات قراءة الملفات."
+    en: "Narrows the list to a topic, such as «Filter by import» for file-reading extensions."
+  - key: search
+    label: "(search button)"
+    kind: button
+    ar: "زر العدسة يبحث عن إضافة بالاسم."
+    en: "The magnifier button searches for an extension by name."
+  - key: list
+    label: "List of plugins (bolded means installed)"
+    kind: list
+    ar: "قائمة الإضافات. الخط العريض يعني أنها مثبّتة. اضغط على اسم لترى وصفه تحت."
+    en: "The list of extensions. Bold means installed. Click a name to see its description below."
+  - key: info
+    label: "Tags: · Status: · Size: · Description of the plugin:"
+    kind: text
+    ar: "معلومات الإضافة المختارة: وسومها، وهل هي مثبّتة، وحجمها، ووصفها."
+    en: "Information on the selected extension: its tags, whether it is installed, its size and its description."
+  - key: links
+    label: "Rate this plugin · Web documentation · Create your own plugin"
+    kind: button
+    ar: "روابط في المتصفح: تقييم الإضافة، وتوثيقها، وشرح كتابة إضافة خاصة بك."
+    en: "Links in your browser: rate the extension, its documentation, and how to write your own."
+  - key: buttons
+    label: "Cancel · Remove · Install/Update"
+    kind: button
+    ar: "«Install/Update» يثبّت الإضافة المختارة أو يحدّثها. «Remove» يحذفها. «Cancel» يغلق النافذة. بعد التثبيت يعيد EEGLAB رسم قوائمه."
+    en: "«Install/Update» installs or updates the selected extension. «Remove» deletes it. «Cancel» closes the window. After installing, EEGLAB redraws its menus."

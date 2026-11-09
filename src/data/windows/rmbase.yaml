@@ -1,0 +1,37 @@
+id: rmbase
+func: pop_rmbase
+source: "EEGLAB pop_rmbase.m (uilist, lines 89-123)"
+title: "Baseline removal - pop_rmbase()"
+menu: "Tools > Remove epoch baseline"
+shot: rmbase-dialog
+intro:
+  ar: "تطرح متوسط فترة ما قبل الحدث من كل epoch، فتبدأ كل القنوات من الصفر تقريباً."
+  en: "Subtracts the mean of the pre-event period from each epoch, so every channel starts near zero."
+fields:
+  - key: range
+    label: "Baseline latency range ([min max] in ms) ([ ] = whole epoch):"
+    default:
+      ar: "من بداية الـ epoch إلى الصفر"
+      en: "from the epoch start to 0"
+    ar: "فترة خط الأساس بالميلي ثانية، مثل `-200 0`. فارغة تعني الـ epoch كلها."
+    en: "The baseline period in milliseconds, such as `-200 0`. Empty means the whole epoch."
+  - key: points
+    label: "Or remove baseline points vector (ex:1:56):"
+    default: ""
+    ar: "نفس الفكرة بأرقام العيّنات. اتركها فارغة."
+    en: "The same idea in sample numbers. Leave it empty."
+  - key: note
+    label: "Note: press Cancel if you do not want to remove the baseline"
+    kind: text
+    ar: "إذا فتحت هذه النافذة بعد التقطيع ولا تريد إزالة خط الأساس الآن، فاضغط Cancel."
+    en: "If this window opened after epoching and you don't want baseline removal now, press Cancel."
+  - key: chans
+    label: "Channel type(s) · OR channel(s) (default all)"
+    default: ""
+    ar: "تحدد القنوات بالنوع أو بالاسم. فارغة تعني كل القنوات."
+    en: "Choose channels by type or by name. Empty means all channels."
+  - key: buttons
+    label: "Help · Cancel · OK"
+    kind: button
+    ar: "«OK» يطرح خط الأساس ثم تفتح نافذة تسمية الداتاست الجديدة."
+    en: "OK removes the baseline, then the window for naming the new dataset opens."

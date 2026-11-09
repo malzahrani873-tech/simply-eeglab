@@ -130,12 +130,16 @@ exist('ft_dipolefitting', 'file')
 
 **Third: choose the head model**
 
+<EeglabWindow id="dipfit_settings" use={{ model: "Template Boundary Element Model (MNI)", coreg: "check it is not empty" }} />
+
 6. Open <MenuPath>Tools > Source localization using DIPFIT > Head model and settings</MenuPath>.
 7. Under <UiLabel>Select a head model</UiLabel>, keep the default <UiLabel>Template Boundary Element Model (MNI)</UiLabel>.
 8. Look at the <UiLabel>Matrix to align chan. locs. with head model</UiLabel> box. It must not be empty: most values are zeros and ones, together with the number `-1.5708`, a 90-degree rotation between the nose direction in EEGLAB and in the model. If it is empty, go back to step 4.
 9. Click <UiLabel>Ok</UiLabel>. The command window prints `Warning: 2 channels without coordinates removed from dipole fitting`, which are the same two eye channels.
 
 **Fourth: automatic fit for all components**
+
+<EeglabWindow id="multifit" use={{ comps: "leave it empty", rv: "`100`", plot: "check it" }} />
 
 10. Open <MenuPath>Tools > Source localization using DIPFIT > Component dipole autofit</MenuPath>.
 11. Leave <UiLabel>Component indices (default:all)</UiLabel> empty, so every component is fitted.

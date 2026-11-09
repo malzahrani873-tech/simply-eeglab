@@ -1,0 +1,30 @@
+id: subcomp_confirm
+func: pop_subcomp
+source: "EEGLAB pop_subcomp.m (questdlg2, lines 184-185)"
+title: "Confirmation"
+menu: "Tools > Remove components from data"
+shot: subcomp-confirm-dialog
+intro:
+  ar: "آخر نافذة قبل الحذف. فيها تقارن البيانات قبل الحذف وبعده."
+  en: "The last window before removal. Here you compare the data before and after."
+fields:
+  - key: cancel
+    label: "Cancel"
+    kind: button
+    ar: "يلغي الحذف."
+    en: "Cancels the removal."
+  - key: erps
+    label: "Plot ERPs"
+    kind: button
+    ar: "يرسم متوسط الـ ERP قبل الحذف وبعده. للبيانات المقطّعة فقط."
+    en: "Plots the average ERP before and after removal. For epoched data only."
+  - key: trials
+    label: "Plot single trials"
+    kind: button
+    ar: "يفتح عرض الإشارة: الأسود قبل الحذف والأحمر بعده. تأكد أن الرمشات اختفت والباقي لم يتغيّر."
+    en: "Opens the scrolling view: black is before removal, red is after. Check that the blinks are gone and the rest is unchanged."
+  - key: accept
+    label: "Accept"
+    kind: button
+    ar: "يحذف المكوّنات ثم تفتح نافذة تسمية الداتاست الجديدة."
+    en: "Removes the components, then the window for naming the new dataset opens."

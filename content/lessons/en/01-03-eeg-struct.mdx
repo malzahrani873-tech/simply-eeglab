@@ -72,6 +72,8 @@ Each branch of the tree is a field. The signal itself sits in one field, `data`,
 
 ### 2. Read the events from EEGLAB
 
+<EeglabWindow id="editeventvals" use={{ latency: "look only: about `1.0001` s for the first event", buttons: "press Cancel" }} />
+
 1. Open <MenuPath>Edit > Event values</MenuPath>.
 2. A window shows one event at a time: `type`, `position` and `latency`. (The `urevent` field is not shown in this window.)
 3. Notice that the latency field in this window is titled <UiLabel>latency (sec)</UiLabel>: the window shows the latency **in seconds**, while `EEG.event` stores it **in samples**. The first event appears here at about 1.0001 seconds.

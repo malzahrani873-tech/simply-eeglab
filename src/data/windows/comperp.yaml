@@ -1,0 +1,57 @@
+id: comperp
+func: pop_comperp
+source: "EEGLAB pop_comperp.m (uilist, lines 120-155)"
+title: "ERP grand average/RMS - pop_comperp()"
+menu: "Plot > Sum/Compare ERPs"
+shot: sum-compare-erps-dialog
+intro:
+  ar: "تقارن الـ ERP بين داتاست مختلفة في رسم واحد على شكل الرأس، وترسم الفرق بينها. الأعمدة الثلاثة من المربعات: avg. للمتوسط، و std. للانحراف المعياري، و all ERPs لكل داتاست على حدة."
+  en: "Compares ERPs between datasets in one head-shaped plot, and plots their difference. The three columns of checkboxes are avg. for the average, std. for the standard deviation, and all ERPs for each dataset separately."
+fields:
+  - key: add
+    label: "Datasets to average (ex: 1 3 4):"
+    default: ""
+    ar: "أرقام الداتاست الأولى (حالة أ). يُحسب متوسطها."
+    en: "The numbers of the first datasets (condition A). Their average is computed."
+  - key: sub
+    label: "Datasets to average and subtract (ex: 5 6 7):"
+    default: ""
+    ar: "أرقام الداتاست الثانية (حالة ب). يُطرح متوسطها من الأولى."
+    en: "The numbers of the second datasets (condition B). Their average is subtracted from the first."
+  - key: diff
+    label: "Plot difference"
+    kind: checkbox
+    default: "avg. checked"
+    ar: "يرسم الفرق بين الحالتين."
+    en: "Plots the difference between the two conditions."
+  - key: chans
+    label: "Channels subset ([]=all):"
+    default: ""
+    ar: "القنوات المرسومة. فارغة تعني كلها."
+    en: "The plotted channels. Empty means all."
+  - key: alpha
+    label: "Highlight significant regions (.01 -> p=.01)"
+    default: ""
+    ar: "يظلّل الفترات التي يكون فيها الفرق دالاً إحصائياً. يحتاج عدة داتاست في كل حالة."
+    en: "Shades the periods where the difference is statistically significant. It needs several datasets per condition."
+  - key: rms
+    label: "Use RMS instead of average (check):"
+    kind: checkbox
+    default: unchecked
+    ar: "يستعمل الجذر التربيعي لمتوسط المربعات بدل المتوسط."
+    en: "Uses the root mean square instead of the average."
+  - key: lowpass
+    label: "Low pass (Hz) (for display only)"
+    default: ""
+    ar: "يفلتر الموجات للعرض فقط، ولا تتغيّر البيانات."
+    en: "Filters the waves for display only; the data do not change."
+  - key: options
+    label: "Plottopo options ('key', 'val'):"
+    default: "`'ydir', -1`"
+    ar: "خيارات الرسم. `'ydir', -1` يرسم السالب للأعلى."
+    en: "Plot options. `'ydir', -1` plots negative up."
+  - key: buttons
+    label: "Help · Cancel · OK"
+    kind: button
+    ar: "«OK» يرسم. لا تتغيّر البيانات."
+    en: "OK draws the plot. The data do not change."

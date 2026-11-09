@@ -1,0 +1,42 @@
+id: editeventvals
+func: pop_editeventvals
+source: "EEGLAB pop_editeventvals.m (uilist)"
+title: "Edit event values -- pop_editeventvals()"
+menu: "Edit > Event values"
+shot: event-values-d2
+intro:
+  ar: "تعرض الأحداث حدثاً حدثاً. كل حقل في EEG.event له صف فيها."
+  en: "Shows the events one at a time. Each field of EEG.event has a row."
+fields:
+  - key: type
+    label: "type"
+    ar: "نوع الحدث، أي اسمه أو رمزه، مثل `square` أو `T1`."
+    en: "The event type, its name or code, such as `square` or `T1`."
+  - key: latency
+    label: "latency (sec)"
+    ar: "توقيت الحدث بالثواني من بداية التسجيل. انتبه: هنا بالثواني، أما في EEG.event فبالعيّنات."
+    en: "The event's time in seconds from the start of the recording. Note: seconds here, samples in EEG.event."
+  - key: duration
+    label: "duration (sec)"
+    ar: "مدة الحدث بالثواني، وغالباً صفر."
+    en: "The event's duration in seconds, often zero."
+  - key: fieldbtn
+    label: "(field name buttons)"
+    kind: button
+    ar: "كل اسم حقل على اليسار زر يفتح شرحاً قصيراً لهذا الحقل."
+    en: "Each field name on the left is a button that opens a short description of that field."
+  - key: nav
+    label: "<< · < · Event Num · > · >>"
+    kind: button
+    ar: "التنقّل بين الأحداث: «<» و«>» حدثاً واحداً، و«<<» و«>>» عشرة أحداث. تكتب رقم حدث في الخانة الوسطى لتذهب إليه."
+    en: "Moves between events: «<» and «>» one event, «<<» and «>>» ten. Type an event number in the middle box to jump to it."
+  - key: edit
+    label: "Insert event · Append event · Delete event"
+    kind: button
+    ar: "تضيف حدثاً قبل الحالي أو بعده، أو تحذف الحالي. لا تستعملها في الدروس."
+    en: "Add an event before or after the current one, or delete the current one. The lessons don't use them."
+  - key: buttons
+    label: "Help · Cancel · OK"
+    kind: button
+    ar: "«OK» يحفظ أي تعديل. «Cancel» يغلق دون تغيير، وهو ما تفعله عندما تريد النظر فقط."
+    en: "OK saves any change. Cancel closes with no change, which is what you do when you only want to look."

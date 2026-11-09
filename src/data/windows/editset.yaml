@@ -1,0 +1,75 @@
+id: editset
+func: pop_editset
+source: "EEGLAB pop_editset.m (uilist)"
+title: "Edit dataset information - pop_editset()"
+menu: "Edit > Dataset info"
+shot: editset-dialog
+intro:
+  ar: "تعرض معلومات الداتاست الحالية وتسمح بتعديلها. وفيها تنقل نتيجة ICA من داتاست أخرى."
+  en: "Shows the current dataset's information and lets you change it. It is also where you copy an ICA result from another dataset."
+fields:
+  - key: setname
+    label: "Dataset name"
+    ar: "اسم الداتاست كما يظهر في قائمة Datasets."
+    en: "The dataset's name as shown in the Datasets menu."
+  - key: srate
+    label: "Data sampling rate (Hz)"
+    ar: "معدل العيّنات المسجّل في الملف. لا تغيّره هنا لتغيير المعدل فعلاً، فهذا يكون من Tools > Change sampling rate."
+    en: "The sampling rate stored in the file. Don't change it here to resample; that is done from Tools > Change sampling rate."
+  - key: subject
+    label: "Subject code"
+    ar: "رمز المشارك، مثل `S01`. يستعمله STUDY لاحقاً ليعرف أي ملف لأي مشارك."
+    en: "The participant's code, such as `S01`. STUDY uses it later to know which file belongs to whom."
+  - key: pnts
+    label: "Time points per epoch (0->continuous)"
+    ar: "عدد العيّنات في كل epoch. في البيانات المستمرة هو طول التسجيل كله."
+    en: "The number of samples in each epoch. In continuous data, it is the whole recording."
+  - key: condition
+    label: "Task condition"
+    ar: "اسم الحالة التجريبية لهذا الملف، يستعمله STUDY."
+    en: "The experimental condition of this file, used by STUDY."
+  - key: xmin
+    label: "Start time (sec) (only for data epochs)"
+    ar: "زمن بداية كل epoch بالنسبة للحدث، للبيانات المقطّعة فقط."
+    en: "The start time of each epoch relative to its event, for epoched data only."
+  - key: group
+    label: "Subject group"
+    ar: "مجموعة المشارك، مثل `patient` أو `control`، يستعملها STUDY."
+    en: "The participant's group, such as `patient` or `control`, used by STUDY."
+  - key: nbchan
+    label: "Number of channels (0->set from data)"
+    ar: "عدد القنوات. للعرض فقط ولا يُعدَّل."
+    en: "The number of channels. Shown only; you cannot edit it."
+  - key: run
+    label: "Run number"
+    ar: "رقم الجولة (run) إذا سُجّلت المهمة على أكثر من جولة."
+    en: "The run number, if the task was recorded in more than one run."
+  - key: ref
+    label: "Ref. channel indices or mode (see help)"
+    ar: "المرجع الحالي للبيانات. للعرض فقط، وتغييره يكون من Tools > Re-reference the data."
+    en: "The data's current reference. Shown only; you change it from Tools > Re-reference the data."
+  - key: session
+    label: "Session number"
+    ar: "رقم الجلسة إذا سُجّل المشارك في أكثر من يوم."
+    en: "The session number, if the participant was recorded on more than one day."
+  - key: chanfile
+    label: "Channel location file or info"
+    ar: "ملف مواقع القنوات. «From other dataset» ينسخها من داتاست أخرى، و«Browse» يختار ملفاً."
+    en: "A channel location file. «From other dataset» copies them from another dataset, and «Browse» picks a file."
+  - key: weightfile
+    label: "ICA weights array or text/binary file (if any):"
+    ar: "مصفوفة أوزان ICA. الزر «from other dataset» يسألك عن رقم داتاست ثم يملأ هذه الخانة والخانتين التاليتين منها. بهذا تنقل ICA من نسخة 1 هرتز إلى النسخة الرئيسية."
+    en: "The ICA weight matrix. The «from other dataset» button asks for a dataset number and fills this box and the next two from it. This is how you copy ICA from the 1 Hz copy to the main dataset."
+  - key: sphfile
+    label: "ICA sphere array:"
+    ar: "مصفوفة sphere المرافقة لأوزان ICA. تمتلئ وحدها مع الخانة السابقة."
+    en: "The sphere matrix that goes with the ICA weights. It fills itself with the box above."
+  - key: icainds
+    label: "ICA channel indices (by default all):"
+    ar: "القنوات التي دخلت في حساب ICA. تمتلئ وحدها مع الخانتين السابقتين."
+    en: "The channels that went into the ICA. It fills itself with the two boxes above."
+  - key: buttons
+    label: "Help · Cancel · OK"
+    kind: button
+    ar: "«OK» يحفظ التعديلات في الداتاست. «Cancel» يغلقها دون تغيير."
+    en: "OK saves the changes into the dataset. Cancel closes it with no change."

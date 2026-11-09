@@ -64,6 +64,8 @@ Start `eeglab`. The menu bar has seven menus, roughly in the order you use them:
 
 Most menus are grayed out for now, because they need an open dataset.
 
+<EeglabWindow id="eeglab_main" />
+
 ### 2. Open the dataset
 
 1. Open <MenuPath>File > Load existing dataset</MenuPath>.
@@ -73,6 +75,8 @@ Most menus are grayed out for now, because they need an open dataset.
 The main window fills with the dataset summary, and the menus become available.
 
 ### 3. Browse the signal
+
+<EeglabWindow id="eegplot" use={{ nav: "try `>` and `>>`", spacing: "try `+` and `-`" }} />
 
 1. Open <MenuPath>Plot > Channel data (scroll)</MenuPath>.
 2. A scrolling window opens: each horizontal line is a channel, and the horizontal axis is time in seconds.

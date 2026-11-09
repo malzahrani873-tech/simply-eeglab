@@ -70,6 +70,8 @@ updated: 2026-10-29
 
 ابدأ و D1 مفتوحة. إن لم تكن عندك، فافتح «سكربت للوصول إلى هذه الحالة» في آخر الدرس. في نافذة EEGLAB الرئيسية لاحظ القيم الحالية: <UiLabel>Sampling rate (Hz)</UiLabel> تساوي 128، و <UiLabel>Frames per epoch</UiLabel> تساوي 30504، و <UiLabel>Events</UiLabel> تساوي 154.
 
+<EeglabWindow id="resample" use={{ srate: "`64`" }} />
+
 1. افتح <MenuPath>Tools > Change sampling rate</MenuPath>.
 2. تظهر نافذة بعنوان <UiLabel>Resample current dataset -- pop_resample()</UiLabel>. في خانة <UiLabel>New sampling rate</UiLabel> اكتب `64`، ثم اضغط <UiLabel>OK</UiLabel>.
 3. يطبع الـ Command Window أرقام القنوات واحداً تلو الآخر أثناء المعالجة، ثم `resampling finished`.

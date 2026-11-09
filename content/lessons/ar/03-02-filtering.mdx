@@ -71,6 +71,8 @@ updated: 2026-10-29
 
 **أولاً: فلتر high-pass**
 
+<EeglabWindow id="eegfiltnew" use={{ locutoff: "`0.1`", hicutoff: "اتركها فارغة", filtorder: "اتركها فارغة", plotfreqz: "أبقِ العلامة" }} />
+
 1. افتح <MenuPath>Tools > Filter the data > Basic FIR filter (new, default)</MenuPath>.
 2. في خانة <UiLabel>Lower edge of the frequency pass band (Hz)</UiLabel> اكتب `0.1`.
 3. اترك خانة <UiLabel>Higher edge of the frequency pass band (Hz)</UiLabel> فارغة.
@@ -80,6 +82,8 @@ updated: 2026-10-29
 7. تظهر نافذة تسأل ماذا تفعل بالداتاست الجديدة. في <UiLabel>Name it:</UiLabel> اكتب اسماً واضحاً مثل `D1 hp0.1`.
 8. اترك <UiLabel>Overwrite it in memory (set=yes; unset=create a new dataset)</UiLabel> غير مفعّل، حتى تبقى النسخة الأصلية للمقارنة. اضغط <UiLabel>OK</UiLabel>.
 9. احفظ هذه الداتاست الآن من <MenuPath>File > Save current dataset as</MenuPath> باسم `D1_hp0.1.set` في مجلد عملك (`eeg-course`). هي النسخة الرئيسية للمسار، ونقطة بداية الدرس التالي.
+
+<EeglabWindow id="newset" use={{ name: "`D1 hp0.1`", overwrite: "اتركها بلا علامة" }} compact />
 
 **ثانياً، تمرين: فلتر low-pass** على الداتاست الجديدة
 
@@ -137,6 +141,8 @@ EEG_lp.setname = 'D1 hp0.1 lp30';
 </Callout>
 
 ## كيف أتأكد أن الفلترة نجحت؟
+
+<EeglabWindow id="spectopo" use={{ freqrange: "`1 64`" }} />
 
 1. **اقرأ ما طبعه EEGLAB في الـ Command Window.** مع D1 (128 هرتز) سترى للـ <En>high-pass</En> سطراً مثل `performing 4225 point highpass filtering`، وقطعاً فعلياً `0.05` هرتز. وللـ <En>low-pass</En> فلتراً بطول 59 نقطة وقطعاً فعلياً حوالي `33.64` هرتز.
 2. **قارن الطيف.** افتح <MenuPath>Plot > Channel spectra and maps</MenuPath> على الداتاست الأصلية ثم على `D1 hp0.1 lp30`. للتنقّل بين الداتاست استخدم قائمة <MenuPath>Datasets</MenuPath>. غيّر خانة <UiLabel>Plotting frequency range [lo_Hz hi_Hz]:</UiLabel> من `2 25` إلى `1 64`، لأن النطاق الافتراضي لا يُظهر ما فوق 25 هرتز. واترك باقي الخانات كما هي.

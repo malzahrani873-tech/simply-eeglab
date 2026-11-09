@@ -86,6 +86,8 @@ updated: 2026-10-28
 
 **ثانياً: Picard من نافذة ICA**
 
+<EeglabWindow id="runica" use={{ algo: "Infomax picard.m" }} compact />
+
 1. اصنع نسخة ICA مفلترة عند 1 هرتز، كما في [درس تشغيل ICA](/lesson/run-ica/).
 2. افتح <MenuPath>Tools > Decompose data by ICA</MenuPath>. في <UiLabel>ICA algorithm to use (click to select)</UiLabel> اختر <UiLabel>Infomax picard.m</UiLabel>. خانة <UiLabel>Commandline options (See help messages)</UiLabel> تُظهر `'maxiter', 500, 'mode', 'standard'`.
 3. أضف رتبة البيانات (<En>rank</En>) إلى الخيارات بنفسك: في D1 تصبح الخانة `'maxiter', 500, 'mode', 'standard', 'pca', 31`. مع Picard لا يفحص `pop_runica` الرتبة نيابة عنك.

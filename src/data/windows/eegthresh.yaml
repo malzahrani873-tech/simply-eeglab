@@ -1,0 +1,58 @@
+id: eegthresh
+func: pop_eegthresh
+source: "EEGLAB pop_eegthresh.m (promptstr, lines 110-139)"
+title: "Rejection abnormal elec. values -- pop_eegthresh()"
+menu: "Tools > Reject data epochs > Reject extreme values"
+shot: eegthresh-dialog
+intro:
+  ar: "تعلّم كل epoch تتجاوز إشارتها حدّين بالميكروفولت في قنوات تختارها."
+  en: "Marks every epoch whose signal goes beyond two limits in microvolts, in channels you choose."
+fields:
+  - key: elec
+    label: "Electrode (indices(s), Ex: 2 4 5):"
+    default:
+      ar: "كل القنوات"
+      en: "all channels"
+    ar: "أرقام القنوات التي تُفحص. يمكنك استثناء قنوات العين إذا أردت."
+    en: "The numbers of the channels to check. You can leave out the eye channels if you want."
+  - key: low
+    label: "Minimum rejection threshold(s) (uV, Ex:-20 -10 -15):"
+    default: "`-10`"
+    ar: "الحدّ الأدنى بالميكروفولت. أي قيمة تحته تعلّم الـ epoch."
+    en: "The lower limit in microvolts. Any value below it marks the epoch."
+  - key: high
+    label: "Maximum rejection threshold(s) (uV, Ex: 20 10 15):"
+    default: "`10`"
+    ar: "الحدّ الأعلى بالميكروفولت. الافتراضي صغير جداً لبيانات حقيقية، فاكتب قيمة الدرس."
+    en: "The upper limit in microvolts. The default is far too small for real data, so type the lesson's value."
+  - key: start
+    label: "Start time limit(s) (seconds, Ex -0.1 0.3):"
+    default:
+      ar: "بداية الـ epoch"
+      en: "the epoch start"
+    ar: "من أي زمن يبدأ الفحص داخل كل epoch."
+    en: "From what time the check starts inside each epoch."
+  - key: end
+    label: "End time limit(s) (seconds, Ex 0.2):"
+    default:
+      ar: "نهاية الـ epoch"
+      en: "the epoch end"
+    ar: "إلى أي زمن يستمر الفحص."
+    en: "Up to what time the check runs."
+  - key: marks
+    label: "Display previous rejection marks"
+    kind: checkbox
+    default: unchecked
+    ar: "يعرض أيضاً العلامات من فحوص سابقة بألوانها."
+    en: "Also shows the marks from earlier checks, in their colours."
+  - key: reject
+    label: "Reject marked trial(s)"
+    kind: checkbox
+    default: unchecked
+    ar: "بلا علامة: يعلّم فقط ويفتح عرض الإشارة لتراجع. بعلامة: يحذف الـ epochs المعلّمة مباشرة."
+    en: "Unchecked: it only marks and opens the scrolling view for review. Checked: it removes the marked epochs straight away."
+  - key: buttons
+    label: "Help · Cancel · OK"
+    kind: button
+    ar: "«OK» يشغّل الفحص."
+    en: "OK runs the check."

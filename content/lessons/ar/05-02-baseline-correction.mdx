@@ -110,6 +110,8 @@ updated: 2026-10-28
 
 ابدأ والداتاست `D1 epochs` مفتوحة. إن لم تكن عندك، فافتح «سكربت للوصول إلى هذه الحالة» في آخر الدرس. قبل تشغيل السكربت اجعل مجلد عملك `eeg-course` هو مجلد MATLAB الحالي (<En>Current Folder</En>)، لأن السكربت يقرأ ملفاتك ويحفظها فيه.
 
+<EeglabWindow id="rmbase" use={{ range: "`-200 0`", points: "اتركها فارغة", chans: "اتركها فارغة" }} />
+
 1. افتح <MenuPath>Tools > Remove epoch baseline</MenuPath>.
 2. تظهر نافذة <UiLabel>Baseline removal - pop_rmbase()</UiLabel>. في <UiLabel>Baseline latency range ([min max] in ms) ([ ] = whole epoch):</UiLabel> القيمة الافتراضية `-1000 0`، أي كل الفترة قبل الحدث. غيّرها إلى `-200 0`.
 3. اترك <UiLabel>Or remove baseline points vector (ex:1:56):</UiLabel> فارغة، فهي طريقة بديلة تستخدم أرقام النقاط بدل الزمن.

@@ -108,6 +108,8 @@ updated: 2026-10-28
 
 **أولاً: صنّف المكوّنات**
 
+<EeglabWindow id="iclabel" use={{ version: "Default (recommended)" }} />
+
 1. افتح <MenuPath>Tools > Classify components using ICLabel > Label components</MenuPath>.
 2. في <UiLabel>Select which icversion of ICLabel to use:</UiLabel> اترك <UiLabel>Default (recommended)</UiLabel> واضغط <UiLabel>OK</UiLabel>.
 3. تظهر خرائط رأس المكوّنات، وفوق كل خريطة الفئة الأرجح واحتمالها.
@@ -125,11 +127,19 @@ updated: 2026-10-28
 
 وسم الحذف (<En>flag</En>) علامة على المكوّن، لا حذف فعلي. أما الحذف ففي الخطوة التالية.
 
+<EeglabWindow id="icflag" use={{ muscle: "`0.9` – `1`", eye: "`0.9` – `1`" }} />
+
 1. افتح <MenuPath>Tools > Classify components using ICLabel > Flag components as artifacts</MenuPath>.
 2. تظهر نافذة <UiLabel>Select range for flagging component for rejection</UiLabel>، فيها حد أدنى <UiLabel>Min</UiLabel> وحد أعلى <UiLabel>Max</UiLabel> لكل فئة. الافتراضي: <UiLabel>Muscle</UiLabel> من 0.9 إلى 1، و<UiLabel>Eye</UiLabel> من 0.9 إلى 1، والباقي فارغ.
 3. اضغط <UiLabel>OK</UiLabel>. ستطبع نافذة الأوامر عدد المكوّنات التي عُلّمت.
 
 **رابعاً: احذف المكوّنات وقارن**
+
+<EeglabWindow id="subcomp_ask" use={{ manual: "اضغط هذا" }} />
+
+<EeglabWindow id="subcomp" use={{ remove: "الأرقام المعلّمة بعد تعديلها حسب مراجعتك" }} />
+
+<EeglabWindow id="subcomp_confirm" use={{ trials: "اضغطه لتقارن", accept: "اضغطه إذا اختفت الرمشات" }} />
 
 1. افتح <MenuPath>Tools > Remove components from data</MenuPath>.
 2. تظهر نافذة تذكر أرقام المكوّنات الموسومة وتسأل هل تحذفها. اضغط <UiLabel>Manual rej.</UiLabel> لترى القائمة وتعدّلها، لا <UiLabel>Yes</UiLabel>، لأن <UiLabel>Yes</UiLabel> يحذفها بدون مراجعة. تجاهل ملاحظة STUDY في النافذة الآن، فهي لتحليل عدة مشاركين وتأتي في المحطة 8.

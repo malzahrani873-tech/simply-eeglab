@@ -94,6 +94,10 @@ Type `{EEG.chanlocs(1:3).labels}` again. The result is now `'Fc5'` `'Fc3'` `'Fc1
 
 ### 3. Look up the positions
 
+<EeglabWindow id="chanlookup" use={{ template: "keep the default", importfile: "leave it unchecked" }} />
+
+<EeglabWindow id="chanedit" use={{ buttons: "press OK to close it" }} />
+
 1. Open <MenuPath>Edit > Channel locations</MenuPath>.
 2. Because the channels have no positions yet, EEGLAB first opens a window titled <UiLabel>Look up channel locations?</UiLabel>.
 3. Keep the default choice in the list: <UiLabel>use MNI coordinate file for BEM dipfit model</UiLabel>. The file under it is `standard_1005.elc`. This is the standard positions file, so choose it as it is. You will learn what BEM means in the DIPFIT lesson.

@@ -384,3 +384,19 @@ filter-demo,reref-demo,epoch-reject-demo{display:block}
 @container site (min-width:1024px){.refs-page.wrap.narrow{max-width:64rem}}
 /* map hero: room for "Continue learning: <lesson>" on one line in English */
 @container site (min-width:900px){.mbar{max-width:480px}}
+/* EEGLAB window explained (EeglabWindow) */
+.win{margin:20px 0;padding:14px 16px;border:1px solid var(--sep);border-radius:var(--r3);background:var(--surface)}
+.win p{margin:0 0 6px}
+.win-k{color:var(--muted);font-weight:400;margin-inline-end:4px}
+.win-h{font-weight:600}
+.win-i{color:var(--muted);font-size:15px}
+.win-shot{margin:12px 0}
+.win-f{list-style:none;margin:10px 0 0;padding:0;display:grid;gap:10px}
+.win-f li{padding:8px 10px;border-radius:var(--r2);background:var(--surface-2)}
+.win-f li.used{outline:2px solid var(--primary);outline-offset:-2px}
+.win-f .wf-l{margin:0 0 2px}
+.win-f .wf-k{font-size:13px;color:var(--muted);font-weight:400}
+.win-f .wf-d{font-size:15px;margin:0 0 2px}
+.win-f .wf-v{font-size:14px;margin:0}
+.win-f .wf-u{font-weight:600}
+.win-more{margin-top:8px}

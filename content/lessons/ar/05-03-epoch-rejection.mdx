@@ -140,6 +140,8 @@ EEGLAB يسمّي هذه القوائم legacy، أي قوائم قديمة أُ
 
 لإظهار القائمة:
 
+<EeglabWindow id="editoptions" use={{ allmenus: "ضع علامة، ثم أعد تشغيل EEGLAB" }} compact />
+
 1. اختر `D1 epochs bl` من قائمة <MenuPath>Datasets</MenuPath>، واحفظها من <MenuPath>File > Save current dataset as</MenuPath> باسم `D1_epochs_bl.set` في مجلد عملك (`eeg-course`)، لأن إعادة تشغيل EEGLAB في الخطوة 3 تمسح البيانات من الذاكرة.
 2. افتح <MenuPath>File > Preferences</MenuPath>، وفعّل <UiLabel>If set, show all menu items from previous EEGLAB versions. You must restart EEGLAB for this to take effect.</UiLabel>، ثم اضغط <UiLabel>Ok</UiLabel>.
 3. أعد تشغيل EEGLAB: اكتب `eeglab` في نافذة الأوامر، ثم افتح الملف من <MenuPath>File > Load existing dataset</MenuPath>.
@@ -147,6 +149,8 @@ EEGLAB يسمّي هذه القوائم legacy، أي قوائم قديمة أُ
 هذا الخيار يبقى محفوظاً حتى تلغيه، ويجعل القوائم كلها تختلف عن صور هذه الدروس. لذلك ألغِ تفعيله بعد أن تنتهي من الرفض.
 
 الآن ارفض الـ epochs من القائمة:
+
+<EeglabWindow id="eegthresh" use={{ elec: "`1:32`", low: "`-100`", high: "`100`", reject: "ضع علامة" }} />
 
 1. افتح <MenuPath>Tools > Reject data epochs > Reject extreme values</MenuPath>.
 2. تظهر نافذة <UiLabel>Rejection abnormal elec. values -- pop_eegthresh()</UiLabel>. اترك <UiLabel>Electrode (indices(s), Ex: 2 4 5):</UiLabel> على `1:32`، أي كل القنوات.

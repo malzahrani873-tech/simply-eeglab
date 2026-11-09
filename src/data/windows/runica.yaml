@@ -1,0 +1,37 @@
+id: runica
+func: pop_runica
+source: "EEGLAB pop_runica.m (promptstr, lines 217-225)"
+title: "Run ICA decomposition -- pop_runica()"
+menu: "Tools > Decompose data by ICA"
+shot: S7-ica-dialog
+intro:
+  ar: "تختار فيها خوارزمية ICA وتشغّلها. الحساب قد يأخذ دقائق، وتتابع تقدّمه في الـ Command Window."
+  en: "Choose the ICA algorithm and run it. It can take minutes; follow its progress in the Command Window."
+fields:
+  - key: algo
+    label: "ICA algorithm to use (click to select)"
+    kind: list
+    default: "Extended Infomax (runica.m; default)"
+    ar: "قائمة الخوارزميات. أولها «Extended Infomax (runica.m; default)» وهي الافتراضية والمستعملة في الدروس. فيها أيضاً Picard و AMICA و SOBI وغيرها، وبعضها يحتاج إضافة."
+    en: "The list of algorithms. The first, «Extended Infomax (runica.m; default)», is the default and the one the lessons use. It also lists Picard, AMICA, SOBI and others; some need a plugin."
+  - key: params
+    label: "Commandline options (See help messages)"
+    default: "`'extended', 1`"
+    ar: "خيارات الخوارزمية. `'extended', 1` يسمح بفصل مصادر من أنواع مختلفة. اتركها كما هي، أو أضف `'pca'` إذا نقصت رتبة البيانات."
+    en: "Algorithm options. `'extended', 1` lets it separate sources of different kinds. Leave as is, or add `'pca'` if the data rank is reduced."
+  - key: reorder
+    label: "Reorder components by variance (if that's not already the case)"
+    kind: checkbox
+    default: checked
+    ar: "يرتّب المكوّنات من الأكبر أثراً إلى الأصغر، فيكون المكوّن 1 أقواها."
+    en: "Sorts the components from largest to smallest, so component 1 is the strongest."
+  - key: chans
+    label: "Use only channel type(s) or indices"
+    default: ""
+    ar: "تحدد القنوات التي تدخل ICA. زرا «... types» و«... channels» يفتحان قائمة تختار منها. فارغة تعني كل القنوات."
+    en: "Sets which channels go into ICA. The «... types» and «... channels» buttons open a list to pick from. Empty means all channels."
+  - key: buttons
+    label: "Help · Cancel · OK"
+    kind: button
+    ar: "«OK» يبدأ الحساب. نتيجة ICA تُضاف إلى الداتاست نفسها ولا تُنشأ داتاست جديدة."
+    en: "OK starts the computation. The ICA result is added to the same dataset; no new dataset is made."

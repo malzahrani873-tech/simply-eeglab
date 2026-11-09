@@ -1,0 +1,60 @@
+id: eegplot
+func: pop_eegplot
+source: "EEGLAB pop_eegplot.m (continuous case) and eegplot.m (controls and menus)"
+title: "Scroll channel activities -- eegplot() -- <dataset name>"
+menu: "Plot > Channel data (scroll)"
+shot: scroll-d1
+intro:
+  ar: "تعرض الإشارة الخام قناة فوق قناة، والزمن على المحور الأفقي. الخطوط العمودية الملوّنة هي الأحداث. الأدوات أسفل النافذة، والقوائم في أعلاها."
+  en: "Shows the raw signal channel above channel, with time on the horizontal axis. The coloured vertical lines are events. The controls are at the bottom, and the menus at the top."
+fields:
+  - key: nav
+    label: "<< · < · (time box) · > · >>"
+    kind: button
+    ar: "التنقّل في الزمن: «<» و«>» خُمس النافذة (ثانية واحدة مع النافذة الافتراضية ذات الخمس ثوانٍ)، و«<<» و«>>» 90% من النافذة. اكتب ثانية في الخانة الوسطى لتذهب إليها."
+    en: "Move through time: «<» and «>» move one fifth of the window (one second with the default 5-second window), «<<» and «>>» move 90% of the window. Type a second in the middle box to jump there."
+  - key: readout
+    label: "Chan. · Time · Value"
+    kind: text
+    ar: "عندما تمرّر الفأرة فوق الإشارة تعرض اسم القناة والزمن والقيمة بالميكروفولت."
+    en: "When you move the mouse over the signal, they show the channel name, the time and the value in microvolts."
+  - key: spacing
+    label: "(scale box) · - · +"
+    kind: button
+    ar: "المسافة بين القنوات بالميكروفولت. «+» و«-» يكبّران الإشارة ويصغّرانها. الرقم يظهر أيضاً كمقياس على اليمين."
+    en: "The spacing between channels in microvolts. «+» and «-» enlarge and shrink the signal. The number also shows as a scale on the right."
+  - key: norm
+    label: "Norm"
+    kind: button
+    ar: "يوحّد مقياس كل القنوات لتُرى القناة الضعيفة. اضغطه مرة أخرى للعودة."
+    en: "Puts all channels on the same scale so weak ones are visible. Press it again to go back."
+  - key: stack
+    label: "Stack"
+    kind: button
+    ar: "يرسم كل القنوات فوق بعضها على خط واحد. «Spread» يعيدها."
+    en: "Draws all channels on top of each other on one line. «Spread» puts them back."
+  - key: events
+    label: "Event types"
+    kind: button
+    ar: "يفتح دليلاً بلون كل نوع حدث."
+    en: "Opens a legend with the colour of each event type."
+  - key: mark
+    label: "(drag on the signal)"
+    kind: area
+    ar: "السحب بالفأرة على الإشارة يعلّم فترة للحذف، والضغط على الفترة المعلّمة يلغي التعليم."
+    en: "Dragging with the mouse on the signal marks a period for removal; clicking a marked period unmarks it."
+  - key: reject
+    label: "REJECT · CANCEL"
+    kind: button
+    ar: "«REJECT» يحذف الفترات المعلّمة ثم تفتح نافذة تسمية الداتاست. «CANCEL» يغلق دون حذف. إذا كنت تنظر فقط فاضغط CANCEL."
+    en: "«REJECT» removes the marked periods, then the naming window opens. «CANCEL» closes without removing. If you are only looking, press CANCEL."
+  - key: settings
+    label: "Settings > Time range to display · Number of channels to display · Channel labels · Zoom · Events on/off"
+    kind: menu
+    ar: "من قائمة Settings تغيّر عدد الثواني والقنوات المعروضة، وتُظهر الأسماء أو الأرقام، وتكبّر، وتُخفي الأحداث."
+    en: "From the Settings menu you change how many seconds and channels are shown, show names or numbers, zoom, and hide events."
+  - key: display
+    label: "Display > Data select/mark · Grid · Show scale · Title"
+    kind: menu
+    ar: "من قائمة Display تغيّر لون التعليم، وتُظهر الشبكة والمقياس."
+    en: "From the Display menu you change the marking colour and show the grid and scale."

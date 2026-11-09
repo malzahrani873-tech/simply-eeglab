@@ -1,0 +1,21 @@
+id: iclabel
+func: pop_iclabel
+source: "ICLabel plugin, pop_iclabel.m (inputdlg3)"
+title: "ICLabel"
+menu: "Tools > Classify components using ICLabel > Label components"
+shot: iclabel-dialog
+intro:
+  ar: "نافذة صغيرة تختار فيها نسخة المصنّف، ثم يعطي ICLabel كل مكوّن احتمالات سبع فئات."
+  en: "A small window to choose the classifier version, then ICLabel gives each component probabilities for seven classes."
+fields:
+  - key: version
+    label: "Select which icversion of ICLabel to use:"
+    kind: menu
+    default: "Default (recommended)"
+    ar: "«Default (recommended)» هو المناسب. «Lite» نسخة أخف، و«Beta» موجودة فقط لإعادة نتائج دراسات قديمة."
+    en: "«Default (recommended)» is the right choice. «Lite» is a lighter version, and «Beta» is kept only to reproduce old studies."
+  - key: buttons
+    label: "Help · Cancel · OK"
+    kind: button
+    ar: "«OK» يشغّل التصنيف. بعده افتح خرائط المكوّنات لترى الفئة فوق كل خريطة."
+    en: "OK runs the classification. Then open the component maps to see the class above each map."

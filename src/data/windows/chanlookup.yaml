@@ -1,0 +1,37 @@
+id: chanlookup
+func: pop_chanedit
+source: "EEGLAB pop_chanedit.m (lookup uilist, lines 940-963)"
+title: "Look up channel locations?"
+menu: "Edit > Channel locations"
+shot: chanlookup-dialog
+intro:
+  ar: "تظهر قبل نافذة تحرير القنوات إذا كانت للقنوات أسماء بلا مواقع. تسألك هل يبحث EEGLAB عن مواقعها بالاسم في ملف قياسي."
+  en: "It shows before the channel editor when channels have names but no positions. It asks whether EEGLAB should look up their positions by name in a standard file."
+fields:
+  - key: message
+    label: "Only channel labels are present currently, ..."
+    kind: text
+    ar: "شرح قصير: لديك أسماء قنوات فقط، ولبعضها مواقع معروفة. إن لم تكن متأكداً فاضغط OK."
+    en: "A short explanation: you have channel names only, and some have known positions. If you're not sure, press OK."
+  - key: template
+    label: "use MNI coordinate file for BEM dipfit model"
+    kind: menu
+    default: "use MNI coordinate file for BEM dipfit model"
+    ar: "القائمة تختار ملف المواقع القياسي. الخيار الافتراضي يستعمل ملف `standard_1005.elc`، وهو المناسب لأسماء 10-20 و10-10."
+    en: "The menu picks the standard positions file. The default uses `standard_1005.elc`, which suits 10-20 and 10-10 names."
+  - key: file
+    label: "(file path) ..."
+    default: "`standard_1005.elc`"
+    ar: "مسار الملف المختار. زر النقاط الثلاث يسمح باختيار ملف آخر."
+    en: "The path of the chosen file. The `...` button lets you pick another file."
+  - key: importfile
+    label: "Import file instead and erase all channels"
+    kind: checkbox
+    default: unchecked
+    ar: "بعلامة: يمسح القنوات ويأخذها كلها من الملف. بلا علامة: يبحث عن مواقع أسماء قنواتك فقط. اتركه بلا علامة."
+    en: "Checked: it erases the channels and takes them all from the file. Unchecked: it only looks up positions for your channel names. Leave it unchecked."
+  - key: buttons
+    label: "Help · Cancel · OK"
+    kind: button
+    ar: "«OK» يبحث عن المواقع ثم تفتح نافذة تحرير القنوات. «Cancel» يتخطى البحث."
+    en: "OK looks up the positions, then the channel editor opens. Cancel skips the lookup."

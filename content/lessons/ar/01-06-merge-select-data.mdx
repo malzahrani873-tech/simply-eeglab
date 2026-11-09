@@ -57,6 +57,8 @@ updated: 2026-10-28
 
 ### 1. قُصّ الجزء الأول
 
+<EeglabWindow id="select" use={{ time: "`0 120` (الجزء 1 بلا علامة، والجزء 2 بعلامة)" }} compact />
+
 1. تأكّد أن `eeglab_data.set` مفتوحة وأنها الداتاست 1، ثم افتح <MenuPath>Edit > Select data</MenuPath>.
 2. في صف <UiLabel>Time range [min max] (s)</UiLabel> اكتب `0 120`. اترك الخانة تحت <UiLabel>on->remove these</UiLabel> في نفس الصف غير مفعّلة.
 3. اضغط <UiLabel>OK</UiLabel>. في نافذة <UiLabel>What do you want to do with the new dataset?</UiLabel>، اكتب في <UiLabel>Name it:</UiLabel> الاسم `D1 part 1`، ثم اضغط <UiLabel>OK</UiLabel>.
@@ -74,6 +76,8 @@ updated: 2026-10-28
 
 ### 3. ادمج الجزأين
 
+<EeglabWindow id="mergeset" use={{ indices: "`2 3`", keepica: "اتركها بلا علامة" }} />
+
 1. افتح <MenuPath>Edit > Append datasets</MenuPath>.
 2. في <UiLabel>Dataset indices to merge</UiLabel> اكتب `2 3`. الترتيب مهم: الداتاست التي تكتب رقمها أولاً تأتي أولاً في الزمن.
 3. اترك <UiLabel>Preserve ICA weights of the first dataset ?</UiLabel> غير مفعّلة، واضغط <UiLabel>OK</UiLabel>.
@@ -89,6 +93,8 @@ updated: 2026-10-28
 3. عند 120 ثانية ترى خطاً أحمر سميكاً مكتوباً عليه `boundary`. هذا هو الحدث الإضافي: رقم 155.
 
 ### 5. اختر البيانات حول حدث واحد
+
+<EeglabWindow id="rmdat" use={{ events: "`square`", limits: "`-0.5 1`", mode: "Keep selected" }} />
 
 1. ارجع إلى `Dataset 1:Continuous EEG Data` من قائمة <UiLabel>Datasets</UiLabel>.
 2. افتح <MenuPath>Edit > Select data using events</MenuPath>. تُفتح نافذة <UiLabel>Remove data portions around events - pop_rmdat()</UiLabel>.

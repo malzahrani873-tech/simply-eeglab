@@ -1,0 +1,25 @@
+id: prop
+func: pop_prop
+source: "EEGLAB pop_prop.m (uitext, lines 87-94)"
+title: "Channel properties - pop_prop()"
+menu: "Plot > Channel properties"
+shot: prop-dialog
+intro:
+  ar: "نافذة صغيرة تسألك عن القناة، ثم يفتح رسم يجمع موقعها على الرأس ونشاطها عبر الزمن وطيفها."
+  en: "A small window asks which channel, then a plot opens with its place on the head, its activity over time and its spectrum."
+fields:
+  - key: chan
+    label: "Channel index(ices) to plot:"
+    default: "`1`"
+    ar: "رقم القناة. زر النقاط الثلاث يعرض القنوات بأسمائها لتختار منها."
+    en: "The channel number. The `...` button lists the channels by name so you can pick one."
+  - key: spec
+    label: "Spectral options (see spectopo() help):"
+    default: "`'freqrange', [2 50]`"
+    ar: "مدى الطيف المرسوم بالهرتز. اتركه كما هو."
+    en: "The spectrum's frequency range in Hz. Leave it as is."
+  - key: buttons
+    label: "Help · Cancel · OK"
+    kind: button
+    ar: "«OK» يفتح رسم خصائص القناة. لا تتغيّر البيانات."
+    en: "OK opens the channel properties plot. The data do not change."

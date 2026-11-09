@@ -1,0 +1,37 @@
+id: epoch
+func: pop_epoch
+source: "EEGLAB pop_epoch.m (uilist, lines 155-166)"
+title: "Extract data epochs - pop_epoch()"
+menu: "Tools > Extract epochs"
+shot: epoch-dialog
+intro:
+  ar: "تقطّع البيانات المستمرة إلى قطع (epochs) حول كل حدث تختاره."
+  en: "Cuts the continuous data into pieces (epochs) around each event you choose."
+fields:
+  - key: events
+    label: "Time-locking event type(s) ([]=all)"
+    default: ""
+    ar: "نوع الحدث الذي تُقطع حوله، مثل `square`. زر النقاط الثلاث يعرض الأنواع لتختار منها. فارغة تعني كل الأحداث."
+    en: "The event type to cut around, such as `square`. The `...` button lists the types to pick from. Empty means all events."
+  - key: limits
+    label: "Epoch limits [start, end] in seconds"
+    default: "`-1 2`"
+    ar: "بداية كل epoch ونهايتها بالثواني بالنسبة للحدث، مثل `-0.2 0.8`."
+    en: "Each epoch's start and end in seconds, relative to the event, such as `-0.2 0.8`."
+  - key: name
+    label: "Name for the new dataset"
+    default:
+      ar: "الاسم القديم مع `epochs`"
+      en: "the old name plus `epochs`"
+    ar: "اسم الداتاست المقطّعة."
+    en: "The name of the epoched dataset."
+  - key: valuelim
+    label: "Out-of-bounds EEG limits if any [min max]"
+    default: ""
+    ar: "يحذف أي epoch تتجاوز إشارتها هذين الحدّين بالميكروفولت. اتركها فارغة، فالرفض له درس خاص."
+    en: "Drops any epoch whose signal goes beyond these limits in microvolts. Leave it empty; rejection has its own lesson."
+  - key: buttons
+    label: "Help · Cancel · OK"
+    kind: button
+    ar: "«OK» يقطّع، ثم تفتح نافذة تسمية الداتاست، ثم نافذة تسأل عن إزالة خط الأساس."
+    en: "OK cuts the data, then the naming window opens, then a window asks about baseline removal."

@@ -1,0 +1,70 @@
+id: newtimef
+func: pop_newtimef
+source: "EEGLAB pop_newtimef.m (uilist, lines 166-223)"
+title: "Plot channel time frequency -- pop_newtimef()"
+menu: "Plot > Time-frequency transforms > Channel time-frequency"
+shot: newtimef-dialog
+intro:
+  ar: "تحسب ERSP (تغيّر القدرة) و ITC (ثبات الطور) لقناة واحدة وترسمهما."
+  en: "Computes and plots ERSP (power change) and ITC (phase consistency) for one channel."
+fields:
+  - key: chan
+    label: "Channel number"
+    default: "`1`"
+    ar: "رقم القناة. زر النقاط الثلاث بجانبها يعرض القنوات بأسمائها."
+    en: "The channel number. The `...` button next to it lists the channels by name."
+  - key: tlimits
+    label: "Sub epoch time limits [min max] (msec)"
+    default:
+      ar: "الـ epoch كلها"
+      en: "the whole epoch"
+    ar: "مدى الزمن. القائمة بجانبه تحدد عدد النقاط الزمنية في الناتج (200 افتراضياً)."
+    en: "The time range. The menu next to it sets how many time points the result has (200 by default)."
+  - key: freqs
+    label: "Frequency limits [min max] (Hz) or sequence"
+    default: ""
+    ar: "مدى الترددات بالهرتز، مثل `3 30`. القائمة بجانبه تحدد دقة التردد، و«Log spaced» يوزّع الترددات لوغاريتمياً."
+    en: "The frequency range in Hz, such as `3 30`. The menu next to it sets the frequency resolution, and «Log spaced» spaces frequencies logarithmically."
+  - key: baseline
+    label: "Baseline limits [min max] (msec) (0->pre-stim.)"
+    default: "`0`"
+    ar: "فترة خط الأساس. `0` تعني كل ما قبل الحدث. القائمة بجانبه تحدد طريقة التطبيع، و«No baseline» يلغيه."
+    en: "The baseline period. `0` means everything before the event. The menu next to it sets the normalisation, and «No baseline» turns it off."
+  - key: cycle
+    label: "Wavelet cycles [min max/fact] or sequence"
+    default: "`3 0.8`"
+    ar: "عدد دورات الـ wavelet. `3 0.8` يعني 3 دورات عند أقل تردد وتزداد مع التردد. «Use FFT» يستعمل FFT بدل wavelet."
+    en: "The number of wavelet cycles. `3 0.8` means 3 cycles at the lowest frequency, growing with frequency. «Use FFT» uses an FFT instead of wavelets."
+  - key: erspmax
+    label: "ERSP color limits [max] (min=-max)"
+    default: ""
+    ar: "حدّ الألوان لرسم ERSP. فارغة تعني تلقائياً. «see log power» يعرض القدرة بالديسيبل."
+    en: "The colour limit for the ERSP plot. Empty means automatic. «see log power» shows power in dB."
+  - key: itcmax
+    label: "ITC color limits [max]"
+    default: ""
+    ar: "حدّ الألوان لرسم ITC. «plot ITC phase» يلوّن حسب الطور."
+    en: "The colour limit for the ITC plot. «plot ITC phase» colours by phase."
+  - key: alpha
+    label: "Bootstrap significance level (Ex: 0.01 -> 1%)"
+    default: ""
+    ar: "إذا كتبت رقماً، مثل `0.01`، يخفي ما ليس دالاً إحصائياً. «FDR correct» يصحّح للمقارنات المتعددة."
+    en: "A number such as `0.01` hides what is not statistically significant. «FDR correct» corrects for multiple comparisons."
+  - key: options
+    label: "Optional newtimef() arguments (see Help)"
+    default: ""
+    ar: "خيارات إضافية، مثل `'winsize', 128` لطول النافذة بالعيّنات."
+    en: "Extra options, such as `'winsize', 128` for the window length in samples."
+  - key: plots
+    label: "Plot Event Related Spectral Power · Plot Inter Trial Coherence · Plot curve at each frequency"
+    kind: checkbox
+    default:
+      ar: "الأول والثاني عليهما علامة"
+      en: "the first two checked"
+    ar: "أي الرسوم تظهر: ERSP في الأعلى، ITC في الأسفل، أو منحنيات بدل الصورة."
+    en: "Which plots appear: ERSP on top, ITC below, or curves instead of an image."
+  - key: buttons
+    label: "Help · Cancel · OK"
+    kind: button
+    ar: "«OK» يبدأ الحساب، وقد يأخذ ثوانٍ. لا تتغيّر البيانات."
+    en: "OK starts the computation, which can take a few seconds. The data do not change."

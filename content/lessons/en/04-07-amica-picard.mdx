@@ -86,6 +86,8 @@ Start with the main dataset `D1 main` open. If you don't have it, open "Script t
 
 **Second: Picard from the ICA window**
 
+<EeglabWindow id="runica" use={{ algo: "Infomax picard.m" }} compact />
+
 1. Make an ICA copy filtered at 1 Hz, as in [the Running ICA lesson](/en/lesson/run-ica/).
 2. Open <MenuPath>Tools > Decompose data by ICA</MenuPath>. In <UiLabel>ICA algorithm to use (click to select)</UiLabel>, choose <UiLabel>Infomax picard.m</UiLabel>. The <UiLabel>Commandline options (See help messages)</UiLabel> field shows `'maxiter', 500, 'mode', 'standard'`.
 3. Add the rank to the options yourself: `'maxiter', 500, 'mode', 'standard', 'pca', 31` in D1. With Picard, `pop_runica` does not check the rank for you.

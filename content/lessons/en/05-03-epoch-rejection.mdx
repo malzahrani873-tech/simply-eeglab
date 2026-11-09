@@ -140,6 +140,8 @@ EEGLAB calls these menus legacy, because it prefers cleaning the continuous data
 
 To show the menu:
 
+<EeglabWindow id="editoptions" use={{ allmenus: "check it, then restart EEGLAB" }} compact />
+
 1. Select `D1 epochs bl` from the <MenuPath>Datasets</MenuPath> menu, and save it with <MenuPath>File > Save current dataset as</MenuPath>, as `D1_epochs_bl.set` in your work folder (`eeg-course`), because restarting EEGLAB in step 3 clears the data from memory.
 2. Open <MenuPath>File > Preferences</MenuPath>, check <UiLabel>If set, show all menu items from previous EEGLAB versions. You must restart EEGLAB for this to take effect.</UiLabel>, then press <UiLabel>Ok</UiLabel>.
 3. Restart EEGLAB: type `eeglab` in the command window, then open the file with <MenuPath>File > Load existing dataset</MenuPath>.
@@ -147,6 +149,8 @@ To show the menu:
 This option stays saved until you turn it off, and it makes all the menus differ from the pictures in these lessons. So turn it off once you finish the rejection.
 
 Now reject the epochs from the menu:
+
+<EeglabWindow id="eegthresh" use={{ elec: "`1:32`", low: "`-100`", high: "`100`", reject: "check it" }} />
 
 1. Open <MenuPath>Tools > Reject data epochs > Reject extreme values</MenuPath>.
 2. The <UiLabel>Rejection abnormal elec. values -- pop_eegthresh()</UiLabel> window opens. Keep <UiLabel>Electrode (indices(s), Ex: 2 4 5):</UiLabel> at `1:32`, that is, all channels.

@@ -1,0 +1,78 @@
+id: chanedit
+func: pop_chanedit
+source: "EEGLAB pop_chanedit.m (uilist, lines 307-432)"
+title: "Edit channel info -- pop_chanedit()"
+menu: "Edit > Channel locations"
+shot: chanedit-dialog
+intro:
+  ar: "تعرض قناة واحدة في كل مرة مع إحداثياتها. التغييرات لا تُطبّق إلا بعد الضغط على OK أسفل النافذة."
+  en: "Shows one channel at a time with its coordinates. Changes take effect only after you press OK at the bottom."
+fields:
+  - key: label
+    label: "Channel label (\"label\")"
+    ar: "اسم القناة، مثل `Cz`. تغيّره هنا لقناة واحدة."
+    en: "The channel name, such as `Cz`. You change it here for one channel."
+  - key: polar
+    label: "Polar angle (\"theta\") · Polar radius (\"radius\")"
+    ar: "موقع القناة على رسم الرأس المسطّح. يحسبها EEGLAB وحده من الإحداثيات."
+    en: "The channel's place on the flat head plot. EEGLAB computes them from the coordinates."
+  - key: xyz
+    label: "Cartesian X (\"X\") · Cartesian Y (\"Y\") · Cartesian Z (\"Z\")"
+    ar: "موقع القناة في ثلاثة أبعاد. لا تكتبها بيدك عادة، بل تأتي من ملف المواقع."
+    en: "The channel's position in 3D. You don't usually type these; they come from the locations file."
+  - key: sph
+    label: "Spherical horiz. angle · azimuth angle · radius"
+    ar: "نفس الموقع بإحداثيات كروية. تُحسب وحدها."
+    en: "The same position in spherical coordinates. Computed for you."
+  - key: type
+    label: "Channel type"
+    ar: "نوع القناة، مثل `EEG` أو `EOG`. يفيدك لاحقاً في اختيار القنوات بالنوع."
+    en: "The channel type, such as `EEG` or `EOG`. Useful later to select channels by type."
+  - key: refc
+    label: "Reference"
+    ar: "مرجع هذه القناة إن كان معروفاً."
+    en: "This channel's reference, if known."
+  - key: urchan
+    label: "Index in backup 'urchanlocs' structure"
+    ar: "رقم القناة الأصلي قبل أي حذف. يستعمله EEGLAB لإرجاع القنوات المحذوفة بالاستيفاء."
+    en: "The channel's original number before any removal. EEGLAB uses it to bring removed channels back by interpolation."
+  - key: datachan
+    label: "Channel in data array (set=yes)"
+    kind: checkbox
+    ar: "بعلامة: القناة موجودة في البيانات. بلا علامة: موقع فقط بلا إشارة، مثل مرجع محذوف."
+    en: "Checked: the channel is in the data. Unchecked: a position only, without a signal, such as a removed reference."
+  - key: convert
+    label: "xyz -> polar & sph. · sph. -> polar & xyz · polar -> sph. & xyz"
+    kind: button
+    ar: "تحوّل الإحداثيات من نظام إلى آخر. لا تحتاجها في الدروس."
+    en: "Convert coordinates from one system to the others. The lessons don't need them."
+  - key: nav
+    label: "<< · < · (channel number) · > · >>"
+    kind: button
+    ar: "التنقّل بين القنوات، أو اكتب رقم القناة في الخانة الوسطى."
+    en: "Move between channels, or type a channel number in the middle box."
+  - key: chanbtn
+    label: "Delete chan · Insert chan · Append chan"
+    kind: button
+    ar: "تحذف القناة الحالية أو تضيف قناة قبلها أو بعدها."
+    en: "Delete the current channel, or add one before or after it."
+  - key: tools
+    label: "Opt. head center · Rotate axis · Transform axes · Set head radius · Set channel types · Set reference"
+    kind: button
+    ar: "أدوات لضبط الإحداثيات والأنواع لكل القنوات مرة واحدة. «Set channel types» مفيد لتحديد قنوات EOG."
+    en: "Tools that adjust coordinates and types for all channels at once. «Set channel types» is useful to mark EOG channels."
+  - key: plot
+    label: "Plot 2-D · Plot radius (0.2-1, []=auto) · Plot 3-D (xyz) · Nose along +X"
+    kind: button
+    ar: "ترسم القنوات على الرأس لتتأكد من المواقع. اتجاه الأنف يحدد أي محور هو الأمام، والافتراضي +X."
+    en: "Plot the channels on the head to check the positions. The nose direction sets which axis is the front; the default is +X."
+  - key: files
+    label: "Read locations · Read locs help · Look up locs · Save (as .ced) · Save (other types)"
+    kind: button
+    ar: "«Read locations» يقرأ ملف مواقع جهازك. «Look up locs» يبحث عن المواقع بالاسم في ملف قياسي. أزرار Save تحفظ المواقع في ملف."
+    en: "«Read locations» reads your cap's locations file. «Look up locs» looks up positions by name in a standard file. The Save buttons write the locations to a file."
+  - key: buttons
+    label: "Help · Cancel · OK"
+    kind: button
+    ar: "«OK» يطبّق كل التغييرات ويغلق النافذة. «Cancel» يتجاهلها."
+    en: "OK applies all changes and closes the window. Cancel discards them."

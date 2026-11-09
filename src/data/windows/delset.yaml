@@ -1,0 +1,22 @@
+id: delset
+func: pop_delset
+source: "EEGLAB pop_delset.m (inputdlg2)"
+title: "Delete dataset -- pop_delset()"
+menu: "Edit > Delete dataset(s) from memory"
+shot: delset-dialog
+intro:
+  ar: "تحذف داتاست من ذاكرة EEGLAB فقط. الملف على القرص لا يُمس."
+  en: "Removes a dataset from EEGLAB's memory only. The file on disk is not touched."
+fields:
+  - key: index
+    label: "Dataset(s) to delete:"
+    default:
+      ar: "رقم الداتاست الحالية"
+      en: "the current dataset's number"
+    ar: "رقم الداتاست كما يظهر في قائمة Datasets، أو عدة أرقام مثل `2 3`."
+    en: "The dataset's number as shown in the Datasets menu, or several numbers such as `2 3`."
+  - key: buttons
+    label: "Help · Cancel · OK"
+    kind: button
+    ar: "«OK» يحذف. «Cancel» يغلق النافذة دون حذف."
+    en: "OK deletes. Cancel closes the window without deleting."

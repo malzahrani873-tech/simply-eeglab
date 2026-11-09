@@ -1,0 +1,65 @@
+id: editoptions
+func: pop_editoptions
+source: "EEGLAB pop_editoptions.m (optionsToShow) and eeg_optionsbackup.m (descriptions)"
+title: "Memory options - pop_editoptions()"
+menu: "File > Preferences"
+shot: preferences-dialog
+intro:
+  ar: "إعدادات EEGLAB. كل سطر وصف وبجانبه مربع في عمود «Set/Unset». تبقى الإعدادات محفوظة بين الجلسات."
+  en: "EEGLAB's settings. Each line is a description with a checkbox in the «Set/Unset» column. The settings are kept between sessions."
+fields:
+  - key: storedisk
+    label: "If set, keep at most one dataset in memory. ..."
+    kind: checkbox
+    ar: "يُبقي داتاست واحدة فقط في الذاكرة. مفيد مع STUDY كبير، لكنه يمنع العمل على أكثر من داتاست في الدروس."
+    en: "Keeps only one dataset in memory. Useful with a large STUDY, but it stops you working with several datasets in the lessons."
+  - key: savetwofiles
+    label: "If set, save not one but two files for each dataset (header and data). ..."
+    kind: checkbox
+    ar: "يحفظ كل داتاست في ملفين: `.set` للمعلومات و `.fdt` للإشارة. الدروس تعمل بهذا."
+    en: "Saves each dataset as two files: `.set` for the information and `.fdt` for the signal. The lessons use this."
+  - key: parallel
+    label: "If set, use the parallel toolbox when processing multiple datasets (beta)"
+    kind: checkbox
+    ar: "يستعمل المعالجة المتوازية مع عدة داتاست. تجريبي، فاتركه."
+    en: "Uses parallel processing with several datasets. Experimental; leave it."
+  - key: computeica
+    label: "If set, precompute ICA activations. ..."
+    kind: checkbox
+    ar: "يحسب نشاط مكوّنات ICA مسبقاً فيصبح عرضها أسرع، مقابل ذاكرة أكثر."
+    en: "Computes ICA component activity in advance, so plotting is faster, at the cost of more memory."
+  - key: rememberfolder
+    label: "If set, when browsing to open a new dataset assume the folder/directory of the previous dataset."
+    kind: checkbox
+    ar: "نافذة فتح الملفات تبدأ من آخر مجلد استعملته."
+    en: "The file-open window starts in the last folder you used."
+  - key: allmenus
+    label: "If set, show all menu items from previous EEGLAB versions. You must restart EEGLAB for this to take effect."
+    kind: checkbox
+    ar: "يُظهر القوائم القديمة المخفية، مثل Reject data epochs. بعد تغييره أغلق EEGLAB وافتحه من جديد."
+    en: "Shows the hidden older menus, such as Reject data epochs. After changing it, close and reopen EEGLAB."
+  - key: checkversion
+    label: "If set, check for new version of EEGLAB and EEGLAB extensions at startup."
+    kind: checkbox
+    ar: "يبحث عن تحديثات عند التشغيل."
+    en: "Looks for updates at startup."
+  - key: showadvanced
+    label: "If set, show advanced options (close and reopen this GUI to effect changes)"
+    kind: checkbox
+    ar: "يُظهر إعدادات متقدمة إضافية في هذه النافذة. لا تحتاجه."
+    en: "Shows extra advanced settings in this window. You don't need it."
+  - key: boundary99
+    label: "If set, use type \"-99\" for boundary events when processing numerical event types (ERPLAB compatibility)"
+    kind: checkbox
+    ar: "لتوافق ERPLAB مع الأحداث الرقمية. اتركه ما لم يطلبه درس ERPLAB."
+    en: "For ERPLAB compatibility with numeric events. Leave it unless an ERPLAB lesson asks for it."
+  - key: cachesize
+    label: "Size of cache in Mbytes for EEGLAB STUDY cache in RAM."
+    default: "`500`"
+    ar: "ذاكرة التخزين المؤقت لـ STUDY بالميغابايت."
+    en: "The STUDY cache size in megabytes."
+  - key: buttons
+    label: "Help · Cancel · OK"
+    kind: button
+    ar: "«OK» يحفظ الإعدادات. «Cancel» يغلق دون تغيير."
+    en: "OK saves the settings. Cancel closes with no change."

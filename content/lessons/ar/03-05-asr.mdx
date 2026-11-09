@@ -83,6 +83,8 @@ updated: 2026-10-29
 
 ابدأ و `D1 hp0.1 notch60` مفتوحة. إن لم تكن عندك، فافتح «سكربت للوصول إلى هذه الحالة» في آخر الدرس. وهي مفلترة مسبقاً بـ <En>high-pass</En>.
 
+<EeglabWindow id="clean_rawdata" use={{ filter: "اتركها بلا علامة", chanignore: "ضع علامة، و `EOG1 EOG2`", rmflat: "أزل العلامة", rmnoise: "أزل العلامة", rmcorr: "أزل العلامة", asr: "أبقِ العلامة", asrstdval: "`20`", asrrej: "أبقِ العلامة", distance: "اتركها بلا علامة", rejwin: "أبقِ العلامة", rejwinval1: "`-Inf 7`", rejwinval2: "`25`", vis: "أبقِ العلامة" }} compact />
+
 1. افتح <MenuPath>Tools > Reject data using Clean Rawdata and ASR</MenuPath>.
 2. اترك <UiLabel>Remove channel drift (data not already high-pass filtered)</UiLabel> بدون تفعيل، لأن البيانات مفلترة عند 0.1 هرتز.
 3. أبقِ <UiLabel>Process/remove channels</UiLabel> مفعّلاً، وفعّل <UiLabel>Ignore these channels (ECG, EMG, ...)</UiLabel>، واكتب بجانبه `EOG1 EOG2`.

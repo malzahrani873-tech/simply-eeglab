@@ -98,6 +98,8 @@ D1 has two event types: the square appearing on the screen (`square`, 80 times),
 
 Start with the dataset `D1 main clean lp30` open: load the file `D1_main_clean_lp30.set` that you saved at the end of [the ICLabel lesson](/en/lesson/iclabel/) with <MenuPath>File > Load existing dataset</MenuPath>. If you don't have it, open "Script to reach this state" at the end of the lesson. Before you run the script, make your work folder `eeg-course` the MATLAB Current Folder, because the script reads and saves your files there.
 
+<EeglabWindow id="epoch" use={{ events: "`square`", limits: "`-1 2`", name: "`D1 epochs`", valuelim: "leave it empty" }} />
+
 1. Open <MenuPath>Tools > Extract epochs</MenuPath>.
 2. The <UiLabel>Extract data epochs - pop_epoch()</UiLabel> window opens. Press the <UiLabel>...</UiLabel> button next to <UiLabel>Time-locking event type(s) ([]=all)</UiLabel>.
 3. A list of event types appears: `rt` and `square`. Select `square` and press <UiLabel>Ok</UiLabel>. You can also type `square` in the box directly.

@@ -57,6 +57,8 @@ EEG = pop_eegfiltnew(EEG, 'locutoff',0.1,'plotfreqz',1);
 
 **أولاً: نفّذ بعض الخطوات من الواجهة**
 
+<EeglabWindow id="eegfiltnew" compact />
+
 1. افتح <MenuPath>File > Load existing dataset</MenuPath>، واختر `eeglab_data.set` من مجلد `sample_data` داخل مجلد EEGLAB.
 2. افتح <MenuPath>Tools > Filter the data > Basic FIR filter (new, default)</MenuPath>. اكتب `0.1` في <UiLabel>Lower edge of the frequency pass band (Hz)</UiLabel>، واضغط <UiLabel>Ok</UiLabel>. أغلق نافذة استجابة الفلتر، ثم اكتب `D1 hp0.1` في خانة <UiLabel>Name it:</UiLabel> في النافذة التي تظهر بعدها، فهذا اسم الداتاست (<En>dataset</En>) الجديدة، واضغط <UiLabel>Ok</UiLabel>.
 3. افتح نفس القائمة مرة ثانية لإزالة ضوضاء الكهرباء (<En>line noise</En>) عند 60 هرتز، لأن D1 مسجّلة على شبكة 60 هرتز. تردد الكهرباء 60 هرتز في السعودية وأمريكا، و50 هرتز في أوروبا وأغلب الدول العربية الأخرى، فتحقّق من الطيف قبل أن تفترض. اكتب `58` في <UiLabel>Lower edge of the frequency pass band (Hz)</UiLabel> و`62` في <UiLabel>Higher edge of the frequency pass band (Hz)</UiLabel>، وفعّل <UiLabel>Notch filter the data instead of pass band</UiLabel>. اضغط <UiLabel>Ok</UiLabel>، وسمِّ الداتاست الجديدة `D1 hp0.1 notch60`.

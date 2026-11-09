@@ -54,6 +54,10 @@ The `CURRENTSET` arrow points at box 2, and `EEG` is the copy of that box you wo
 
 To have something to store, we make one simple change: remove the two eye channels `EOG1` and `EOG2`. This is only an example for this lesson.
 
+<EeglabWindow id="select" use={{ chans: "`EOG1 EOG2`", remove: "check it in the Channel(s) row" }} />
+
+<EeglabWindow id="newset" use={{ name: "`D1 no EOG`", savenew: "leave it unchecked", overwrite: "leave it unchecked" }} />
+
 1. With `eeglab_data.set` open, open <MenuPath>Edit > Select data</MenuPath>.
 2. In the <UiLabel>Channel(s)</UiLabel> row, type `EOG1 EOG2`.
 3. Tick the box in the same row, under <UiLabel>on->remove these</UiLabel>. Without this tick, EEGLAB would keep these two channels and remove all the others.
@@ -72,6 +76,8 @@ The main window now starts with `#2: D1 no EOG`, and <UiLabel>Channels per frame
 3. Any menu you use now works on dataset 1. Before each step, look at the first line of the main window to know which dataset is current.
 
 ### 3. Delete a dataset from memory
+
+<EeglabWindow id="delset" use={{ index: "`2`" }} />
 
 1. Open <MenuPath>Edit > Delete dataset(s) from memory</MenuPath>.
 2. In <UiLabel>Dataset(s) to delete:</UiLabel>, type `2`.

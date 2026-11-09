@@ -130,12 +130,16 @@ exist('ft_dipolefitting', 'file')
 
 **ثالثاً: اختر نموذج الرأس**
 
+<EeglabWindow id="dipfit_settings" use={{ model: "Template Boundary Element Model (MNI)", coreg: "تأكد أنها ليست فارغة" }} />
+
 6. افتح <MenuPath>Tools > Source localization using DIPFIT > Head model and settings</MenuPath>.
 7. في <UiLabel>Select a head model</UiLabel> اترك الاختيار الافتراضي <UiLabel>Template Boundary Element Model (MNI)</UiLabel>.
 8. انظر إلى خانة <UiLabel>Matrix to align chan. locs. with head model</UiLabel>. يجب ألا تكون فارغة: أغلب قيمها أصفار وآحاد، ومعها الرقم `-1.5708`، أي دوران 90 درجة بين اتجاه الأنف في EEGLAB واتجاهه في النموذج. إذا كانت فارغة، فارجع إلى الخطوة 4.
 9. اضغط <UiLabel>Ok</UiLabel>. تطبع نافذة الأوامر `Warning: 2 channels without coordinates removed from dipole fitting`، وهما قناتا العين نفسهما.
 
 **رابعاً: ملاءمة آلية لكل المكوّنات**
+
+<EeglabWindow id="multifit" use={{ comps: "اتركها فارغة", rv: "`100`", plot: "ضع علامة" }} />
 
 10. افتح <MenuPath>Tools > Source localization using DIPFIT > Component dipole autofit</MenuPath>.
 11. اترك <UiLabel>Component indices (default:all)</UiLabel> فارغة، فتُلاءَم كل المكوّنات.

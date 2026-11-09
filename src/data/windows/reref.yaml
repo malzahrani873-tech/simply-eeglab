@@ -1,0 +1,60 @@
+id: reref
+func: pop_reref
+source: "EEGLAB pop_reref.m (uilist)"
+title: "pop_reref - average reference or re-reference data"
+menu: "Tools > Re-reference the data"
+shot: reref-dialog
+intro:
+  ar: "تغيّر المرجع الذي تُقاس منه كل القنوات: متوسط كل القنوات، أو قناة معيّنة."
+  en: "Changes the reference every channel is measured against: the average of all channels, or a chosen channel."
+fields:
+  - key: state
+    label: "Current data reference state is:"
+    kind: text
+    ar: "يعرض المرجع الحالي. قد يظهر `unknown` إذا لم يحفظ الملف اسم المرجع."
+    en: "Shows the current reference. It may show `unknown` if the file did not store the reference name."
+  - key: ave
+    label: "Compute average reference"
+    kind: checkbox
+    default: checked
+    ar: "يجعل المرجع متوسط كل القنوات (عدا المستثناة)."
+    en: "Makes the reference the average of all channels (except excluded ones)."
+  - key: huber
+    label: "Huber average ref. with threshold"
+    kind: checkbox
+    default: unchecked
+    ar: "متوسط أقل تأثراً بالقنوات الشاذة، بعتبة بالميكروفولت (`25` افتراضياً). التوثيق الرسمي لا ينصح به قبل ICA."
+    en: "An average that is less affected by outlier channels, with a threshold in microvolts (`25` by default). The official tutorial advises against it before ICA."
+  - key: rerefstr
+    label: "Re-reference data to channel(s):"
+    kind: checkbox
+    default: unchecked
+    ar: "بدل المتوسط، اجعل المرجع قناة أو قنوات تكتبها، مثل الماستويد. زر النقاط الثلاث يفتح قائمة القنوات."
+    en: "Instead of the average, use a channel or channels you type, such as the mastoids. The `...` button opens the channel list."
+  - key: interp
+    label: "Interpolate removed channel(s)"
+    kind: checkbox
+    default: unchecked
+    ar: "يستوفي القنوات المحذوفة قبل حساب المتوسط في خطوة واحدة. في مسارنا نفعل الخطوتين منفصلتين."
+    en: "Interpolates removed channels before computing the average, in one step. On our path we do the two steps separately."
+  - key: keepref
+    label: "Retain ref. channel(s) in data (will be flat for single-channel ref.)"
+    kind: checkbox
+    default: unchecked
+    ar: "يعمل فقط مع المرجع بقناة. يُبقي قناة المرجع في البيانات، وتكون مسطّحة إذا كانت قناة واحدة."
+    en: "Works only with a channel reference. Keeps the reference channel in the data; it is flat if there is one channel."
+  - key: exclude
+    label: "Exclude channel indices (EMG, EOG)"
+    default: ""
+    ar: "قنوات لا تدخل في حساب المرجع ولا يتغيّر مرجعها، مثل قنوات العين. زر النقاط الثلاث يفتح قائمة تختار منها."
+    en: "Channels left out of the reference and not re-referenced, such as eye channels. The `...` button opens a list to pick from."
+  - key: refloc
+    label: "Add old ref. channel back to the data"
+    default: ""
+    ar: "إذا كانت قناة المرجع القديم معروفة الموقع، تعيدها هنا كقناة. فارغة إذا لم تكن في الملف."
+    en: "If the old reference channel has a known position, you add it back here as a channel. Leave it empty if it is not in the file."
+  - key: buttons
+    label: "Help · Cancel · OK"
+    kind: button
+    ar: "«OK» يغيّر المرجع ثم تفتح نافذة تسمية الداتاست الجديدة."
+    en: "OK re-references, then the window for naming the new dataset opens."

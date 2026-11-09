@@ -92,6 +92,8 @@ Start with the main dataset `D1 main` open. If you don't have it, open "Script t
 
 **First: create the ICA copy**
 
+<EeglabWindow id="eegfiltnew" use={{ locutoff: "`1` (on a copy)" }} compact />
+
 1. Make sure dataset 1 is current in the <MenuPath>Datasets</MenuPath> menu.
 2. Open <MenuPath>Tools > Filter the data > Basic FIR filter (new, default)</MenuPath>.
 3. In <UiLabel>Lower edge of the frequency pass band (Hz)</UiLabel>, type `1`. Leave the other fields as they are and press <UiLabel>OK</UiLabel>.
@@ -103,6 +105,8 @@ The main dataset is already filtered at 0.1 Hz. A 1 Hz filter on top of it gives
 
 **Second: run ICA on the ICA copy**
 
+<EeglabWindow id="runica" use={{ algo: "Extended Infomax (runica.m; default)", reorder: "keep it checked", chans: "leave it empty" }} />
+
 1. With dataset 2 current, open <MenuPath>Tools > Decompose data by ICA</MenuPath>.
 2. In <UiLabel>ICA algorithm to use (click to select)</UiLabel>, keep the first option, <UiLabel>Extended Infomax (runica.m; default)</UiLabel>. The options field below shows `'extended', 1`.
 3. Keep <UiLabel>Reorder components by variance (if that's not already the case)</UiLabel> checked, leave <UiLabel>Use only channel type(s) or indices</UiLabel> empty, and press <UiLabel>OK</UiLabel>.
@@ -111,10 +115,14 @@ The main dataset is already filtered at 0.1 Hz. A 1 Hz filter on top of it gives
 
 **Third: display the component maps**
 
+<EeglabWindow id="topoplot_ic" />
+
 1. Open <MenuPath>Plot > Component maps > In 2-D</MenuPath> and keep the defaults.
 2. Look for the blink component: a strong map at the front of the head, symmetric between left and right. It is usually among the first components.
 
 **Fourth: copy the weights to the main dataset**
+
+<EeglabWindow id="editset" use={{ weightfile: "press «from other dataset», type `2`" }} />
 
 1. Go back to dataset 1 from the <MenuPath>Datasets</MenuPath> menu.
 2. Open <MenuPath>Edit > Dataset info</MenuPath>.

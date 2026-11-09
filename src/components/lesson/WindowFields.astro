@@ -1,0 +1,21 @@
+---
+// The field list of one EEGLAB window, in the order the fields appear (used by EeglabWindow).
+import { t, type Lang } from '../../i18n';
+import { mdInline } from '../../lib/mini-md';
+interface Props { fields: any[]; use: Record<string, string>; lang: Lang }
+const { fields, use, lang } = Astro.props;
+const md = (s: string) => mdInline(String(s), lang);
+const kind = (f: any) => t(lang, `win.kind.${f.kind ?? 'edit'}`);
+// A default is a plain value, a token (checked, unchecked, or '' for empty) or { ar, en }.
+const def = (d: any) => (typeof d === 'object' ? md(d[lang]) : d === '' ? md(t(lang, 'win.empty')) : ['checked', 'unchecked'].includes(d) ? md(t(lang, `win.${d}`)) : md(d));
+---
+<ol class="win-f">
+  {fields.map((f: any) => (
+    <li class:list={{ used: f.key in use }}>
+      <p class="wf-l"><span class="ui">{f.label}</span> <span class="wf-k">{kind(f)}</span></p>
+      <p class="wf-d" set:html={md(f[lang])} />
+      {f.default !== undefined && !(f.key in use) && <p class="wf-v"><span class="win-k">{t(lang, 'win.default')}</span> <span set:html={def(f.default)} /></p>}
+      {f.key in use && <p class="wf-v wf-u"><span class="win-k">{t(lang, 'win.inLesson')}</span> <span set:html={md(use[f.key])} /></p>}
+    </li>
+  ))}
+</ol>

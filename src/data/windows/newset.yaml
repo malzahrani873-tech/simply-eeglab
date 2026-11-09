@@ -1,0 +1,50 @@
+id: newset
+func: pop_newset
+source: "EEGLAB pop_newset.m (case 8/9 uilist)"
+title: "Dataset info -- pop_newset()"
+menu: ""
+shot: newset-dialog
+intro:
+  ar: "تفتح هذه النافذة بعد أغلب أوامر Tools و Edit التي تغيّر البيانات. تسألك ماذا تفعل بالنتيجة الجديدة وبالداتاست القديمة."
+  en: "This window opens after most Tools and Edit commands that change the data. It asks what to do with the new result and with the old dataset."
+fields:
+  - key: question
+    label: "What do you want to do with the new dataset?"
+    kind: text
+    ar: "عنوان القسم الأول: ما يخصّ الداتاست الجديدة الناتجة عن الأمر."
+    en: "The heading of the first part: settings for the new dataset the command produced."
+  - key: name
+    label: "Name it:"
+    kind: edit
+    default:
+      ar: "الاسم القديم مع وصف ما تغيّر"
+      en: "the old name plus what changed"
+    ar: "اسم الداتاست الجديدة كما يظهر في قائمة Datasets. اكتب اسماً واضحاً يقول ما فعلته، لتعرفها لاحقاً."
+    en: "The new dataset's name as it shows in the Datasets menu. Type a clear name that says what you did, so you can find it later."
+  - key: description
+    label: "Edit description"
+    kind: button
+    ar: "يفتح خانة لكتابة ملاحظة عن الداتاست تُحفظ معها. اختياري."
+    en: "Opens a box to write a note about the dataset, saved with it. Optional."
+  - key: savenew
+    label: "Save it as file:"
+    kind: checkbox
+    default: "unchecked"
+    ar: "ضع علامة واكتب اسم ملف، أو اضغط «Browse»، لتحفظ الداتاست الجديدة على القرص الآن. يمكنك الحفظ لاحقاً من File بدلاً من ذلك."
+    en: "Check it and type a file name, or press Browse, to save the new dataset to disk now. You can save later from the File menu instead."
+  - key: overwrite
+    label: "Overwrite it in memory (set=yes; unset=create a new dataset)"
+    kind: checkbox
+    default: "unchecked"
+    ar: "بعلامة: تحلّ النتيجة محل الداتاست القديمة في الذاكرة فتختفي القديمة. بلا علامة: تبقى القديمة وتُضاف الجديدة كداتاست مستقلة."
+    en: "Checked: the result replaces the old dataset in memory, and the old one is gone. Unchecked: the old one stays and the new one is added as a separate dataset."
+  - key: saveold
+    label: "Save it as file: (old dataset)"
+    kind: checkbox
+    ar: "يظهر فقط إذا كانت في الداتاست القديمة تغييرات لم تُحفظ. يحفظ القديمة في ملف قبل أن تكمل."
+    en: "Shows only if the old dataset has unsaved changes. It saves the old one to a file before you go on."
+  - key: buttons
+    label: "Help · Cancel · OK"
+    kind: button
+    ar: "«OK» ينفّذ اختياراتك. «Cancel» يلغي النتيجة كلها ويُبقي البيانات كما كانت."
+    en: "OK applies your choices. Cancel throws the result away and keeps the data as it was."

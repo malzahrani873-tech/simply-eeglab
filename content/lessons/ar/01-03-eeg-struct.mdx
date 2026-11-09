@@ -72,6 +72,8 @@ updated: 2026-10-28
 
 ### 2. اقرأ الأحداث من EEGLAB
 
+<EeglabWindow id="editeventvals" use={{ latency: "للنظر فقط: حوالي `1.0001` ثانية لأول حدث", buttons: "اضغط Cancel" }} />
+
 1. افتح <MenuPath>Edit > Event values</MenuPath>.
 2. تظهر نافذة تعرض حدثاً (<En>event</En>) واحداً في كل مرة: `type` و `position` و `latency`. (لا تظهر هنا حقول داخلية مثل `urevent`، ولن تحتاجها الآن.)
 3. لاحظ أن خانة التوقيت (<En>latency</En>) في هذه النافذة عنوانها <UiLabel>latency (sec)</UiLabel>: النافذة تعرض التوقيت **بالثواني**، أما `EEG.event` فيحفظه **بالعيّنات**. أول حدث يظهر هنا عند حوالي 1.0001 ثانية.

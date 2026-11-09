@@ -1,0 +1,51 @@
+id: select
+func: pop_select
+source: "EEGLAB pop_select.m (uilist)"
+title: "Select data -- pop_select()"
+menu: "Edit > Select data"
+shot: select-dialog
+intro:
+  ar: "تختار جزءاً من البيانات: زمناً أو قنوات أو epochs. كل صف فيه خانة للمدى، ومربع تحت «on->remove these» يقلب المعنى من «أبقِ هذا» إلى «احذف هذا»."
+  en: "Choose part of the data: a time range, channels or epochs. Each row has a box for the range, and a checkbox under «on->remove these» that flips the meaning from «keep this» to «remove this»."
+fields:
+  - key: time
+    label: "Time range [min max] (s)"
+    default: ""
+    ar: "مدى زمني بالثواني، مثل `0 120`. بلا علامة في مربع الصف يبقى هذا المدى وحده. بعلامة يُحذف ويبقى الباقي."
+    en: "A time range in seconds, such as `0 120`. With the row's checkbox unchecked, only this range stays. Checked, it is removed and the rest stays."
+  - key: point
+    label: "Point range (ex: [1 10])"
+    default: ""
+    ar: "نفس الفكرة لكن بأرقام العيّنات بدل الثواني. نادراً ما تحتاجه."
+    en: "The same idea, but in sample numbers instead of seconds. You rarely need it."
+  - key: epoch
+    label: "Epoch range (ex: 3:2:10)"
+    default: ""
+    ar: "أرقام الـ epochs، للبيانات المقطّعة فقط."
+    en: "Epoch numbers, for epoched data only."
+  - key: chans
+    label: "Channel(s)"
+    default: ""
+    ar: "أسماء القنوات أو أرقامها، مثل `EOG1 EOG2`. زر النقاط الثلاث يفتح قائمة تختار منها. مع العلامة تحت «on->remove these» تُحذف هذه القنوات، وبدونها تبقى وحدها."
+    en: "Channel names or numbers, such as `EOG1 EOG2`. The `...` button opens a list to pick from. With the checkbox under «on->remove these», these channels are removed; without it, only they stay."
+  - key: chantype
+    label: "Channel type(s)"
+    default: ""
+    ar: "نفس فكرة الصف السابق لكن بنوع القناة، مثل `EOG`. يعمل إذا كانت الأنواع محددة في مواقع القنوات."
+    en: "Like the row above, but by channel type, such as `EOG`. It works if the types are set in the channel locations."
+  - key: remove
+    label: "on->remove these"
+    kind: checkbox
+    default: unchecked
+    ar: "عمود المربعات. علامة في صف تعني «احذف ما كتبته في هذا الصف». بلا علامة تعني «أبقِ ما كتبته فقط»."
+    en: "The column of checkboxes. A check in a row means «remove what I typed in this row». Unchecked means «keep only what I typed»."
+  - key: scroll
+    label: "Scroll dataset"
+    kind: button
+    ar: "يفتح عرض الإشارة لتجد الأزمنة أو القنوات التي تريدها قبل أن تكتبها."
+    en: "Opens the scrolling view so you can find the times or channels you want before typing them."
+  - key: buttons
+    label: "Help · Cancel · OK"
+    kind: button
+    ar: "«OK» ينفّذ الاختيار ثم تفتح نافذة تسمية الداتاست الجديدة."
+    en: "OK applies the selection, then the window for naming the new dataset opens."

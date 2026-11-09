@@ -101,6 +101,8 @@ We compute the spectrum here on the continuous data after removing ICA component
 
 This lesson needs the continuous dataset, not the epochs you used in the previous lesson.
 
+<EeglabWindow id="spectopo" use={{ freqs: "`10`", freqrange: "`1 64`" }} compact />
+
 1. Open the file `D1_main_clean.set` (continuous, before cutting into epochs) with <MenuPath>File > Load existing dataset</MenuPath>, from your work folder (`eeg-course`). You saved it in [the ICLabel lesson](/en/lesson/iclabel/), and its name in the <UiLabel>Datasets</UiLabel> menu is `D1 main clean`. If you don't have it, run "Script to reach this state" at the end of the lesson. The script loads `D1_main_ica.set` if it finds it in your work folder; otherwise it runs ICA again, which takes a few minutes.
 2. Open <MenuPath>Plot > Channel spectra and maps</MenuPath>.
 3. The <UiLabel>Channel spectra and maps -- pop_spectopo()</UiLabel> window opens. Keep <UiLabel>Epoch time range to analyze [min_ms max_ms]:</UiLabel> at its value, that is, the whole recording.

@@ -1,0 +1,43 @@
+id: plottopo
+func: pop_plottopo
+source: "EEGLAB pop_plottopo.m (uilist, lines 64-76)"
+title: "Topographic ERP plot - pop_plottopo()"
+menu: "Plot > Channel ERPs > In scalp/rect. array"
+shot: plottopo-dialog
+intro:
+  ar: "ترسم موجة الـ ERP لكل قناة في مكانها على الرأس."
+  en: "Plots each channel's ERP in its place on the head."
+fields:
+  - key: chan
+    label: "Channels to plot"
+    default:
+      ar: "كل القنوات"
+      en: "all channels"
+    ar: "أرقام القنوات المرسومة."
+    en: "The numbers of the channels to plot."
+  - key: title
+    label: "Plot title"
+    ar: "العنوان فوق الرسم."
+    en: "The title above the plot."
+  - key: cbst
+    label: "Plot single trials"
+    kind: checkbox
+    default: unchecked
+    ar: "يرسم كل محاولة بدل المتوسط وحده."
+    en: "Plots every trial instead of only the average."
+  - key: cbra
+    label: "Plot in rect. array"
+    kind: checkbox
+    default: unchecked
+    ar: "يرتّب القنوات في شبكة مستطيلة بدل شكل الرأس."
+    en: "Arranges the channels in a rectangular grid instead of the head shape."
+  - key: opt
+    label: "Other plot options (see help)"
+    default: "`'ydir', 1`"
+    ar: "خيارات إضافية. `'ydir', 1` يرسم الموجب للأعلى."
+    en: "Extra options. `'ydir', 1` plots positive up."
+  - key: buttons
+    label: "Help · Cancel · OK"
+    kind: button
+    ar: "«OK» يرسم. اضغط على أي قناة في الرسم لتكبيرها."
+    en: "OK draws the plot. Click any channel in the plot to enlarge it."

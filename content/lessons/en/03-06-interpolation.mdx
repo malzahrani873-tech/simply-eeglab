@@ -92,6 +92,10 @@ Run "Script to reach this state" at the end of the lesson. It puts the dataset f
 
 **First: practice on a good channel**
 
+<EeglabWindow id="select" use={{ chans: "`C3`", remove: "check it in the Channel(s) row" }} compact />
+
+<EeglabWindow id="interp" use={{ uselist: "press it, then type the number of `D1 badch`", method: "Spherical", trange: "leave it empty" }} />
+
 1. With `D1 badch` current, open <MenuPath>Edit > Select data</MenuPath>. Type `C3` in <UiLabel>Channel(s)</UiLabel>, check the box under <UiLabel>on->remove these</UiLabel>, then press <UiLabel>OK</UiLabel>.
 2. Name the new dataset `D1 noC3`. In the main window, <UiLabel>Channels per frame</UiLabel> is now 31.
 3. Open <MenuPath>Tools > Interpolate electrodes</MenuPath>. A window titled <UiLabel>Interpolate channel(s) -- pop_interp()</UiLabel> appears.

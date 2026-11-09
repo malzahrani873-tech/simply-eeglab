@@ -92,6 +92,8 @@ updated: 2026-10-28
 
 **أولاً: اصنع نسخة ICA**
 
+<EeglabWindow id="eegfiltnew" use={{ locutoff: "`1` (على نسخة)" }} compact />
+
 1. تأكد من أن الداتاست 1 هي الحالية من قائمة <MenuPath>Datasets</MenuPath>.
 2. افتح <MenuPath>Tools > Filter the data > Basic FIR filter (new, default)</MenuPath>.
 3. في <UiLabel>Lower edge of the frequency pass band (Hz)</UiLabel> اكتب `1`، واترك باقي الخانات كما هي، ثم اضغط <UiLabel>OK</UiLabel>.
@@ -103,6 +105,8 @@ updated: 2026-10-28
 
 **ثانياً: شغّل ICA على نسخة ICA**
 
+<EeglabWindow id="runica" use={{ algo: "Extended Infomax (runica.m; default)", reorder: "أبقِ العلامة", chans: "اتركها فارغة" }} />
+
 1. والداتاست 2 هي الحالية، افتح <MenuPath>Tools > Decompose data by ICA</MenuPath>.
 2. في <UiLabel>ICA algorithm to use (click to select)</UiLabel> اترك الخيار الأول <UiLabel>Extended Infomax (runica.m; default)</UiLabel>. خانة الخيارات تحته تكون `'extended', 1`.
 3. أبقِ <UiLabel>Reorder components by variance (if that's not already the case)</UiLabel> مفعّلاً، واترك خانة <UiLabel>Use only channel type(s) or indices</UiLabel> فارغة، ثم اضغط <UiLabel>OK</UiLabel>.
@@ -111,10 +115,14 @@ updated: 2026-10-28
 
 **ثالثاً: اعرض خرائط المكوّنات**
 
+<EeglabWindow id="topoplot_ic" />
+
 1. افتح <MenuPath>Plot > Component maps > In 2-D</MenuPath>، واترك الإعدادات الافتراضية، واضغط <UiLabel>OK</UiLabel>. تظهر خريطة رأس (<En>scalp map</En>) لكل مكوّن ICA.
 2. ابحث عن مكوّن الرمش: خريطة فيها لون داكن (أحمر أو أزرق) فوق العينين في مقدمة الرأس، ومتماثلة بين اليمين واليسار. غالباً يكون بين المكوّنات الأولى.
 
 **رابعاً: انسخ الأوزان إلى النسخة الرئيسية**
+
+<EeglabWindow id="editset" use={{ weightfile: "اضغط «from other dataset» واكتب `2`" }} />
 
 1. ارجع إلى الداتاست 1 من قائمة <MenuPath>Datasets</MenuPath>.
 2. افتح <MenuPath>Edit > Dataset info</MenuPath>.

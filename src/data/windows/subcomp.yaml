@@ -1,0 +1,32 @@
+id: subcomp
+func: pop_subcomp
+source: "EEGLAB pop_subcomp.m (uilist, lines 120-128)"
+title: "Remove components from data -- pop_subcomp()"
+menu: "Tools > Remove components from data"
+shot: subcomp-dialog
+intro:
+  ar: "تكتب فيها أرقام المكوّنات التي تُطرح من البيانات."
+  en: "Here you type the numbers of the components to subtract from the data."
+fields:
+  - key: note
+    label: "Note: for group level analysis, remove components in STUDY"
+    kind: text
+    ar: "تذكير بالتحليل الجماعي. لا تحتاجه الآن."
+    en: "A reminder about group analysis. You don't need it now."
+  - key: remove
+    label: "List of component(s) to remove from data"
+    default:
+      ar: "المكوّنات المعلّمة"
+      en: "the flagged components"
+    ar: "أرقام المكوّنات التي تحذفها، مثل `1 3`. أضف أو احذف أرقاماً بعد مراجعتك."
+    en: "The numbers of the components to remove, such as `1 3`. Add or delete numbers after your review."
+  - key: retain
+    label: "Or list of component(s) to retain"
+    default: ""
+    ar: "بديل: تكتب المكوّنات التي تبقى، ويُحذف الباقي. اتركها فارغة."
+    en: "The alternative: type the components to keep, and the rest are removed. Leave it empty."
+  - key: buttons
+    label: "Help · Cancel · OK"
+    kind: button
+    ar: "«OK» يفتح نافذة التأكيد."
+    en: "OK opens the confirmation window."

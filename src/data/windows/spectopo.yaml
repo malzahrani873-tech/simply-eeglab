@@ -1,0 +1,47 @@
+id: spectopo
+func: pop_spectopo
+source: "EEGLAB pop_spectopo.m (channel uilist, lines 144-155)"
+title: "Channel spectra and maps -- pop_spectopo()"
+menu: "Plot > Channel spectra and maps"
+shot: spectopo-dialog
+intro:
+  ar: "ترسم طيف كل القنوات في رسم واحد، مع خرائط رأس عند ترددات تختارها."
+  en: "Plots the spectrum of all channels in one plot, with scalp maps at frequencies you choose."
+fields:
+  - key: timerange
+    label: "Epoch time range to analyze [min_ms max_ms]:"
+    default:
+      ar: "التسجيل كله"
+      en: "the whole recording"
+    ar: "جزء البيانات الذي يُحسب منه الطيف، بالميلي ثانية."
+    en: "The part of the data the spectrum is computed from, in milliseconds."
+  - key: percent
+    label: "Percent data to sample (1 to 100):"
+    default: "`100`"
+    ar: "نسبة البيانات المستعملة. أقل من 100 يسرّع الحساب على البيانات الكبيرة."
+    en: "The share of the data used. Less than 100 speeds things up on large data."
+  - key: freqs
+    label: "Frequencies to plot as scalp maps (Hz):"
+    default: "`6 10 22`"
+    ar: "الترددات التي تُرسم لها خريطة رأس فوق الطيف، مثل `10 60`."
+    en: "The frequencies that get a scalp map above the spectrum, such as `10 60`."
+  - key: apply
+    label: "Apply to EEG|ERP|BOTH:"
+    default: "`EEG`"
+    ar: "للبيانات المقطّعة: طيف الإشارة نفسها (EEG)، أو طيف متوسطها (ERP)، أو الاثنين."
+    en: "For epoched data: the spectrum of the signal itself (EEG), of its average (ERP), or both."
+  - key: freqrange
+    label: "Plotting frequency range [lo_Hz hi_Hz]:"
+    default: "`2 25`"
+    ar: "مدى الترددات على المحور الأفقي. الافتراضي يتوقف عند 25 هرتز، فغيّره إلى `1 64` مثلاً لترى ضجيج الكهرباء."
+    en: "The frequency range on the horizontal axis. The default stops at 25 Hz, so change it to `1 64`, for example, to see line noise."
+  - key: options
+    label: "Spectral and scalp map options (see topoplot):"
+    default: "`'electrodes','off'`"
+    ar: "خيارات إضافية لمن يعرف دالة spectopo. اتركها كما هي."
+    en: "Extra options for those who know the spectopo function. Leave as is."
+  - key: buttons
+    label: "Help · Cancel · OK"
+    kind: button
+    ar: "«OK» يحسب الطيف ويفتح الرسم. لا تتغيّر البيانات."
+    en: "OK computes the spectrum and opens the plot. The data do not change."

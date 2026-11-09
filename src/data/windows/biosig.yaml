@@ -1,0 +1,77 @@
+id: biosig
+func: pop_biosig
+source: "EEGLAB pop_biosig.m (uilist after the file is chosen)"
+title: "Load data using BIOSIG -- pop_biosig()"
+menu: "File > Import data > Using EEGLAB functions and plugins > From EDF/EDF+/GDF files (BIOSIG toolbox)"
+shot: biosig-options-dialog
+intro:
+  ar: "تفتح بعد أن تختار الملف من نافذة الملفات في Windows. تحدد فيها ما يُقرأ من الملف."
+  en: "It opens after you choose the file in the Windows file window. It sets what is read from the file."
+fields:
+  - key: channels
+    label: "Channel list (default all):"
+    default: ""
+    ar: "أرقام القنوات التي تقرؤها فقط، مثل `1:32`. فارغة تعني كل القنوات."
+    en: "The numbers of the channels to read, such as `1:32`. Empty means all channels."
+  - key: range
+    label: "Data range (in seconds) to read (default all [0 ...])"
+    default: ""
+    ar: "جزء التسجيل الذي تقرؤه بالثواني، مثل `[0 60]`. الرقم الأخير في العنوان هو طول الملف. فارغة تعني التسجيل كله."
+    en: "The part of the recording to read, in seconds, such as `[0 60]`. The last number in the label is the file length. Empty means the whole recording."
+  - key: ref
+    label: "Reference chan(s) indices - recommended for BIOSEMI"
+    default: ""
+    ar: "رقم قناة المرجع. مهم لملفات BioSemi وحدها، لأنها تُسجَّل بلا مرجع. اتركها فارغة لملفات EDF."
+    en: "The reference channel number. It matters only for BioSemi files, which are recorded without a reference. Leave it empty for EDF files."
+  - key: bdfmode
+    label: "Event mode import (see bdf2biosig_events function help)"
+    default: "`4`"
+    ar: "طريقة قراءة الأحداث من قناة الأحداث في ملفات BDF. اتركها على `4`."
+    en: "How events are read from the trigger channel in BDF files. Leave it at `4`."
+  - key: importevent
+    label: "Extract event from marker channel"
+    kind: checkbox
+    default: checked
+    ar: "يقرأ الأحداث من قناة العلامات (marker channel) إن وُجدت."
+    en: "Reads events from the marker channel, if there is one."
+  - key: blockepoch
+    label: "Force continuous data when data is stored in blocks"
+    kind: checkbox
+    default: checked
+    ar: "بعض الملفات تخزّن الإشارة على شكل كتل. هذا الخيار يجمعها في تسجيل واحد مستمر. أبقه."
+    en: "Some files store the signal in blocks. This option joins them into one continuous recording. Keep it."
+  - key: memorymapped
+    label: "Import as memory mapped file (use if out of memory error)"
+    kind: checkbox
+    default: unchecked
+    ar: "يقرأ البيانات من القرص عند الحاجة بدل تحميلها كلها في الذاكرة. استعمله فقط إذا ظهر خطأ نفاد الذاكرة."
+    en: "Reads the data from disk when needed instead of loading it all into memory. Use it only if you get an out-of-memory error."
+  - key: overflow
+    label: "Enable overflow detection"
+    kind: checkbox
+    default: unchecked
+    ar: "يعلّم العيّنات التي تجاوزت مدى جهاز التسجيل. اتركه بلا علامة."
+    en: "Marks samples that went beyond the amplifier's range. Leave it unchecked."
+  - key: uncalibrated
+    label: "Import uncalibrated data"
+    kind: checkbox
+    default: unchecked
+    ar: "يقرأ الأرقام الخام دون تحويلها إلى ميكروفولت. اتركه بلا علامة."
+    en: "Reads the raw numbers without converting them to microvolts. Leave it unchecked."
+  - key: importannot
+    label: "Import EDF+ annotations (try also mexSLOAD below)"
+    kind: checkbox
+    default: checked
+    ar: "يقرأ الملاحظات المخزّنة داخل ملف EDF+ مع توقيتها، وتصبح أحداثاً. إذا أزلت العلامة تخسر الأحداث."
+    en: "Reads the notes stored inside an EDF+ file with their timing, and they become events. Uncheck it and you lose the events."
+  - key: importmex
+    label: "Import using alternative BIOSIG method (mexSLOAD)"
+    kind: checkbox
+    default: unchecked
+    ar: "طريقة قراءة بديلة، تجرّبها فقط إذا فشلت القراءة العادية."
+    en: "An alternative reading method. Try it only if normal reading fails."
+  - key: buttons
+    label: "Help · Cancel · OK"
+    kind: button
+    ar: "«OK» يقرأ الملف ثم تفتح نافذة تسمية الداتاست الجديدة. «Cancel» يلغي الاستيراد."
+    en: "OK reads the file, then the window for naming the new dataset opens. Cancel stops the import."

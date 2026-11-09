@@ -1,0 +1,41 @@
+id: timtopo
+func: pop_timtopo
+source: "EEGLAB pop_timtopo.m (uilist, lines 62-74)"
+title: "pop_timtopo()"
+menu: "Plot > Channel ERPs > With scalp maps"
+shot: timtopo-dialog
+intro:
+  ar: "ترسم موجات الـ ERP لكل القنوات فوق بعضها، مع خرائط رأس عند أزمنة تختارها."
+  en: "Plots the ERP of every channel on top of each other, with scalp maps at times you choose."
+fields:
+  - key: timerange
+    label: "Plotting time range (ms):"
+    default:
+      ar: "الـ epoch كلها"
+      en: "the whole epoch"
+    ar: "مدى الزمن المرسوم بالميلي ثانية."
+    en: "The plotted time range in milliseconds."
+  - key: topotime
+    label: "Scalp map latencies (ms, NaN -> max-RMS)"
+    default: "`NaN`"
+    ar: "أزمنة الخرائط بالميلي ثانية، مثل `100 170 300`. `NaN` يختار وحده الزمن الذي تكون فيه الإشارة أقوى."
+    en: "The map times in milliseconds, such as `100 170 300`. `NaN` picks the time where the signal is strongest."
+  - key: winsize
+    label: "Window size at latencies in ms"
+    default: "`0`"
+    ar: "إذا كتبت رقماً، تُرسم الخريطة لمتوسط نافذة بهذا العرض حول كل زمن بدل لحظة واحدة."
+    en: "A number here makes each map the average of a window this wide around the time, instead of one instant."
+  - key: title
+    label: "Plot title:"
+    ar: "العنوان فوق الرسم."
+    en: "The title above the plot."
+  - key: options
+    label: "Scalp map options (see >> help topoplot):"
+    default: ""
+    ar: "خيارات خرائط الرأس. اتركها فارغة."
+    en: "Scalp map options. Leave it empty."
+  - key: buttons
+    label: "Help · Cancel · OK"
+    kind: button
+    ar: "«OK» يرسم. لا تتغيّر البيانات."
+    en: "OK draws the plot. The data do not change."

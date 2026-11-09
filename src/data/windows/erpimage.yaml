@@ -1,0 +1,114 @@
+id: erpimage
+func: pop_erpimage
+source: "EEGLAB pop_erpimage.m (uilist, lines 299-383)"
+title: "Channel ERP image -- pop_erpimage()"
+menu: "Plot > Channel ERP image"
+shot: erpimage-dialog
+intro:
+  ar: "نافذة كبيرة. القسم الأول (القناة والتنعيم والزمن) هو ما تحتاجه دائماً. أقسام الترتيب حسب الطور والـ ITC والخيارات الأخرى متقدمة، فاتركها فارغة."
+  en: "A large window. The first part (channel, smoothing, time) is what you always need. The phase sorting, ITC and other options parts are advanced, so leave them empty."
+fields:
+  - key: chan
+    label: "Channel"
+    default: "`1`"
+    ar: "رقم القناة. زر النقاط الثلاث يعرض القنوات بأسمائها."
+    en: "The channel number. The `...` button lists the channels by name."
+  - key: title
+    label: "Fig. title"
+    default: ""
+    ar: "عنوان الرسم. فارغة تعني عنواناً تلقائياً."
+    en: "The plot title. Empty gives an automatic title."
+  - key: smooth
+    label: "Smoothing"
+    default: "`10`"
+    ar: "عدد المحاولات المتجاورة التي يُحسب متوسطها في كل سطر من الصورة. `1` يعني بلا تنعيم."
+    en: "How many neighbouring trials are averaged in each row of the image. `1` means no smoothing."
+  - key: topo
+    label: "Plot scalp map"
+    kind: checkbox
+    default: checked
+    ar: "يرسم موقع القناة على الرأس في زاوية الرسم."
+    en: "Draws the channel's place on the head in a corner of the plot."
+  - key: decimate
+    label: "Downsampling"
+    default: "`1`"
+    ar: "يقلّل عدد الأسطر المرسومة. تحتاجه فقط مع مئات المحاولات."
+    en: "Reduces the number of plotted rows. You need it only with hundreds of trials."
+  - key: erp
+    label: "Plot ERP"
+    kind: checkbox
+    default: checked
+    ar: "يرسم متوسط الـ ERP تحت الصورة."
+    en: "Draws the average ERP below the image."
+  - key: limerp
+    label: "ERP limits (uV)"
+    default: ""
+    ar: "حدود محور الـ ERP بالميكروفولت. فارغة تعني تلقائياً."
+    en: "The ERP axis limits in microvolts. Empty means automatic."
+  - key: limtime
+    label: "Time limits (ms)"
+    default: ""
+    ar: "مدى الزمن المرسوم بالميلي ثانية، مثل `-200 800`. فارغة تعني الـ epoch كلها."
+    en: "The plotted time range in milliseconds, such as `-200 800`. Empty means the whole epoch."
+  - key: cbar
+    label: "Plot colorbar"
+    kind: checkbox
+    default: checked
+    ar: "يرسم مقياس الألوان بجانب الصورة."
+    en: "Draws the colour scale next to the image."
+  - key: caxis
+    label: "Color limits (see Help)"
+    default: ""
+    ar: "حدود الألوان. فارغة تعني متماثلة حول الصفر من أكبر قيمة. كسر مثل `0.9` يضيّقها إذا طغت محاولة شاذة."
+    en: "The colour limits. Empty means symmetric around zero from the largest value. A fraction such as `0.9` narrows them if one outlier trial dominates."
+  - key: sortfield
+    label: "Epoch-sorting field"
+    kind: button
+    ar: "يختار حقل الحدث الذي تُرتّب به المحاولات، مثل `latency` لترتيبها بزمن الاستجابة."
+    en: "Picks the event field the trials are sorted by, such as `latency` to sort them by reaction time."
+  - key: sorttype
+    label: "Event type(s)"
+    kind: button
+    ar: "يختار نوع الحدث الذي يُؤخذ منه الحقل، مثل `rt`."
+    en: "Picks the event type the field is taken from, such as `rt`."
+  - key: sortwin
+    label: "Event time range"
+    default: ""
+    ar: "يحصر البحث عن الحدث في هذا المدى بالميلي ثانية، مثل `0 1000`، حتى لا يأخذ حدثاً من محاولة أخرى."
+    en: "Limits the search for the event to this range in milliseconds, such as `0 1000`, so it doesn't take an event from another trial."
+  - key: rescale
+    label: "Rescale"
+    default: "`no`"
+    ar: "يعيد قياس قيم الترتيب لتناسب نافذة الرسم. اتركها `no`."
+    en: "Rescales the sorting values to the plot window. Leave it at `no`."
+  - key: align
+    label: "Align"
+    default: ""
+    ar: "يحاذي المحاولات على قيمة الترتيب. `Inf` يعني الوسيط، فترى البيانات من جهة الاستجابة."
+    en: "Aligns the trials on the sorting value. `Inf` means the median, so you see the data from the response side."
+  - key: nosort
+    label: "Don't sort by value · Don't plot values"
+    kind: checkbox
+    default: unchecked
+    ar: "الأول يرسم المحاولات بترتيبها الأصلي. الثاني يخفي خط قيم الترتيب فوق الصورة."
+    en: "The first keeps the trials in their original order. The second hides the line of sorting values on the image."
+  - key: phase
+    label: "Sort trials by phase"
+    kind: text
+    ar: "قسم متقدم لترتيب المحاولات بطور تردد معيّن. اتركه فارغاً."
+    en: "An advanced part that sorts trials by the phase at one frequency. Leave it empty."
+  - key: itc
+    label: "Inter-trial coherence options"
+    kind: text
+    ar: "قسم متقدم يضيف رسم السعة وتماسك الطور تحت الصورة. اتركه فارغاً."
+    en: "An advanced part that adds amplitude and phase coherence plots below the image. Leave it empty."
+  - key: other
+    label: "Other options"
+    kind: text
+    ar: "طيف وخط أساس وعلامات زمنية وخيارات erpimage. اتركها فارغة."
+    en: "Spectrum, baseline, time marks and erpimage options. Leave them empty."
+  - key: buttons
+    label: "Help · Cancel · OK"
+    kind: button
+    ar: "«OK» يرسم الصورة. النافذة تتذكر قيمك في المرة التالية."
+    en: "OK draws the image. The window remembers your values next time."

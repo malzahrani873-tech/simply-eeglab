@@ -54,6 +54,10 @@ updated: 2026-10-28
 
 حتى يكون عندك شيء تخزّنه، أجرِ تغييراً بسيطاً: احذف قناتي (<En>channels</En>) حركة العين `EOG1` و `EOG2`. هذا مثال لهذا الدرس فقط.
 
+<EeglabWindow id="select" use={{ chans: "`EOG1 EOG2`", remove: "ضع علامة في صف Channel(s)" }} />
+
+<EeglabWindow id="newset" use={{ name: "`D1 no EOG`", savenew: "اتركها بلا علامة", overwrite: "اتركها بلا علامة" }} />
+
 1. بعد أن تفتح `eeglab_data.set`، افتح <MenuPath>Edit > Select data</MenuPath>.
 2. في صف <UiLabel>Channel(s)</UiLabel> اكتب `EOG1 EOG2`.
 3. فعّل الخانة في نفس الصف، تحت <UiLabel>on->remove these</UiLabel>. بدون هذه العلامة يُبقي EEGLAB هاتين القناتين ويحذف كل القنوات (<En>channel</En>) الأخرى.
@@ -72,6 +76,8 @@ updated: 2026-10-28
 3. أي قائمة تستخدمها الآن تعمل على الداتاست 1. قبل كل خطوة، انظر إلى السطر الأول في النافذة الرئيسية لتعرف أي داتاست هي الحالية.
 
 ### 3. احذف داتاست من الذاكرة
+
+<EeglabWindow id="delset" use={{ index: "`2`" }} />
 
 1. افتح <MenuPath>Edit > Delete dataset(s) from memory</MenuPath>.
 2. في <UiLabel>Dataset(s) to delete:</UiLabel> اكتب `2`.

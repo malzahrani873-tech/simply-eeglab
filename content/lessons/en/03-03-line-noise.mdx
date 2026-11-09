@@ -78,12 +78,16 @@ Start with the main dataset `D1 hp0.1` open, the result of [the filtering lesson
 
 **First: find the peak in the spectrum**
 
+<EeglabWindow id="spectopo" use={{ freqs: "`10 60`", freqrange: "`1 64`" }} compact />
+
 1. Open <MenuPath>Plot > Channel spectra and maps</MenuPath>.
 2. Change <UiLabel>Plotting frequency range [lo_Hz hi_Hz]:</UiLabel> from `2 25` to `1 64`. The default range stops at 25 Hz, so it never shows the line-noise peak.
 3. In <UiLabel>Frequencies to plot as scalp maps (Hz):</UiLabel>, type `10 60`. Leave the other fields as they are and press <UiLabel>OK</UiLabel>.
 4. Look at the spectrum: a sharp, narrow peak at 60 Hz. The scalp map at 60 Hz shows which channels carry the most noise.
 
 **Second: apply the notch filter**
+
+<EeglabWindow id="eegfiltnew" use={{ locutoff: "`58`", hicutoff: "`62`", revfilt: "check it" }} compact />
 
 1. Open <MenuPath>Tools > Filter the data > Basic FIR filter (new, default)</MenuPath>.
 2. In <UiLabel>Lower edge of the frequency pass band (Hz)</UiLabel>, type `58`.

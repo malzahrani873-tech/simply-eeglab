@@ -1,0 +1,31 @@
+id: rmdat
+func: pop_rmdat
+source: "EEGLAB pop_rmdat.m (uilist)"
+title: "Remove data portions around events - pop_rmdat()"
+menu: "Edit > Select data using events"
+shot: rmdat-dialog
+intro:
+  ar: "تُبقي أو تحذف أجزاء البيانات حول نوع حدث معيّن، وتبقى البيانات مستمرة."
+  en: "Keeps or removes the parts of the data around one event type. The data stay continuous."
+fields:
+  - key: events
+    label: "Event type(s) ([]=all)"
+    default: ""
+    ar: "نوع الحدث، مثل `square`. زر النقاط الثلاث يعرض الأنواع الموجودة. فارغة تعني كل الأحداث."
+    en: "The event type, such as `square`. The `...` button lists the types in your data. Empty means all events."
+  - key: limits
+    label: "Time limits [start, end] in sec."
+    default: "`-1 1`"
+    ar: "من كم ثانية قبل كل حدث إلى كم ثانية بعده."
+    en: "From how many seconds before each event to how many seconds after it."
+  - key: mode
+    label: "Keep selected | Remove selected"
+    kind: menu
+    default: "Keep selected"
+    ar: "«Keep selected» يُبقي هذه الأجزاء ويحذف الباقي. «Remove selected» يحذفها ويُبقي الباقي."
+    en: "«Keep selected» keeps these parts and removes the rest. «Remove selected» removes them and keeps the rest."
+  - key: buttons
+    label: "Help · Cancel · OK"
+    kind: button
+    ar: "«OK» ينفّذ ثم تفتح نافذة تسمية الداتاست الجديدة."
+    en: "OK applies it, then the window for naming the new dataset opens."

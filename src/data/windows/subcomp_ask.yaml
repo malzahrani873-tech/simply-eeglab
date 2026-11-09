@@ -1,0 +1,30 @@
+id: subcomp_ask
+func: pop_subcomp
+source: "EEGLAB pop_subcomp.m (questdlg2, line 93)"
+title: "Remove components from data"
+menu: "Tools > Remove components from data"
+shot: S9-subcomp-dialog
+intro:
+  ar: "أول نافذة تظهر إذا كانت هناك مكوّنات معلّمة. تذكر أرقامها وتسألك هل تحذفها."
+  en: "The first window, shown when some components are flagged. It lists their numbers and asks whether to remove them."
+fields:
+  - key: msg
+    label: "Components [...] flagged for rejection. Do you want to remove these components?"
+    kind: text
+    ar: "أرقام المكوّنات المعلّمة. الملاحظة عن STUDY تخص التحليل الجماعي في المحطة 8، فتجاهلها الآن."
+    en: "The numbers of the flagged components. The note about STUDY is for group analysis in station 8; ignore it for now."
+  - key: cancel
+    label: "Cancel"
+    kind: button
+    ar: "يغلق دون حذف."
+    en: "Closes without removing."
+  - key: manual
+    label: "Manual rej."
+    kind: button
+    ar: "يفتح قائمة المكوّنات لتراجعها وتعدّلها قبل الحذف. هذا الذي تختاره."
+    en: "Opens the component list so you can review and edit it before removing. This is the one to choose."
+  - key: yes
+    label: "Yes"
+    kind: button
+    ar: "يحذف المكوّنات المعلّمة مباشرة دون مراجعة."
+    en: "Removes the flagged components straight away, without review."

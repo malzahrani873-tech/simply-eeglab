@@ -108,6 +108,8 @@ Start with the main dataset open and holding ICA weights: open `D1_main_ica.set`
 
 **First: classify the components**
 
+<EeglabWindow id="iclabel" use={{ version: "Default (recommended)" }} />
+
 1. Open <MenuPath>Tools > Classify components using ICLabel > Label components</MenuPath>.
 2. In <UiLabel>Select which icversion of ICLabel to use:</UiLabel>, keep <UiLabel>Default (recommended)</UiLabel> and press <UiLabel>OK</UiLabel>.
 3. The component scalp maps appear, each with its most likely class and probability above it.
@@ -125,11 +127,19 @@ For each component you plan to remove, check its scalp map, spectrum and time se
 
 A flag is a mark on the component, not a removal. Removal is the next step.
 
+<EeglabWindow id="icflag" use={{ muscle: "`0.9` – `1`", eye: "`0.9` – `1`" }} />
+
 1. Open <MenuPath>Tools > Classify components using ICLabel > Flag components as artifacts</MenuPath>.
 2. The <UiLabel>Select range for flagging component for rejection</UiLabel> window shows a <UiLabel>Min</UiLabel> and a <UiLabel>Max</UiLabel> for each class. Defaults: <UiLabel>Muscle</UiLabel> from 0.9 to 1, <UiLabel>Eye</UiLabel> from 0.9 to 1, the rest empty.
 3. Press <UiLabel>OK</UiLabel>. The command window prints how many components were flagged.
 
 **Fourth: remove the components and compare**
+
+<EeglabWindow id="subcomp_ask" use={{ manual: "press this one" }} />
+
+<EeglabWindow id="subcomp" use={{ remove: "the flagged numbers, edited after your review" }} />
+
+<EeglabWindow id="subcomp_confirm" use={{ trials: "press it to compare", accept: "press it if the blinks are gone" }} />
 
 1. Open <MenuPath>Tools > Remove components from data</MenuPath>.
 2. A window lists the flagged component numbers and asks whether to remove them. Press <UiLabel>Manual rej.</UiLabel> to see and edit the list, not <UiLabel>Yes</UiLabel>, because <UiLabel>Yes</UiLabel> removes them without review. Ignore the STUDY note in that window for now; it is for multi-participant analysis in station 8.

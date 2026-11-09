@@ -1,0 +1,47 @@
+id: dipfit_settings
+func: pop_dipfit_settings
+source: "dipfit plugin, pop_dipfit_settings.m (uilist, lines 246-282)"
+title: "Dipole fit settings - pop_dipfit_settings()"
+menu: "Tools > Source localization using DIPFIT > Head model and settings"
+shot: dipfit-settings-dialog
+intro:
+  ar: "تختار نموذج الرأس، وتربط مواقع أقطابك به. يجب فتحها قبل أي توطين."
+  en: "Choose the head model and align your electrode positions to it. Open it before any source fitting."
+fields:
+  - key: model
+    label: "Select a head model"
+    kind: menu
+    default: "Template Boundary Element Model (MNI)"
+    ar: "نموذج الرأس. الافتراضي BEM (MNI) أقرب لشكل الرأس الحقيقي. النموذج الكروي (BESA) باقٍ للتوافق مع القديم فقط."
+    en: "The head model. The default BEM (MNI) is closer to a real head shape. The spherical model (BESA) is kept only for backward compatibility."
+  - key: coord
+    label: "Output coordinates"
+    kind: menu
+    ar: "نظام إحداثيات النتائج. يُضبط وحده مع النموذج."
+    en: "The coordinate system of the results. It is set with the model."
+  - key: headfile
+    label: "Head model file"
+    ar: "ملف النموذج. يُملأ وحده عند اختيار نموذج جاهز."
+    en: "The model file. Filled in for you when you pick a ready model."
+  - key: mrifile
+    label: "Associated MRI file for plotting"
+    ar: "صورة MRI التي تُرسم عليها الـ dipoles. تُملأ وحدها."
+    en: "The MRI image the dipoles are drawn on. Filled in for you."
+  - key: chanfile
+    label: "Associated coord. landmarks if any"
+    ar: "ملف مواقع الأقطاب القياسي المرافق للنموذج."
+    en: "The standard electrode positions file that goes with the model."
+  - key: coreg
+    label: "Matrix to align chan. locs. with head model"
+    ar: "مصفوفة تربط مواقع أقطابك بالنموذج. يجب ألا تكون فارغة. «Co-register» يفتح أداة الربط اليدوي، و«No Co-Reg.» يلغي الربط."
+    en: "A matrix that aligns your electrode positions with the model. It must not be empty. «Co-register» opens the manual alignment tool, and «No Co-Reg.» turns alignment off."
+  - key: omit
+    label: "Channels to omit from dipole fitting"
+    default: ""
+    ar: "قنوات لا تدخل في التوطين، مثل قنوات العين. زر النقاط الثلاث يفتح القائمة."
+    en: "Channels left out of the fit, such as eye channels. The `...` button opens the list."
+  - key: buttons
+    label: "Help · Cancel · OK"
+    kind: button
+    ar: "«OK» يحفظ الإعدادات في الداتاست."
+    en: "OK stores the settings in the dataset."

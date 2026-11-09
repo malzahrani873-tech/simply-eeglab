@@ -1,0 +1,66 @@
+id: export
+func: pop_export
+source: "EEGLAB pop_export.m (uilist, lines 77-96)"
+title: "Export data - pop_export()"
+menu: "File > Export > Data and ICA activity to text file"
+shot: export-dialog
+intro:
+  ar: "تحفظ الإشارة في ملف نصي تفتحه في Excel أو برنامج آخر."
+  en: "Saves the signal to a text file you can open in Excel or another program."
+fields:
+  - key: file
+    label: "Output file name"
+    default: ""
+    ar: "اسم الملف ومساره. «Browse» يختار مكاناً."
+    en: "The file name and path. «Browse» picks a place."
+  - key: ica
+    label: "Export ICA activities instead of EEG data:"
+    kind: checkbox
+    default: unchecked
+    ar: "يصدّر نشاط مكوّنات ICA بدل القنوات."
+    en: "Exports ICA component activity instead of the channels."
+  - key: erp
+    label: "Export ERP average instead of trials:"
+    kind: checkbox
+    default: unchecked
+    ar: "للبيانات المقطّعة: يصدّر المتوسط بدل كل محاولة."
+    en: "For epoched data: exports the average instead of every trial."
+  - key: transpose
+    label: "Transpose matrix (elec -> cols):"
+    kind: checkbox
+    default: checked
+    ar: "يجعل كل قناة عموداً وكل زمن صفاً، وهو الأنسب لـ Excel."
+    en: "Makes each channel a column and each time point a row, which suits Excel."
+  - key: elec
+    label: "Export channel labels/component numbers:"
+    kind: checkbox
+    default: checked
+    ar: "يكتب أسماء القنوات في أول سطر."
+    en: "Writes the channel names in the first line."
+  - key: csv
+    label: "Use comma separator (csv) instead of tab:"
+    kind: checkbox
+    default: unchecked
+    ar: "يفصل القيم بفاصلة بدل Tab."
+    en: "Separates values with commas instead of tabs."
+  - key: time
+    label: "Export time values: · Unit (re. sec)"
+    kind: checkbox
+    default: "checked, `1E-3`"
+    ar: "يضيف عموداً للزمن. `1E-3` يعني بالميلي ثانية."
+    en: "Adds a time column. `1E-3` means milliseconds."
+  - key: digits
+    label: "Number of significant digits to output:"
+    default: "`4`"
+    ar: "عدد الأرقام المعنوية لكل قيمة."
+    en: "The number of significant digits for each value."
+  - key: expr
+    label: "Apply an expression to the output (see 'expr' help):"
+    default: ""
+    ar: "معادلة تُطبّق على القيم قبل الحفظ. اتركها فارغة."
+    en: "An expression applied to the values before saving. Leave it empty."
+  - key: buttons
+    label: "Help · Cancel · OK"
+    kind: button
+    ar: "«OK» يكتب الملف."
+    en: "OK writes the file."

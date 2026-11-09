@@ -1,0 +1,26 @@
+id: mergeset
+func: pop_mergeset
+source: "EEGLAB pop_mergeset.m (uilist)"
+title: "pop_mergeset()"
+menu: "Edit > Append datasets"
+shot: merge-dialog
+intro:
+  ar: "تلصق داتاستين أو أكثر في داتاست واحدة، بالترتيب الذي تكتبه. شريط عنوان هذه النافذة فارغ."
+  en: "Joins two or more datasets into one, in the order you type. This window has an empty title bar."
+fields:
+  - key: indices
+    label: "Dataset indices to merge"
+    default: "`1`"
+    ar: "أرقام الداتاست من قائمة Datasets، مثل `2 3`. الأولى تأتي أولاً في الزمن."
+    en: "Dataset numbers from the Datasets menu, such as `2 3`. The first one comes first in time."
+  - key: keepica
+    label: "Preserve ICA weights of the first dataset ?"
+    kind: checkbox
+    default: unchecked
+    ar: "ينقل نتيجة ICA من الداتاست الأولى إلى الناتجة. اتركه بلا علامة ما لم تكن قد شغّلت ICA."
+    en: "Carries the ICA result of the first dataset over to the merged one. Leave it unchecked unless you ran ICA."
+  - key: buttons
+    label: "Help · Cancel · OK"
+    kind: button
+    ar: "«OK» يدمج ثم تفتح نافذة تسمية الداتاست الجديدة."
+    en: "OK merges, then the window for naming the new dataset opens."

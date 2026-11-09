@@ -1,0 +1,52 @@
+id: interp
+func: pop_interp
+source: "EEGLAB pop_interp.m (uilist)"
+title: "Interpolate channel(s) -- pop_interp()"
+menu: "Tools > Interpolate electrodes"
+shot: interp-dialog
+intro:
+  ar: "تقدّر إشارة القنوات المحذوفة أو السيئة من القنوات المجاورة لها."
+  en: "Estimates the signal of removed or bad channels from their neighbours."
+fields:
+  - key: chanlist
+    label: "What channel(s) do you want to interpolate"
+    kind: text
+    default: "none selected"
+    ar: "يعرض القنوات التي اخترتها بالأزرار تحته."
+    en: "Shows the channels you chose with the buttons below."
+  - key: removed
+    label: "Select from removed channels"
+    kind: button
+    ar: "تختار من القنوات التي حُذفت سابقاً وما زالت محفوظة في الداتاست. قد يكون معطّلاً إذا لم تُحفظ."
+    en: "Pick from channels removed earlier that the dataset still remembers. It may be disabled if none were kept."
+  - key: datchan
+    label: "Select from data channels"
+    kind: button
+    ar: "تختار قناة موجودة لكنها سيئة، فتُستبدل إشارتها بالتقدير."
+    en: "Pick an existing but bad channel, and its signal is replaced by the estimate."
+  - key: selectchan
+    label: "Use specific channels of other dataset"
+    kind: button
+    ar: "تختار قنوات معيّنة من داتاست أخرى فيها القنوات كاملة."
+    en: "Pick some channels from another dataset that has all of them."
+  - key: uselist
+    label: "Use all channels from other dataset"
+    kind: button
+    ar: "يسألك عن رقم داتاست (Dataset index) فيها كل القنوات، ويستوفي كل قناة ناقصة. هذا الأسلم."
+    en: "Asks for the number of a dataset (Dataset index) that has all channels, and interpolates every missing one. This is the safest choice."
+  - key: method
+    label: "Interpolation method"
+    kind: menu
+    default: "Spherical"
+    ar: "«Spherical» يستعمل مواقع الأقطاب على سطح الرأس، وهو الافتراضي. «Planar» أبطأ ونادراً ما تحتاجه."
+    en: "«Spherical» uses the electrode positions on the surface of the head; it is the default. «Planar» is slower and rarely needed."
+  - key: trange
+    label: "Time range [min max] (s)"
+    default: ""
+    ar: "تستوفي جزءاً زمنياً فقط. فارغة تعني التسجيل كله."
+    en: "Interpolate only part of the time. Empty means the whole recording."
+  - key: buttons
+    label: "Help · Cancel · OK"
+    kind: button
+    ar: "«OK» يستوفي ثم تفتح نافذة تسمية الداتاست الجديدة."
+    en: "OK interpolates, then the window for naming the new dataset opens."

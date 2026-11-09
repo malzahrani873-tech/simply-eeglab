@@ -1,0 +1,37 @@
+id: topoplot_erp
+func: pop_topoplot
+source: "EEGLAB pop_topoplot.m (uilist, typeplot = 1)"
+title: "Plot ERP scalp maps in 2-D -- pop_topoplot()"
+menu: "Plot > ERP map series > In 2-D"
+shot: topoplot-erp-dialog
+intro:
+  ar: "ترسم خريطة رأس لمتوسط الـ ERP عند كل زمن تكتبه."
+  en: "Plots a scalp map of the average ERP at each time you type."
+fields:
+  - key: latencies
+    label: "Plotting ERP scalp maps at these latencies"
+    default: ""
+    ar: "الأزمنة بالميلي ثانية، مثل `100 200 300`. السطر تحته يذكّرك بمدى الـ epoch المسموح."
+    en: "The times in milliseconds, such as `100 200 300`. The line below reminds you of the allowed epoch range."
+  - key: title
+    label: "Plot title"
+    default:
+      ar: "اسم الداتاست"
+      en: "the dataset name"
+    ar: "العنوان فوق الرسم."
+    en: "The title above the plot."
+  - key: geom
+    label: "Plot geometry (rows,col.); [] -> near square"
+    default: "`[]`"
+    ar: "ترتيب الخرائط في صفوف وأعمدة، مثل `[1 4]`. `[]` يرتّبها تلقائياً."
+    en: "How the maps are arranged in rows and columns, such as `[1 4]`. `[]` arranges them automatically."
+  - key: options
+    label: "-> Additional topoplot() options (see Help)"
+    default: "`'electrodes', 'on'`"
+    ar: "خيارات الرسم. `'electrodes', 'on'` يُظهر نقاط الأقطاب على الخريطة."
+    en: "Plot options. `'electrodes', 'on'` shows electrode dots on the map."
+  - key: buttons
+    label: "Help · Cancel · OK"
+    kind: button
+    ar: "«OK» يرسم الخرائط. لا تتغيّر البيانات."
+    en: "OK draws the maps. The data do not change."
