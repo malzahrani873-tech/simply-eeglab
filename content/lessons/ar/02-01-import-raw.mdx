@@ -55,7 +55,7 @@ updated: 2026-10-28
 
 <BeforeAfter>
 <Figure src="import-raw/S2-eeglab-empty.png" alt="نافذة EEGLAB الرئيسية قبل الاستيراد: لا توجد بيانات، وتظهر عبارة No current dataset." caption="قبل الاستيراد" source="eeglab-ui" />
-<Figure src="import-raw/S5-main-after-import.png" alt="نافذة EEGLAB الرئيسية بعد استيراد ملف EDF: عدد القنوات 64، وعدد العينات 20000، والأحداث 29، ومعدل العينات 160 هرتز، ومواقع القنوات No (labels only)." caption="بعد الاستيراد" source="eeglab-ui" />
+<Figure src="import-raw/S5-main-after-import.png" alt="نافذة EEGLAB الرئيسية بعد استيراد ملف EDF: عدد القنوات 64، وعدد العيّنات 20000، والأحداث 29، ومعدل العيّنات 160 هرتز، ومواقع القنوات No (labels only)." caption="بعد الاستيراد" source="eeglab-ui" />
 </BeforeAfter>
 
 ## كيف أستورد ملف التمرين من القوائم؟
@@ -80,7 +80,7 @@ updated: 2026-10-28
 4. تظهر نافذة <UiLabel>Load data using BIOSIG -- pop_biosig()</UiLabel>. اترك كل الخانات على قيمها الافتراضية:
    - <UiLabel>Channel list (default all):</UiLabel> فارغة، أي كل القنوات.
    - <UiLabel>Data range (in seconds) to read (default all [0 ...])</UiLabel> فارغة، أي التسجيل كله.
-   - <UiLabel>Import EDF+ annotations (try also mexSLOAD below)</UiLabel> مفعّلة. الـ annotations ملاحظات نصية مخزّنة داخل ملف EDF+ مع توقيتها (<En>latency</En>)، ومنها تأتي الأحداث في هذا الملف. إذا ألغيتها تفقد الأحداث.
+   - <UiLabel>Import EDF+ annotations (try also mexSLOAD below)</UiLabel> مفعّلة. الـ annotations ملاحظات نصية مخزّنة داخل ملف <En>EDF+</En> مع توقيتها (<En>latency</En>)، ومنها تأتي الأحداث في هذا الملف. إذا ألغيتها تفقد الأحداث.
    - <UiLabel>Extract event from marker channel</UiLabel> مفعّلة أيضاً. اتركها كما هي.
 5. اضغط <UiLabel>OK</UiLabel>.
 
@@ -134,7 +134,7 @@ EEG = pop_loadbv(dataFolder, 'sub01.vhdr');
 
 | جهازك | الصيغة | الإضافة | القائمة | الدالة |
 |---|---|---|---|---|
-| أنظمة سريرية وبحثية كثيرة، و PhysioNet، و g.tec (ملفات GDF) | EDF أو EDF+ أو GDF: `.edf` و `.gdf` | Biosig | <UiLabel>From EDF/EDF+/GDF files (BIOSIG toolbox)</UiLabel> | `pop_biosig` |
+| أنظمة سريرية وبحثية كثيرة، و PhysioNet، و g.tec (ملفات GDF) | EDF أو <En>EDF+</En> أو GDF: `.edf` و `.gdf` | Biosig | <UiLabel>From EDF/EDF+/GDF files (BIOSIG toolbox)</UiLabel> | `pop_biosig` |
 | BioSemi | BDF: `.bdf` | Biosig | <UiLabel>From Biosemi BDF file (BIOSIG toolbox)</UiLabel> | `pop_biosig` مع `'ref'` |
 | Brain Products | BrainVision: `.vhdr` و `.vmrk` و `.eeg` | bva-io | <UiLabel>From Brain Vis. Rec. .vhdr file</UiLabel> (بعد التثبيت: <UiLabel>From Brain Vis. Rec. .vhdr or .ahdr file</UiLabel>) | `pop_loadbv` |
 | EGI / Magstim | MFF: مجلد `.mff` | mffmatlabio | <UiLabel>Import Magstim/EGI .mff file</UiLabel> | `pop_mffimport` |
@@ -168,4 +168,4 @@ EEG recordings in EDF+ format (64 channels, 160 Hz) were imported into EEGLAB 20
 - **عدم الحفظ بعد الاستيراد.** ستعيد الاستيراد كل مرة. احفظ نسخة `.set` واحدة بعد الاستيراد، ولا تكتب فوق الملف الأصلي.
 - **أسماء قنوات غريبة في هذا الملف.** أسماء القنوات في هذه الداتاست تنتهي بنقاط، مثل `Fc5.` و `C3..`. هذا ليس خطأ في الاستيراد، لكنه يمنع EEGLAB من التعرّف على مواقع الأقطاب. نصلحه في [درس مواقع القنوات](/lesson/channel-locations/).
 
-{/* صندوق "من التجربة": بانتظار قصة من صاحب المشروع. لا يُكتب قبل وصولها. */}
+{/* صندوق «من التجربة»: بانتظار قصة من صاحب المشروع. لا يُكتب قبل وصولها. */}

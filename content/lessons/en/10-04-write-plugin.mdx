@@ -49,7 +49,7 @@ So how do you write these two files, so that your tool appears in the menu and i
 Two screenshots side by side. Left: the `chanvar1.0` folder inside the `plugins` folder, holding the two files `eegplugin_chanvar.m` and `pop_chanvar.m`. Right: the Plot menu open, ending with the new Channel variance item.
 </ImageSpec>
 
-Left: the plugin folder and its two files. Right: the item one of them adds to the Plot menu.
+Left: the plugin folder and its two files. Right: the item that `eegplugin_chanvar.m` adds to the Plot menu.
 
 ## What are the two files, and what does each one do?
 
@@ -163,7 +163,7 @@ uimenu(plotmenu, 'Label', 'Channel variance', 'CallBack', cmd, 'Separator', 'on'
 
 4. Close the EEGLAB window and type `eeglab` again, because EEGLAB looks for plugins only at startup. The command window prints a line containing `adding "chanvar" v1.0`.
 5. Load D1 (the file `eeglab_data.set`, as in "Starts from" at the top of the lesson), but from the GUI: <MenuPath>File > Load existing dataset</MenuPath>.
-6. Open <MenuPath>Plot > Channel variance</MenuPath>. Your window appears with `3` in it. Click <UiLabel>Ok</UiLabel>. The plot appears.
+6. Open <MenuPath>Plot > Channel variance</MenuPath>. Your window appears, with `3` in <UiLabel>Robust z-score threshold</UiLabel>. Click <UiLabel>Ok</UiLabel>. The plot appears.
 7. Type `eegh`. The last line is `pop_chanvar(EEG, 3);`. Your tool is now part of the command history like any official tool.
 
 ## How do I test the plugin from a script?

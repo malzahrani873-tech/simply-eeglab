@@ -133,7 +133,7 @@ function isolateLatin(n) {
   n.children = out;
 }
 
-const DEMOS = new Set(['FilterDemo', 'RerefDemo', 'EpochRejectDemo', 'BeforeAfter', 'Figure', 'ImageSpec', 'IcaGameTeaser', 'YouTube']);
+const DEMOS = new Set(['FilterDemo', 'RerefDemo', 'EpochRejectDemo', 'BeforeAfter', 'Figure', 'ImageSpec', 'YouTube']);
 const FOLD_ICON = { topic: 'book', gui: 'steps', script: 'code', values: 'list', verify: 'check', mistakes: 'warn' };
 const countItems = (body) => body.filter((n) => isEl(n, 'ol') || isEl(n, 'ul')).reduce((a, l) => a + l.children.filter((c) => isEl(c, 'li')).length, 0);
 const isDemo = (n) => (n.type === 'mdxJsxFlowElement' && DEMOS.has(n.name)) || (isEl(n, 'p') && n.children.some((c) => c.type === 'mdxJsxTextElement' && DEMOS.has(c.name)));

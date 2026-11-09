@@ -32,7 +32,7 @@ updated: 2026-10-28
 
 ## الفكرة
 
-لداتاست (<En>dataset</En>) EEGLAB جزآن: الوصف (أسماء القنوات ومواقعها، والأحداث، ومعدل العيّنات، وسجل المعالجة)، والإشارة نفسها (الأرقام في `EEG.data`).
+لكل داتاست (<En>dataset</En>) في EEGLAB جزآن: الوصف (أسماء القنوات ومواقعها، والأحداث، ومعدل العيّنات، وسجل المعالجة)، والإشارة نفسها (الأرقام في `EEG.data`).
 
 في EEGLAB 2026.1 يحفظ البرنامج الجزأين افتراضياً في ملفين بنفس الاسم: ملف `.set` فيه الوصف، وملف `.fdt` فيه الإشارة. والداتاست التعليمية `eeglab_data.set` محفوظة بنفس الطريقة.
 
@@ -62,9 +62,9 @@ updated: 2026-10-28
 
 1. افتح <MenuPath>File > Preferences</MenuPath>.
 2. في أول مجموعة من الخيارات، ابحث عن الخانة التي تبدأ بـ <UiLabel>If set, save not one but two files for each dataset (header and data).</UiLabel>
-3. أغلق النافذة بـ <UiLabel>Cancel</UiLabel>، ولا تضغط <UiLabel>OK</UiLabel>. نبقى في هذا المسار على الافتراضي: ملفان.
+3. أغلق النافذة بـ <UiLabel>Cancel</UiLabel>، ولا تضغط <UiLabel>OK</UiLabel>. نبقى في سلسلة المعالجة (<En>pipeline</En>) على الافتراضي: ملفان.
 
-قد تجد الخانة غير مفعّلة، مع أن EEGLAB حفظ ملفين للتو. السبب أن النافذة تقرأ قيمتها من ملف إعدادات، والحفظ يتبع ملفاً آخر، إلى أن تضغط <UiLabel>OK</UiLabel> في هذه النافذة لأول مرة. بعدها يتبع الحفظ ما في الخانة.
+قد تجد الخانة غير مفعّلة، مع أن EEGLAB حفظ ملفين للتو. السبب أن النافذة تقرأ قيمة الخانة من ملف إعدادات، والحفظ يتبع ملفاً آخر، إلى أن تضغط <UiLabel>OK</UiLabel> في هذه النافذة لأول مرة. بعدها يتبع الحفظ ما في الخانة.
 
 ## كيف أحفظ بملفين أو بملف واحد في سكربت؟
 
@@ -99,7 +99,7 @@ dir(fullfile(myFolder, 'D1_onefile.*'))        % D1_onefile.set only, about 4 MB
 | ملفان (الافتراضي في 2026.1) | في أغلب الحالات، ومع STUDY في المحطة 8، لأن EEGLAB يقرأ الوصف وحده بسرعة. | `name.set` و `name.fdt`، معاً دائماً |
 | ملف واحد (ألغِ الخانة في <MenuPath>File > Preferences</MenuPath> واضغط <UiLabel>OK</UiLabel>، أو `'savemode', 'onefile'`) | تريد إرسال داتاست واحدة بالبريد أو نسخها دون أن تنسى ملفاً. | `name.set` فقط |
 
-**إعادة الحفظ تُبقي الصيغة الموجودة على القرص.** <MenuPath>File > Resave current dataset(s)</MenuPath> على داتاست من ملفين يكتب ملفين من جديد، حتى لو كان إعدادك ملفاً واحداً. وفي هذه الحالة يطبع الـ Command Window ملاحظة تبدأ بـ `Note that your memory options for saving datasets does not correspond`. هذا طبيعي.
+**إعادة الحفظ تُبقي الصيغة الموجودة على القرص.** <MenuPath>File > Resave current dataset(s)</MenuPath> على داتاست من ملفين يكتب ملفين من جديد، حتى لو كان إعدادك ملفاً واحداً. وفي هذه الحالة يطبع EEGLAB في الـ Command Window ملاحظة تبدأ بـ `Note that your memory options for saving datasets does not correspond`. هذا طبيعي.
 
 <Callout type="note" title="ملفان لا ملف واحد">
 بعض صفحات توثيق EEGLAB تقول إن EEGLAB يحفظ ملفاً واحداً افتراضياً منذ 2021، ونافذة <MenuPath>File > Preferences</MenuPath> تكتب ذلك أيضاً. لكن ملف الإعدادات الذي يأتي مع EEGLAB 2026.1 يفعّل خيار الملفين، فيكتب الحفظ ملفين. صدّق ما تراه في مجلدك.
@@ -123,4 +123,4 @@ dir(fullfile(myFolder, 'D1_onefile.*'))        % D1_onefile.set only, about 4 MB
 - **ضغط <UiLabel>OK</UiLabel> في <MenuPath>File > Preferences</MenuPath> دون قصد.** إذا كانت خانة الملفين غير مفعّلة، يصير الحفظ بعدها ملفاً واحداً. لا مشكلة في ذلك، لكن لا تستغرب حين تتغيّر ملفاتك.
 - **الاستغراب من اختفاء ملف `.fdt` القديم.** إذا حفظت داتاست من ملفين في ملف واحد بنفس الاسم في نفس المجلد، يحذف EEGLAB ملف `.fdt` القديم، لأن الإشارة أصبحت داخل ملف `.set`. ويطبع `Old .fdt file detected on disk, deleting file since the Matlab file now contains all the data`. لهذا احفظ نسخك في مجلدك، لا فوق الداتاست التعليمية أبداً.
 
-{/* صندوق "من التجربة": بانتظار قصة من صاحب المشروع. لا يُكتب قبل وصولها. */}
+{/* صندوق «من التجربة»: بانتظار قصة من صاحب المشروع. لا يُكتب قبل وصولها. */}

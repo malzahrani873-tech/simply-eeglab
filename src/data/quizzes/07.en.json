@@ -169,7 +169,7 @@
         "b",
         "c"
       ],
-      "explanation": "A sharp spot around one electrode is usually a bad channel, and a map does not locate the source anyway, because voltage spreads through the skull. `EOG1` and `EOG2` are not on the average reference, so they are removed before plotting maps so they do not distort the scale."
+      "explanation": "A sharp spot around one electrode is usually a bad channel, and a map does not locate the source anyway, because voltage spreads through the skull. `EOG1` and `EOG2` are not on the average reference, so they are removed before plotting maps so they do not distort the scale. One shared scale for colors and axes, and stating the trial counts, are what make the comparison between the conditions fair."
     }
   ]
 }

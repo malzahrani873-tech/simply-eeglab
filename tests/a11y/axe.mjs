@@ -3,7 +3,7 @@ import { chromium } from 'playwright';
 import { AxeBuilder } from '@axe-core/playwright';
 import { serve } from '../serve.mjs';
 
-const PAGES = ['', 'station/03/', 'lesson/filtering/', 'lesson/filtering/card/', 'lesson/epoch-rejection/', 'ica-game/', 'search/', 'progress/', 'about/', 'references/', 'plugins/', 'map/', '404.html'];
+const PAGES = ['', 'station/03/', 'lesson/filtering/', 'lesson/filtering/card/', 'lesson/epoch-rejection/', 'search/', 'progress/', 'about/', 'references/', 'plugins/', 'map/', '404.html'];
 const { server, url } = await serve();
 const browser = await chromium.launch(process.env.CHROMIUM_PATH ? { executablePath: process.env.CHROMIUM_PATH } : {});
 let bad = 0;

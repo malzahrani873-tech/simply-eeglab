@@ -1,5 +1,5 @@
 ---
-title: MVPA
+title: التصنيف (decoding / MVPA)
 titleEn: Decoding (MVPA)
 description: كيف تدرّب مصنّفاً يميّز الوجوه من السيارات من نمط القنوات كلها عبر الزمن بإضافة ERPLAB، وتقرأ منحنى الدقة مقابل خط الصدفة.
 station: 10
@@ -88,7 +88,7 @@ updated: 2026-10-28
 
 **ثانياً: قائمة الأحداث، ثم الـ bins، ثم التقطيع**
 
-الـ bin في ERPLAB مجموعة أحداث تُحسب لها موجة متوسطة واحدة، مثل "وجوه بإجابة صحيحة". ERPLAB يصنّف الـ bins، لا رموز الأحداث مباشرة، فنحدّد الـ bins أولاً ثم نقطّع البيانات حولها.
+الـ bin في ERPLAB مجموعة أحداث تُحسب لها موجة متوسطة واحدة، مثل «وجوه بإجابة صحيحة». ERPLAB يصنّف الـ bins، لا رموز الأحداث مباشرة، فنحدّد الـ bins أولاً ثم نقطّع البيانات حولها.
 
 3. ابدأ و`N170 sub2 ica corr` مفتوحة. إن لم تكن عندك، فافتح «سكربت للوصول إلى هذه الحالة» تحت «تبدأ من» أعلى الدرس. هذه بيانات مستمرة، لم تُقطَّع بعد. رموز الأحداث من 1 إلى 40 وجوه، ومن 41 إلى 80 سيارات، ومن 101 إلى 180 صور مبعثرة، والرمز 201 إجابة صحيحة.
 4. افتح <MenuPath>ERPLAB > EventList > Create EEG EVENTLIST</MenuPath>. فعّل خيار تنظيف الرموز من الحروف (<En>alphanumeric cleaning</En>) كما تفعل سكربتات ERP CORE. اضغط زر التنفيذ.
@@ -206,7 +206,7 @@ MVPC = pop_savemymvpc(MVPC, 'mvpcname', 'N170_sub2_faces_cars', ...
 - **قراءة نقطة واحدة فوق 0.5 على أنها نتيجة.** منحنى مشارك واحد مليء بالتذبذب، فقد تعلو نقطة فوق الصدفة بالمصادفة. النتيجة العلمية تحتاج عدة مشاركين واختباراً إحصائياً، وهذا خارج الدرس.
 - **تفسير الدقة العالية على أنها اختلاف أكبر في الـ ERP.** الدقة تقول إن المعلومة موجودة في النمط، ولا تقول أي قناة أو أي اتجاه. للتفسير ارجع إلى منحنيات الـ ERP.
 
-{/* صندوق "من التجربة": بانتظار قصة من صاحب المشروع. لا يُكتب قبل وصولها. */}
+{/* صندوق «من التجربة»: بانتظار قصة من صاحب المشروع. لا يُكتب قبل وصولها. */}
 
 <Methods>
 Faces and cars (correct trials only) were decoded at each time point from the 28 scalp channels with a support vector machine in ERPLAB [version] (EEGLAB 2026.1; Lopez-Calderon & Luck, 2014), using 3-fold cross-validation on averages of equal numbers of trials per class, repeated over 100 iterations; chance was 0.5. Data were from the ERP CORE N170 paradigm (participant 2).

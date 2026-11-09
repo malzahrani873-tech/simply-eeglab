@@ -1,4 +1,5 @@
 // Local progress, kept in this browser only. Every access is guarded: storage can be blocked.
+// icagame and daily belong to a feature that was removed; they stay listed so a reset still clears them.
 export const KEYS = {
   progress: 'simplyeeglab:progress.v1', icagame: 'simplyeeglab:icagame.v1', quiz: 'simplyeeglab:quiz.v1',
   daily: 'simplyeeglab:daily.v1', last: 'simplyeeglab:last.v1', backup: 'simplyeeglab:backup.v1', tips: 'simplyeeglab:tips.v1',

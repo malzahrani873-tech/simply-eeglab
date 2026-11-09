@@ -214,7 +214,7 @@
           ],
           "url": "https://github.com/VisLab/EEG-Clean-Tools",
           "text": {
-            "ar": "بايبلاين PREP: يكتشف القنوات السيئة ويحسب مرجعاً متوسطاً لا يتأثر بها (robust reference). بديل آلي لخطوات المحطة 3.",
+            "ar": "سلسلة المعالجة (pipeline) PREP: يكتشف القنوات السيئة ويحسب مرجعاً متوسطاً لا يتأثر بها (robust reference). بديل آلي لخطوات المحطة 3.",
             "en": "The PREP pipeline: detects bad channels and computes an average reference that they do not distort (robust reference). An automated alternative to station 3."
           }
         }
@@ -328,11 +328,11 @@
     {
       "n": 4,
       "title": {
-        "ar": "بايبلاينات آلية جاهزة",
+        "ar": "سلاسل معالجة آلية جاهزة (pipelines)",
         "en": "Ready-made automated pipelines"
       },
       "note": {
-        "ar": "هذه الأدوات تنفّذ المعالجة المسبقة كاملة بأقل تدخّل. **ابنِ البايبلاين بيدك أولاً** (المحطات 3 إلى 5)، ثم استخدمها وأنت تعرف ماذا تفعل كل خطوة فيها.",
+        "ar": "هذه الأدوات تنفّذ المعالجة المسبقة كاملة بأقل تدخّل. **ابنِ سلسلة المعالجة (pipeline) بيدك أولاً** (المحطات 3 إلى 5)، ثم استخدمها وأنت تعرف ماذا تفعل كل خطوة فيها.",
         "en": "These tools run the whole preprocessing stage with little input from you. **Build the pipeline by hand first** (stations 3 to 5), then use them knowing what each step does."
       },
       "items": [
@@ -371,7 +371,7 @@
           ],
           "url": "https://github.com/BeMoBIL/bemobil-pipeline",
           "text": {
-            "ar": "بايبلاين بالسكربت للاستيراد والمعالجة، مصمّم لبيانات الحركة (MoBI).",
+            "ar": "سلسلة معالجة (pipeline) بالسكربت للاستيراد والمعالجة، مصمّم لبيانات الحركة (MoBI).",
             "en": "A script-based import and processing pipeline, designed for mobile brain/body imaging (MoBI) data."
           }
         },

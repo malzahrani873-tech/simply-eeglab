@@ -1,5 +1,5 @@
 ---
-title: التصميم والمتغيّرات
+title: تصاميم STUDY والمتغيّرات
 titleEn: STUDY designs and variables
 description: "كيف تعرّف في EEGLAB تصميماً يجمع متغيّراً داخل المشارك (نوع الصورة) ومتغيّراً بين المشاركين (الجنس)، وما معنى paired و unpaired."
 station: 8
@@ -106,7 +106,7 @@ updated: 2026-10-28
 
 <Figure src="study-design/study-design-2x2.svg" alt="شبكة 2×2. العمودان animal و distractor مظلّلان بلونين، وهما متغيّر داخل المشارك، وبينهما سهم مزدوج مكتوب عليه نفس المشاركين: paired. الصفان F و M متغيّر بين المشاركين، وبينهما خط فاصل مكتوب عليه مشاركون مختلفون: unpaired. في كل خلية دوائر صغيرة برموز المشاركين: سبع في كل صف، ونفس الدوائر تتكرر في العمودين." caption="رسم توضيحي، بلا بيانات" source="original" />
 
-نستخدم نفس `animal_mine.study` من درس الإنشاء. كل مشارك رأى نوعي الصور (animal و distractor)، فنوع الصورة **داخل المشارك** (<En>within-subject</En>). وكل مشارك له جنس واحد (7 نساء و 7 رجال)، فالجنس **بين المشاركين** (<En>between-subject</En>). ومعاً يكوّنان تصميماً مختلطاً (<En>mixed design</En>) 2×2.
+نستخدم نفس `animal_mine.study` من درس الإنشاء. كل مشارك رأى نوعي الصور (animal و distractor)، فنوع الصورة **داخل المشارك** (<En>within-subject</En>). وكل مشارك له جنس واحد (7 نساء و7 رجال)، فالجنس **بين المشاركين** (<En>between-subject</En>). ومعاً يكوّنان تصميماً مختلطاً (<En>mixed design</En>) 2×2.
 
 ## ما الفرق بين متغيّر داخل المشارك ومتغيّر بين المشاركين؟
 
@@ -124,7 +124,7 @@ updated: 2026-10-28
 
 ## أي تصميم أختار لسؤالي؟
 
-لكل سؤال بحث تصميم يناسبه. لهذا ننشئ في الخطوات التالية تصميمين، إضافة إلى التصميم 1 الذي يُنشئه EEGLAB وحده.
+لكل سؤال بحث تصميم يناسبه. لهذا ننشئ في الخطوات التالية تصميمين، إضافة إلى التصميم 1 الذي يُنشئه EEGLAB تلقائياً.
 
 | سؤالك | التصميم | لماذا |
 |---|---|---|
@@ -142,7 +142,7 @@ updated: 2026-10-28
 
 1. ابدأ والـ STUDY `animal_mine.study` مفتوحة. إن لم تكن عندك، فافتح «سكربت للوصول إلى هذه الحالة» تحت «تبدأ من» أعلى الدرس، وشغّله.
 2. افتح <MenuPath>Study > Select/Edit study design(s)</MenuPath>. تفتح نافذة <UiLabel>Edit STUDY design -- pop_studydesign()</UiLabel>.
-3. في قائمة <UiLabel>Design name</UiLabel> تصميم واحد اسمه `STUDY.design 1`. أنشأه EEGLAB وحده عند إنشاء الـ STUDY.
+3. في قائمة <UiLabel>Design name</UiLabel> تصميم واحد اسمه `STUDY.design 1`. أنشأه EEGLAB تلقائياً عند إنشاء الـ STUDY.
 4. في الجزء <UiLabel>Edit the independent variables for this design</UiLabel> سطران: `Categorical variable: condition - Values (animal - distractor)` و `Categorical variable: group - Values (F - M)`. EEGLAB يضع في التصميم الأول كل متغيّر أساسي في الـ STUDY (مثل `condition` و`group`) له أكثر من قيمة.
 
 **ثانياً: أنشئ التصميم 2 باسم واضح**
@@ -150,7 +150,7 @@ updated: 2026-10-28
 1. اضغط <UiLabel>New</UiLabel> بجانب قائمة التصاميم. يظهر `Design 2` بلا متغيّرات.
 2. اضغط <UiLabel>Rename</UiLabel>، واكتب في <UiLabel>Study design name:</UiLabel> الاسم `image x gender`، ثم <UiLabel>Ok</UiLabel>.
 3. في جزء المتغيّرات اضغط <UiLabel>New</UiLabel>. تفتح نافذة <UiLabel>Add variable</UiLabel>.
-4. في <UiLabel>Select independent variable</UiLabel> اختر `condition`. تتحدد القيمتان `animal` و `distractor` في <UiLabel>Select variable values</UiLabel>. أبقهما محددتين، ثم <UiLabel>Ok</UiLabel>.
+4. في <UiLabel>Select independent variable</UiLabel> اختر `condition`. تتحدد القيمتان `animal` و `distractor` في <UiLabel>Select variable values</UiLabel>. أبقِهما محددتين، ثم اضغط <UiLabel>Ok</UiLabel>.
 5. اضغط <UiLabel>New</UiLabel> مرة أخرى، واختر `group`، وأبقِ `F` و `M` محددتين، ثم <UiLabel>Ok</UiLabel>.
 
 **ثالثاً: أنشئ التصميم 3 بمتغيّر واحد**
@@ -162,7 +162,7 @@ updated: 2026-10-28
 
 1. اضغط على `image x gender` في قائمة <UiLabel>Design name</UiLabel>. التصميم المحدد عند الضغط على <UiLabel>Ok</UiLabel> يصير التصميم الحالي.
 2. أبقِ <UiLabel>Re-save STUDY file (if saved previously)</UiLabel> مفعّلاً، فيُحفظ `animal_mine.study` بتصاميمه الثلاثة.
-3. اضغط <UiLabel>Ok</UiLabel>. في نافذة الأوامر: `Selecting STUDY design 2` ثم `Resaving STUDY`.
+3. اضغط <UiLabel>Ok</UiLabel>. تظهر في نافذة الأوامر `Selecting STUDY design 2` ثم `Resaving STUDY`.
 
 <Callout type="note">
 **إذا جاءت الـ STUDY من BIDS** (درس الإنشاء من BIDS)، فالجنس في حقل اسمه `gender` لا في `group`. يظهر `gender` في نفس قائمة <UiLabel>Select independent variable</UiLabel>، ويعمل بنفس الطريقة.
@@ -211,12 +211,12 @@ eeglab redraw;
 ## أخطاء شائعة في التصميم
 
 - **نسيان اختيار التصميم الحالي.** الرسم والإحصاء يعملان على التصميم المحدد في القائمة عند آخر <UiLabel>Ok</UiLabel>. السكربت يطبع `Current design`.
-- **وضع متغيّر بين المشاركين في condition.** إذا كتبت الجنس كشرط، يظن EEGLAB أنه داخل المشارك. السطر `paired` يكشف ذلك: يجب أن يكون الجنس `off`.
+- **وضع متغيّر بين المشاركين في condition.** إذا وضعت الجنس على أنه شرط، يظن EEGLAB أنه داخل المشارك. السطر `paired` يكشف ذلك: يجب أن يكون الجنس `off`.
 - **تصميم واحد لكل الأسئلة.** التصميم 2×2 يجيب عن التفاعل. أما أثر الصورة وحده فأبسط في تصميم بمتغيّر واحد، كما في جدول «أي تصميم أختار لسؤالي؟».
 - **اختيار قيم ناقصة.** إذا حددت `animal` فقط في <UiLabel>Select variable values</UiLabel>، فلا توجد مقارنة. تأكد من القيمتين.
 - **الظن أن تغيير التصميم يحتاج حساباً جديداً.** منذ EEGLAB 2019 تُحفظ المحاولات منفردة، والتصميم يختار منها وقت الرسم. فلا تُعِد [الحساب المسبق](/lesson/study-precompute/) بسبب تصميم جديد.
 
-{/* صندوق "من التجربة": بانتظار قصة من صاحب المشروع. لا يُكتب قبل وصولها. */}
+{/* صندوق «من التجربة»: بانتظار قصة من صاحب المشروع. لا يُكتب قبل وصولها. */}
 
 <Methods>
 A 2 × 2 mixed design was defined in the STUDY, with image category (animal, distractor) as a within-subject factor and gender ([7] female, [7] male) as a between-subject factor (std_makedesign, EEGLAB 2026.1).

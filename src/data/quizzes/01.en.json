@@ -132,7 +132,7 @@
         "b",
         "d"
       ],
-      "explanation": "`EEG.times` is in milliseconds, while `EEG.xmin` and `EEG.xmax` are in seconds. `EEG.icaweights` stays empty until you compute ICA in station 4. To convert a latency to seconds: (sample number − 1) ÷ sampling rate."
+      "explanation": "`EEG.times` is in milliseconds, while `EEG.xmin` and `EEG.xmax` are in seconds. `EEG.icaweights` stays empty until you compute ICA in station 4. To convert a latency to seconds: (sample number − 1) ÷ sampling rate. `EEG.trials` = 1 means a single segment, that is, continuous data not yet cut into epochs."
     },
     {
       "id": "s01-q05",

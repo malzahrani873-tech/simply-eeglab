@@ -31,7 +31,7 @@
       "answer": [
         "a"
       ],
-      "explanation": "`eegh` prints every command of the session in order, including the filter line with its values, such as `'revfilt',1` for the notch box. Running `eeglab` again starts an empty history, so you lose the session history if you did not save it."
+      "explanation": "`eegh` prints every command of the session in order, including the filter line with its values, such as `'revfilt',1`, which matches the `Notch filter the data instead of pass band` box. Running `eeglab` again starts an empty history, so you lose the session history if you did not save it."
     },
     {
       "id": "s09-q02",
@@ -131,7 +131,7 @@
       "answer": [
         "b"
       ],
-      "explanation": "A script that works only because `EEG` or `badChans` already exists will fail tomorrow. Always run it after `clear`. If a window opens and waits for you, a line is missing arguments: fix it."
+      "explanation": "A script that works only because `EEG` or `badChans` already exists will fail tomorrow. Always run it after `clear`. If a window opens and waits for you, a line is missing an argument: add the value the window asks for to that line."
     },
     {
       "id": "s09-q05",

@@ -3,7 +3,7 @@ import { execFileSync } from 'node:child_process';
 import { readFileSync, existsSync } from 'node:fs';
 
 const base = process.argv[2] ?? 'origin/main';
-const locks = ['src/data/progress-slots.lock', 'src/data/ica-daily.lock'];
+const locks = ['src/data/progress-slots.lock'];
 let bad = 0;
 for (const f of locks) {
   if (!existsSync(f)) continue;

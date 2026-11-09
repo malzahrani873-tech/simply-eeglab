@@ -246,7 +246,7 @@ fprintf('Channels inside a significant cluster: %s\n', strjoin(chanNames(any(mas
 
 نافذة LIMO تعرض `WLS` أولاً، وهي تعطي المحاولات غير المعتادة وزناً أقل، وغالباً هي الاختيار الأفضل. لكن توثيق LIMO يذكر أن WLS تحتاج محاولات أكثر من النقاط الزمنية عند كل مشارك.
 
-في الـ epochs عندنا 750 نقطة زمنية (3 ثوانٍ بمعدل 250 Hz). في كل ملف أصلي من 87 إلى 192 محاولة، فحتى بعد الدمج لا يزيد ما عند المشارك على 384 محاولة، أي أقل من النقاط الزمنية. لذلك نستخدم `OLS` التي ليس لها هذا الحد.
+في الـ epochs عندنا 750 نقطة زمنية (3 ثوانٍ بمعدل 250 هرتز). في كل ملف أصلي من 87 إلى 192 محاولة، فحتى بعد الدمج لا يزيد ما عند المشارك على 384 محاولة، أي أقل من النقاط الزمنية. لذلك نستخدم `OLS` التي ليس لها هذا الحد.
 
 في بياناتك جرّب `WLS` مع نافذة أقصر (خانة <UiLabel>Options</UiLabel> تقبل مثلاً `'timelim', [-100 600]`).
 
@@ -257,7 +257,7 @@ fprintf('Channels inside a significant cluster: %s\n', strjoin(chanNames(any(mas
 | <UiLabel>Input data to use for the GLM</UiLabel> | `ERP` | `Spectrum` لأسئلة القدرة، مع نطاق ترددات في <UiLabel>Options</UiLabel>، مثل `'freqlim', [1 40]`. |
 | <UiLabel>Estimation method</UiLabel> | `OLS` | `WLS` عندما يكون عند كل مشارك محاولات أكثر من النقاط الزمنية. `IRLS` أبطأ بكثير، وفائدته قليلة. |
 | التصميم | `image`، نوع صورة كل محاولة | أضف متغيّرات مستمرة لكل محاولة (مثل زمن الاستجابة) في تصميم STUDY. الجنس يبقى للمستوى الثاني. |
-| اختبار المستوى الثاني | Paired t-test على الـ betas 1 و 2 | Repeated-measures ANOVA مع الجنس مجموعةً للتصميم المختلط، الذي لم يعالجه الاختبار الثنائي في EEGLAB كما يجب. |
+| اختبار المستوى الثاني | Paired t-test على الـ betas 1 و2 | Repeated-measures ANOVA مع الجنس مجموعةً للتصميم المختلط، الذي لم يعالجه الاختبار الثنائي في EEGLAB كما يجب. |
 | bootstrap | 1000 | أبقِ 1000 أو أكثر لتصحيح العناقيد. العدد الأقل يجعل قيم p المصحّحة غير مستقرة. |
 | <UiLabel>MC Correction</UiLabel> | `Clustering` | `TFCE` موجود أيضاً في LIMO (يحتاج <UiLabel>Apply TFCE</UiLabel> قبل الاختبار). `Max` أشدّ. `None` للاستكشاف فقط. |
 
@@ -277,7 +277,7 @@ fprintf('Channels inside a significant cluster: %s\n', strjoin(chanNames(any(mas
 - **توقّع أثر مختلف عن المتوسطات مع OLS ومتغيّر واحد.** في هذه الحالة البسيطة الفرق بين الـ betas هو الفرق بين المتوسطات. ما يتغيّر هو المستوى الثاني المتين، ثم لاحقاً نماذج المستوى الأول الأغنى.
 - **نسيان ملف الجيران.** بدون `limo_gp_level_chanlocs.mat` لا يستطيع LIMO أن يكوّن عناقيد عبر القنوات.
 
-{/* صندوق "من التجربة": بانتظار قصة من صاحب المشروع. لا يُكتب قبل وصولها. */}
+{/* صندوق «من التجربة»: بانتظار قصة من صاحب المشروع. لا يُكتب قبل وصولها. */}
 
 <Methods>
 A two-level hierarchical linear model was estimated with LIMO EEG [version] (Pernet et al., 2011) in EEGLAB 2026.1. At the first level, the animal and distractor epochs of each participant were merged into one dataset, and the single-trial ERPs were modeled at every channel and time point with image category as a categorical regressor (ordinary least squares). At the second level, the animal and distractor parameter estimates were compared across [14] participants with a paired Yuen t-test on 20% trimmed means, with spatio-temporal cluster correction based on [1000] bootstrap samples at a threshold of 0.05.

@@ -119,7 +119,7 @@ updated: 2026-10-28
 
 ## متى أحذف مكوّنات ICA؟
 
-خيار <UiLabel>Remove ICA artifactual components pre-tagged in each dataset</UiLabel> يحذف مكوّنات ICA المعلَّمة على أنها آرتفاكت (<En>artifact</En>) في كل ملف وقت الحساب، ولا يغيّر الملفات نفسها. يعمل فقط إذا كان في الملفات أوزان ICA وعلامات، وهذا ما فحصته في [درس ما هو STUDY](/lesson/study-concepts/).
+خيار <UiLabel>Remove ICA artifactual components pre-tagged in each dataset</UiLabel> يحذف مكوّنات ICA المعلَّمة على أنها آرتفاكت (<En>artifact</En>) في كل ملف وقت الحساب، ولا يغيّر الملفات نفسها. يعمل فقط إذا كان في الملفات أوزان ICA وعلامات، وهذا ما فحصته في [درس ما الـ STUDY](/lesson/study-concepts/).
 
 إذا كانت أوزان ICA موجودة بلا علامات، فشغّل ICLabel على كل الملفات والـ STUDY مفتوحة: افتح <MenuPath>Tools > Classify components using ICLabel > Label components</MenuPath> ثم <MenuPath>Tools > Classify components using ICLabel > Flag components as artifacts</MenuPath>. تُطبَّق الخطوتان، وهما نفس خطوتي [درس ICLabel](/lesson/iclabel/)، على كل الملفات المحددة. بعدها فعّل الخيار وأعد الحساب.
 
@@ -132,32 +132,32 @@ updated: 2026-10-28
 **أولاً: افتح نافذة الحساب**
 
 1. ابدأ والـ STUDY `animal_mine.study` مفتوحة بالتصميم 2. إن لم تكن عندك، فافتح «سكربت للوصول إلى هذه الحالة» تحت «تبدأ من» أعلى الدرس، وشغّله؛ فهو يعيد بناء الـ STUDY والتصميم 2 إذا لم يجدهما.
-2. افتح <MenuPath>Study > Precompute channel measures</MenuPath>. في أعلى النافذة: <UiLabel>Pre-compute channel measures for STUDY 'Go-nogo animal (mine)'</UiLabel>.
+2. افتح <MenuPath>Study > Precompute channel measures</MenuPath>. يظهر في أعلى النافذة السطر <UiLabel>Pre-compute channel measures for STUDY 'Go-nogo animal (mine)'</UiLabel>.
 
 **ثانياً: خيارات البيانات (الجزء العلوي)**
 
-1. <UiLabel>Spherical interpolation of missing channels (performed after optional ICA removal below)</UiLabel>: أبقه مفعّلاً، فهو مفعّل افتراضياً في النافذة. إذا كانت كل الملفات بنفس القنوات، كما فحصت في [درس ما هو STUDY](/lesson/study-concepts/)، فلا يغيّر شيئاً.
+1. <UiLabel>Spherical interpolation of missing channels (performed after optional ICA removal below)</UiLabel>: أبقِه مفعّلاً، فهو مفعّل افتراضياً في النافذة. إذا كانت كل الملفات بنفس القنوات، كما فحصت في [درس ما الـ STUDY](/lesson/study-concepts/)، فلا يغيّر شيئاً.
 2. <UiLabel>Remove ICA artifactual components pre-tagged in each dataset</UiLabel>: اتركه غير مفعّل الآن، للسبب الذي في «متى أحذف مكوّنات ICA؟» أعلاه.
 3. <UiLabel>Remove artifactual ICA cluster or clusters (hold shift key)</UiLabel>: اتركه غير مفعّل. يحتاج مجموعات مكوّنات (<En>clusters</En>) من درس تجميع مكوّنات ICA.
 
 **ثالثاً: المقاييس (الجزء السفلي)**
 
 1. فعّل <UiLabel>ERPs</UiLabel>، ثم اضغط زر <UiLabel>...</UiLabel> بجانبه. تفتح نافذة <UiLabel>Select parameters for ERP</UiLabel>.
-2. في <UiLabel>Baseline (min max) ("rmbase")</UiLabel> اكتب بداية الـ epoch بالميلي ثانية، ثم 0. خذ البداية من <UiLabel>Epoch start (sec)</UiLabel> التي سجّلتها في [درس ما هو STUDY](/lesson/study-concepts/)، واضربها في 1000. في هذه النسخة يبدأ الـ epoch عند -1 ثانية، فاكتب `-1000 0`. اضغط <UiLabel>Ok</UiLabel>.
+2. في <UiLabel>Baseline (min max) ("rmbase")</UiLabel> اكتب بداية الـ epoch بالميلي ثانية، ثم 0. خذ البداية من <UiLabel>Epoch start (sec)</UiLabel> التي سجّلتها في [درس ما الـ STUDY](/lesson/study-concepts/)، واضربها في 1000. في هذه النسخة يبدأ الـ epoch عند -1 ثانية، فاكتب `-1000 0`. اضغط <UiLabel>Ok</UiLabel>.
 3. فعّل <UiLabel>Power spectrum</UiLabel> واترك قيمته الافتراضية `'specmode', 'fft', 'logtrials', 'off'`.
-4. **لا تفعّل** <UiLabel>ERSPs</UiLabel> و <UiLabel>ITCs</UiLabel> هنا. النافذة تحسبها لكل القنوات، وهذا يأخذ وقتاً طويلاً ومساحة كبيرة جداً. بالشبكة الافتراضية (100 تردد و 200 نقطة زمنية) تأخذ حوالي 1.5 GB لكل مشارك. نحسبها بالسكربت بشبكة أخف.
+4. **لا تفعّل** <UiLabel>ERSPs</UiLabel> و <UiLabel>ITCs</UiLabel> هنا. النافذة تحسبها لكل القنوات، وهذا يأخذ وقتاً طويلاً ومساحة كبيرة جداً. بالشبكة الافتراضية (100 تردد و200 نقطة زمنية) تأخذ حوالي 1.5 GB لكل مشارك. نحسبها بالسكربت بشبكة أخف.
 5. أبقِ <UiLabel>Overwrite files on disk</UiLabel> مفعّلاً، حتى لا يُستخدم ملف قديم بإعدادات مختلفة. إذا وُجدت ملفات من قبل، تسأل النافذة `WARNING: SOME DATAFILES ALREADY EXIST, OVERWRITE THEM?`، وتنبّه إلى أن STUDY أخرى تستخدم نفس الملفات قد تتأثر. اضغط <UiLabel>Yes</UiLabel>. صحيح أن `animal.study` الجاهزة و `animal_mine.study` تشتركان في المجلدات، لكننا نعمل على نسختنا فقط.
 6. اضغط <UiLabel>Ok</UiLabel>. الحساب يأخذ دقيقة إلى دقيقتين للـ 14 مشاركاً، وتظهر أسطر التقدم في نافذة الأوامر.
 
 **رابعاً: ERSP و ITC بالسكربت**
 
-شغّل السكربت أدناه. يعيد في استدعاء واحد حساب ERP والطيف بنفس اختيارات النافذة، ويضيف ERSP و ITC لكل القنوات بشبكة أخف: 20 تردداً من 3 إلى 30 Hz و 50 نقطة زمنية، بدل الشبكة الافتراضية (100 تردد و 200 نقطة).
+شغّل السكربت أدناه. يعيد في استدعاء واحد حساب ERP والطيف بنفس اختيارات النافذة، ويضيف ERSP و ITC لكل القنوات بشبكة أخف: 20 تردداً من 3 إلى 30 هرتز، و50 نقطة زمنية، بدل الشبكة الافتراضية (100 تردد و200 نقطة).
 
 لماذا نحسب لكل القنوات، لا للقناتين أو الثلاث التي سترسمها لاحقاً فقط؟ لأن ملف ERSP المحسوب لبعض القنوات لا يُقرأ في EEGLAB 2026.1: يتوقف الرسم بالرسالة `Unrecognized field name "chan1"`. السبب أن الملف يسمّي كل قناة برقمها في القائمة الكاملة، ودالة القراءة في EEGLAB تبحث عنها بمكانها في القائمة القصيرة. والشبكة الأخف تُبقي ملفات كل القنوات صغيرة.
 
 **خامساً: انظر إلى الملفات**
 
-1. افتح مجلد المشارك الأول (`cba`). فيه ثلاثة ملفات جديدة باسم رمز المشارك فقط، مثل `cba.daterp`: `.daterp` (ERP) و `.datspec` (الطيف) و `.dattimef` (التحليل الزمني الترددي لكل محاولة). ERSP و ITC يُحسبان كلاهما من `.dattimef` وقت الرسم، فلا ملف منفصل لهما.
+1. افتح مجلد المشارك الأول (`cba`). فيه ثلاثة ملفات جديدة باسم رمز المشارك فقط، مثل `cba.daterp`: `.daterp` (ERP) و `.datspec` (الطيف) و `.dattimef` (التحليل الزمني-الترددي لكل محاولة). ERSP و ITC يُحسبان كلاهما من `.dattimef` وقت الرسم، فلا ملف منفصل لهما.
 2. الملفات الأقدم التي في اسمها الشرط، مثل `cbaanimal.daterp`، هي ملفات EEGLAB 6 من سنة 2007. أسماؤها تختلف عن الجديدة، فلا يقرؤها EEGLAB ولا يكتب فوقها: تبقى بلا استعمال. يمكنك تركها أو حذفها.
 3. لاحظ أن الملف الجديد واحد لكل مشارك، لا لكل ملف .set. EEGLAB يجمع محاولات الشرطين في ملف واحد، ويفرّقها عند الرسم حسب التصميم.
 
@@ -196,13 +196,13 @@ fprintf('Channel groups in the STUDY: %d\n', numel(STUDY.changrp));
 | إعادة الحساب (`recompute`) | on | on كلما غيّرت أي خيار، وإلا فسيقرأ EEGLAB الملفات القديمة. |
 
 <Callout type="warning">
-**المساحة على القرص.** لأن EEGLAB يحفظ كل محاولة، يكون ملف `.dattimef` كبيراً: ترددات × نقاط زمنية × محاولات × قنوات. بالإعدادات الافتراضية (100 تردد و 200 نقطة زمنية) ولكل القنوات يصل إلى حوالي 1.5 GB لكل مشارك، أي حوالي 21 GB للمشاركين الـ 14 (تقدير تقريبي من حجم البيانات، وقد يختلف قليلاً على جهازك). لهذا نستعمل شبكة أخف: حوالي 75 MB لكل مشارك، وحوالي 1 GB للكل (تقدير تقريبي). [درس تنظيم الملفات](/lesson/file-organization/) في المحطة 9 يشرح أين تضع هذه الملفات وكيف تحذفها بأمان.
+**المساحة على القرص.** لأن EEGLAB يحفظ كل محاولة، يكون ملف `.dattimef` كبيراً: ترددات × نقاط زمنية × محاولات × قنوات. بالإعدادات الافتراضية (100 تردد و200 نقطة زمنية) ولكل القنوات يصل إلى حوالي 1.5 GB لكل مشارك، أي حوالي 21 GB للمشاركين الـ 14 (تقدير تقريبي من حجم البيانات، وقد يختلف قليلاً على جهازك). لهذا نستعمل شبكة أخف: حوالي 75 MB لكل مشارك، وحوالي 1 GB للكل (تقدير تقريبي). [درس تنظيم الملفات](/lesson/file-organization/) في المحطة 9 يشرح أين تضع هذه الملفات وكيف تحذفها بأمان.
 </Callout>
 
 ## كيف أتأكد أن الحساب نجح؟
 
 - **في مجلد المشارك الأول** ثلاثة ملفات جديدة باسم الرمز فقط، `cba.daterp` و `cba.datspec` و `cba.dattimef`، ولا يوجد `.datersp` ولا `.datitc` جديد. ملفات `cbaanimal.*` و `cbadistractor.*` هي القديمة.
-- **السكربت يطبع حجم كل ملف.** سجّل الأرقام لتقدّر المساحة التي يحتاجها كل المشاركين (`.dattimef` حوالي 75 MB تقديراً) {/* حجما daterp و datspec: يُقاسان في التشغيل المجمّع */}، لأننا استعملنا شبكة خفيفة لـ ERSP. بالشبكة الافتراضية كان `.dattimef` سيصير حوالي 1.5 GB.
+- **السكربت يطبع حجم كل ملف.** حجم `.dattimef` حوالي 75 MB تقريباً {/* حجما daterp و datspec: يُقاسان في التشغيل المجمّع */}، لأننا استعملنا شبكة خفيفة لـ ERSP. سجّل الأرقام لتقدّر المساحة التي يحتاجها كل المشاركين. بالشبكة الافتراضية كان `.dattimef` سيصير حوالي 1.5 GB.
 - **السكربت يطبع** عدد مجموعات القنوات `Channel groups in the STUDY`، وهو يساوي عدد القنوات في الملفات.
 - **نافذة الأوامر** لا تعرض أخطاء حمراء، ولا تحذير `IMPORTANT WARNING`.
 
@@ -215,7 +215,7 @@ fprintf('Channel groups in the STUDY: %d\n', numel(STUDY.changrp));
 - **استعمال ملفات 2007 في نتائجك.** حُسبت بإعدادات لا تعرفها، و EEGLAB لا يقرؤها. استعمل فقط الملفات التي باسم رمز المشارك وحسبتها بنفسك.
 - **نقل ملفات المقاييس (`.daterp` وأمثالها) وحدها.** هي تابعة لملفات المشارك. انقل المجلد كاملاً.
 
-{/* صندوق "من التجربة": بانتظار قصة من صاحب المشروع. لا يُكتب قبل وصولها. */}
+{/* صندوق «من التجربة»: بانتظار قصة من صاحب المشروع. لا يُكتب قبل وصولها. */}
 
 <Methods>
 Channel ERPs and spectra were precomputed for each participant and condition (std_precomp), with baseline correction from [−1000] to 0 ms; with spherical interpolation of any missing channels enabled; event-related spectral perturbations were computed at every channel for [20] frequencies from [3] to [30] Hz.

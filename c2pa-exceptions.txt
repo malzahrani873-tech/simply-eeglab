@@ -67,9 +67,8 @@ public/quiz/04/s04-q05.webp
 public/quiz/04/s04-q06.webp
 public/quiz/04/s04-q07.webp
 public/quiz/04/s04-q08.webp
-tests/fixtures/ica/img/
 
-# Run-day figures, the approved ICA game images and late drawings: the record is added when a file passes through
+# Run-day figures and late drawings: the record is added when a file passes through
 # the shared project folder (decisions ق-29, ق-36).
 assets-src/lessons/automated-pipelines/prep-spectra.png
 assets-src/lessons/bad-channels/bad-channels-d3-scroll.png
@@ -102,6 +101,5 @@ assets-src/lessons/resampling/resampling-cz-128-64.png
 assets-src/lessons/run-ica/run-ica-maps-20.png
 assets-src/lessons/topoplot/topoplot-scales-after.png
 assets-src/lessons/topoplot/topoplot-scales-before.png
-assets-src/ica/
 assets-src/lessons/merge-select-data/merge-select-timeline.ar.svg
 assets-src/lessons/merge-select-data/merge-select-timeline.en.svg

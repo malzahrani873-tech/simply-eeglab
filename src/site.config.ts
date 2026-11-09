@@ -5,8 +5,6 @@ export const site = {
   feedbackFormUrl: '',
   issuesUrl: 'https://github.com/malzahrani873-tech/simply-eeglab/issues',
   discussions: { enabled: false, url: '' },
-  // First day of the "component of the day" series (YYYY-MM-DD, UTC). Set at launch.
-  dailyEpoch: '2026-11-01',
 };
 
 // Production builds show approved lessons only. Branch previews show every status.

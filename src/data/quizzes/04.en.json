@@ -145,9 +145,8 @@
         "w": 720,
         "h": 280,
         "status": "draft",
-        "fromIcaGame": "sub-003_IC01",
         "alt": "A scalp map with a strong color at the front of the head, symmetric between left and right. The spectrum is highest at the lowest frequencies, then falls smoothly. The time course has two or three large, separate peaks in five seconds.",
-        "spec": "An ICA game image (level 1), draft file assets/ica-game/draft/img/sub-003_IC01.webp: scalp map, spectrum and time course of a component from OpenNeuro ds002718 (CC0), with no text that reveals the class. The final image is copied after expert approval (expert_agrees), and the question takes its final game id. One version for both languages."
+        "spec": "An ICA component image, draft file sub-003_IC01.webp: scalp map, spectrum and time course of a component from OpenNeuro ds002718 (CC0), with no text that reveals the class. The final image is copied after expert approval. One version for both languages."
       },
       "options": [
         {
@@ -183,9 +182,8 @@
         "w": 720,
         "h": 280,
         "status": "draft",
-        "fromIcaGame": "sub-006_IC15",
         "alt": "A scalp map with a small, focal spot at the edge of the head near the front left temple. The spectrum rises above 20 Hz and stays high up to 80. The time course is fast, rough activity.",
-        "spec": "An ICA game image (level 1), draft file assets/ica-game/draft/img/sub-006_IC15.webp: scalp map, spectrum and time course of a component from OpenNeuro ds002718 (CC0), with no text that reveals the class. The final image is copied after expert approval (expert_agrees), and the question takes its final game id. One version for both languages."
+        "spec": "An ICA component image, draft file sub-006_IC15.webp: scalp map, spectrum and time course of a component from OpenNeuro ds002718 (CC0), with no text that reveals the class. The final image is copied after expert approval. One version for both languages."
       },
       "options": [
         {
@@ -221,9 +219,8 @@
         "w": 720,
         "h": 280,
         "status": "draft",
-        "fromIcaGame": "sub-011_IC11",
         "alt": "A smooth, broad scalp map over the back of the head. The spectrum falls as frequency rises, with a clear peak near 10 Hz. The time course is an ongoing oscillation without large separate peaks.",
-        "spec": "An ICA game image (level 1), draft file assets/ica-game/draft/img/sub-011_IC11.webp: scalp map, spectrum and time course of a component from OpenNeuro ds002718 (CC0), with no text that reveals the class. The final image is copied after expert approval (expert_agrees), and the question takes its final game id. One version for both languages."
+        "spec": "An ICA component image, draft file sub-011_IC11.webp: scalp map, spectrum and time course of a component from OpenNeuro ds002718 (CC0), with no text that reveals the class. The final image is copied after expert approval. One version for both languages."
       },
       "options": [
         {
@@ -259,9 +256,8 @@
         "w": 720,
         "h": 280,
         "status": "draft",
-        "fromIcaGame": "sub-009_IC22",
         "alt": "A scalp map that is mostly neutral, with a very small spot around one electrode at the back of the midline. The spectrum falls with frequency and has a narrow peak at 50 Hz. The time course shows irregular jumps.",
-        "spec": "An ICA game image (level 1), draft file assets/ica-game/draft/img/sub-009_IC22.webp: scalp map, spectrum and time course of a component from OpenNeuro ds002718 (CC0), with no text that reveals the class. The final image is copied after expert approval (expert_agrees), and the question takes its final game id. One version for both languages."
+        "spec": "An ICA component image, draft file sub-009_IC22.webp: scalp map, spectrum and time course of a component from OpenNeuro ds002718 (CC0), with no text that reveals the class. The final image is copied after expert approval. One version for both languages."
       },
       "options": [
         {

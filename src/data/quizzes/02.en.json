@@ -99,7 +99,7 @@
       "answer": [
         "b"
       ],
-      "explanation": "`No (labels only)` means each channel has a name but no coordinates. This is not an import error: you add the positions in the channel locations lesson, after removing the dots from the names. The other lines (64 channels, 160 Hz, events above zero) show that the import worked."
+      "explanation": "`No (labels only)` means each channel has a name but no coordinates. This is not an import error: you add the positions in the channel locations lesson, after removing the extra dots at the end of the names (such as `Cz..`). The other lines (64 channels, 160 Hz, events above zero) show that the import worked."
     },
     {
       "id": "s02-q04",
@@ -136,7 +136,7 @@
       "answer": [
         "a"
       ],
-      "explanation": "The circle marks the horizontal plane through the middle of the head, and electrodes around the lower edge of the cap are below it, so they are drawn on or outside the circle. Cz in the center, Fpz at the front and Oz at the back show the lookup worked. `Import file instead and erase all channels` would replace your channels with all the template's channels."
+      "explanation": "The circle marks the horizontal plane through the middle of the head, and electrodes around the lower edge of the cap are below it, so they are drawn on or outside the circle. Cz in the center, Fpz at the front and Oz at the back show the lookup worked. `Import file instead and erase all channels` would replace your channels with all the template's channels. An electrode's place on the plot says nothing about its signal quality, so these are not bad channels."
     },
     {
       "id": "s02-q05",

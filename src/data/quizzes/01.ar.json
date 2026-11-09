@@ -45,7 +45,7 @@
         "h": 480,
         "status": "pending",
         "alt": "نافذة EEGLAB الرئيسية وفي أعلاها اسم الداتاست Continuous EEG Data، وتحته أسطر القيم: Channels per frame، و Frames per epoch، و Epochs، و Events، و Sampling rate (Hz)، و Epoch start (sec)، و Epoch end (sec)، و Reference، و Channel locations، و ICA weights.",
-        "spec": "لقطة حقيقية من EEGLAB 2026.1 (المصدر: eeglab-ui) للنافذة الرئيسية بعد فتح eeglab_data.set، مثل صورة \"بعد\" في درس eeglab-gui لكن **بلا أرقام ولا أسهم** فوقها. القيم المتوقعة: 32 و 30504 و 1 و 154 و 128 و 0.000 و 238.305. نصوص الواجهة إنجليزية، فتكفي نسخة واحدة للغتين."
+        "spec": "لقطة حقيقية من EEGLAB 2026.1 (المصدر: eeglab-ui) للنافذة الرئيسية بعد فتح eeglab_data.set، مثل صورة «بعد» في درس eeglab-gui لكن **بلا أرقام ولا أسهم** فوقها. القيم المتوقعة: 32 و 30504 و 1 و 154 و 128 و 0.000 و 238.305. نصوص الواجهة إنجليزية، فتكفي نسخة واحدة للغتين."
       },
       "options": [
         {
@@ -132,7 +132,7 @@
         "b",
         "d"
       ],
-      "explanation": "`EEG.times` بالميلي ثانية، بينما `EEG.xmin` و `EEG.xmax` بالثواني. و `EEG.icaweights` فارغ حتى تحسب ICA في المحطة 4. ولتحويل توقيت الحدث (latency) إلى ثوانٍ: (رقم العيّنة − 1) ÷ معدل العيّنات."
+      "explanation": "`EEG.times` بالميلي ثانية، بينما `EEG.xmin` و `EEG.xmax` بالثواني. و `EEG.icaweights` فارغ حتى تحسب ICA في المحطة 4. ولتحويل توقيت الحدث (latency) إلى ثوانٍ: (رقم العيّنة − 1) ÷ معدل العيّنات. و`EEG.trials` = 1 يعني مقطعاً واحداً، أي بيانات مستمرة لم تُقطّع."
     },
     {
       "id": "s01-q05",

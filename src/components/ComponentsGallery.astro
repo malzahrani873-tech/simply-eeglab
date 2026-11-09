@@ -8,7 +8,7 @@ import { components as C } from './lesson/index';
 interface Props { lang: Lang }
 const { lang } = Astro.props;
 const ar = lang === 'ar';
-const { MenuPath, UiLabel, En, Callout, Figure, ImageSpec, Methods, BeforeAfter, YouTube, LessonComplete, IcaGameTeaser, FilterDemo, RerefDemo, EpochRejectDemo } = C;
+const { MenuPath, UiLabel, En, Callout, Figure, ImageSpec, Methods, BeforeAfter, YouTube, LessonComplete, FilterDemo, RerefDemo, EpochRejectDemo } = C;
 const code = "EEG = pop_eegfiltnew(EEG, 'locutoff', 0.1);\nEEG = pop_eegfiltnew(EEG, 'hicutoff', 40);\n[ALLEEG, EEG] = eeg_store(ALLEEG, EEG);";
 ---
 <Base lang={lang} title="Components" description="Component gallery" path="dev/components/" noindex>
@@ -52,8 +52,6 @@ const code = "EEG = pop_eegfiltnew(EEG, 'locutoff', 0.1);\nEEG = pop_eegfiltnew(
     <RerefDemo />
     <h2>EpochRejectDemo</h2>
     <EpochRejectDemo />
-    <h2>IcaGameTeaser</h2>
-    <IcaGameTeaser />
     <h2>LessonComplete</h2>
     <LessonComplete slug="filtering" />
   </div>

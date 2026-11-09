@@ -37,7 +37,7 @@
     - "Attach channel locations and check them on a head plot"
     - "Confirm events arrived with the right types and timing"
 - station: 3
-  description: "تنظيف الإشارة الخام خطوة خطوة قبل أي تحليل: معدل العيّنات، والفلترة، وضوضاء الكهرباء، والقنوات السيئة، والاستيفاء، والمرجع."
+  description: "تنظّف الإشارة الخام خطوة خطوة قبل أي تحليل: معدل العيّنات، والفلترة، وضوضاء الكهرباء، والقنوات السيئة، والاستيفاء، والمرجع."
   descriptionEn: "Clean the raw signal step by step before any analysis: sampling rate, filtering, line noise, bad channels, interpolation and reference."
   outcomes:
     - "تطبّق سلسلة معالجة مسبقة كاملة (pipeline) على مشارك واحد"
@@ -81,7 +81,7 @@
     - "Compute a PSD and interpret the alpha peak"
     - "Measure ERP amplitude and latency reproducibly"
 - station: 7
-  description: "تحويل النتائج إلى رسوم واضحة وصادقة: خرائط الرأس، وموجات ERP، والـ ERP image."
+  description: "تحوّل النتائج إلى رسوم واضحة وصادقة: خرائط الرأس، وموجات ERP، والـ ERP image."
   descriptionEn: "Turn results into clear and honest figures: scalp maps, ERP waveforms and ERP images."
   outcomes:
     - "ترسم خريطة رأس عند زمن محدد"
@@ -107,13 +107,13 @@
     - "Test differences with a multiple-comparisons correction"
     - "Export values to a table for your stats software"
 - station: 9
-  description: "تحويل كل ضغطة في الواجهة إلى سطر كود، ثم تشغيل سلسلة المعالجة (pipeline) على كل المشاركين دون تدخّل منك."
+  description: "تحوّل كل ضغطة في الواجهة إلى سطر كود، ثم تشغّل سلسلة المعالجة (pipeline) على كل المشاركين دون تدخّل منك."
   descriptionEn: "Turn every GUI click into a line of code, then run the pipeline on all participants unattended."
   outcomes:
     - "تستخرج الكود من `eegh` لأي خطوة نفّذتها"
     - "تكتب سكربتاً لمشارك واحد من الاستيراد إلى الحفظ"
     - "تشغّله على كل المشاركين وتنظّم ملفاتك دون أن تمتلئ مساحة التخزين"
-    - "تعرف متى يصلح بايبلاين جاهز، وماذا تفحص فيه قبل أن تثق بنتيجته"
+    - "تعرف متى تصلح سلسلة معالجة جاهزة (pipeline)، وماذا تفحص فيه قبل أن تثق بنتيجته"
   outcomesEn:
     - "Get the code for any step from `eegh`"
     - "Write a single-subject script from import to saving"

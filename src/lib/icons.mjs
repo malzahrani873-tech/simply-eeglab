@@ -7,7 +7,7 @@ export const ICON_FILES = {
   copy: 'copy', warn: 'warning-circle', info: 'info', flag: 'flag', chat: 'chat-circle', heart: 'heart',
   list: 'list-bullets', plug: 'plug', book: 'book-open', chart: 'chart-bar', about: 'user-circle', img: 'image',
   steps: 'list-checks', code: 'code', file: 'file-text', books: 'books', close: 'x', undo: 'arrow-counter-clockwise',
-  download: 'download-simple', upload: 'upload-simple', link: 'link', home: 'house', game: 'game-controller',
+  download: 'download-simple', upload: 'upload-simple', link: 'link', home: 'house',
   idea: 'lightbulb', print: 'printer', cap: 'graduation-cap', help: 'question',
   ok: 'check-circle', bad: 'x-circle', up: 'arrow-up', dn: 'arrow-down',
 };

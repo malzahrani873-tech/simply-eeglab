@@ -51,7 +51,7 @@ updated: 2026-10-28
 
 ## كيف أبني حلقة المعالجة لمشاركي D4؟
 
-نطبّق هنا سلسلة خطوات المعالجة (<En>pipeline</En>)، أي البايبلاين، على ثلاثة مشاركين من D4 فقط (حوالي 700 ميجابايت للتنزيل). السكربت نفسه يعمل على المشاركين الثمانية عشر كلهم إذا نزّلتهم.
+نطبّق هنا سلسلة المعالجة (<En>pipeline</En>)، أي البايبلاين، على ثلاثة مشاركين من D4 فقط (حوالي 700 ميجابايت للتنزيل). السكربت نفسه يعمل على المشاركين الثمانية عشر كلهم إذا نزّلتهم.
 
 **أولاً: نزّل ثلاثة مشاركين من D4**
 
@@ -233,7 +233,7 @@ end
 
 - الجدول المطبوع في النهاية فيه ثلاثة صفوف، والحالة `ok` في كل صف.
 - `logs/batch_log.txt` غير موجود أو فارغ. إذا وُجد سطر، فاسم المشارك والسبب فيه.
-- في مجلد كل مشارك داخل `derivatives/eeglab` ملفان جديدان: `desc-clean` و `desc-epochs`.
+- في مجلد كل مشارك داخل `derivatives/eeglab` ملفان جديدان، مثل `sub-002_task-FaceRecognition_desc-clean_eeg.set` و `sub-002_task-FaceRecognition_desc-epochs_eeg.set`.
 - عدد الـ epochs الباقية لكل مشارك قريب من 450 (150 لكل نوع)، بعد طرح المرفوضة وأي epoch يقطعه حدث `boundary` (5 في sub-002)، لأن `pop_epoch` يحذفها. إذا كان أقل بكثير لمشارك واحد، فراجعه.
 
 ## أخطاء شائعة في معالجة الدفعات
@@ -244,7 +244,7 @@ end
 - **نسيان الفرق بين مجموعات البيانات.** قنوات العين في D1 اسمها `EOG1` و `EOG2`، وفي D4 `EEG061` و `EEG062`. نسخ السكربت بلا مراجعة هذه الأسماء يجعل ICA والمرجع يعاملان قنوات العين كقنوات رأس.
 - **الثقة بالحلقة بلا فحص.** ملخص يقول `ok` لا يعني أن التنظيف جيد. افتح ملفاً أو اثنين من الواجهة، وانظر عدد مكوّنات ICA المحذوفة والـ epochs الباقية لكل مشارك. المشارك صاحب القيمة الشاذة في الجدول هو أول من تراجعه.
 
-{/* صندوق "من التجربة": بانتظار قصة من صاحب المشروع. لا يُكتب قبل وصولها. */}
+{/* صندوق «من التجربة»: بانتظار قصة من صاحب المشروع. لا يُكتب قبل وصولها. */}
 
 <Methods>
 Data from [n] participants (ds002718; EEG-BIDS plugin 10.5, EEGLAB 2026.1) were high-pass filtered (passband edge 0.1 Hz; firfilt plugin 2.8), and line noise was attenuated with a band-stop filter (passband edges 48 and 52 Hz). Bad channels were identified with clean_rawdata (clean_rawdata plugin 2.11; flatline 5 s, channel correlation 0.8) and interpolated, then data were average-referenced, EOG excluded. Independent component analysis (extended Infomax; Lee et al., 1999) was computed on a 1 Hz high-passed copy, and components labeled Eye or Muscle with probability ≥ 0.9 (ICLabel 1.7; Pion-Tonachini et al., 2019) were removed. After low-pass filtering (passband edge 30 Hz), epochs from −1 to 2 s were baseline-corrected (−200 to 0 ms), and epochs beyond ±100 µV were rejected.

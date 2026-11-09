@@ -252,6 +252,7 @@
     "en": "artifact",
     "ar": "آرتفاكت",
     "variants": [
+      "آرتفاكتات",
       "آرتفاكتس"
     ],
     "decision": "ع+إ",
@@ -376,8 +377,10 @@
   {
     "id": "pipeline",
     "en": "pipeline",
-    "ar": "بايبلاين",
+    "ar": "سلسلة المعالجة",
     "variants": [
+      "بايبلاين",
+      "البايبلاين",
       "سلسلة خطوات المعالجة"
     ],
     "decision": "ع+إ",
@@ -493,7 +496,7 @@
     ],
     "decision": "ع+إ",
     "def": {
-      "ar": "حالة تجريبية نقارن بينها وبين غيرها، مثل \"مألوف\" و\"غير مألوف\".",
+      "ar": "حالة تجريبية نقارن بينها وبين غيرها، مثل «مألوف» و«غير مألوف».",
       "en": "An experimental situation compared with others, such as familiar vs. unfamiliar."
     }
   },
@@ -605,7 +608,7 @@
     "variants": [],
     "decision": "ع+إ",
     "def": {
-      "ar": "التردد الذي تنخفض عنده سعة الإشارة إلى النصف (−6 dB) في فلاتر FIR.",
+      "ar": "التردد الذي تنخفض عنده سعة الإشارة إلى النصف (أي بمقدار 6 dB) في فلاتر FIR.",
       "en": "In FIR filters, the frequency where the amplitude drops to half (−6 dB)."
     }
   },
@@ -638,7 +641,7 @@
     "variants": [],
     "decision": "ع+إ",
     "def": {
-      "ar": "طول الفلتر بالعيّنات، وكلما زاد ضاق النطاق الانتقالي.",
+      "ar": "عدد معاملات الفلتر ناقص واحد (طوله بالعيّنات = الرتبة + 1)، وكلما زادت ضاق النطاق الانتقالي.",
       "en": "The length of the filter in samples; higher order means a narrower transition band."
     }
   },
@@ -706,7 +709,7 @@
     "variants": [],
     "decision": "ع+إ",
     "def": {
-      "ar": "مرجع يساوي متوسط قطبي العظمتين خلف الأذنين.",
+      "ar": "مرجع يساوي متوسط قطبين على عظمتي الخشاء (mastoid) خلف الأذنين.",
       "en": "A reference equal to the mean of the two electrodes behind the ears."
     }
   },
@@ -846,7 +849,7 @@
     "variants": [],
     "decision": "ع",
     "def": {
-      "ar": "تحرّك العين يميناً أو يساراً، ويظهر كتغيّر في القنوات الأمامية الجانبية.",
+      "ar": "تحرّك العين يميناً أو يساراً، ويظهر قفزات في المستوى في القنوات الأمامية الجانبية.",
       "en": "Moving the eyes sideways; seen as steps on the lateral frontal channels."
     }
   },
@@ -973,7 +976,9 @@
     "id": "threshold",
     "en": "threshold",
     "ar": "حد",
-    "variants": [],
+    "variants": [
+      "عتبة"
+    ],
     "decision": "ع+إ",
     "def": {
       "ar": "قيمة إذا تجاوزتها الإشارة اعتُبرت مشكلة.",
@@ -1120,7 +1125,7 @@
     "variants": [],
     "decision": "إ",
     "def": {
-      "ar": "تغيّر القدرة عند كل تردد وزمن مقارنة بفترة baseline.",
+      "ar": "تغيّر القدرة عند كل تردد وزمن مقارنة بفترة baseline (event-related spectral perturbation).",
       "en": "The change in power at each time and frequency relative to baseline."
     }
   },
@@ -1131,7 +1136,7 @@
     "variants": [],
     "decision": "إ",
     "def": {
-      "ar": "مقياس لثبات الطور عبر المحاولات عند كل تردد وزمن.",
+      "ar": "مقياس لثبات الطور عبر المحاولات عند كل تردد وزمن (inter-trial coherence).",
       "en": "How consistent the phase is across trials at each time and frequency."
     }
   },
@@ -1265,8 +1270,8 @@
     "variants": [],
     "decision": "ع+إ",
     "def": {
-      "ar": "قياس تفاعل إشارات مناطق الدماغ بعضها مع بعض.",
-      "en": "Measuring how signals from brain regions interact with each other."
+      "ar": "قياس تفاعل إشارات مناطق الدماغ بعضها مع بعض، ومنه الاتصال الموجّه الذي يقيس اتجاه التأثير.",
+      "en": "How signals from brain regions interact with each other, including directed connectivity, which measures the direction of influence."
     }
   },
   {

@@ -23,13 +23,13 @@ under the content licence (CC BY-NC-SA 4.0); contributions to code under MIT.
 - Sections are written in a fixed order (`why`, `before-after`, `gui`, `script`, `values`,
   `mistakes`, `verify`, `methods`). The template decides which ones are shown and which are folded.
 - Allowed components: `MenuPath`, `UiLabel`, `En`, `Callout`, `Figure`, `ImageSpec`, `Methods`,
-  `BeforeAfter`, `YouTube`, `FilterDemo`, `RerefDemo`, `EpochRejectDemo`, `IcaGameTeaser`.
+  `BeforeAfter`, `YouTube`, `FilterDemo`, `RerefDemo`, `EpochRejectDemo`.
   No `import` lines; components are provided by the template.
 - Menu paths use `>` between items: `<MenuPath>Tools > Filter the data</MenuPath>`.
 - Every `Figure` names its `source` (a dataset code, `eeglab-ui` or `original`); the licence
   line under the image is generated from `src/data/datasets.yaml`.
 - Code blocks are MATLAB unless marked otherwise and are always shown left to right.
-- `progress-slots.lock` and `ica-daily.lock` are append-only: add new lines at the end, never
+- `progress-slots.lock` is append-only: add new lines at the end, never
   reorder or remove one.
 
 `npm run check:content` explains each problem with the file and line.

@@ -25,7 +25,7 @@ const imgReady = (q: any) => q.image?.status === 'ready' && existsSync(`public${
   data-l-result={t(lang, 'quiz.result', { n: '{n}', total: '{total}' })} data-l-review={t(lang, 'quiz.review')}
   data-l-passed={t(lang, 'quiz.passed')} data-l-pick={t(lang, 'quiz.pick')} data-l-pos={t(lang, 'quiz.position', { n: '{n}' })}>
   <h2 id="quiz-t">{t(lang, 'station.quiz.title')}</h2>
-  <p class="muted">{t(lang, 'quiz.lead', { n: quiz.questions.length })}</p>
+  <p class="muted">{tn(lang, 'quiz.lead', quiz.questions.length)}</p>
   {quiz.questions.map((q, i) => (
     <fieldset class="qz" id={q.id} data-type={q.type} data-answer={JSON.stringify(q.answer)} data-lesson={q.lesson}
       data-lesson-title={nodeTitle(lang, q.lesson)} data-lesson-href={lessonHref(q.lesson)}>

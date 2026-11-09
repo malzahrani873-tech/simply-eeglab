@@ -66,7 +66,7 @@ startingPoint:
     EEG.filename = ''; EEG.filepath = ''; EEG.datfile = ''; EEG.saved = 'no';
     [ALLEEG, EEG, CURRENTSET] = pop_newset(ALLEEG, EEG, 0, 'setname', 'D1 main', 'gui', 'off');
     eeglab redraw;
-interactive: [IcaGameTeaser]
+interactive: []
 eeglabVersion: "2026.1"
 updated: 2026-10-28
 ---
@@ -112,11 +112,6 @@ No single panel is enough. A component is an artifact when the panels agree.
 **Training your eye:** the official tutorial points to the ICLabel website, where you can practice labeling components and compare your answers with experts. The tutorial also mentions other automatic classifiers, such as MARA, FASTER, SASICA, and ADJUST.
 </Callout>
 
-## How do I practice reading components?
-
-<IcaGameTeaser />
-
-The example here is solved, and its link opens the full ICA game. Each example there shows the three panels, and after you answer, it shows ICLabel's probabilities and the reasons behind them.
 
 ## How do I open the component panels from the menus?
 
@@ -160,7 +155,6 @@ In D1, expect several brain components and at least one eye component among the 
 1. **You can name the sign** of each of the seven classes: map, spectrum, and time course.
 2. **In D1** you found the clearest eye component and confirmed it with all three panels.
 3. **Your list is written down:** the components you would remove, with a reason for each, and no Brain or Other component on it.
-4. **In the ICA game**, you classified the examples and read the explanation after each answer.
 
 ## What are the common mistakes in reading components?
 

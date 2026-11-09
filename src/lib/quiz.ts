@@ -8,7 +8,7 @@ export interface QuizOption { id: string; text: string }
 export interface QuizQuestion {
   id: string; type: 'single' | 'multiple' | 'order' | 'image'; lesson: string; objective: number;
   prompt: string; options: QuizOption[]; answer: string[]; explanation: string;
-  image?: { src: string; w: number; h: number; status: 'pending' | 'draft' | 'ready'; alt: string; fromIcaGame?: string };
+  image?: { src: string; w: number; h: number; status: 'pending' | 'draft' | 'ready'; alt: string; };
 }
 export interface Quiz { v: 1; station: number; lang: Lang; passPercent: number; questions: QuizQuestion[] }
 

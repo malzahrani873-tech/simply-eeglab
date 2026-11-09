@@ -31,7 +31,7 @@
       "answer": [
         "b"
       ],
-      "explanation": "Postsynaptic potentials last tens of milliseconds, so they overlap across many cells. Pyramidal cells are parallel and point toward the surface, so their currents add up instead of canceling. Action potentials are very short, about 1 ms, so they rarely line up across many cells."
+      "explanation": "Postsynaptic potentials last tens of milliseconds, so they overlap across many cells. Pyramidal cells are parallel and point toward the surface, so their currents add up instead of canceling. Action potentials are very short, about 1 ms, so they rarely line up across many cells. Deep structures are far from the electrodes, so their signal weakens a lot before it reaches the scalp; most of what arrives comes from the cortex."
     },
     {
       "id": "s00-q02",

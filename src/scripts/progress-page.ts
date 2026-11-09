@@ -10,7 +10,6 @@ const ids: string[] = JSON.parse(L.ids!);
 const cores: string[] = JSON.parse(L.cores!);
 const fill = (s: string, v: Record<string, string | number>) => s.replace(/\{(\w+)\}/g, (_, k) => String(v[k] ?? ''));
 const today = () => new Date().toISOString().slice(0, 10);
-const plural = (n: number) => { const f = new Intl.PluralRules(document.documentElement.lang).select(n); return (f === 'two' && L.lStreakTwo) || (f === 'few' && L.lStreakFew) || L.lStreak!; };
 const PREFIX = 'simplyeeglab:';
 const SKIP = ['simplyeeglab:theme', KEYS.tips];
 
@@ -24,12 +23,6 @@ function render() {
   const n = ids.filter((i) => i in done).length;
   $('[data-sum-count]').textContent = fill(L.lCount!, { n, total: ids.length });
   $('[data-sum-core]').textContent = fill(L.lCore!, { n: cores.filter((i) => i in done).length, total: cores.length });
-  const games = read<any>(KEYS.icagame)?.rounds ?? 0;
-  $('[data-sum-games]').hidden = !games;
-  $('[data-sum-games]').textContent = fill(L.lGames!, { n: games });
-  const streak = read<any>(KEYS.daily)?.streak ?? 0;
-  $('[data-sum-streak]').hidden = !streak;
-  $('[data-sum-streak]').textContent = fill(plural(streak), { n: streak });
   const c = code();
   const box = $('[data-code]');
   box.textContent = c;

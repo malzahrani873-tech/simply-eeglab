@@ -56,7 +56,7 @@ updated: 2026-10-28
 
 ## الفكرة
 
-`runica`، أي Extended Infomax، هو ICA الافتراضي في EEGLAB، وهو المستخدم في سلسلة المعالجة (<En>pipeline</En>) التي نتبعها. لكنه ليس الخيار الوحيد: خوارزميتا AMICA و Picard تظهران كثيراً في أبحاث EEG.
+`runica`، أي Extended Infomax، هو خوارزمية ICA الافتراضية في EEGLAB، وهو المستخدم في سلسلة المعالجة (<En>pipeline</En>) التي نتبعها. لكنه ليس الخيار الوحيد: خوارزميتا AMICA و Picard تظهران كثيراً في أبحاث EEG.
 
 هذا الدرس اختياري، وكل دروس الخريطة الباقية تعمل بـ `runica`.
 
@@ -65,7 +65,7 @@ updated: 2026-10-28
 ## بماذا تختلف AMICA و Picard عن runica؟
 
 - **AMICA:** يعرضها EEGLAB في نافذة ICA باسم <UiLabel>AMICA (slowest; best)</UiLabel>. تستطيع أن تتعلّم أكثر من نموذج ICA لنفس البيانات.
-- **Picard:** طريقة أسرع للوصول إلى حل Infomax أو FastICA. وضع Infomax فيه هو Infomax العادي، لا Extended Infomax الذي يستخدمه `runica` في سلسلة المعالجة التي نتبعها. يعرضها EEGLAB باسمين: <UiLabel>Infomax picard.m</UiLabel> و <UiLabel>FastICA picard.m (fastest)</UiLabel>.
+- **Picard:** طريقة أسرع للوصول إلى حل Infomax أو FastICA. وضع Infomax فيه (<En>mode</En>) هو Infomax العادي، لا Extended Infomax الذي يستخدمه `runica` في سلسلة المعالجة التي نتبعها. يعرضها EEGLAB باسمين: <UiLabel>Infomax picard.m</UiLabel> و <UiLabel>FastICA picard.m (fastest)</UiLabel>.
 
 كلتاهما إضافة (<En>plugin</En>)، ويسمّيها EEGLAB في قوائمه <En>extension</En>. لا تعرض نافذة ICA الخوارزمية إلا إذا كانت دالتها موجودة في جهازك، لذلك لا تظهر AMICA و Picard في القائمة إلا بعد تثبيتهما.
 
@@ -88,7 +88,7 @@ updated: 2026-10-28
 
 1. اصنع نسخة ICA مفلترة عند 1 هرتز، كما في [درس تشغيل ICA](/lesson/run-ica/).
 2. افتح <MenuPath>Tools > Decompose data by ICA</MenuPath>. في <UiLabel>ICA algorithm to use (click to select)</UiLabel> اختر <UiLabel>Infomax picard.m</UiLabel>. خانة <UiLabel>Commandline options (See help messages)</UiLabel> تُظهر `'maxiter', 500, 'mode', 'standard'`.
-3. أضف رتبة البيانات (<En>rank</En>) إلى الخيارات بنفسك: `'maxiter', 500, 'mode', 'standard', 'pca', 31` في D1. مع Picard لا يفحص `pop_runica` الرتبة نيابة عنك.
+3. أضف رتبة البيانات (<En>rank</En>) إلى الخيارات بنفسك: في D1 تصبح الخانة `'maxiter', 500, 'mode', 'standard', 'pca', 31`. مع Picard لا يفحص `pop_runica` الرتبة نيابة عنك.
 4. اضغط <UiLabel>OK</UiLabel>، ثم قارن الخرائط من <MenuPath>Plot > Component maps > In 2-D</MenuPath> بخرائط `runica`.
 
 **ثالثاً (اختياري): AMICA**
@@ -137,7 +137,7 @@ pop_topoplot(EEG_picard, 0, 1:10);
 | | runica (Extended Infomax) | Picard | AMICA |
 |---|---|---|---|
 | يأتي مع EEGLAB | نعم، الافتراضي | لا، إضافة | لا، إضافة |
-| السرعة كما يكتبها EEGLAB | الافتراضي | <UiLabel>FastICA picard.m (fastest)</UiLabel> | <UiLabel>AMICA (slowest; best)</UiLabel> |
+| السرعة كما يكتبها EEGLAB | لا يصفها (الخيار الافتراضي) | <UiLabel>FastICA picard.m (fastest)</UiLabel> | <UiLabel>AMICA (slowest; best)</UiLabel> |
 | ماذا يعطي | نموذج ICA واحد | حل Infomax العادي (لا Extended) أو FastICA، أسرع | نموذج ICA واحد أو أكثر |
 | الرتبة | `pop_runica` يحاول اكتشافها | مرّر `'pca'` بنفسك | حدّد عدد المكوّنات المحفوظة بنفسك |
 | متى تختاره | أغلب الدراسات، وكل ما في هذه الخريطة | داتاست كثيرة أو قنوات كثيرة، عندما يهمّ الوقت | عندما تريد التفكيك الأبطأ والأدق ولديك الوقت |
@@ -163,6 +163,6 @@ Independent component analysis was computed with Picard (Infomax mode, maximum 5
 - **نسيان الرتبة مع Picard أو AMICA.** فحص الرتبة التلقائي في `pop_runica` خاص بـ `runica`. مع الاثنتين الأخريين حدّد عدد المكوّنات بنفسك.
 - **انتظار مكوّنات متطابقة.** الخوارزميات المختلفة، بل حتى تشغيلان لـ `runica`، تعطي المكوّنات بترتيب مختلف، وقد يكون بعضها مقلوب القطبية (موجب صار سالباً). قارنها بالشكل.
 - **قراءة AMICA للملف على القرص.** إذا كانت الداتاست مرتبطة بملف `.fdt`، يقرأ AMICA ذلك الملف لا البيانات المفلترة في الذاكرة. امسح <UiLabel>In File:</UiLabel>، أو اكتب `EEG.datfile = ''` في السكربت.
-- **خلط الخوارزميات في دراسة واحدة.** استخدم نفس الخوارزمية والإعدادات لكل المشاركين، واكتبها في Methods.
+- **خلط الخوارزميات في دراسة واحدة.** استخدم نفس الخوارزمية والإعدادات لكل المشاركين، واكتبها في قسم Methods في ورقتك.
 
-{/* صندوق "من التجربة": بانتظار قصة من صاحب المشروع. لا يُكتب قبل وصولها. */}
+{/* صندوق «من التجربة»: بانتظار قصة من صاحب المشروع. لا يُكتب قبل وصولها. */}

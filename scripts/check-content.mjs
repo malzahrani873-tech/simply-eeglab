@@ -115,7 +115,7 @@ for (const lang of ['ar', 'en']) {
     if (fm.startingPoint?.script && fmKey.test(fm.startingPoint.script)) err(file, 'startingPoint.script فيه سطر يبدأ بمفتاح frontmatter: غالباً خطأ مسافة بادئة في YAML');
     for (const m of body.matchAll(/^(`{3,}|~{3,})[^\n]*\n([\s\S]*?)^\1\s*$/gm)) if (fmKey.test(m[2])) err(file, `سطر ${lineOf(body, m[0])}: كتلة كود فيها سطر يبدأ بمفتاح frontmatter`);
     // the interactive list matches the demos used in the body, both ways
-    const used = new Set([...body.matchAll(/<(FilterDemo|RerefDemo|EpochRejectDemo|IcaGameTeaser)\b/g)].map((m) => m[1]));
+    const used = new Set([...body.matchAll(/<(FilterDemo|RerefDemo|EpochRejectDemo)\b/g)].map((m) => m[1]));
     const listed = new Set(fm.interactive ?? []);
     for (const x of used) if (!listed.has(x)) err(file, `<${x}> مستعمل في النص وليس في interactive`);
     for (const x of listed) if (!used.has(x)) err(file, `${x} في interactive وغير مستعمل في النص`);
@@ -279,26 +279,6 @@ if (existsSync('src/data/plugins.json')) {
     if (it.url && !/^https:\/\//.test(it.url)) err(f, `${it.name}: الرابط ليس https`);
     if (!it.text.ar?.trim() || !it.text.en?.trim()) err(f, `${it.name}: وصف فارغ`);
     for (const l of it.lessons) if (!roadmap.byId.has(l)) err(f, `${it.name}: الدرس ${l} غير موجود في الخريطة`);
-  }
-}
-
-// ---------- ICA game and daily list (§23.6) ----------
-for (const [f, daily] of [['src/data/ica-game.items.json', false], ['src/data/ica-daily.items.json', true]]) {
-  if (!existsSync(f)) continue;
-  const items = JSON.parse(readFileSync(f, 'utf8')).items ?? [];
-  const ids = items.map((x) => x.id);
-  if (new Set(ids).size !== ids.length) err(f, 'معرّف مكرّر');
-  for (const it of items) {
-    const name = String(it.img ?? '').split('/').pop();
-    if (!existsSync(`assets-src/ica/${name}`)) err(f, `${it.id}: الصورة ${name} ليست في assets-src/ica/`);
-    if (!daily) continue;
-    if (it.answer === 'other') err(f, `${it.id}: فئة "أخرى" لا تدخل مكوّن اليوم`);
-    if (Math.max(...Object.values(it.iclabel)) < 0.9) err(f, `${it.id}: أعلى احتمال ICLabel أقل من 0.9`);
-    if (it.validation?.expert_agrees !== true) err(f, `${it.id}: لم يوافق عليه الخبير`);
-  }
-  if (daily) {
-    const lock = existsSync('src/data/ica-daily.lock') ? readFileSync('src/data/ica-daily.lock', 'utf8').split('\n').filter(Boolean) : [];
-    if (lock.some((id, i) => ids[i] !== id)) err(f, 'ترتيب القائمة تغيّر عن ica-daily.lock (يُضاف في الآخر فقط)');
   }
 }
 

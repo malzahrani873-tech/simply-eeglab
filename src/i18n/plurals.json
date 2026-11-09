@@ -5,7 +5,7 @@
     "map.station.lessons.few": "{n} دروس",
     "map.station.lessons.many": "{n} درساً",
     "map.station.lessons": "{n} درس",
-    "station.counts": "{lessons}: {core} أساسي، {rec} مهم، {opt} اختياري"
+    "station.counts": "{lessons}: {core} أساسي، {rec} موصى به، {opt} اختياري"
   },
   "en": {
     "map.station.lessons.one": "1 lesson",

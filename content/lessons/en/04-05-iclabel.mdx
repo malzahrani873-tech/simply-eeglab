@@ -66,7 +66,7 @@ startingPoint:
     EEG.filename = ''; EEG.filepath = ''; EEG.datfile = ''; EEG.saved = 'no';
     [ALLEEG, EEG, CURRENTSET] = pop_newset(ALLEEG, EEG, 0, 'setname', 'D1 main', 'gui', 'off');
     eeglab redraw;
-interactive: [IcaGameTeaser]
+interactive: []
 eeglabVersion: "2026.1"
 updated: 2026-10-28
 ---
@@ -99,11 +99,6 @@ For each component you plan to remove, check the three signs:
 Reading the other classes (heart, line noise, channel noise) is covered in the next lesson: [Reading artifact components](/en/lesson/ic-artifacts/).
 </Callout>
 
-## How do I train my eye before trusting the classifier?
-
-<IcaGameTeaser />
-
-Classify the component yourself first. After you answer, the game shows ICLabel's probabilities and the reasons behind them, so you see where your eye agrees with it and where it does not.
 
 ## How do I classify and remove components from the menus?
 

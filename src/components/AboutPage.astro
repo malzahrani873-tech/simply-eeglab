@@ -27,14 +27,6 @@ const x = (s: string) => iso(s, lang);
       <ul>{['beginner', 'hasData', 'matlab'].map((k) => <li set:html={x(t(lang, `about.audience.${k}`))} />)}</ul>
     </section>
 
-    <section class="card-row" aria-labelledby="a-game">
-      <Icon name="wave" class="ico s32" />
-      <div>
-        <h2 id="a-game" set:html={x(t(lang, 'about.game.title'))} />
-        <p set:html={x(t(lang, 'about.game.body'))} />
-        <a class="btn pri" href={url('ica-game/', lang)}>{t(lang, 'about.game.cta')}</a>
-      </div>
-    </section>
 
     <p><Fragment set:html={x(t(lang, 'about.sources'))} /> <a href={url('references/', lang)}>{t(lang, 'about.sources.link')}</a></p>
 

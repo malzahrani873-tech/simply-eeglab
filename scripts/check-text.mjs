@@ -4,7 +4,7 @@ import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 
 const root = process.argv[2] ?? 'dist';
-const TAGS = 'UiLabel|MenuPath|En|Kbd|Callout|ImageSpec|Figure|Methods|BeforeAfter|YouTube|LessonComplete|IcaGameTeaser|FilterDemo|RerefDemo|EpochRejectDemo';
+const TAGS = 'UiLabel|MenuPath|En|Kbd|Callout|ImageSpec|Figure|Methods|BeforeAfter|YouTube|LessonComplete|FilterDemo|RerefDemo|EpochRejectDemo';
 const LEAK = new RegExp(`&lt;\\/?(?:${TAGS})\\b|<\\/?(?:${TAGS})\\b|\\buiLabel\\b`);
 const pages = [];
 const walk = (d) => { for (const f of readdirSync(d)) { const p = join(d, f); if (statSync(p).isDirectory()) walk(p); else if (p.endsWith('.html')) pages.push(p); } };

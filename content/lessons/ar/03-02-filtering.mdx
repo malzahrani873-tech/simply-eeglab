@@ -97,7 +97,7 @@ updated: 2026-10-29
 </Callout>
 
 <Callout type="note" title="الفلاتر الأخرى في القائمة">
-تعرض <MenuPath>Tools > Filter the data</MenuPath> أيضاً <UiLabel>Windowed sinc FIR filter</UiLabel> و <UiLabel>Parks-McClellan (equiripple) FIR filter</UiLabel> و <UiLabel>Moving average FIR filter</UiLabel>، من نفس الإضافة (<En>plugin</En>) firfilt، و <UiLabel>Basic FIR filter (legacy)</UiLabel>، وهو الفلتر القديم الباقي للسكربتات القديمة؛ لا تستخدمه في عمل جديد. كل واحد منها يطلب منك أن تختار رتبة الفلتر وتفاصيل أخرى بنفسك، فتحتاجها فقط عندما يطلب بحث أو حالة خاصة تصميم فلتر معيّن. في هذا المسار يكفي <UiLabel>Basic FIR filter (new, default)</UiLabel>.
+تعرض <MenuPath>Tools > Filter the data</MenuPath> أيضاً <UiLabel>Windowed sinc FIR filter</UiLabel> و <UiLabel>Parks-McClellan (equiripple) FIR filter</UiLabel> و <UiLabel>Moving average FIR filter</UiLabel>، من نفس الإضافة (<En>plugin</En>) firfilt. وتعرض أيضاً <UiLabel>Basic FIR filter (legacy)</UiLabel>، وهو الفلتر القديم الباقي للسكربتات القديمة، فلا تستخدمه في عمل جديد. كل واحد منها يطلب منك أن تختار رتبة الفلتر وتفاصيل أخرى بنفسك، فتحتاجها فقط عندما يطلب بحث أو حالة خاصة تصميم فلتر معيّن. في هذا المسار يكفي <UiLabel>Basic FIR filter (new, default)</UiLabel>.
 </Callout>
 
 ## كيف أطبّق الفلترين بسكربت؟
@@ -131,7 +131,7 @@ EEG_lp.setname = 'D1 hp0.1 lp30';
 **في المسار الأساسي لهذا الموقع** هدفنا تحليل ERP. نطبّق الـ <En>high-pass</En> عند 0.1 هرتز الآن على النسخة الرئيسية، ونؤجّل الـ <En>low-pass</En> عند 30 هرتز إلى ما بعد تنظيف البيانات بـ ICA. السبب أن ICA و ICLabel يستفيدان من الترددات العالية، فالـ <En>low-pass</En> يأتي في آخر معالجة البيانات المستمرة، قبل التقطيع إلى epochs. لذلك يبقى فلتر الـ 30 هرتز في هذا الدرس تمريناً لترى أثره.
 
 <Callout type="expert">
-**أرقام Luck و EEGLAB:** Luck يستخدم فلاتر ERPLAB، والرقم عنده هو القطع عند نصف السعة. في EEGLAB الرقم حافة النطاق المسموح، فالقيمتان 0.1 و 30 تعطيان تردد قطع فعلياً (-6 dB) عند 0.05 هرتز وحوالي 33.6 هرتز في D1. الفرق صغير ومقبول عملياً.
+**أرقام Luck و EEGLAB:** Luck يستخدم فلاتر ERPLAB، والرقم عنده هو القطع عند نصف السعة. في EEGLAB الرقم حافة النطاق المسموح، فالقيمتان 0.1 و 30 تعطيان تردد قطع فعلياً (<En>−6 dB</En>) عند 0.05 هرتز وحوالي 33.6 هرتز في D1. الفرق صغير ومقبول عملياً.
 </Callout>
 
 ## كيف أتأكد أن الفلترة نجحت؟
@@ -164,4 +164,4 @@ Data were high-pass filtered using a zero-phase Hamming-windowed sinc FIR filter
 - **تطبيق الفلترين في خطوة واحدة.** إذا كتبت الحافتين معاً في نفس النافذة، يشترك الفلتران في نفس عرض النطاق الانتقالي، فيصبح الـ <En>low-pass</En> أحدّ من اللازم. التوثيق الرسمي يوصي بتطبيق كل فلتر وحده.
 - **إعدادات مختلفة بين المشاركين.** استخدم نفس الحدود ونفس الطريقة لكل المشاركين في الدراسة، وإلا صار الفرق بينهم من الفلتر لا من الدماغ.
 
-{/* صندوق "من التجربة": بانتظار قصة من صاحب المشروع. لا يُكتب قبل وصولها. */}
+{/* صندوق «من التجربة»: بانتظار قصة من صاحب المشروع. لا يُكتب قبل وصولها. */}
