@@ -24,39 +24,41 @@ startingPoint:
   file: eeglab_data.set
   applied: [filtering, line-noise, bad-channels, interpolation, rereferencing, run-ica, ica-1hz-copy-weights, iclabel, extract-epochs, baseline-correction, epoch-rejection]
   script: |
-    % Shortcut: if you saved D1_epochs_clean.set in the epoch rejection lesson, keep
-    % the first line and the last two lines (pop_newset, eeglab redraw), and replace
-    % every line between them with:
-    % EEG = pop_loadset('D1_epochs_clean.set', pwd);
     [ALLEEG, EEG, CURRENTSET, ALLCOM] = eeglab;
-    eeglabRoot = fileparts(which('eeglab'));
-    EEG = pop_loadset('eeglab_data.set', fullfile(eeglabRoot, 'sample_data'));
-    fullLocs = EEG.chanlocs;
+    % Your Current Folder must be your work folder (eeg-course)
+    if exist(fullfile(pwd, 'D1_main_ica.set'), 'file')
+        % Saved in the run-ica lesson: load it instead of running ICA again (minutes)
+        EEG = pop_loadset('D1_main_ica.set', pwd);
+    else
+        eeglabRoot = fileparts(which('eeglab'));
+        EEG = pop_loadset('eeglab_data.set', fullfile(eeglabRoot, 'sample_data'));
+        fullLocs = EEG.chanlocs;
 
-    % Main dataset: high-pass at 0.1 Hz, then 60 Hz line-noise removal
-    EEG = pop_eegfiltnew(EEG, 'locutoff', 0.1);
-    EEG = pop_eegfiltnew(EEG, 'locutoff', 58, 'hicutoff', 62, 'revfilt', 1);
+        % Main dataset: high-pass at 0.1 Hz, then 60 Hz line-noise removal
+        EEG = pop_eegfiltnew(EEG, 'locutoff', 0.1);
+        EEG = pop_eegfiltnew(EEG, 'locutoff', 58, 'hicutoff', 62, 'revfilt', 1);
 
-    % Bad channels you removed earlier, e.g. {'T7'}; leave empty if none
-    badChans = {};
-    if ~isempty(badChans)
-        EEG = pop_select(EEG, 'rmchannel', badChans);
-        EEG = pop_interp(EEG, fullLocs, 'spherical');
+        % Bad channels you removed earlier, e.g. {'T7'}; leave empty if none
+        badChans = {};
+        if ~isempty(badChans)
+            EEG = pop_select(EEG, 'rmchannel', badChans);
+            EEG = pop_interp(EEG, fullLocs, 'spherical');
+        end
+
+        % Average reference, EOG channels excluded
+        eogIdx = find(ismember({EEG.chanlocs.labels}, {'EOG1', 'EOG2'}));
+        EEG = pop_reref(EEG, [], 'exclude', eogIdx);
+
+        % ICA on a 1-Hz copy, then copy the weights back
+        EEG_ica = pop_eegfiltnew(EEG, 'locutoff', 1);
+        EEG_ica = pop_runica(EEG_ica, 'icatype', 'runica', 'extended', 1);
+        EEG.icaweights  = EEG_ica.icaweights;
+        EEG.icasphere   = EEG_ica.icasphere;
+        EEG.icachansind = EEG_ica.icachansind;
+        EEG.icawinv     = [];
+        EEG.icaact      = [];
+        EEG = eeg_checkset(EEG);
     end
-
-    % Average reference, EOG channels excluded
-    eogIdx = find(ismember({EEG.chanlocs.labels}, {'EOG1', 'EOG2'}));
-    EEG = pop_reref(EEG, [], 'exclude', eogIdx);
-
-    % ICA on a 1-Hz copy, then copy the weights back
-    EEG_ica = pop_eegfiltnew(EEG, 'locutoff', 1);
-    EEG_ica = pop_runica(EEG_ica, 'icatype', 'runica', 'extended', 1);
-    EEG.icaweights  = EEG_ica.icaweights;
-    EEG.icasphere   = EEG_ica.icasphere;
-    EEG.icachansind = EEG_ica.icachansind;
-    EEG.icawinv     = [];
-    EEG.icaact      = [];
-    EEG = eeg_checkset(EEG);
 
     % Remove eye and muscle components, then low-pass at 30 Hz
     EEG = pop_iclabel(EEG, 'default');
@@ -104,7 +106,7 @@ Here you prepare two figures you know from [the scalp maps lesson](/en/lesson/to
 
 ## How do I fix the scale and export maps and numbers from the menus?
 
-Start with the `D1 epochs clean` dataset loaded. If you don't have it, open "Script to reach this state" at the top of the lesson. For the maps, use `D1 epochs clean scalp`, the 30-channel copy without EOG1 and EOG2. If it is not open, make it as in step 0 of [the scalp maps lesson](/en/lesson/topoplot/) (<MenuPath>Edit > Select data</MenuPath>). The GUI is enough for maps of one dataset. Comparing two conditions in one figure needs the script, as in the "Plotting channel ERPs" lesson.
+Start with the `D1 epochs clean` dataset loaded. If you don't have it, open "Script to reach this state" at the end of the lesson. For the maps, use `D1 epochs clean scalp`, the 30-channel copy without EOG1 and EOG2. If it is not open, make it as in step 0 of [the scalp maps lesson](/en/lesson/topoplot/) (<MenuPath>Edit > Select data</MenuPath>). The GUI is enough for maps of one dataset. Comparing two conditions in one figure needs the script, as in the "Plotting channel ERPs" lesson.
 
 **1. Find the scale limit**
 
@@ -115,21 +117,31 @@ Start with the `D1 epochs clean` dataset loaded. If you don't have it, open "Scr
 **2. Fix the scale and export**
 
 1. Open the same window again. In the additional options field, enter `'electrodes', 'on', 'maplimits', [-5 5]`, replacing 5 with your limit. Use the same limit for every map you will compare with this one, even from another dataset.
-2. In the figure window, open <MenuPath>File > Save As</MenuPath> and choose PDF or SVG as the file type. This is MATLAB's own menu, not an EEGLAB menu.
+2. In the figure window, open <MenuPath>File > Save As</MenuPath> choose PDF or SVG as the file type, and save it in your work folder (`eeg-course`), for example as `maps_2d.pdf`. This is MATLAB's own menu, not an EEGLAB menu.
 3. Open the file and zoom in: lines and letters stay sharp, and you can select the label text. That is what "vector" means.
 
 **3. Export the numbers behind the figure**
 
 1. Open <MenuPath>File > Export > Data and ICA activity to text file</MenuPath>.
-2. In <UiLabel>Output file name</UiLabel>, enter `erp_all.txt`.
+2. In <UiLabel>Output file name</UiLabel>, enter `erp_all.txt`. The file is saved in MATLAB's Current Folder, which is your work folder (`eeg-course`).
 3. Check <UiLabel>Export ERP average instead of trials:</UiLabel>, and leave <UiLabel>Transpose matrix (elec -> cols):</UiLabel>, <UiLabel>Export channel labels/component numbers:</UiLabel>, and <UiLabel>Export time values:</UiLabel> checked as they are. Click <UiLabel>Ok</UiLabel>.
 4. You get a text file: the first row holds channel names, the first column holds time in milliseconds, and each following row is one time point. Put it in the paper's supplementary material, or plot from it in another program.
 
 ## How do I export the waveform figure and both condition maps in a script?
 
+In D1 the square appeared at two places on the screen, so there are two conditions. Each epoch has a `square` event at time 0, and that event has a field named `position` with the value 1 or 2. The script does three things:
+
+1. It reads the `position` value of each epoch with `eeg_getepochevent`.
+2. It takes the numbers of the epochs with value 1, then those with value 2, and makes one dataset from each group with `pop_select`.
+3. It averages each group, then plots both conditions on the same scale.
+
+MATLAB's Current Folder must be your work folder (`eeg-course`), because the script reads from it and saves into it with `pwd`.
+
 ```matlab
 EEG = pop_loadset('D1_epochs_clean.set', pwd);
+% The 'position' value (1 or 2) of the 'square' event at time 0 in each epoch
 pos = eeg_getepochevent(EEG, 'type', {'square'}, 'timewin', [-5 5], 'fieldname', 'position');
+% Keep only the epochs of each condition: one dataset per position
 EEG_pos1 = pop_select(EEG, 'trial', find(pos == 1));
 EEG_pos2 = pop_select(EEG, 'trial', find(pos == 2));
 EEG_pos1.setname = 'D1 epochs clean pos1';

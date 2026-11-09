@@ -5,7 +5,7 @@ description: "How to read each participant's ERP values from a STUDY with std_re
 station: 8
 order: 8
 level: recommended
-status: approved
+status: review
 objectives:
   - Read the ERP of every participant and condition at chosen channels with std_readdata.
   - Compute one mean amplitude per participant in a window fixed before looking at the data.
@@ -140,7 +140,7 @@ Right now the ERPs are stored in each participant's `.daterp` file, which only E
 
 **1. See what you will export**
 
-1. Start with `animal_mine.study` open and its measures computed. If you don't have it, open "Script to reach this state" under "Starts from" at the top of the lesson.
+1. Start with `animal_mine.study` open and its measures computed. If you don't have it, open "Script to reach this state" at the end of the lesson.
 2. Open <MenuPath>Study > Plot channel measures</MenuPath>, choose `image only` in <UiLabel>Select design:</UiLabel>, and select `Pz`.
 3. Press <UiLabel>Params</UiLabel> next to <UiLabel>Plot ERPs</UiLabel> and type `150 250` in <UiLabel>Time range (ms) [low high]</UiLabel>. Press <UiLabel>Ok</UiLabel>, then <UiLabel>Plot ERPs</UiLabel>. The plot now shows only the window you will average. Clear the time range afterwards.
 

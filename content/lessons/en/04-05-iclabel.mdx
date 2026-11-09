@@ -31,38 +31,40 @@ startingPoint:
   file: eeglab_data.set
   applied: [filtering, line-noise, bad-channels, interpolation, rereferencing, run-ica, ica-1hz-copy-weights]
   script: |
-    % Shortcut: if you saved D1_main_ica.set in the 1-Hz filtering lesson, keep
-    % the first line and the last two lines, and replace every line between them with:
-    % EEG = pop_loadset('D1_main_ica.set', pwd);
     [ALLEEG, EEG, CURRENTSET, ALLCOM] = eeglab;
-    eeglabRoot = fileparts(which('eeglab'));
-    EEG = pop_loadset('eeglab_data.set', fullfile(eeglabRoot, 'sample_data'));
-    fullLocs = EEG.chanlocs;
+    if exist(fullfile(pwd, 'D1_main_ica.set'), 'file')
+        % Saved in the run-ica lesson: load it instead of running ICA again (minutes)
+        EEG = pop_loadset('D1_main_ica.set', pwd);
+    else
+        eeglabRoot = fileparts(which('eeglab'));
+        EEG = pop_loadset('eeglab_data.set', fullfile(eeglabRoot, 'sample_data'));
+        fullLocs = EEG.chanlocs;
 
-    % Main dataset: high-pass at 0.1 Hz, then 60 Hz line-noise removal
-    EEG = pop_eegfiltnew(EEG, 'locutoff', 0.1);
-    EEG = pop_eegfiltnew(EEG, 'locutoff', 58, 'hicutoff', 62, 'revfilt', 1);
+        % Main dataset: high-pass at 0.1 Hz, then 60 Hz line-noise removal
+        EEG = pop_eegfiltnew(EEG, 'locutoff', 0.1);
+        EEG = pop_eegfiltnew(EEG, 'locutoff', 58, 'hicutoff', 62, 'revfilt', 1);
 
-    % Bad channels you removed earlier, e.g. {'T7'}; leave empty if none
-    badChans = {};
-    if ~isempty(badChans)
-        EEG = pop_select(EEG, 'rmchannel', badChans);
-        EEG = pop_interp(EEG, fullLocs, 'spherical');
+        % Bad channels you removed earlier, e.g. {'T7'}; leave empty if none
+        badChans = {};
+        if ~isempty(badChans)
+            EEG = pop_select(EEG, 'rmchannel', badChans);
+            EEG = pop_interp(EEG, fullLocs, 'spherical');
+        end
+
+        % Average reference, EOG channels excluded
+        eogIdx = find(ismember({EEG.chanlocs.labels}, {'EOG1', 'EOG2'}));
+        EEG = pop_reref(EEG, [], 'exclude', eogIdx);
+
+        % ICA on a 1-Hz copy, then copy the weights back
+        EEG_ica = pop_eegfiltnew(EEG, 'locutoff', 1);
+        EEG_ica = pop_runica(EEG_ica, 'icatype', 'runica', 'extended', 1);
+        EEG.icaweights  = EEG_ica.icaweights;
+        EEG.icasphere   = EEG_ica.icasphere;
+        EEG.icachansind = EEG_ica.icachansind;
+        EEG.icawinv     = [];
+        EEG.icaact      = [];
+        EEG = eeg_checkset(EEG);
     end
-
-    % Average reference, EOG channels excluded
-    eogIdx = find(ismember({EEG.chanlocs.labels}, {'EOG1', 'EOG2'}));
-    EEG = pop_reref(EEG, [], 'exclude', eogIdx);
-
-    % ICA on a 1-Hz copy, then copy the weights back
-    EEG_ica = pop_eegfiltnew(EEG, 'locutoff', 1);
-    EEG_ica = pop_runica(EEG_ica, 'icatype', 'runica', 'extended', 1);
-    EEG.icaweights  = EEG_ica.icaweights;
-    EEG.icasphere   = EEG_ica.icasphere;
-    EEG.icachansind = EEG_ica.icachansind;
-    EEG.icawinv     = [];
-    EEG.icaact      = [];
-    EEG = eeg_checkset(EEG);
     EEG.filename = ''; EEG.filepath = ''; EEG.datfile = ''; EEG.saved = 'no';
     [ALLEEG, EEG, CURRENTSET] = pop_newset(ALLEEG, EEG, 0, 'setname', 'D1 main', 'gui', 'off');
     eeglab redraw;
@@ -102,7 +104,7 @@ Reading the other classes (heart, line noise, channel noise) is covered in the n
 
 ## How do I classify and remove components from the menus?
 
-Start with the main dataset open and holding ICA weights: open `D1_main_ica.set` with <MenuPath>File > Load existing dataset</MenuPath>. If you don't have it, open "Script to reach this state" under "Starts from" at the top of the lesson.
+Start with the main dataset open and holding ICA weights: open `D1_main_ica.set` with <MenuPath>File > Load existing dataset</MenuPath>. If you don't have it, open "Script to reach this state" at the end of the lesson. Before you run the script, make your work folder `eeg-course` the MATLAB Current Folder, because the script reads and saves your files there.
 
 **First: classify the components**
 
@@ -131,14 +133,18 @@ A flag is a mark on the component, not a removal. Removal is the next step.
 
 1. Open <MenuPath>Tools > Remove components from data</MenuPath>.
 2. A window lists the flagged component numbers and asks whether to remove them. Press <UiLabel>Manual rej.</UiLabel> to see and edit the list, not <UiLabel>Yes</UiLabel>, because <UiLabel>Yes</UiLabel> removes them without review. Ignore the STUDY note in that window for now; it is for multi-participant analysis in station 8.
-3. The <UiLabel>List of component(s) to remove from data</UiLabel> field holds the flagged components. Edit it based on your review: add a component you are sure is an artifact, or delete a number you doubt. Then press <UiLabel>OK</UiLabel>.
+3. The <UiLabel>List of component(s) to remove from data</UiLabel> field holds the flagged components. Edit it based on your review: add the number of a component you are sure is an artifact, or delete the number of a component you are not sure about, so it stays in the data. If you are not sure about a component, keep it, and come back to it after [the Reading artifact components lesson](/en/lesson/ic-artifacts/). Then press <UiLabel>OK</UiLabel>.
 4. A confirmation window appears. Press <UiLabel>Plot single trials</UiLabel>: black is before removal, red is after.
 5. If the blinks are gone and the rest of the signal is unchanged, press <UiLabel>Accept</UiLabel>.
-6. Name the new dataset `D1 main clean` and leave <UiLabel>Overwrite it in memory (set=yes; unset=create a new dataset)</UiLabel> unchecked. Save it with <MenuPath>File > Save current dataset as</MenuPath> as `D1_main_clean.set`; [the power spectrum lesson](/en/lesson/power-spectrum/) can start from it.
+6. Name the new dataset `D1 main clean` and leave <UiLabel>Overwrite it in memory (set=yes; unset=create a new dataset)</UiLabel> unchecked. Save it with <MenuPath>File > Save current dataset as</MenuPath> as `D1_main_clean.set` in your work folder (`eeg-course`); [the power spectrum lesson](/en/lesson/power-spectrum/) can start from it.
 
 **Fifth: apply the postponed low-pass**
 
-Now that the data are clean, apply the 30 Hz low-pass from [the filtering lesson](/en/lesson/filtering/): <MenuPath>Tools > Filter the data > Basic FIR filter (new, default)</MenuPath>, and type `30` in <UiLabel>Higher edge of the frequency pass band (Hz)</UiLabel>. Name the resulting dataset `D1 main clean lp30`, then save it with <MenuPath>File > Save current dataset as</MenuPath>. [The Extracting epochs lesson](/en/lesson/extract-epochs/) starts from it.
+<Callout type="warning">
+**Do not move to station 5 before this step.** Every lesson in station 5 starts from the file `D1_main_clean_lp30.set` that you save here.
+</Callout>
+
+Now that the data are clean, apply the 30 Hz low-pass from [the filtering lesson](/en/lesson/filtering/): <MenuPath>Tools > Filter the data > Basic FIR filter (new, default)</MenuPath>, and type `30` in <UiLabel>Higher edge of the frequency pass band (Hz)</UiLabel>. Name the resulting dataset `D1 main clean lp30`, then save it with <MenuPath>File > Save current dataset as</MenuPath> as `D1_main_clean_lp30.set` in your work folder (`eeg-course`). [The Extracting epochs lesson](/en/lesson/extract-epochs/) starts from it.
 
 ## How do I classify and remove components with a script?
 

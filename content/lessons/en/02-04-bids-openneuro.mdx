@@ -70,13 +70,15 @@ At the root are files that describe the whole dataset. Inside each participant's
 
 We use dataset `ds002718` (Wakeman and Henson): participants viewed famous, unfamiliar and scrambled faces. The whole dataset is about 4 GB, so we download one participant only, `sub-002`, about 235 MB.
 
+**The easy way: with the script.** Open "Script to reach this state" at the end of the lesson, copy it into MATLAB and run it. It downloads the eight files you need and puts each one in its folder inside `ds002718` in your work folder (`eeg-course`). Then go to "2. Look at the side files".
+
+**Or by hand from the website:**
+
 1. Open the dataset page: [ds002718 on OpenNeuro](https://openneuro.org/datasets/ds002718).
-2. On your computer, create a folder named `ds002718`, inside it a folder `sub-002`, and inside that a folder `eeg`. Then download these files from the file list and put each one in its place:
+2. Inside your work folder (`eeg-course`), create a folder named `ds002718`, inside it a folder `sub-002`, and inside that a folder `eeg`. Then download these files from the file list and put each one in its place:
    - At the top level: `dataset_description.json`, `README` and `task-FaceRecognition_events.json`.
    - In `sub-002/eeg/`: the five files that start with `sub-002_task-FaceRecognition_`.
 3. You do not need the `anat` folder (the MRI) for this lesson.
-
-To download them all in one go, open "Script to reach this state" under "Starts from" at the top of the lesson.
 
 <Callout type="note" title="About the data">
 Data: Wakeman, D. G., & Henson, R. N. (2015). A multi-subject, multi-modal human neuroimaging dataset. Scientific Data, 2, 150001. https://doi.org/10.1038/sdata.2015.1. EEGLAB version on OpenNeuro: ds002718 v1.0.5, DOI 10.18112/openneuro.ds002718.v1.0.5. License: CC0.
@@ -155,6 +157,6 @@ EEG data in BIDS format (OpenNeuro ds002718, participant sub-002) were imported 
 - **Downloading the `.set` file only.** If you skip `events.tsv` and `electrodes.tsv`, you lose the side files that make BIDS useful. Keep the folder structure as on OpenNeuro.
 - **Event types appear as numbers.** You kept `value` in the event column list. Import again and choose `trial_type`.
 - **Unticking the electrode.tsv option.** The lookup by name finds no position for `EEG001`, and the channels have no locations.
-- **Looking for 70 channels.** The recording has 70 EEG channels plus `HEOG`, `VEOG` and two `EKG` channels, so `EEG.nbchan` is 74.
+- **Looking for 70 channels.** The recording has 70 EEG channels plus four more: `EEG061` and `EEG062` (eye: HEOG, VEOG) and `EEG063`, `EEG064` (heart: EKG). So `EEG.nbchan` is 74.
 
 {/* "From experience" box: waiting for a story from the project owner. Do not write it before it arrives. */}

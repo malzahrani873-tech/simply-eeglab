@@ -12,15 +12,10 @@ export function loadRoadmap() {
     s.nodes.forEach((n, i) => nodes.push({ ...n, station: s.station, order: i + 1 }));
   }
   const ids = nodes.map((n) => n.id);
-  // next: core -> next core; other -> next in its station, else first core of a later station;
-  // when no core node is left, the next node in order; last node -> null.
+  // next: the following node in roadmap order; last node -> null.
   nodes.forEach((n, i) => {
     if (n.next !== undefined) return;
-    const later = nodes.slice(i + 1);
-    let next;
-    if (n.level === 'core') next = later.find((m) => m.level === 'core');
-    else next = later.find((m) => m.station === n.station) ?? later.find((m) => m.level === 'core');
-    next ??= later[0];
+    const next = nodes[i + 1];
     n.next = next ? next.id : null;
   });
   const byId = new Map(nodes.map((n) => [n.id, n]));

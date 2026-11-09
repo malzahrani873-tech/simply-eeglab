@@ -51,20 +51,24 @@ updated: 2026-10-28
 1. افتح مجلد `sample_data` داخل مجلد EEGLAB، من File Explorer في Windows أو Finder في macOS.
 2. ستجد `eeglab_data.set` (حوالي 0.35 ميغابايت) و `eeglab_data.fdt` (حوالي 3.9 ميغابايت). ملف `.fdt` هو الأكبر لأنه يحمل الإشارة: 32 قناة (<En>channel</En>) × 30504 عيّنة × 4 بايت لكل رقم.
 
-### 2. احفظ نسخة في مجلدك
+### 2. احفظ نسخة في مجلد عملك
 
 1. بعد أن تفتح `eeglab_data.set` في EEGLAB، افتح <MenuPath>File > Save current dataset as</MenuPath>.
-2. اذهب إلى مجلد خاص بدروسك (أنشئه الآن إن لم يكن موجوداً، مثل `Documents/eeg-course`)، لا إلى `sample_data`، واكتب الاسم `D1_copy.set`.
+2. اذهب إلى مجلد عملك (`eeg-course`) الذي أنشأته في [درس التثبيت](/lesson/install-eeglab/)، لا إلى `sample_data`، واكتب الاسم `D1_copy.set`.
 3. اضغط <UiLabel>Save</UiLabel>.
-4. انظر في مجلدك: فيه ملفان، `D1_copy.set` (حوالي 0.35 ميغابايت) و `D1_copy.fdt` (حوالي 3.9 ميغابايت). كتبتَ اسماً واحداً، و EEGLAB كتب الملفين.
+4. انظر في مجلد عملك: فيه ملفان، `D1_copy.set` (حوالي 0.35 ميغابايت) و `D1_copy.fdt` (حوالي 3.9 ميغابايت). كتبتَ اسماً واحداً، و EEGLAB كتب الملفين.
 
 ### 3. اعثر على خيار الحفظ
 
 1. افتح <MenuPath>File > Preferences</MenuPath>.
 2. في أول مجموعة من الخيارات، ابحث عن الخانة التي تبدأ بـ <UiLabel>If set, save not one but two files for each dataset (header and data).</UiLabel>
-3. أغلق النافذة بـ <UiLabel>Cancel</UiLabel>، ولا تضغط <UiLabel>OK</UiLabel>. نبقى في سلسلة المعالجة (<En>pipeline</En>) على الافتراضي: ملفان.
+3. اترك الخانة كما هي، وأغلق النافذة بـ <UiLabel>Cancel</UiLabel> ولا تضغط <UiLabel>OK</UiLabel>. EEGLAB 2026.1 يحفظ ملفين افتراضياً، وهذا ما نستعمله في كل الدروس.
 
+<Callout type="note" title="للمهتمين: لماذا قد تظهر الخانة غير مفعّلة؟">
 قد تجد الخانة غير مفعّلة، مع أن EEGLAB حفظ ملفين للتو. السبب أن النافذة تقرأ قيمة الخانة من ملف إعدادات، والحفظ يتبع ملفاً آخر، إلى أن تضغط <UiLabel>OK</UiLabel> في هذه النافذة لأول مرة. بعدها يتبع الحفظ ما في الخانة.
+
+وبعض صفحات التوثيق الرسمي تقول إن EEGLAB يحفظ ملفاً واحداً افتراضياً منذ 2021، والنافذة تكتب ذلك أيضاً. لكن ملف الإعدادات الذي يأتي مع EEGLAB 2026.1 يفعّل خيار الملفين، فيكتب الحفظ ملفين. صدّق ما تراه في مجلد عملك.
+</Callout>
 
 ## كيف أحفظ بملفين أو بملف واحد في سكربت؟
 
@@ -78,15 +82,15 @@ EEG = pop_loadset('filename', 'eeglab_data.set', 'filepath', sampleFolder);
 EEG.datfile                                 % 'eeglab_data.fdt'
 dir(fullfile(sampleFolder, 'eeglab_data.*'))   % the .fdt and the .set
 
-% Save a copy in your own folder: two files by default in EEGLAB 2026.1
-myFolder = 'C:\Users\me\Documents\eeg-course';   % change it
-EEG = pop_saveset(EEG, 'filename', 'D1_copy.set', 'filepath', myFolder);
-dir(fullfile(myFolder, 'D1_copy.*'))           % D1_copy.fdt and D1_copy.set
+% Save a copy in your work folder: two files by default in EEGLAB 2026.1
+dataFolder = 'C:\Users\me\Documents\eeg-course';   % your work folder: change it to your path
+EEG = pop_saveset(EEG, 'filename', 'D1_copy.set', 'filepath', dataFolder);
+dir(fullfile(dataFolder, 'D1_copy.*'))           % D1_copy.fdt and D1_copy.set
 
 % Ask for one file explicitly, if you need it
-EEG = pop_saveset(EEG, 'filename', 'D1_onefile.set', 'filepath', myFolder, ...
+EEG = pop_saveset(EEG, 'filename', 'D1_onefile.set', 'filepath', dataFolder, ...
     'savemode', 'onefile');
-dir(fullfile(myFolder, 'D1_onefile.*'))        % D1_onefile.set only, about 4 MB
+dir(fullfile(dataFolder, 'D1_onefile.*'))        % D1_onefile.set only, about 4 MB
 ```
 
 - `EEG.datfile` يحمل اسم ملف `.fdt`. إذا كان فارغاً، فالإشارة داخل ملف `.set`.
@@ -101,14 +105,10 @@ dir(fullfile(myFolder, 'D1_onefile.*'))        % D1_onefile.set only, about 4 MB
 
 **إعادة الحفظ تُبقي الصيغة الموجودة على القرص.** <MenuPath>File > Resave current dataset(s)</MenuPath> على داتاست من ملفين يكتب ملفين من جديد، حتى لو كان إعدادك ملفاً واحداً. وفي هذه الحالة يطبع EEGLAB في الـ Command Window ملاحظة تبدأ بـ `Note that your memory options for saving datasets does not correspond`. هذا طبيعي.
 
-<Callout type="note" title="ملفان لا ملف واحد">
-بعض صفحات توثيق EEGLAB تقول إن EEGLAB يحفظ ملفاً واحداً افتراضياً منذ 2021، ونافذة <MenuPath>File > Preferences</MenuPath> تكتب ذلك أيضاً. لكن ملف الإعدادات الذي يأتي مع EEGLAB 2026.1 يفعّل خيار الملفين، فيكتب الحفظ ملفين. صدّق ما تراه في مجلدك.
-</Callout>
-
 ## كيف تتأكد أن الحفظ نجح؟
 
 1. في `sample_data` الملفان `eeglab_data.set` و `eeglab_data.fdt`، و `EEG.datfile` يعطي `'eeglab_data.fdt'` بعد تحميل الداتاست التعليمية.
-2. في مجلدك `D1_copy.set` (حوالي 0.35 ميغابايت) و `D1_copy.fdt` (حوالي 3.9 ميغابايت).
+2. في مجلد عملك `D1_copy.set` (حوالي 0.35 ميغابايت) و `D1_copy.fdt` (حوالي 3.9 ميغابايت).
 3. إذا شغّلت السكربت: `D1_onefile.set` وحده، بحجم حوالي 4 ميغابايت.
 4. `D1_copy.set` يُفتح من <MenuPath>File > Load existing dataset</MenuPath> ويعرض 32 قناة و 154 حدثاً.
 

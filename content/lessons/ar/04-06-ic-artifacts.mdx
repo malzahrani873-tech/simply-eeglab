@@ -31,38 +31,40 @@ startingPoint:
   file: eeglab_data.set
   applied: [filtering, line-noise, bad-channels, interpolation, rereferencing, run-ica, ica-1hz-copy-weights]
   script: |
-    % Shortcut: if you saved D1_main_ica.set in the 1-Hz filtering lesson, keep
-    % the first line and the last two lines, and replace every line between them with:
-    % EEG = pop_loadset('D1_main_ica.set', pwd);
     [ALLEEG, EEG, CURRENTSET, ALLCOM] = eeglab;
-    eeglabRoot = fileparts(which('eeglab'));
-    EEG = pop_loadset('eeglab_data.set', fullfile(eeglabRoot, 'sample_data'));
-    fullLocs = EEG.chanlocs;
+    if exist(fullfile(pwd, 'D1_main_ica.set'), 'file')
+        % Saved in the run-ica lesson: load it instead of running ICA again (minutes)
+        EEG = pop_loadset('D1_main_ica.set', pwd);
+    else
+        eeglabRoot = fileparts(which('eeglab'));
+        EEG = pop_loadset('eeglab_data.set', fullfile(eeglabRoot, 'sample_data'));
+        fullLocs = EEG.chanlocs;
 
-    % Main dataset: high-pass at 0.1 Hz, then 60 Hz line-noise removal
-    EEG = pop_eegfiltnew(EEG, 'locutoff', 0.1);
-    EEG = pop_eegfiltnew(EEG, 'locutoff', 58, 'hicutoff', 62, 'revfilt', 1);
+        % Main dataset: high-pass at 0.1 Hz, then 60 Hz line-noise removal
+        EEG = pop_eegfiltnew(EEG, 'locutoff', 0.1);
+        EEG = pop_eegfiltnew(EEG, 'locutoff', 58, 'hicutoff', 62, 'revfilt', 1);
 
-    % Bad channels you removed earlier, e.g. {'T7'}; leave empty if none
-    badChans = {};
-    if ~isempty(badChans)
-        EEG = pop_select(EEG, 'rmchannel', badChans);
-        EEG = pop_interp(EEG, fullLocs, 'spherical');
+        % Bad channels you removed earlier, e.g. {'T7'}; leave empty if none
+        badChans = {};
+        if ~isempty(badChans)
+            EEG = pop_select(EEG, 'rmchannel', badChans);
+            EEG = pop_interp(EEG, fullLocs, 'spherical');
+        end
+
+        % Average reference, EOG channels excluded
+        eogIdx = find(ismember({EEG.chanlocs.labels}, {'EOG1', 'EOG2'}));
+        EEG = pop_reref(EEG, [], 'exclude', eogIdx);
+
+        % ICA on a 1-Hz copy, then copy the weights back
+        EEG_ica = pop_eegfiltnew(EEG, 'locutoff', 1);
+        EEG_ica = pop_runica(EEG_ica, 'icatype', 'runica', 'extended', 1);
+        EEG.icaweights  = EEG_ica.icaweights;
+        EEG.icasphere   = EEG_ica.icasphere;
+        EEG.icachansind = EEG_ica.icachansind;
+        EEG.icawinv     = [];
+        EEG.icaact      = [];
+        EEG = eeg_checkset(EEG);
     end
-
-    % Average reference, EOG channels excluded
-    eogIdx = find(ismember({EEG.chanlocs.labels}, {'EOG1', 'EOG2'}));
-    EEG = pop_reref(EEG, [], 'exclude', eogIdx);
-
-    % ICA on a 1-Hz copy, then copy the weights back
-    EEG_ica = pop_eegfiltnew(EEG, 'locutoff', 1);
-    EEG_ica = pop_runica(EEG_ica, 'icatype', 'runica', 'extended', 1);
-    EEG.icaweights  = EEG_ica.icaweights;
-    EEG.icasphere   = EEG_ica.icasphere;
-    EEG.icachansind = EEG_ica.icachansind;
-    EEG.icawinv     = [];
-    EEG.icaact      = [];
-    EEG = eeg_checkset(EEG);
     EEG.filename = ''; EEG.filepath = ''; EEG.datfile = ''; EEG.saved = 'no';
     [ALLEEG, EEG, CURRENTSET] = pop_newset(ALLEEG, EEG, 0, 'setname', 'D1 main', 'gui', 'off');
     eeglab redraw;
@@ -115,7 +117,7 @@ ICLabel يعطي كل مكوّن ICA احتمالاً لكل فئة من سبع 
 
 ## كيف أفتح لوحات المكوّنات من القوائم؟
 
-ابدأ والنسخة الرئيسية مفتوحة وفيها أوزان ICA. إن لم تكن عندك، فافتح «سكربت للوصول إلى هذه الحالة» تحت «تبدأ من» أعلى الدرس. إذا كنت تكمل من درس ICLabel، فاختر `D1 main` من قائمة <MenuPath>Datasets</MenuPath>، لا `D1 main clean`، لأن مكوّنات الآرتفاكت ما زالت فيها.
+ابدأ والنسخة الرئيسية مفتوحة وفيها أوزان ICA. إن لم تكن عندك، فافتح «سكربت للوصول إلى هذه الحالة» في آخر الدرس. قبل تشغيل السكربت اجعل مجلد عملك `eeg-course` هو مجلد MATLAB الحالي (<En>Current Folder</En>)، لأن السكربت يقرأ ملفاتك ويحفظها فيه. إذا كنت تكمل من درس ICLabel، فاختر `D1 main` من قائمة <MenuPath>Datasets</MenuPath>، لا `D1 main clean`، لأن مكوّنات الآرتفاكت ما زالت فيها.
 
 1. افتح <MenuPath>Tools > Classify components using ICLabel > Label components</MenuPath>، واترك <UiLabel>Default (recommended)</UiLabel>، ثم اضغط <UiLabel>OK</UiLabel>. تظهر الخرائط وفوق كل واحدة الفئة الأرجح.
 2. افتح <MenuPath>Tools > Classify components using ICLabel > View extended component properties</MenuPath> واكتب رقم المكوّن الذي تريده في الخانة، ثم اضغط <UiLabel>OK</UiLabel>. نافذته تعرض خريطة الرأس، وطيف النشاط، والسلسلة الزمنية، واحتمال كل فئة.

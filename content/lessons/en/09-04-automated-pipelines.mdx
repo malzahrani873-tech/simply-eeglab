@@ -80,7 +80,7 @@ Use a ready-made pipeline if it was designed for your type of data and you have 
 
 **Second: look at the data before PREP**
 
-2. Start with `D1 raw` open. If you don't have it, open "Script to reach this state" under "Starts from" at the top of the lesson. These are the data as downloaded, without filtering.
+2. Start with `D1 raw` open. If you don't have it, open "Script to reach this state" at the end of the lesson. These are the data as downloaded, without filtering.
 3. Open <MenuPath>Plot > Channel spectra and maps</MenuPath> and keep the defaults. Note the sharp peak at 60 Hz, as in [the line noise lesson](/en/lesson/line-noise/).
 
 **Third: run PREP**
@@ -88,7 +88,7 @@ Use a ready-made pipeline if it was designed for your type of data and you have 
 4. Open <MenuPath>Tools > Run PREP pipeline</MenuPath>. The <UiLabel>PREP pipeline control panel</UiLabel> window opens with six buttons, one for each stage.
 5. Click <UiLabel>Reference</UiLabel>. In <UiLabel>Reference channels</UiLabel>, <UiLabel>Evaluation channels</UiLabel> and <UiLabel>Re-referenced channels</UiLabel>, type `[1 3:5 7:32]`, that is, all channels except `EOG1` (channel 2) and `EOG2` (channel 6). Click <UiLabel>Ok</UiLabel>.
 6. Click <UiLabel>Line noise</UiLabel> and check that <UiLabel>Line frequencies removed</UiLabel> shows `60`. PREP computes it from the sampling rate: multiples of 60 below Nyquist, which is 64 Hz in D1. Click <UiLabel>Ok</UiLabel>.
-7. Click <UiLabel>Ok</UiLabel> in the control panel. PREP prints each stage in the command window and takes about a minute on D1. When it finishes, it writes a summary file (`.html`) and a detailed report (`.pdf`) in your working folder, and asks you to name the new dataset. Name it `D1 prep`.
+7. Click <UiLabel>Ok</UiLabel> in the control panel. PREP prints each stage in the command window and takes about a minute on D1. When it finishes, it writes a summary file (`.html`) and a detailed report (`.pdf`) in your work folder (`eeg-course`), and asks you to name the new dataset. Name it `D1 prep`.
 
 **Fourth: check the output**
 
@@ -98,7 +98,7 @@ Use a ready-made pipeline if it was designed for your type of data and you have 
 
 ## How do I run PREP from a script?
 
-This script continues from the state in "Starts from" at the top of the lesson. PREP's own function `prepPipeline` is the clearest way to call it from a script, as in the example that ships with the plugin. The script does not write the report; it prints the results directly.
+This script continues from the state in "Script to reach this state" at the end of the lesson. PREP's own function `prepPipeline` is the clearest way to call it from a script, as in the example that ships with the plugin. The script does not write the report; it prints the results directly.
 
 ```matlab
 % PREP is not bundled with EEGLAB: install it from the extension manager

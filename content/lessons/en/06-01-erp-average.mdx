@@ -24,38 +24,41 @@ startingPoint:
   file: eeglab_data.set
   applied: [filtering, line-noise, bad-channels, interpolation, rereferencing, run-ica, ica-1hz-copy-weights, iclabel, extract-epochs, baseline-correction, epoch-rejection]
   script: |
-    % Shortcut: if you saved D1_epochs_clean.set in the epoch rejection lesson,
-    % keep the first line and the last three lines, and replace every line between them with:
-    % EEG = pop_loadset('D1_epochs_clean.set', pwd);
     [ALLEEG, EEG, CURRENTSET, ALLCOM] = eeglab;
-    eeglabRoot = fileparts(which('eeglab'));
-    EEG = pop_loadset('eeglab_data.set', fullfile(eeglabRoot, 'sample_data'));
-    fullLocs = EEG.chanlocs;
+    % Your Current Folder must be your work folder (eeg-course)
+    if exist(fullfile(pwd, 'D1_main_ica.set'), 'file')
+        % Saved in the run-ica lesson: load it instead of running ICA again (minutes)
+        EEG = pop_loadset('D1_main_ica.set', pwd);
+    else
+        eeglabRoot = fileparts(which('eeglab'));
+        EEG = pop_loadset('eeglab_data.set', fullfile(eeglabRoot, 'sample_data'));
+        fullLocs = EEG.chanlocs;
 
-    % Main dataset: high-pass at 0.1 Hz, then 60 Hz line-noise removal
-    EEG = pop_eegfiltnew(EEG, 'locutoff', 0.1);
-    EEG = pop_eegfiltnew(EEG, 'locutoff', 58, 'hicutoff', 62, 'revfilt', 1);
+        % Main dataset: high-pass at 0.1 Hz, then 60 Hz line-noise removal
+        EEG = pop_eegfiltnew(EEG, 'locutoff', 0.1);
+        EEG = pop_eegfiltnew(EEG, 'locutoff', 58, 'hicutoff', 62, 'revfilt', 1);
 
-    % Bad channels you removed earlier, e.g. {'T7'}; leave empty if none
-    badChans = {};
-    if ~isempty(badChans)
-        EEG = pop_select(EEG, 'rmchannel', badChans);
-        EEG = pop_interp(EEG, fullLocs, 'spherical');
+        % Bad channels you removed earlier, e.g. {'T7'}; leave empty if none
+        badChans = {};
+        if ~isempty(badChans)
+            EEG = pop_select(EEG, 'rmchannel', badChans);
+            EEG = pop_interp(EEG, fullLocs, 'spherical');
+        end
+
+        % Average reference, EOG channels excluded
+        eogIdx = find(ismember({EEG.chanlocs.labels}, {'EOG1', 'EOG2'}));
+        EEG = pop_reref(EEG, [], 'exclude', eogIdx);
+
+        % ICA on a 1-Hz copy, then copy the weights back
+        EEG_ica = pop_eegfiltnew(EEG, 'locutoff', 1);
+        EEG_ica = pop_runica(EEG_ica, 'icatype', 'runica', 'extended', 1);
+        EEG.icaweights  = EEG_ica.icaweights;
+        EEG.icasphere   = EEG_ica.icasphere;
+        EEG.icachansind = EEG_ica.icachansind;
+        EEG.icawinv     = [];
+        EEG.icaact      = [];
+        EEG = eeg_checkset(EEG);
     end
-
-    % Average reference, EOG channels excluded
-    eogIdx = find(ismember({EEG.chanlocs.labels}, {'EOG1', 'EOG2'}));
-    EEG = pop_reref(EEG, [], 'exclude', eogIdx);
-
-    % ICA on a 1-Hz copy, then copy the weights back
-    EEG_ica = pop_eegfiltnew(EEG, 'locutoff', 1);
-    EEG_ica = pop_runica(EEG_ica, 'icatype', 'runica', 'extended', 1);
-    EEG.icaweights  = EEG_ica.icaweights;
-    EEG.icasphere   = EEG_ica.icasphere;
-    EEG.icachansind = EEG_ica.icachansind;
-    EEG.icawinv     = [];
-    EEG.icaact      = [];
-    EEG = eeg_checkset(EEG);
 
     % Remove components ICLabel rates above 90% Eye or Muscle
     EEG = pop_iclabel(EEG, 'default');
@@ -97,7 +100,7 @@ The result is the event-related potential (<En>ERP</En>), the basis for measurem
 
 ## What happens to the waveform as trials add up?
 
-One trial looks like noise. With 10 trials the waveform starts to appear, and with all 77, a clear positive peak appears after 400 ms.
+One trial looks like noise. With 10 trials the waveform starts to appear, and with all of them (77 in the figure; your number may differ slightly, depending on what you rejected), a clear positive peak appears after 400 ms.
 
 <Figure src="erp-average/erp-average-1-10-all.png" alt="Three panels for Pz with the same axes: one epoch, the average of 10, and the average of all 77. The single epoch is noise; the full average is smoother, with a positive peak after 400 ms." caption="n = 1, n = 10 and n = 77" source="D1" />
 
@@ -105,14 +108,14 @@ One trial looks like noise. With 10 trials the waveform starts to appear, and wi
 
 EEGLAB has no separate "compute average" menu. The average is computed inside the ERP plotting menus, or with one line in a script. Here we display it once for a first look; station 7 covers the plotting options in detail.
 
-Start with the dataset `D1 epochs clean` open. If you don't have it, open "Script to reach this state" at the top of the lesson.
+Start with the dataset `D1 epochs clean` open. If you don't have it, open "Script to reach this state" at the end of the lesson.
 
 1. Open <MenuPath>Plot > Channel ERPs > In scalp/rect. array</MenuPath>.
 2. The <UiLabel>Topographic ERP plot - pop_plottopo()</UiLabel> window opens. Keep <UiLabel>Channels to plot</UiLabel> at `1:32`, leave <UiLabel>Plot single trials</UiLabel> and <UiLabel>Plot in rect. array</UiLabel> unchecked, and press <UiLabel>Ok</UiLabel>.
 3. The average of each channel appears at its place on the head. Click the <En>Pz</En> trace to enlarge it in its own window.
 4. In the enlarged trace, look for two things after the vertical line at zero:
    - A small negative wave around 200 ms, clearest at posterior channels such as <En>POz</En> and <En>Oz</En>.
-   - A large positive wave peaking around 400 ms, largest at central and parietal channels such as <En>Cz</En> and <En>Pz</En>.
+   - A large positive wave peaking around 400 ms, largest at central and parietal channels such as <En>Cz</En> and <En>Pz</En>. Its timing and location match the P3 component (also called P300) mentioned in earlier lessons, which is not the electrode named P3. Naming it in your own research needs a comparison with earlier studies of a similar task.
 
 <Callout type="note" title="Axis direction">
 In this window, positive is up (the `'ydir', 1` option in the last box). Some books and programs plot negative up, so always check the axis labels before you say "positive peak".

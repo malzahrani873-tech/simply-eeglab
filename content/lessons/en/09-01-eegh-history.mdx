@@ -53,7 +53,7 @@ Each field you filled in the window is in the line: `'locutoff',0.1` is the lowe
 
 ## How do I show, save and run the history from the menus?
 
-Start a fresh session: type `clear`, then `eeglab`, in the Command Window. These two lines are the "Script to reach this state" under "Starts from" at the top of the lesson. Running `eeglab` starts a new, empty history, so it does not mix with commands from an earlier session.
+Start a fresh session: type `clear`, then `eeglab`, in the Command Window. These two lines are the "Script to reach this state" at the end of the lesson. Running `eeglab` starts a new, empty history, so it does not mix with commands from an earlier session.
 
 **First: run a few steps from the GUI**
 
@@ -81,7 +81,7 @@ pop_eegplot( EEG, 1, 1, 1);
 
 **Third: save the history to a file**
 
-7. Open <MenuPath>File > History scripts > Save session history script</MenuPath>. The suggested name is `eeglabhist.m`. Change it to `my_first_history.m` and save it in your working folder.
+7. Open <MenuPath>File > History scripts > Save session history script</MenuPath>. The suggested name is `eeglabhist.m`. Change it to `my_first_history.m` and save it in your work folder (`eeg-course`).
 8. Type `EEG.history` in the command window. This is the **dataset history**: the commands for the current dataset only, without the dataset management commands. It starts with lines you did not write, with paths like `/Users/arno/...`. They are the file's history on the computer of whoever made it, because the history is saved inside the `.set` file and travels with it. Then comes a line that records the EEGLAB version, then the two filter lines, and at the end a `pop_eegplot` line, because you opened the scroll window from the menu.
 9. To save it to a file, open <MenuPath>File > History scripts > Save dataset history script</MenuPath>.
 
@@ -92,7 +92,7 @@ pop_eegplot( EEG, 1, 1, 1);
 
 ## How do I clean the history script?
 
-The history script works as is, but it is written for the machine, not for you. Clean it before you rely on it. Here is the same history after cleaning:
+The history script works as is, but it is written for the machine, not for you. Clean it before you rely on it. Here is the same history after cleaning. Run it with MATLAB's <UiLabel>Current Folder</UiLabel> set to your work folder `eeg-course`, because its last line saves there with `pwd`:
 
 ```matlab
 % Rebuilt from the EEGLAB session history (eegh)
@@ -143,7 +143,7 @@ The session history (`eegh`) keeps everything you did in the session, for all da
 
 1. **The script runs on its own.** Run the clean script in a fresh session. It should finish without any error and without asking you to click anything.
 2. **Same processing.** After it runs, type `EEG.history`. You should see the two filter lines with the same numbers you chose in the GUI: `0.1`, then `58` and `62` with `'revfilt',1`.
-3. **The history file exists.** In your working folder you should find `D1_hp0.1_notch60_history.m`. Open it: it holds the same two filter lines.
+3. **The history file exists.** In your work folder (`eeg-course`) you should find `D1_hp0.1_notch60_history.m`. Open it: it holds the same two filter lines.
 
 ## Common mistakes with the history
 

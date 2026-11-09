@@ -55,7 +55,7 @@ updated: 2026-10-28
 
 **أولاً: نزّل ثلاثة مشاركين من D4**
 
-1. أنشئ مجلداً اسمه `faces_project` وفيه مجلد `rawdata`، واجعل `faces_project` مجلد العمل في MATLAB: اكتب في نافذة الأوامر (<UiLabel>Command Window</UiLabel>) `cd` ثم مسافة ثم مسار المجلد، أو اختره من لوحة <UiLabel>Current Folder</UiLabel>. شغّل كل سكربتات المحطة 9 من داخل هذا المجلد. [درس تنظيم الملفات](/lesson/file-organization/) يشرح بقية المجلدات.
+1. أنشئ داخل مجلد عملك (`eeg-course`) مجلداً اسمه `faces_project` وفيه مجلد `rawdata`، واجعل `faces_project` مجلد العمل في MATLAB: اكتب في نافذة الأوامر (<UiLabel>Command Window</UiLabel>) `cd` ثم مسافة ثم مسار المجلد، أو اختره من لوحة <UiLabel>Current Folder</UiLabel>. شغّل كل سكربتات المحطة 9 من داخل هذا المجلد. [درس تنظيم الملفات](/lesson/file-organization/) يشرح بقية المجلدات.
 2. افتح [ds002718 على OpenNeuro](https://openneuro.org/datasets/ds002718)، ونزّل إلى `rawdata` الملفات الثلاثة الموجودة في أعلى الداتاست (`dataset_description.json` و `README` و `task-FaceRecognition_events.json`)، ثم المجلدات `sub-002` و `sub-003` و `sub-004` كاملة، بنفس أسمائها وترتيبها، كما في [درس BIDS و OpenNeuro](/lesson/bids-openneuro/). أو من سطر أوامر النظام، إذا كان عندك AWS CLI:
 
 ```text
@@ -65,8 +65,8 @@ aws s3 sync --no-sign-request s3://openneuro.org/ds002718 rawdata --exclude "sub
 **ثانياً: جرّب البايبلاين على مشارك واحد من الواجهة**
 
 3. افتح <MenuPath>File > Import data > Using EEGLAB functions and plugins > From BIDS folder structure</MenuPath>، واختر مجلد `rawdata`. تأكد أن <UiLabel>Use BIDS electrode.tsv files (when present) for channel locations; off: look up locations using channel labels</UiLabel> مفعّلة، لتأتي مواقع الأقطاب (<En>electrode locations</En>) من ملفات BIDS. وفعّل <UiLabel>Use BIDS event.tsv files for events and use the following BIDS field for event type</UiLabel>، واختر `trial_type` من القائمة بجانبها. في <UiLabel>Study output folder</UiLabel> غيّر المجلد إلى `faces_project/derivatives/eeglab`. القيمة الافتراضية تضعه داخل `rawdata`، لكن السكربت و[درس الحوسبة على HPC](/lesson/hpc/) يبحثان عن الملفات في `derivatives/eeglab`. اضغط <UiLabel>Ok</UiLabel>. تُنشأ STUDY فيها المشاركون الثلاثة.
-4. اختر مشاركاً واحداً من قائمة <MenuPath>Datasets</MenuPath>، وطبّق عليه الخطوات من الواجهة كما في المحطات 3 إلى 5، مع تغيير ثلاثة إعدادات فقط: تردد الكهرباء 50 هرتز لا 60 لأن التسجيل في بريطانيا، وقنوات العين (EOG) هي `EEG061` و `EEG062`، وقناتا القلب `EEG063` و `EEG064` تُحذفان.
-5. اكتب `eegh`، وقارن السطور بسكربت المشارك الواحد. ستجد الخطوات نفسها، والفرق في الإعدادات الثلاثة فقط. هذه الإعدادات هي ما ستضعه في `cfg` في أعلى الملف.
+4. **اختياري، وعلى مشارك واحد فقط** (يأخذ حوالي ساعة، لأن البيانات 72 قناة): اختر مشاركاً واحداً من قائمة <MenuPath>Datasets</MenuPath>، وطبّق عليه الخطوات من الواجهة كما في المحطات 3 إلى 5، مع تغيير ثلاثة إعدادات فقط: تردد الكهرباء 50 هرتز لا 60 لأن التسجيل في بريطانيا، وقنوات العين والقلب تظهر في D4 بأسماء أخرى: `EEG061` و `EEG062` (العين: HEOG و VEOG)، و `EEG063` و `EEG064` (القلب: EKG)، وقناتا القلب تُحذفان. إذا تخطّيت هذه الخطوة فانتقل إلى الخطوة 6: السكربت فيه الإعدادات الثلاثة جاهزة.
+5. إذا نفّذت الخطوة 4، اكتب `eegh`، وقارن السطور بسكربت المشارك الواحد. ستجد الخطوات نفسها، والفرق في الإعدادات الثلاثة فقط. هذه الإعدادات هي ما ستضعه في `cfg` في أعلى الملف.
 
 **ثالثاً: حوّل البايبلاين إلى حلقة**
 
@@ -223,7 +223,7 @@ end
 | الإعداد | القيمة في الدرس | لماذا |
 |---|---|---|
 | تردد الكهرباء | 50 هرتز | D4 مسجّلة في كامبريدج ببريطانيا، و `PowerLineFrequency` في ملف `eeg.json` يساوي 50. والتردد 60 هرتز في السعودية وأمريكا، و50 هرتز في أوروبا وأغلب الدول العربية الأخرى، فتحقّق من الطيف قبل أن تفترض. هذا الإعداد هو الفرق الأوضح بين D1 و D4. |
-| قنوات العين والقلب | `EEG061` و `EEG062` للعين، و `EEG063` و `EEG064` للقلب | من ملف `channels.tsv` في D4. قنوات القلب تُحذف، وقنوات العين تبقى لتساعد ICA ولا تدخل المرجع. |
+| قنوات العين والقلب | `EEG061` و `EEG062` (العين: HEOG و VEOG)، و `EEG063` و `EEG064` (القلب: EKG) | من ملف `channels.tsv` في D4: عمود `name` فيه الاسم، وعمود `type` فيه النوع (HEOG و VEOG و EKG). قنوات القلب تُحذف، وقنوات العين تبقى لتساعد ICA ولا تدخل المرجع. |
 | الأحداث للتقطيع | `famous_new` و `unfamiliar_new` و `scrambled_new` | العرض الأول لكل صورة، 150 لكل نوع في sub-002. التكرارات لها أسماء أخرى (`_second_early` و `_second_late`). |
 | الاستيراد | `pop_importbids` مرة واحدة قبل الحلقة | يقرأ الأحداث من `events.tsv` ومواقع الأقطاب من `electrodes.tsv`، كما في درس EEGLAB الرسمي لنفس البيانات. |
 | مكان الإعدادات | المتغيّر `cfg` في الأعلى | كل ما يختلف بين المشاريع في مكان واحد، والدالة نفسها لا تتغيّر. |

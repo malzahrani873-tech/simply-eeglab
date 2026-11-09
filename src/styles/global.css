@@ -190,7 +190,7 @@ main{flex:1}
 .lgrid{display:grid;grid-template-columns:minmax(0,1fr);gap:40px;padding-bottom:48px}
 @container site (min-width:1024px){.lgrid{grid-template-columns:minmax(0,42rem);justify-content:center}}
 .art{max-width:42rem}
-.lhead{padding-top:18px}
+.lhead{padding-top:18px;margin-bottom:20px}
 .pos{font-size:15px;color:var(--muted);margin:0}
 .lhead h1{font-size:30px;line-height:1.45;margin:4px 0 0;font-weight:700}
 @container site (min-width:1024px){.lhead h1{font-size:34px}}

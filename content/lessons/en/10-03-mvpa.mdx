@@ -90,7 +90,7 @@ The data in this lesson come from ERP CORE by Emily S. Kappenman and Steven J. L
 
 A bin in ERPLAB is a set of events that gets one averaged waveform, such as "faces with a correct response". ERPLAB decodes bins, not raw event codes, so we define the bins first and then cut epochs around them.
 
-3. Start with `N170 sub2 ica corr` open. If you don't have it, open "Script to reach this state" under "Starts from" at the top of the lesson. These are continuous data, not epoched yet. Event codes 1 to 40 are faces, 41 to 80 cars, 101 to 180 scrambled images, and 201 is a correct response.
+3. Start with `N170 sub2 ica corr` open. If you don't have it, open "Script to reach this state" at the end of the lesson. These are continuous data, not epoched yet. Event codes 1 to 40 are faces, 41 to 80 cars, 101 to 180 scrambled images, and 201 is a correct response.
 4. Open <MenuPath>ERPLAB > EventList > Create EEG EVENTLIST</MenuPath>. Enable the option that removes letters from event codes (<En>alphanumeric cleaning</En>), as the ERP CORE scripts do. Run it.
 5. Write a bin descriptor file (<En>BDF</En>) named `n170_faces_cars_bins.txt`. It is a text file with this content, copied from the first two bins of `BDF_N170.txt` in ERP CORE. Each bin takes the image only when a correct response (201) followed it within 200 to 1000 ms:
 
@@ -123,7 +123,7 @@ Cars, Correct
 
 ## How do I run the decoding from a script?
 
-This script starts from the open dataset, as in "Starts from" at the top of the lesson. ERPLAB writes every step to the `eegh` history, so you can also save your script from the GUI, as you learned in [the command history lesson](/en/lesson/eegh-history/).
+This script starts from the open dataset, as in "Script to reach this state" at the end of the lesson. ERPLAB writes every step to the `eegh` history, so you can also save your script from the GUI, as you learned in [the command history lesson](/en/lesson/eegh-history/).
 
 ```matlab
 % ERPLAB is not bundled with EEGLAB: install it from the extension manager

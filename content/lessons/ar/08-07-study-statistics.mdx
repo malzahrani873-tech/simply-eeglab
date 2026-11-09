@@ -155,7 +155,7 @@ EEGLAB يختبر كل نقطة زمنية وحدها، والـ epoch فيه م
 
 **أولاً: جهّز الرسم**
 
-1. ابدأ و`animal_mine.study` مفتوحة بمقاييسها المحسوبة. إن لم تكن عندك، فافتح «سكربت للوصول إلى هذه الحالة» تحت «تبدأ من» أعلى الدرس.
+1. ابدأ و`animal_mine.study` مفتوحة بمقاييسها المحسوبة. إن لم تكن عندك، فافتح «سكربت للوصول إلى هذه الحالة» في آخر الدرس.
 2. افتح <MenuPath>Study > Plot channel measures</MenuPath>. في <UiLabel>Select design:</UiLabel> اختر `image only`، ثم اختر `Pz` في القائمة اليسرى.
 3. اضغط <UiLabel>Params</UiLabel> بجانب <UiLabel>Plot ERPs</UiLabel>. فعّل <UiLabel>Plot first variable on the same panel</UiLabel>، واترك <UiLabel>Time range (ms) [low high]</UiLabel> فارغاً، وتأكد أن <UiLabel>Multiple channels selection</UiLabel> على <UiLabel>Plot channels individually</UiLabel>. اضغط <UiLabel>Ok</UiLabel>.
 
@@ -190,7 +190,7 @@ EEGLAB يختبر كل نقطة زمنية وحدها، والـ epoch فيه م
 **خامساً: تصحيح العناقيد (يحتاج Fieldtrip-lite)**
 
 1. **تحقق من أنها مثبّتة.** افتح <UiLabel>STATS</UiLabel>. إذا ظهر السطر <UiLabel>Use Fieldtrip statistics (to use install "Fieldtrip-lite" using File > Manage EEGLAB extensions)</UiLabel> ولا يمكن تفعيله، فالإضافة غير موجودة. ويمكنك أيضاً كتابة `exist('ft_freqstatistics', 'file')` في نافذة الأوامر: `2` تعني مثبّتة، و `0` تعني غير موجودة.
-2. **لتثبيتها:** افتح <MenuPath>File > Manage EEGLAB extensions</MenuPath>. في <UiLabel>List of plugins (bolded means installed)</UiLabel> اضغط `Fieldtrip-lite`، ثم <UiLabel>Install/Update</UiLabel>. افتح <UiLabel>STATS</UiLabel> مرة أخرى: يجب أن يصبح السطر <UiLabel>Use Fieldtrip statistics</UiLabel>. إذا بقي رمادياً، أعد تشغيل EEGLAB، ثم شغّل مرة أخرى «سكربت للوصول إلى هذه الحالة» تحت «تبدأ من» أعلى الدرس.
+2. **لتثبيتها:** افتح <MenuPath>File > Manage EEGLAB extensions</MenuPath>. في <UiLabel>List of plugins (bolded means installed)</UiLabel> اضغط `Fieldtrip-lite`، ثم <UiLabel>Install/Update</UiLabel>. افتح <UiLabel>STATS</UiLabel> مرة أخرى: يجب أن يصبح السطر <UiLabel>Use Fieldtrip statistics</UiLabel>. إذا بقي رمادياً، أعد تشغيل EEGLAB، ثم شغّل مرة أخرى «سكربت للوصول إلى هذه الحالة» في آخر الدرس.
 3. **لتشغيله:** حدد `Pz` وحدها، وافتح <UiLabel>STATS</UiLabel>، وتأكد أن المتغيّر الأول وحده مفعّل، وفعّل <UiLabel>Use Fieldtrip statistics</UiLabel>، واختر <UiLabel>Use montecarlo/permutation statistics</UiLabel> و <UiLabel>Use cluster correction (CC)</UiLabel>، واكتب `0.05` عتبةً. اضغط <UiLabel>Ok</UiLabel>، ثم <UiLabel>Plot ERPs</UiLabel>.
 4. فعّل <UiLabel>Use EEGLAB statistics</UiLabel> مرة أخرى بعد ذلك، من أجل الخطوة التالية.
 

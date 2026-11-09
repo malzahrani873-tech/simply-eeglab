@@ -24,38 +24,41 @@ startingPoint:
   file: eeglab_data.set
   applied: [filtering, line-noise, bad-channels, interpolation, rereferencing, run-ica, ica-1hz-copy-weights, iclabel, extract-epochs, baseline-correction, epoch-rejection]
   script: |
-    % Shortcut: if you saved D1_epochs_clean.set in the epoch rejection lesson,
-    % keep the first line and the last three lines, and replace every line between them with:
-    % EEG = pop_loadset('D1_epochs_clean.set', pwd);
     [ALLEEG, EEG, CURRENTSET, ALLCOM] = eeglab;
-    eeglabRoot = fileparts(which('eeglab'));
-    EEG = pop_loadset('eeglab_data.set', fullfile(eeglabRoot, 'sample_data'));
-    fullLocs = EEG.chanlocs;
+    % Your Current Folder must be your work folder (eeg-course)
+    if exist(fullfile(pwd, 'D1_main_ica.set'), 'file')
+        % Saved in the run-ica lesson: load it instead of running ICA again (minutes)
+        EEG = pop_loadset('D1_main_ica.set', pwd);
+    else
+        eeglabRoot = fileparts(which('eeglab'));
+        EEG = pop_loadset('eeglab_data.set', fullfile(eeglabRoot, 'sample_data'));
+        fullLocs = EEG.chanlocs;
 
-    % Main dataset: high-pass at 0.1 Hz, then 60 Hz line-noise removal
-    EEG = pop_eegfiltnew(EEG, 'locutoff', 0.1);
-    EEG = pop_eegfiltnew(EEG, 'locutoff', 58, 'hicutoff', 62, 'revfilt', 1);
+        % Main dataset: high-pass at 0.1 Hz, then 60 Hz line-noise removal
+        EEG = pop_eegfiltnew(EEG, 'locutoff', 0.1);
+        EEG = pop_eegfiltnew(EEG, 'locutoff', 58, 'hicutoff', 62, 'revfilt', 1);
 
-    % Bad channels you removed earlier, e.g. {'T7'}; leave empty if none
-    badChans = {};
-    if ~isempty(badChans)
-        EEG = pop_select(EEG, 'rmchannel', badChans);
-        EEG = pop_interp(EEG, fullLocs, 'spherical');
+        % Bad channels you removed earlier, e.g. {'T7'}; leave empty if none
+        badChans = {};
+        if ~isempty(badChans)
+            EEG = pop_select(EEG, 'rmchannel', badChans);
+            EEG = pop_interp(EEG, fullLocs, 'spherical');
+        end
+
+        % Average reference, EOG channels excluded
+        eogIdx = find(ismember({EEG.chanlocs.labels}, {'EOG1', 'EOG2'}));
+        EEG = pop_reref(EEG, [], 'exclude', eogIdx);
+
+        % ICA on a 1-Hz copy, then copy the weights back
+        EEG_ica = pop_eegfiltnew(EEG, 'locutoff', 1);
+        EEG_ica = pop_runica(EEG_ica, 'icatype', 'runica', 'extended', 1);
+        EEG.icaweights  = EEG_ica.icaweights;
+        EEG.icasphere   = EEG_ica.icasphere;
+        EEG.icachansind = EEG_ica.icachansind;
+        EEG.icawinv     = [];
+        EEG.icaact      = [];
+        EEG = eeg_checkset(EEG);
     end
-
-    % Average reference, EOG channels excluded
-    eogIdx = find(ismember({EEG.chanlocs.labels}, {'EOG1', 'EOG2'}));
-    EEG = pop_reref(EEG, [], 'exclude', eogIdx);
-
-    % ICA on a 1-Hz copy, then copy the weights back
-    EEG_ica = pop_eegfiltnew(EEG, 'locutoff', 1);
-    EEG_ica = pop_runica(EEG_ica, 'icatype', 'runica', 'extended', 1);
-    EEG.icaweights  = EEG_ica.icaweights;
-    EEG.icasphere   = EEG_ica.icasphere;
-    EEG.icachansind = EEG_ica.icachansind;
-    EEG.icawinv     = [];
-    EEG.icaact      = [];
-    EEG = eeg_checkset(EEG);
 
     % Remove components ICLabel rates above 90% Eye or Muscle
     EEG = pop_iclabel(EEG, 'default');
@@ -97,7 +100,7 @@ updated: 2026-10-28
 
 ## ماذا يحدث للموجة كلما زاد عدد المحاولات؟
 
-المحاولة الواحدة تبدو ضوضاء. مع 10 محاولات تبدأ الموجة بالظهور، ومع كل المحاولات (77) تظهر قمة موجبة واضحة بعد 400 ميلي ثانية.
+المحاولة الواحدة تبدو ضوضاء. مع 10 محاولات تبدأ الموجة بالظهور، ومع كل المحاولات (77 في الشكل، وعددك قد يختلف قليلاً حسب ما رفضته) تظهر قمة موجبة واضحة بعد 400 ميلي ثانية.
 
 <Figure src="erp-average/erp-average-1-10-all.png" alt="ثلاث لوحات للقناة Pz بنفس المحاور: epoch واحد، ثم متوسط 10 epochs، ثم متوسط كل الـ epochs (77). الـ epoch الواحد ضوضاء، والمتوسط الكامل موجة أنعم فيها قمة موجبة بعد 400 ميلي ثانية." caption="عدد الـ epochs في المتوسط: 1، ثم 10، ثم 77" source="D1" />
 
@@ -105,14 +108,14 @@ updated: 2026-10-28
 
 EEGLAB ليس فيه قائمة اسمها «احسب المتوسط». المتوسط يُحسب داخل قوائم رسم الـ ERP، أو بسطر واحد في السكربت. هنا نستخدم أبسط رسم، وخيارات الرسم بالتفصيل في المحطة 7.
 
-ابدأ والداتاست (<En>dataset</En>) `D1 epochs clean` مفتوحة. إن لم تكن عندك، فافتح «سكربت للوصول إلى هذه الحالة» أعلى الدرس.
+ابدأ والداتاست (<En>dataset</En>) `D1 epochs clean` مفتوحة. إن لم تكن عندك، فافتح «سكربت للوصول إلى هذه الحالة» في آخر الدرس.
 
 1. افتح <MenuPath>Plot > Channel ERPs > In scalp/rect. array</MenuPath>.
 2. تظهر نافذة <UiLabel>Topographic ERP plot - pop_plottopo()</UiLabel>. اترك <UiLabel>Channels to plot</UiLabel> على `1:32`، واترك <UiLabel>Plot single trials</UiLabel> و<UiLabel>Plot in rect. array</UiLabel> غير مفعّلين، واضغط <UiLabel>Ok</UiLabel>.
 3. يظهر متوسط كل قناة (<En>channel</En>) في مكانها على الرأس. اضغط على موجة <En>Pz</En> لتكبيرها في نافذة مستقلة.
 4. ابحث في الموجة المكبّرة، بعد الخط العمودي عند الصفر، عن شيئين:
    - موجة سالبة صغيرة عند حوالي 200 ميلي ثانية، أوضح في القنوات الخلفية مثل <En>POz</En> و<En>Oz</En>.
-   - موجة موجبة كبيرة قمتها حوالي 400 ميلي ثانية، أكبر ما تكون في القنوات الوسطى والجدارية مثل <En>Cz</En> و<En>Pz</En>.
+   - موجة موجبة كبيرة قمتها حوالي 400 ميلي ثانية، أكبر ما تكون في القنوات الوسطى والجدارية مثل <En>Cz</En> و<En>Pz</En>. توقيتها ومكانها يطابقان مكوّن P3 (ويسمّى أيضاً P300) الذي ذُكر في دروس سابقة، وهو غير القطب الذي اسمه P3. أما تسميتها في بحثك فتحتاج مقارنة بالدراسات السابقة على مهمة مشابهة.
 
 <Callout type="note" title="اتجاه المحور">
 في هذه النافذة، الموجب لأعلى (الخيار `'ydir', 1` المكتوب في آخر خانة من النافذة). بعض الكتب والبرامج ترسم السالب لأعلى، فانظر دائماً إلى علامات المحور قبل أن تقول «قمة موجبة».

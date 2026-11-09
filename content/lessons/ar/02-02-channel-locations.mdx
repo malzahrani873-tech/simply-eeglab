@@ -88,20 +88,22 @@ end
 [ALLEEG, EEG, CURRENTSET] = eeg_store(ALLEEG, EEG, CURRENTSET); eeglab redraw;
 ```
 
+هذه الحلقة (<En>for loop</En>) تمرّ على القنوات واحدة واحدة، من 1 إلى عدد القنوات `EEG.nbchan`. ولكل قناة تحذف النقاط من اسمها بـ `strrep`. والسطر الأخير يحفظ التغيير في EEGLAB ويحدّث النافذة الرئيسية.
+
 اكتب `{EEG.chanlocs(1:3).labels}` مرة أخرى. الناتج الآن `'Fc5'` `'Fc3'` `'Fc1'`.
 
 ### 3. اجلب المواقع
 
 1. افتح <MenuPath>Edit > Channel locations</MenuPath>.
 2. لأن القنوات بلا مواقع بعد، يفتح EEGLAB أولاً نافذة عنوانها <UiLabel>Look up channel locations?</UiLabel>.
-3. أبقِ الاختيار الافتراضي في القائمة المنسدلة: <UiLabel>use MNI coordinate file for BEM dipfit model</UiLabel>. والملف تحته `standard_1005.elc`.
+3. أبقِ الاختيار الافتراضي في القائمة المنسدلة: <UiLabel>use MNI coordinate file for BEM dipfit model</UiLabel>. والملف تحته `standard_1005.elc`. هذا ملف المواقع القياسي، فاختره كما هو. وستعرف معنى BEM في درس DIPFIT.
 4. اترك خانة <UiLabel>Import file instead and erase all channels</UiLabel> غير مفعّلة.
 5. اضغط <UiLabel>OK</UiLabel>. يطبع الـ Command Window السطر `64 channel with the same label found and imported`.
 6. تفتح نافذة تعديل القنوات، وفيها كل قناة بإحداثياتها. اضغط <UiLabel>OK</UiLabel> في أسفلها لتغلقها. التغييرات لا تُطبَّق إلا بعد إغلاق هذه النافذة.
 
 ### 4. احفظ
 
-افتح <MenuPath>File > Resave current dataset(s)</MenuPath>. يحفظ هذا الأمر الأسماء المصحّحة والمواقع في نفس الملف `S001R03.set` في مجلد الدروس. احتفظ به، فـ[درس الأحداث](/lesson/events/) يبدأ منه.
+افتح <MenuPath>File > Resave current dataset(s)</MenuPath>. يحفظ هذا الأمر الأسماء المصحّحة والمواقع في نفس الملف `S001R03.set` في مجلد عملك (`eeg-course`). احتفظ به، فـ[درس الأحداث](/lesson/events/) يبدأ منه.
 
 ## كيف أفعل ذلك كله بسكربت؟
 

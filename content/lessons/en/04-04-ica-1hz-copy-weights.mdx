@@ -31,31 +31,44 @@ startingPoint:
   applied: [filtering, line-noise, bad-channels, interpolation, rereferencing, run-ica]
   script: |
     [ALLEEG, EEG, CURRENTSET, ALLCOM] = eeglab;
-    eeglabRoot = fileparts(which('eeglab'));
-    EEG = pop_loadset('eeglab_data.set', fullfile(eeglabRoot, 'sample_data'));
-    fullLocs = EEG.chanlocs;
+    if exist(fullfile(pwd, 'D1_main_ica.set'), 'file')
+        % Saved in the run-ica lesson: load it instead of running ICA again (minutes)
+        EEG = pop_loadset('D1_main_ica.set', pwd);
+        % Rebuild the two datasets of this lesson: main without weights, 1-Hz copy with weights
+        EEG_ica = pop_eegfiltnew(EEG, 'locutoff', 1);
+        EEG_ica.setname = 'D1 ica1hz';
+        EEG_main = EEG;
+        EEG_main.icaweights = []; EEG_main.icasphere = []; EEG_main.icawinv = [];
+        EEG_main.icachansind = []; EEG_main.icaact = [];
+        EEG_main = eeg_checkset(EEG_main);
+        EEG_main.setname = 'D1 main';
+    else
+        eeglabRoot = fileparts(which('eeglab'));
+        EEG = pop_loadset('eeglab_data.set', fullfile(eeglabRoot, 'sample_data'));
+        fullLocs = EEG.chanlocs;
 
-    % Main dataset: high-pass at 0.1 Hz, then 60 Hz line-noise removal
-    EEG = pop_eegfiltnew(EEG, 'locutoff', 0.1);
-    EEG = pop_eegfiltnew(EEG, 'locutoff', 58, 'hicutoff', 62, 'revfilt', 1);
+        % Main dataset: high-pass at 0.1 Hz, then 60 Hz line-noise removal
+        EEG = pop_eegfiltnew(EEG, 'locutoff', 0.1);
+        EEG = pop_eegfiltnew(EEG, 'locutoff', 58, 'hicutoff', 62, 'revfilt', 1);
 
-    % Bad channels you removed earlier, e.g. {'T7'}; leave empty if none
-    badChans = {};
-    if ~isempty(badChans)
-        EEG = pop_select(EEG, 'rmchannel', badChans);
-        EEG = pop_interp(EEG, fullLocs, 'spherical');
+        % Bad channels you removed earlier, e.g. {'T7'}; leave empty if none
+        badChans = {};
+        if ~isempty(badChans)
+            EEG = pop_select(EEG, 'rmchannel', badChans);
+            EEG = pop_interp(EEG, fullLocs, 'spherical');
+        end
+
+        % Average reference, EOG channels excluded
+        eogIdx = find(ismember({EEG.chanlocs.labels}, {'EOG1', 'EOG2'}));
+        EEG = pop_reref(EEG, [], 'exclude', eogIdx);
+        EEG.setname = 'D1 main';
+        EEG_main = EEG;
+
+        % ICA copy: same data, high-pass at 1 Hz, with ICA weights
+        EEG_ica = pop_eegfiltnew(EEG_main, 'locutoff', 1);
+        EEG_ica.setname = 'D1 ica1hz';
+        EEG_ica = pop_runica(EEG_ica, 'icatype', 'runica', 'extended', 1);
     end
-
-    % Average reference, EOG channels excluded
-    eogIdx = find(ismember({EEG.chanlocs.labels}, {'EOG1', 'EOG2'}));
-    EEG = pop_reref(EEG, [], 'exclude', eogIdx);
-    EEG.setname = 'D1 main';
-    EEG_main = EEG;
-
-    % ICA copy: same data, high-pass at 1 Hz, with ICA weights
-    EEG_ica = pop_eegfiltnew(EEG_main, 'locutoff', 1);
-    EEG_ica.setname = 'D1 ica1hz';
-    EEG_ica = pop_runica(EEG_ica, 'icatype', 'runica', 'extended', 1);
 
     % Dataset 1: main dataset; dataset 2: ICA copy
     EEG_main.filename = ''; EEG_main.filepath = ''; EEG_main.datfile = ''; EEG_main.saved = 'no';
@@ -100,7 +113,13 @@ ICA does not learn a signal. It learns a fixed way to combine the channels, whic
 
 ## How do I copy the weights and compare the maps from the menus?
 
-Start with the two copies: run "Script to reach this state" under "Starts from" at the top of the lesson. It puts the main dataset in dataset 1 and the ICA copy in dataset 2.
+Start with the two copies: run "Script to reach this state" at the end of the lesson. It puts the main dataset in dataset 1 and the ICA copy in dataset 2. Before you run the script, make your work folder `eeg-course` the MATLAB Current Folder, because the script reads and saves your files there.
+
+**If you continued from [the Running ICA lesson](/en/lesson/run-ica/) in the same session**, you already have both copies, and the weights are already in dataset 1. Go straight to "Third: compare the maps".
+
+<Callout type="warning">
+**Running ICA again changes the component order.** If the starting script does not find `D1_main_ica.set` in your work folder, it runs ICA again. This takes minutes and gives a different component order from your earlier run, and saving in step 3 of "Third" writes the new file over the old one. This does no harm, but find components by their shape, not by their number.
+</Callout>
 
 **First: check the two copies**
 
@@ -120,7 +139,7 @@ This is the same step as in the Running ICA lesson. You repeat it here because t
 
 1. With dataset 1 current, open <MenuPath>Plot > Component maps > In 2-D</MenuPath>.
 2. Choose dataset 2 and open the same window. The maps are identical, in the same order. The blink component is in the same place in both.
-3. Save dataset 1 (the 0.1 Hz main dataset, not the 1 Hz ICA copy) with <MenuPath>File > Save current dataset as</MenuPath> as `D1_main_ica.set`. [The ICLabel lesson](/en/lesson/iclabel/) starts from it.
+3. Save dataset 1 (the 0.1 Hz main dataset, not the 1 Hz ICA copy) with <MenuPath>File > Save current dataset as</MenuPath> as `D1_main_ica.set` in your work folder (`eeg-course`). [The ICLabel lesson](/en/lesson/iclabel/) starts from it.
 
 ## How do I copy the weights and measure the difference with a script?
 

@@ -28,38 +28,40 @@ startingPoint:
   file: eeglab_data.set
   applied: [filtering, line-noise, bad-channels, interpolation, rereferencing, run-ica, ica-1hz-copy-weights, iclabel, extract-epochs, baseline-correction]
   script: |
-    % Shortcut: if you saved D1_main_clean_lp30.set in the ICLabel lesson, keep
-    % the first line and the last three lines, and replace every line between them with:
-    % EEG = pop_loadset('D1_main_clean_lp30.set', pwd);
     [ALLEEG, EEG, CURRENTSET, ALLCOM] = eeglab;
-    eeglabRoot = fileparts(which('eeglab'));
-    EEG = pop_loadset('eeglab_data.set', fullfile(eeglabRoot, 'sample_data'));
-    fullLocs = EEG.chanlocs;
+    if exist(fullfile(pwd, 'D1_main_ica.set'), 'file')
+        % Saved in the run-ica lesson: load it instead of running ICA again (minutes)
+        EEG = pop_loadset('D1_main_ica.set', pwd);
+    else
+        eeglabRoot = fileparts(which('eeglab'));
+        EEG = pop_loadset('eeglab_data.set', fullfile(eeglabRoot, 'sample_data'));
+        fullLocs = EEG.chanlocs;
 
-    % Main dataset: high-pass at 0.1 Hz, then 60 Hz line-noise removal
-    EEG = pop_eegfiltnew(EEG, 'locutoff', 0.1);
-    EEG = pop_eegfiltnew(EEG, 'locutoff', 58, 'hicutoff', 62, 'revfilt', 1);
+        % Main dataset: high-pass at 0.1 Hz, then 60 Hz line-noise removal
+        EEG = pop_eegfiltnew(EEG, 'locutoff', 0.1);
+        EEG = pop_eegfiltnew(EEG, 'locutoff', 58, 'hicutoff', 62, 'revfilt', 1);
 
-    % Bad channels you removed earlier, e.g. {'T7'}; leave empty if none
-    badChans = {};
-    if ~isempty(badChans)
-        EEG = pop_select(EEG, 'rmchannel', badChans);
-        EEG = pop_interp(EEG, fullLocs, 'spherical');
+        % Bad channels you removed earlier, e.g. {'T7'}; leave empty if none
+        badChans = {};
+        if ~isempty(badChans)
+            EEG = pop_select(EEG, 'rmchannel', badChans);
+            EEG = pop_interp(EEG, fullLocs, 'spherical');
+        end
+
+        % Average reference, EOG channels excluded
+        eogIdx = find(ismember({EEG.chanlocs.labels}, {'EOG1', 'EOG2'}));
+        EEG = pop_reref(EEG, [], 'exclude', eogIdx);
+
+        % ICA on a 1-Hz copy, then copy the weights back
+        EEG_ica = pop_eegfiltnew(EEG, 'locutoff', 1);
+        EEG_ica = pop_runica(EEG_ica, 'icatype', 'runica', 'extended', 1);
+        EEG.icaweights  = EEG_ica.icaweights;
+        EEG.icasphere   = EEG_ica.icasphere;
+        EEG.icachansind = EEG_ica.icachansind;
+        EEG.icawinv     = [];
+        EEG.icaact      = [];
+        EEG = eeg_checkset(EEG);
     end
-
-    % Average reference, EOG channels excluded
-    eogIdx = find(ismember({EEG.chanlocs.labels}, {'EOG1', 'EOG2'}));
-    EEG = pop_reref(EEG, [], 'exclude', eogIdx);
-
-    % ICA on a 1-Hz copy, then copy the weights back
-    EEG_ica = pop_eegfiltnew(EEG, 'locutoff', 1);
-    EEG_ica = pop_runica(EEG_ica, 'icatype', 'runica', 'extended', 1);
-    EEG.icaweights  = EEG_ica.icaweights;
-    EEG.icasphere   = EEG_ica.icasphere;
-    EEG.icachansind = EEG_ica.icachansind;
-    EEG.icawinv     = [];
-    EEG.icaact      = [];
-    EEG = eeg_checkset(EEG);
 
     % Remove components ICLabel rates above 90% Eye or Muscle
     EEG = pop_iclabel(EEG, 'default');
@@ -101,7 +103,7 @@ ICA أزال أغلب الرمش، لكن بعض الـ epochs (المقاطع �
 
 ## كيف أرفض الـ epochs المتطرفة بسكربت؟
 
-قائمة رفض الـ epochs مخفية افتراضياً في EEGLAB 2026.1، لذلك السكربت هو الطريق الأساسي هنا. ابدأ والداتاست `D1 epochs bl` مفتوحة (إن لم تكن عندك، فافتح «سكربت للوصول إلى هذه الحالة» تحت «تبدأ من» أعلى الدرس)، ثم انسخ هذا السكربت كاملاً إلى نافذة الأوامر.
+قائمة رفض الـ epochs مخفية افتراضياً في EEGLAB 2026.1، لذلك السكربت هو الطريق الأساسي هنا. ابدأ والداتاست `D1 epochs bl` مفتوحة (إن لم تكن عندك، فافتح «سكربت للوصول إلى هذه الحالة» في آخر الدرس)، ثم انسخ هذا السكربت كاملاً إلى نافذة الأوامر. قبل تشغيل السكربت اجعل مجلد عملك `eeg-course` هو مجلد MATLAB الحالي (<En>Current Folder</En>)، لأن السكربت يقرأ ملفاتك ويحفظها فيه.
 
 ```matlab
 % Mark epochs where any channel goes beyond +/-100 uV anywhere in the epoch
@@ -138,7 +140,7 @@ EEGLAB يسمّي هذه القوائم legacy، أي قوائم قديمة أُ
 
 لإظهار القائمة:
 
-1. اختر `D1 epochs bl` من قائمة <MenuPath>Datasets</MenuPath>، واحفظها من <MenuPath>File > Save current dataset as</MenuPath> باسم `D1_epochs_bl.set`، لأن إعادة تشغيل EEGLAB في الخطوة 3 تمسح البيانات من الذاكرة.
+1. اختر `D1 epochs bl` من قائمة <MenuPath>Datasets</MenuPath>، واحفظها من <MenuPath>File > Save current dataset as</MenuPath> باسم `D1_epochs_bl.set` في مجلد عملك (`eeg-course`)، لأن إعادة تشغيل EEGLAB في الخطوة 3 تمسح البيانات من الذاكرة.
 2. افتح <MenuPath>File > Preferences</MenuPath>، وفعّل <UiLabel>If set, show all menu items from previous EEGLAB versions. You must restart EEGLAB for this to take effect.</UiLabel>، ثم اضغط <UiLabel>Ok</UiLabel>.
 3. أعد تشغيل EEGLAB: اكتب `eeglab` في نافذة الأوامر، ثم افتح الملف من <MenuPath>File > Load existing dataset</MenuPath>.
 
@@ -156,7 +158,7 @@ EEGLAB يسمّي هذه القوائم legacy، أي قوائم قديمة أُ
    - **إذا طبعت نافذة الأوامر `0/80 trials marked for rejection`** فلا يوجد ما يُرفض، والزر <UiLabel>REJECT</UiLabel> لن يفعل شيئاً. أغلق نافذة العرض، وافتح <MenuPath>Edit > Dataset info</MenuPath>، واكتب في <UiLabel>Dataset name</UiLabel> الاسم `D1 epochs clean`، ثم اضغط <UiLabel>Ok</UiLabel>، وانتقل إلى الخطوة 10.
 8. اضغط <UiLabel>REJECT</UiLabel>، ثم أكّد بـ <UiLabel>YES</UiLabel>.
 9. في نافذة الداتاست الجديدة اكتب في <UiLabel>Name it:</UiLabel> الاسم `D1 epochs clean`، ثم اضغط <UiLabel>Ok</UiLabel>.
-10. احفظها من <MenuPath>File > Save current dataset as</MenuPath> باسم `D1_epochs_clean.set`. دروس المحطتين 6 و 7 تبدأ منها.
+10. احفظها من <MenuPath>File > Save current dataset as</MenuPath> باسم `D1_epochs_clean.set` في مجلد عملك (`eeg-course`). دروس المحطتين 6 و 7 تبدأ منها.
 
 ## أي حد سعة أختار؟
 
@@ -175,7 +177,7 @@ EEGLAB يسمّي هذه القوائم legacy، أي قوائم قديمة أُ
 - نافذة الأوامر تطبع عدد الـ epochs المعلّمة، مثل `1/80 trials marked for rejection`. المتوقع في D1 بعد تنظيف ICA عدد قليل، بين 0 و 3 تقريباً، ويختلف قليلاً بين تشغيل وآخر لأن نتيجة ICA تختلف.
 - <UiLabel>Epochs</UiLabel> في النافذة الرئيسية تساوي 80 ناقص عدد المرفوض.
 - اكتب `max(abs(EEG.data(:)))` في نافذة الأوامر (<En>Command Window</En>): الناتج أصغر من 100.
-- الملف `D1_epochs_clean.set` موجود في مجلد العمل.
+- الملف `D1_epochs_clean.set` موجود في مجلد عملك `eeg-course`.
 
 ## ما الأخطاء الشائعة في رفض الـ epochs؟
 

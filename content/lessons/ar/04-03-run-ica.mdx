@@ -88,7 +88,7 @@ updated: 2026-10-28
 
 ## كيف أشغّل ICA من القوائم؟
 
-ابدأ والنسخة الرئيسية `D1 main` مفتوحة. إن لم تكن عندك، فافتح «سكربت للوصول إلى هذه الحالة» تحت «تبدأ من» أعلى الدرس. سنسمّيها الداتاست 1.
+ابدأ والنسخة الرئيسية `D1 main` مفتوحة. إن لم تكن عندك، فافتح «سكربت للوصول إلى هذه الحالة» في آخر الدرس. سنسمّيها الداتاست 1.
 
 **أولاً: اصنع نسخة ICA**
 
@@ -120,15 +120,17 @@ updated: 2026-10-28
 2. افتح <MenuPath>Edit > Dataset info</MenuPath>.
 3. بجانب <UiLabel>ICA weights array or text/binary file (if any):</UiLabel> اضغط <UiLabel>from other dataset</UiLabel>، واكتب `2` ثم اضغط <UiLabel>OK</UiLabel>. تمتلئ ثلاث خانات تلقائياً: `ALLEEG(2).icaweights` و `ALLEEG(2).icasphere` و `ALLEEG(2).icachansind`.
 4. اضغط <UiLabel>OK</UiLabel> لإغلاق النافذة.
-5. احفظ النسخة الرئيسية من <MenuPath>File > Save current dataset as</MenuPath> باسم `D1_main_ica.set`. درس ICLabel يبدأ منها.
+5. احفظ النسخة الرئيسية من <MenuPath>File > Save current dataset as</MenuPath> باسم `D1_main_ica.set` في مجلد عملك (`eeg-course`). درس ICLabel يبدأ منها.
 
 ## ماذا أرى في خرائط المكوّنات؟
 
 <Figure src="run-ica/run-ica-maps-20.png" alt="خرائط الرأس لأول 20 مكوّن ICA على D1، مرقّمة من IC 1 إلى IC 20، بألوان EEGLAB الافتراضية." source="D1" />
 
-هذه خرائط أول 20 مكوّناً في D1. مكوّن الرمش فيها خريطة قوية في مقدمة الرأس. ترتيب مكوّناتك قد يختلف عن الصورة، فابحث عن المكوّن بشكله.
+هذه خرائط أول 20 مكوّناً في D1. مكوّن الرمش فيها خريطة قوية عند حافة الجبهة فقط: في هذه الصورة هو IC 2 (رقمه عندك قد يختلف). ترتيب مكوّناتك قد يختلف عن الصورة، فابحث عن المكوّن بشكله.
 
 ## كيف أشغّل ICA بسكربت؟
+
+قبل تشغيل السكربت اجعل مجلد عملك `eeg-course` هو مجلد MATLAB الحالي (<En>Current Folder</En>)، لأن السكربت يقرأ ملفاتك ويحفظها فيه.
 
 ```matlab
 % Main dataset (high-pass 0.1 Hz, line noise removed, average reference) is in EEG

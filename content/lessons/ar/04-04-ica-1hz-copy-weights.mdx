@@ -31,31 +31,44 @@ startingPoint:
   applied: [filtering, line-noise, bad-channels, interpolation, rereferencing, run-ica]
   script: |
     [ALLEEG, EEG, CURRENTSET, ALLCOM] = eeglab;
-    eeglabRoot = fileparts(which('eeglab'));
-    EEG = pop_loadset('eeglab_data.set', fullfile(eeglabRoot, 'sample_data'));
-    fullLocs = EEG.chanlocs;
+    if exist(fullfile(pwd, 'D1_main_ica.set'), 'file')
+        % Saved in the run-ica lesson: load it instead of running ICA again (minutes)
+        EEG = pop_loadset('D1_main_ica.set', pwd);
+        % Rebuild the two datasets of this lesson: main without weights, 1-Hz copy with weights
+        EEG_ica = pop_eegfiltnew(EEG, 'locutoff', 1);
+        EEG_ica.setname = 'D1 ica1hz';
+        EEG_main = EEG;
+        EEG_main.icaweights = []; EEG_main.icasphere = []; EEG_main.icawinv = [];
+        EEG_main.icachansind = []; EEG_main.icaact = [];
+        EEG_main = eeg_checkset(EEG_main);
+        EEG_main.setname = 'D1 main';
+    else
+        eeglabRoot = fileparts(which('eeglab'));
+        EEG = pop_loadset('eeglab_data.set', fullfile(eeglabRoot, 'sample_data'));
+        fullLocs = EEG.chanlocs;
 
-    % Main dataset: high-pass at 0.1 Hz, then 60 Hz line-noise removal
-    EEG = pop_eegfiltnew(EEG, 'locutoff', 0.1);
-    EEG = pop_eegfiltnew(EEG, 'locutoff', 58, 'hicutoff', 62, 'revfilt', 1);
+        % Main dataset: high-pass at 0.1 Hz, then 60 Hz line-noise removal
+        EEG = pop_eegfiltnew(EEG, 'locutoff', 0.1);
+        EEG = pop_eegfiltnew(EEG, 'locutoff', 58, 'hicutoff', 62, 'revfilt', 1);
 
-    % Bad channels you removed earlier, e.g. {'T7'}; leave empty if none
-    badChans = {};
-    if ~isempty(badChans)
-        EEG = pop_select(EEG, 'rmchannel', badChans);
-        EEG = pop_interp(EEG, fullLocs, 'spherical');
+        % Bad channels you removed earlier, e.g. {'T7'}; leave empty if none
+        badChans = {};
+        if ~isempty(badChans)
+            EEG = pop_select(EEG, 'rmchannel', badChans);
+            EEG = pop_interp(EEG, fullLocs, 'spherical');
+        end
+
+        % Average reference, EOG channels excluded
+        eogIdx = find(ismember({EEG.chanlocs.labels}, {'EOG1', 'EOG2'}));
+        EEG = pop_reref(EEG, [], 'exclude', eogIdx);
+        EEG.setname = 'D1 main';
+        EEG_main = EEG;
+
+        % ICA copy: same data, high-pass at 1 Hz, with ICA weights
+        EEG_ica = pop_eegfiltnew(EEG_main, 'locutoff', 1);
+        EEG_ica.setname = 'D1 ica1hz';
+        EEG_ica = pop_runica(EEG_ica, 'icatype', 'runica', 'extended', 1);
     end
-
-    % Average reference, EOG channels excluded
-    eogIdx = find(ismember({EEG.chanlocs.labels}, {'EOG1', 'EOG2'}));
-    EEG = pop_reref(EEG, [], 'exclude', eogIdx);
-    EEG.setname = 'D1 main';
-    EEG_main = EEG;
-
-    % ICA copy: same data, high-pass at 1 Hz, with ICA weights
-    EEG_ica = pop_eegfiltnew(EEG_main, 'locutoff', 1);
-    EEG_ica.setname = 'D1 ica1hz';
-    EEG_ica = pop_runica(EEG_ica, 'icatype', 'runica', 'extended', 1);
 
     % Dataset 1: main dataset; dataset 2: ICA copy
     EEG_main.filename = ''; EEG_main.filepath = ''; EEG_main.datfile = ''; EEG_main.saved = 'no';
@@ -100,7 +113,13 @@ ICA لا يتعلّم إشارة. يتعلّم طريقة ثابتة لجمع ا
 
 ## كيف أنسخ الأوزان وأقارن الخرائط من القوائم؟
 
-ابدأ بالنسختين: شغّل «سكربت للوصول إلى هذه الحالة» تحت «تبدأ من» أعلى الدرس. هو يضع النسخة الرئيسية في الداتاست 1، ونسخة ICA في الداتاست 2.
+ابدأ بالنسختين: شغّل «سكربت للوصول إلى هذه الحالة» في آخر الدرس. هو يضع النسخة الرئيسية في الداتاست 1، ونسخة ICA في الداتاست 2. قبل تشغيل السكربت اجعل مجلد عملك `eeg-course` هو مجلد MATLAB الحالي (<En>Current Folder</En>)، لأن السكربت يقرأ ملفاتك ويحفظها فيه.
+
+**إذا أكملت من [درس تشغيل ICA](/lesson/run-ica/) في نفس الجلسة** فعندك النسختان، والأوزان منسوخة إلى الداتاست 1. انتقل مباشرة إلى «ثالثاً: قارن الخرائط».
+
+<Callout type="warning">
+**إعادة ICA تغيّر ترتيب المكوّنات.** إذا لم يجد سكربت البداية الملف `D1_main_ica.set` في مجلد عملك، فسيشغّل ICA من جديد. هذا يأخذ دقائق، ويعطي ترتيب مكوّنات مختلفاً عن تشغيلك السابق، وعند الحفظ في الخطوة 3 من «ثالثاً» يُكتب الملف الجديد فوق القديم. هذا لا يضر، لكن ابحث عن المكوّنات بشكلها لا برقمها.
+</Callout>
 
 **أولاً: تحقّق من النسختين**
 
@@ -120,7 +139,7 @@ ICA لا يتعلّم إشارة. يتعلّم طريقة ثابتة لجمع ا
 
 1. والداتاست 1 هي الحالية، افتح <MenuPath>Plot > Component maps > In 2-D</MenuPath>.
 2. اختر الداتاست 2 وافتح نفس النافذة. الخرائط متطابقة وبنفس الترتيب، ومكوّن الرمش في نفس المكان في النسختين.
-3. احفظ الداتاست 1، وهي النسخة الرئيسية بـ 0.1 هرتز لا نسخة ICA بـ 1 هرتز، من <MenuPath>File > Save current dataset as</MenuPath> باسم `D1_main_ica.set`. [درس ICLabel](/lesson/iclabel/) يبدأ منها.
+3. احفظ الداتاست 1، وهي النسخة الرئيسية بـ 0.1 هرتز لا نسخة ICA بـ 1 هرتز، من <MenuPath>File > Save current dataset as</MenuPath> باسم `D1_main_ica.set` في مجلد عملك (`eeg-course`). [درس ICLabel](/lesson/iclabel/) يبدأ منها.
 
 ## كيف أنسخ الأوزان وأقيس الفرق بسكربت؟
 

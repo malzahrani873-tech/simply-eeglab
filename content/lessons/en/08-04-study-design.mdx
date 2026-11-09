@@ -94,6 +94,10 @@ eeglabVersion: "2026.1"
 updated: 2026-10-28
 ---
 
+<Callout type="warning">
+The lesson on creating a STUDY is coming soon. Until then, run "Script to reach this state" at the end of the lesson. The script creates a STUDY named `animal_mine.study` with the 14 participants, and stores each participant's gender in the `group` variable (values `F` and `M`). It also converts the old `.dat` data files to `.fdt` and then deletes the old ones. This is on purpose: resaving `.dat` files in their old format damages the data in EEGLAB 2026.1.
+</Callout>
+
 ## The idea
 
 The STUDY knows each file's subject, condition and group. But it does not know your question. The design is the question written in EEGLAB's terms: which variables you compare, which of their values, and which participants.
@@ -140,7 +144,7 @@ Each research question has a design that fits it. That is why the steps below cr
 
 **1. Look at the design EEGLAB created**
 
-1. Start with `animal_mine.study` open. If you don't have it, open "Script to reach this state" under "Starts from" at the top of the lesson, and run it.
+1. Start with `animal_mine.study` open. If you don't have it, open "Script to reach this state" at the end of the lesson, and run it.
 2. Open <MenuPath>Study > Select/Edit study design(s)</MenuPath>. The <UiLabel>Edit STUDY design -- pop_studydesign()</UiLabel> window opens.
 3. The <UiLabel>Design name</UiLabel> list holds one design, `STUDY.design 1`. EEGLAB created it by itself when the STUDY was created.
 4. The <UiLabel>Edit the independent variables for this design</UiLabel> part has two lines: `Categorical variable: condition - Values (animal - distractor)` and `Categorical variable: group - Values (F - M)`. EEGLAB puts every standard variable with more than one value into the first design.

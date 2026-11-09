@@ -140,7 +140,7 @@ The average hides differences between people. One participant with a very large 
 
 **1. Open the plot window**
 
-1. Start with `animal_mine.study` open and its measures computed. If you don't have it, open "Script to reach this state" under "Starts from" at the top of the lesson. The script computes the measures only if it cannot find them.
+1. Start with `animal_mine.study` open and its measures computed. If you don't have it, open "Script to reach this state" at the end of the lesson. The script computes the measures only if it cannot find them.
 2. Open <MenuPath>Study > Plot channel measures</MenuPath>. The <UiLabel>View and edit current channels -- pop_chanplot()</UiLabel> window opens.
 3. At the top is <UiLabel>Select design:</UiLabel>. Choose `image x gender`.
 4. The left column, <UiLabel>Select channel to plot</UiLabel>, holds the channel list and the buttons that plot the average: <UiLabel>Plot ERPs</UiLabel>, <UiLabel>Plot spectra</UiLabel> and <UiLabel>Plot ERSPs</UiLabel>. Next to each button is <UiLabel>Params</UiLabel> for its options.
@@ -225,7 +225,7 @@ STUDY = std_erspplot(STUDY, ALLEEG, 'channels', pz, 'design', 3);
 - **The wrong design in <UiLabel>Select design:</UiLabel>.** The window remembers the last choice. Look at the number of panels: design 2 gives two panels, and design 3 one panel.
 - **Trusting the average without looking at the participants.** If one or two participants create the difference, the average does not represent the group.
 - **Choosing the map window after seeing the difference.** This greatly raises the chance of finding a "difference" even in random data. The statistics lesson explains why.
-- **ERSPs computed at a few channels only.** In EEGLAB 2026.1, reading them back fails with `Unrecognized field name "chan1"`. Recompute at every channel, as in "Starts from" at the top of the lesson.
+- **ERSPs computed at a few channels only.** In EEGLAB 2026.1, reading them back fails with `Unrecognized field name "chan1"`. Recompute at every channel, as in "Script to reach this state" at the end of the lesson.
 - **Comparing two panels on different scales.** EEGLAB picks the scale for each plot. Fix <UiLabel>Plot limits [low high]</UiLabel> before comparing.
 
 {/* "From experience" box: waiting for a story from the project owner. Not written before it arrives. */}

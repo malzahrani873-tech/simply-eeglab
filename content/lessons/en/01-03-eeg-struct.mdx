@@ -111,6 +111,7 @@ isempty(EEG.icaweights)   % 1 (true)
 ```
 
 - **Why subtract 1?** In MATLAB the first sample is number 1 and sits at time zero. So time in seconds = (sample number − 1) ÷ sampling rate.
+- **Why is `latency` a fraction, like 129.0087?** It is a sample number, but EEGLAB keeps its decimals, because an event can fall between two samples. This happens, for example, when the sampling rate changes: EEGLAB recomputes each event latency at the new rate. Do not round it yourself: when you cut epochs, EEGLAB converts it to a whole sample number.
 - `EEG.data(1, 1:5)`: the first number selects the channel (row), and the second selects the samples (columns).
 
 ## How do I verify that I read the fields correctly?

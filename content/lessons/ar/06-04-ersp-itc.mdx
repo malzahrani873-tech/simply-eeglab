@@ -28,38 +28,41 @@ startingPoint:
   file: eeglab_data.set
   applied: [filtering, line-noise, bad-channels, interpolation, rereferencing, run-ica, ica-1hz-copy-weights, iclabel, extract-epochs, baseline-correction, epoch-rejection]
   script: |
-    % Shortcut: if you saved D1_epochs_clean.set in the epoch rejection lesson,
-    % keep the first line and the last three lines, and replace every line between them with:
-    % EEG = pop_loadset('D1_epochs_clean.set', pwd);
     [ALLEEG, EEG, CURRENTSET, ALLCOM] = eeglab;
-    eeglabRoot = fileparts(which('eeglab'));
-    EEG = pop_loadset('eeglab_data.set', fullfile(eeglabRoot, 'sample_data'));
-    fullLocs = EEG.chanlocs;
+    % Your Current Folder must be your work folder (eeg-course)
+    if exist(fullfile(pwd, 'D1_main_ica.set'), 'file')
+        % Saved in the run-ica lesson: load it instead of running ICA again (minutes)
+        EEG = pop_loadset('D1_main_ica.set', pwd);
+    else
+        eeglabRoot = fileparts(which('eeglab'));
+        EEG = pop_loadset('eeglab_data.set', fullfile(eeglabRoot, 'sample_data'));
+        fullLocs = EEG.chanlocs;
 
-    % Main dataset: high-pass at 0.1 Hz, then 60 Hz line-noise removal
-    EEG = pop_eegfiltnew(EEG, 'locutoff', 0.1);
-    EEG = pop_eegfiltnew(EEG, 'locutoff', 58, 'hicutoff', 62, 'revfilt', 1);
+        % Main dataset: high-pass at 0.1 Hz, then 60 Hz line-noise removal
+        EEG = pop_eegfiltnew(EEG, 'locutoff', 0.1);
+        EEG = pop_eegfiltnew(EEG, 'locutoff', 58, 'hicutoff', 62, 'revfilt', 1);
 
-    % Bad channels you removed earlier, e.g. {'T7'}; leave empty if none
-    badChans = {};
-    if ~isempty(badChans)
-        EEG = pop_select(EEG, 'rmchannel', badChans);
-        EEG = pop_interp(EEG, fullLocs, 'spherical');
+        % Bad channels you removed earlier, e.g. {'T7'}; leave empty if none
+        badChans = {};
+        if ~isempty(badChans)
+            EEG = pop_select(EEG, 'rmchannel', badChans);
+            EEG = pop_interp(EEG, fullLocs, 'spherical');
+        end
+
+        % Average reference, EOG channels excluded
+        eogIdx = find(ismember({EEG.chanlocs.labels}, {'EOG1', 'EOG2'}));
+        EEG = pop_reref(EEG, [], 'exclude', eogIdx);
+
+        % ICA on a 1-Hz copy, then copy the weights back
+        EEG_ica = pop_eegfiltnew(EEG, 'locutoff', 1);
+        EEG_ica = pop_runica(EEG_ica, 'icatype', 'runica', 'extended', 1);
+        EEG.icaweights  = EEG_ica.icaweights;
+        EEG.icasphere   = EEG_ica.icasphere;
+        EEG.icachansind = EEG_ica.icachansind;
+        EEG.icawinv     = [];
+        EEG.icaact      = [];
+        EEG = eeg_checkset(EEG);
     end
-
-    % Average reference, EOG channels excluded
-    eogIdx = find(ismember({EEG.chanlocs.labels}, {'EOG1', 'EOG2'}));
-    EEG = pop_reref(EEG, [], 'exclude', eogIdx);
-
-    % ICA on a 1-Hz copy, then copy the weights back
-    EEG_ica = pop_eegfiltnew(EEG, 'locutoff', 1);
-    EEG_ica = pop_runica(EEG_ica, 'icatype', 'runica', 'extended', 1);
-    EEG.icaweights  = EEG_ica.icaweights;
-    EEG.icasphere   = EEG_ica.icasphere;
-    EEG.icachansind = EEG_ica.icachansind;
-    EEG.icawinv     = [];
-    EEG.icaact      = [];
-    EEG = eeg_checkset(EEG);
 
     % Remove components ICLabel rates above 90% Eye or Muscle
     EEG = pop_iclabel(EEG, 'default');
@@ -112,15 +115,15 @@ updated: 2026-10-28
 
 ## كيف أحسب الخريطتين من القوائم؟
 
-ابدأ والداتاست (<En>dataset</En>) `D1 epochs clean` مفتوحة. إن لم تكن عندك، فافتح «سكربت للوصول إلى هذه الحالة» أعلى الدرس.
+ابدأ والداتاست (<En>dataset</En>) `D1 epochs clean` مفتوحة. إن لم تكن عندك، فافتح «سكربت للوصول إلى هذه الحالة» في آخر الدرس.
 
 1. افتح القائمة. مكانها يعتمد على إعدادك:
    - إذا فعّلت القوائم القديمة (<En>legacy menus</En>) في [درس رفض الـ epochs السيئة](/lesson/epoch-rejection/): <MenuPath>Plot > Time-frequency transforms > Channel time-frequency</MenuPath>.
    - إذا لم تفعّلها: <MenuPath>Plot > Channel time-frequency</MenuPath>.
-2. تظهر نافذة <UiLabel>Plot channel time frequency -- pop_newtimef()</UiLabel>. في <UiLabel>Channel number</UiLabel> اكتب `14`، أي القناة <En>Cz</En>، أو اخترها بالزر <UiLabel>...</UiLabel>.
+2. تظهر نافذة <UiLabel>Plot channel time frequency -- pop_newtimef()</UiLabel>. في <UiLabel>Channel number</UiLabel> اضغط الزر <UiLabel>...</UiLabel> بجانب الخانة، واختر <En>Cz</En> من القائمة، ثم اضغط <UiLabel>Ok</UiLabel>. يكتب EEGLAB رقم القناة في الخانة وحده، فلا تكتب الرقم بنفسك: رقم Cz يتغيّر إذا حذفت قنوات من قبل.
 3. اترك <UiLabel>Sub epoch time limits [min max] (msec)</UiLabel> على قيمته الافتراضية، أي كل الـ epoch.
 4. في <UiLabel>Frequency limits [min max] (Hz) or sequence</UiLabel> اكتب `3 30`. البيانات مفلترة بـ low-pass عند 30 هرتز، فلا معنى لما فوق ذلك.
-5. اترك <UiLabel>Baseline limits [min max] (msec) (0->pre-stim.)</UiLabel> على `0`، أي كل الفترة قبل المثير.
+5. اترك <UiLabel>Baseline limits [min max] (msec) (0->pre-stim.)</UiLabel> على `0`، أي كل الفترة قبل المثير. عملياً تكون هذه الفترة من -500 إلى 0 ميلي ثانية، لا من -1000، لأن EEGLAB يقصّ نصف ثانية من كل طرف من الـ epoch (انظر «حواف الخريطة» أدناه). لهذا تذكر جملة Methods أن الـ baseline من -500 إلى 0.
 6. اترك <UiLabel>Wavelet cycles [min max/fact] or sequence</UiLabel> على `3 0.8`.
 7. في <UiLabel>Optional newtimef() arguments (see Help)</UiLabel> اكتب `'winsize', 128`، أي نافذة بطول ثانية واحدة، حتى يبدأ التحليل من 3 هرتز.
 8. اترك <UiLabel>Plot Event Related Spectral Power</UiLabel> و<UiLabel>Plot Inter Trial Coherence</UiLabel> مفعّلين، واضغط <UiLabel>Ok</UiLabel>. يستغرق الحساب بضع ثوانٍ.

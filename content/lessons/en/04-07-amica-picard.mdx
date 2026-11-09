@@ -77,7 +77,7 @@ Two rows of scalp maps from D1, the first 10 ICA components of the same 1 Hz cop
 
 ## How do I install and run Picard or AMICA from the menus?
 
-Start with the main dataset `D1 main` open. If you don't have it, open "Script to reach this state" under "Starts from" at the top of the lesson.
+Start with the main dataset `D1 main` open. If you don't have it, open "Script to reach this state" at the end of the lesson.
 
 **First: install an extension**
 
@@ -130,7 +130,7 @@ pop_topoplot(EEG_picard, 0, 1:10);
 % EEG_amica = pop_runamica(EEG_ica, 'pcakeep', expectedRank, 'outdir', fullfile(pwd, 'amicaout'));
 ```
 
-The script times `runica` and Picard on the same copy and prints the number of components of each: 31 in D1 for both. The AMICA line is a comment, because it runs only after you install the extension.
+The script times `runica` and Picard on the same copy and prints the number of components of each: 31 in D1 for both. The AMICA line is a comment, because it runs only after you install the extension. Its output folder `amicaout` is created inside the MATLAB Current Folder, so make that your work folder `eeg-course`.
 
 ## Which algorithm should I choose?
 

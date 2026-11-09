@@ -51,20 +51,24 @@ Only two things tie the files together: the same name and the same folder. If th
 1. Open the `sample_data` folder inside your EEGLAB folder, in File Explorer on Windows or Finder on macOS.
 2. You will find `eeglab_data.set` (about 0.35 MB) and `eeglab_data.fdt` (about 3.9 MB). The `.fdt` is the larger one because it holds the signal: 32 channels × 30504 samples × 4 bytes per number.
 
-### 2. Save a copy in your folder
+### 2. Save a copy in your work folder
 
 1. With `eeglab_data.set` open in EEGLAB, open <MenuPath>File > Save current dataset as</MenuPath>.
-2. Go to your own lessons folder, not `sample_data`, and type the name `D1_copy.set`.
+2. Go to your work folder (`eeg-course`) that you created in [the installation lesson](/en/lesson/install-eeglab/), not `sample_data`, and type the name `D1_copy.set`.
 3. Click <UiLabel>Save</UiLabel>.
-4. Look in your folder: there are two files, `D1_copy.set` (about 0.35 MB) and `D1_copy.fdt` (about 3.9 MB). You typed one name, and EEGLAB wrote both files.
+4. Look in your work folder: there are two files, `D1_copy.set` (about 0.35 MB) and `D1_copy.fdt` (about 3.9 MB). You typed one name, and EEGLAB wrote both files.
 
 ### 3. Find the saving option
 
 1. Open <MenuPath>File > Preferences</MenuPath>.
 2. In the first group of options, find the checkbox that starts with <UiLabel>If set, save not one but two files for each dataset (header and data).</UiLabel>
-3. Close the window with <UiLabel>Cancel</UiLabel>, and do not click <UiLabel>OK</UiLabel>. In this course we keep the default: two files.
+3. Leave the checkbox as it is, and close the window with <UiLabel>Cancel</UiLabel> without clicking <UiLabel>OK</UiLabel>. EEGLAB 2026.1 saves two files by default, and that is what all the lessons use.
 
+<Callout type="note" title="If you are curious: why the checkbox may look unticked">
 You may find the checkbox unticked, even though EEGLAB just saved two files. The window reads its value from one settings file, while saving follows another one, until you click <UiLabel>OK</UiLabel> in this window for the first time. After that, saving follows the checkbox.
+
+Some pages of the official documentation say that EEGLAB saves one file by default since 2021, and the window says so too. But the settings file that ships with EEGLAB 2026.1 turns the two-file option on, so saving writes two files. Trust what you see in your work folder.
+</Callout>
 
 ## How do I save as two files or one file in a script?
 
@@ -78,15 +82,15 @@ EEG = pop_loadset('filename', 'eeglab_data.set', 'filepath', sampleFolder);
 EEG.datfile                                 % 'eeglab_data.fdt'
 dir(fullfile(sampleFolder, 'eeglab_data.*'))   % the .fdt and the .set
 
-% Save a copy in your own folder: two files by default in EEGLAB 2026.1
-myFolder = 'C:\Users\me\Documents\eeg-course';   % change it
-EEG = pop_saveset(EEG, 'filename', 'D1_copy.set', 'filepath', myFolder);
-dir(fullfile(myFolder, 'D1_copy.*'))           % D1_copy.fdt and D1_copy.set
+% Save a copy in your work folder: two files by default in EEGLAB 2026.1
+dataFolder = 'C:\Users\me\Documents\eeg-course';   % your work folder: change it to your path
+EEG = pop_saveset(EEG, 'filename', 'D1_copy.set', 'filepath', dataFolder);
+dir(fullfile(dataFolder, 'D1_copy.*'))           % D1_copy.fdt and D1_copy.set
 
 % Ask for one file explicitly, if you need it
-EEG = pop_saveset(EEG, 'filename', 'D1_onefile.set', 'filepath', myFolder, ...
+EEG = pop_saveset(EEG, 'filename', 'D1_onefile.set', 'filepath', dataFolder, ...
     'savemode', 'onefile');
-dir(fullfile(myFolder, 'D1_onefile.*'))        % D1_onefile.set only, about 4 MB
+dir(fullfile(dataFolder, 'D1_onefile.*'))        % D1_onefile.set only, about 4 MB
 ```
 
 - `EEG.datfile` holds the name of the `.fdt` file. When it is empty, the signal is inside the `.set` file.
@@ -100,10 +104,6 @@ dir(fullfile(myFolder, 'D1_onefile.*'))        % D1_onefile.set only, about 4 MB
 | One file (untick the option in <MenuPath>File > Preferences</MenuPath> and click <UiLabel>OK</UiLabel>, or `'savemode', 'onefile'`) | You want to email one dataset or copy it without forgetting a file. | `name.set` only |
 
 **Resaving keeps the format on disk.** <MenuPath>File > Resave current dataset(s)</MenuPath> on a two-file dataset writes two files again, even if your preference is one file. In that case the Command Window prints a note starting with `Note that your memory options for saving datasets does not correspond`. This is normal.
-
-<Callout type="note" title="Two files, not one">
-Some pages of the EEGLAB documentation say that EEGLAB saves one file by default since 2021, and the <MenuPath>File > Preferences</MenuPath> window says so too. But the settings file that ships with EEGLAB 2026.1 turns the two-file option on, so saving writes two files. Trust what you see in your folder.
-</Callout>
 
 ## How do I check the save worked?
 

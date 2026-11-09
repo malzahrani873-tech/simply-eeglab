@@ -77,7 +77,7 @@ The curve uses k = 30 and 250 Hz. Notice that each doubling of the components mu
 
 ## How do I know whether my data is enough?
 
-You read three numbers from the main EEGLAB window and do the arithmetic yourself, so there is no menu for this check. Start with the main dataset `D1 main` open. If you don't have it, open "Script to reach this state" under "Starts from" at the top of the lesson.
+You read three numbers from the main EEGLAB window and do the arithmetic yourself, so there is no menu for this check. Start with the main dataset `D1 main` open. If you don't have it, open "Script to reach this state" at the end of the lesson.
 
 1. Read <UiLabel>Channels per frame</UiLabel>: 32 in D1.
 2. Read <UiLabel>Frames per epoch</UiLabel>: 30504 in D1. For continuous data this is the number of data points per channel. For epoched data, multiply it by <UiLabel>Epochs</UiLabel>.
@@ -125,7 +125,7 @@ The table gives the shortest recording for k = 30. Treat it as a minimum, becaus
 | Case | What to do | Why |
 |---|---|---|
 | Average reference or interpolated channels | Components = channels − interpolated − 1 | The data rank is lower, as in [the Running ICA lesson](/en/lesson/run-ica/). |
-| The recording is too short for all components | Add `'pca'` in the <UiLabel>Commandline options (See help messages)</UiLabel> field after the option already there, for example `'extended', 1, 'pca', 20` | Fewer components need fewer data points. |
+| The recording is too short for all components | Add `'pca'` in the <UiLabel>Commandline options (See help messages)</UiLabel> field (you will see it in [the Running ICA lesson](/en/lesson/run-ica/)) after the option already there, for example `'extended', 1, 'pca', 20` | Fewer components need fewer data points. |
 | Enough data and full rank | Do not reduce | Official tutorial: PCA slightly corrupts the data, so the full-rank data are better whenever possible. |
 
 ## How do I verify that my decision rests on the right numbers?

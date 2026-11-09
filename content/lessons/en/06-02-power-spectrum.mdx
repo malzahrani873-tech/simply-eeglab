@@ -28,38 +28,41 @@ startingPoint:
   file: eeglab_data.set
   applied: [filtering, line-noise, bad-channels, interpolation, rereferencing, run-ica, ica-1hz-copy-weights, iclabel]
   script: |
-    % Shortcut: if you saved D1_main_clean.set in the ICLabel lesson, keep
-    % the first line and the last three lines, and replace every line between them with:
-    % EEG = pop_loadset('D1_main_clean.set', pwd);
     [ALLEEG, EEG, CURRENTSET, ALLCOM] = eeglab;
-    eeglabRoot = fileparts(which('eeglab'));
-    EEG = pop_loadset('eeglab_data.set', fullfile(eeglabRoot, 'sample_data'));
-    fullLocs = EEG.chanlocs;
+    % Your Current Folder must be your work folder (eeg-course)
+    if exist(fullfile(pwd, 'D1_main_ica.set'), 'file')
+        % Saved in the run-ica lesson: load it instead of running ICA again (minutes)
+        EEG = pop_loadset('D1_main_ica.set', pwd);
+    else
+        eeglabRoot = fileparts(which('eeglab'));
+        EEG = pop_loadset('eeglab_data.set', fullfile(eeglabRoot, 'sample_data'));
+        fullLocs = EEG.chanlocs;
 
-    % Main dataset: high-pass at 0.1 Hz, then 60 Hz line-noise removal
-    EEG = pop_eegfiltnew(EEG, 'locutoff', 0.1);
-    EEG = pop_eegfiltnew(EEG, 'locutoff', 58, 'hicutoff', 62, 'revfilt', 1);
+        % Main dataset: high-pass at 0.1 Hz, then 60 Hz line-noise removal
+        EEG = pop_eegfiltnew(EEG, 'locutoff', 0.1);
+        EEG = pop_eegfiltnew(EEG, 'locutoff', 58, 'hicutoff', 62, 'revfilt', 1);
 
-    % Bad channels you removed earlier, e.g. {'T7'}; leave empty if none
-    badChans = {};
-    if ~isempty(badChans)
-        EEG = pop_select(EEG, 'rmchannel', badChans);
-        EEG = pop_interp(EEG, fullLocs, 'spherical');
+        % Bad channels you removed earlier, e.g. {'T7'}; leave empty if none
+        badChans = {};
+        if ~isempty(badChans)
+            EEG = pop_select(EEG, 'rmchannel', badChans);
+            EEG = pop_interp(EEG, fullLocs, 'spherical');
+        end
+
+        % Average reference, EOG channels excluded
+        eogIdx = find(ismember({EEG.chanlocs.labels}, {'EOG1', 'EOG2'}));
+        EEG = pop_reref(EEG, [], 'exclude', eogIdx);
+
+        % ICA on a 1-Hz copy, then copy the weights back
+        EEG_ica = pop_eegfiltnew(EEG, 'locutoff', 1);
+        EEG_ica = pop_runica(EEG_ica, 'icatype', 'runica', 'extended', 1);
+        EEG.icaweights  = EEG_ica.icaweights;
+        EEG.icasphere   = EEG_ica.icasphere;
+        EEG.icachansind = EEG_ica.icachansind;
+        EEG.icawinv     = [];
+        EEG.icaact      = [];
+        EEG = eeg_checkset(EEG);
     end
-
-    % Average reference, EOG channels excluded
-    eogIdx = find(ismember({EEG.chanlocs.labels}, {'EOG1', 'EOG2'}));
-    EEG = pop_reref(EEG, [], 'exclude', eogIdx);
-
-    % ICA on a 1-Hz copy, then copy the weights back
-    EEG_ica = pop_eegfiltnew(EEG, 'locutoff', 1);
-    EEG_ica = pop_runica(EEG_ica, 'icatype', 'runica', 'extended', 1);
-    EEG.icaweights  = EEG_ica.icaweights;
-    EEG.icasphere   = EEG_ica.icasphere;
-    EEG.icachansind = EEG_ica.icachansind;
-    EEG.icawinv     = [];
-    EEG.icaact      = [];
-    EEG = eeg_checkset(EEG);
 
     % Remove components ICLabel rates above 90% Eye or Muscle
     EEG = pop_iclabel(EEG, 'default');
@@ -96,15 +99,16 @@ Each line is one channel's spectrum. Read the figure in this order:
 
 We compute the spectrum here on the continuous data after removing ICA components and before the 30 Hz <En>low-pass</En>, so the full spectrum up to 64 Hz is visible.
 
-Start with the dataset `D1 main clean` open; it is continuous, not epoched. If you don't have it, open "Script to reach this state" at the top of the lesson. That script reruns ICA, so it may take a few minutes unless you use the shortcut line at its top.
+This lesson needs the continuous dataset, not the epochs you used in the previous lesson.
 
-1. Open <MenuPath>Plot > Channel spectra and maps</MenuPath>.
-2. The <UiLabel>Channel spectra and maps -- pop_spectopo()</UiLabel> window opens. Keep <UiLabel>Epoch time range to analyze [min_ms max_ms]:</UiLabel> at its value, that is, the whole recording.
-3. Keep <UiLabel>Percent data to sample (1 to 100):</UiLabel> at `100`.
-4. In <UiLabel>Frequencies to plot as scalp maps (Hz):</UiLabel>, type `10` instead of the default `6 10 22`.
-5. In <UiLabel>Plotting frequency range [lo_Hz hi_Hz]:</UiLabel>, type `1 64` instead of the default `2 25`. The default hides line noise and everything above 25 Hz.
-6. Keep <UiLabel>Spectral and scalp map options (see topoplot):</UiLabel> as it is, and press <UiLabel>Ok</UiLabel>.
-7. Read the figure as shown above: the alpha peak, then the decline, then any narrow peak. Click any line to see its channel name.
+1. Open the file `D1_main_clean.set` (continuous, before cutting into epochs) with <MenuPath>File > Load existing dataset</MenuPath>, from your work folder (`eeg-course`). You saved it in [the ICLabel lesson](/en/lesson/iclabel/), and its name in the <UiLabel>Datasets</UiLabel> menu is `D1 main clean`. If you don't have it, run "Script to reach this state" at the end of the lesson. The script loads `D1_main_ica.set` if it finds it in your work folder; otherwise it runs ICA again, which takes a few minutes.
+2. Open <MenuPath>Plot > Channel spectra and maps</MenuPath>.
+3. The <UiLabel>Channel spectra and maps -- pop_spectopo()</UiLabel> window opens. Keep <UiLabel>Epoch time range to analyze [min_ms max_ms]:</UiLabel> at its value, that is, the whole recording.
+4. Keep <UiLabel>Percent data to sample (1 to 100):</UiLabel> at `100`.
+5. In <UiLabel>Frequencies to plot as scalp maps (Hz):</UiLabel>, type `10` instead of the default `6 10 22`.
+6. In <UiLabel>Plotting frequency range [lo_Hz hi_Hz]:</UiLabel>, type `1 64` instead of the default `2 25`. The default hides line noise and everything above 25 Hz.
+7. Keep <UiLabel>Spectral and scalp map options (see topoplot):</UiLabel> as it is, and press <UiLabel>Ok</UiLabel>.
+8. Read the figure as shown above: the alpha peak, then the decline, then any narrow peak. Click any line to see its channel name.
 
 <Callout type="note" title="About the scalp map">
 The scalp map in this figure is drawn by <En>topoplot</En>. Its options, and how to read it in detail, are covered in [the scalp maps lesson](/en/lesson/topoplot/) in station 7.

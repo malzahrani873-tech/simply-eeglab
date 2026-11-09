@@ -72,6 +72,8 @@ updated: 2026-10-28
 
 ## كيف يبدو السكربت كاملاً، من البيانات الخام إلى epochs نظيفة؟
 
+قبل التشغيل يجب أن يكون مجلد MATLAB الحالي (<UiLabel>Current Folder</UiLabel>) هو مجلد عملك `eeg-course`، لأن السكربت يحفظ ملفاته فيه (`outDir = pwd`).
+
 ```matlab
 %% D1 single-subject pipeline: raw data to clean epochs
 % Each line comes from the lesson of its step (station in the section title)
@@ -212,7 +214,7 @@ fprintf('Saved: D1_main_clean_lp30.set and D1_epochs_clean.set in %s\n', outDir)
 
 - السكربت يعمل بعد `clear` من البداية إلى النهاية بلا أي نافذة تنتظرك.
 - الملخص يطبع عدد القنوات السيئة ومكوّنات ICA المحذوفة والـ epochs الباقية من 80.
-- في مجلد العمل ملفان: `D1_main_clean_lp30.set` و `D1_epochs_clean.set`.
+- في مجلد عملك (`eeg-course`) ملفان: `D1_main_clean_lp30.set` و `D1_epochs_clean.set`.
 - `size(EEG.data)` في النهاية 32 × 384 × عدد الـ epochs الباقية، كما في [درس رفض الـ epochs السيئة](/lesson/epoch-rejection/).
 
 ## أخطاء شائعة عند جمع السكربت

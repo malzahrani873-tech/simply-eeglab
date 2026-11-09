@@ -124,7 +124,7 @@ If you want connectivity between defined brain regions rather than between ICA c
 
 **Second: choose four brain components**
 
-3. Start with `D1 epochs clean nolp` open. If you don't have it, open "Script to reach this state" under "Starts from" at the top of the lesson. This dataset is a side branch: the same pipeline as station 5 without the 30 Hz <En>low-pass</En> filter, because MVAR models need the full spectrum.
+3. Start with `D1 epochs clean nolp` open. If you don't have it, open "Script to reach this state" at the end of the lesson. This dataset is a side branch: the same pipeline as station 5 without the 30 Hz <En>low-pass</En> filter, because MVAR models need the full spectrum.
 4. Open <MenuPath>Tools > Classify components using ICLabel > Label components</MenuPath> and pick four components whose top class is <En>Brain</En>. Note their numbers.
 5. Open <MenuPath>Tools > Remove components from data</MenuPath>, type the four numbers in <UiLabel>Or list of component(s) to retain</UiLabel>, and clear the <UiLabel>List of component(s) to remove from data</UiLabel> box if it holds numbers. Click <UiLabel>Ok</UiLabel>, then <UiLabel>Accept</UiLabel>, and name the new dataset `D1 sift`.
 

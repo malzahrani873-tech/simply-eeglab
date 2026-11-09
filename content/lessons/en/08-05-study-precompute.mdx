@@ -100,6 +100,10 @@ eeglabVersion: "2026.1"
 updated: 2026-10-28
 ---
 
+<Callout type="warning">
+The lesson on creating a STUDY is coming soon. Until then, run "Script to reach this state" at the end of the lesson. The script creates a STUDY named `animal_mine.study` with the 14 participants, and stores each participant's gender in the `group` variable (values `F` and `M`). It also converts the old `.dat` data files to `.fdt` and then deletes the old ones. This is on purpose: resaving `.dat` files in their old format damages the data in EEGLAB 2026.1.
+</Callout>
+
 ## The idea
 
 To plot a group ERP, EEGLAB needs each participant's average in each condition. Computing it from the raw data every time you plot is slow, especially for [spectra](/en/lesson/power-spectrum/) and [ERSPs](/en/lesson/ersp-itc/).
@@ -131,7 +135,7 @@ Do not tick it if the components were already removed from the data before the S
 
 **1. Open the compute window**
 
-1. Start with `animal_mine.study` open with design 2. If you don't have it, open "Script to reach this state" under "Starts from" at the top of the lesson, and run it; it rebuilds both if it cannot find them.
+1. Start with `animal_mine.study` open with design 2. If you don't have it, open "Script to reach this state" at the end of the lesson, and run it; it rebuilds both if it cannot find them.
 2. Open <MenuPath>Study > Precompute channel measures</MenuPath>. The top of the window reads <UiLabel>Pre-compute channel measures for STUDY 'Go-nogo animal (mine)'</UiLabel>.
 
 **2. Data options (top part)**

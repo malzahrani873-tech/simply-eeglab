@@ -81,7 +81,7 @@ So how do you build a STUDY for the D6 participants, with the right subject, con
 
 **About the data (D6):** a Go-nogo experiment with 14 participants, 7 women and 7 men. The ready EEGLAB copy has one folder per participant, named by its code, with one dataset per condition: animal and distractor, such as `sph/sphanimal.set` and `sph/sphdistractor.set`. Each dataset's data are in a `.dat` file next to it (only `cba` keeps them inside the `.set`).
 
-The script under "Starts from" at the top of the lesson converts every dataset once to the current format, which keeps the data in a `.fdt` file, and deletes the old `.dat` files.
+"Script to reach this state" at the end of the lesson converts every dataset once to the current format, which keeps the data in a `.fdt` file, and deletes the old `.dat` files.
 
 In the ready files <UiLabel>subject</UiLabel> and <UiLabel>condition</UiLabel> are filled, while <UiLabel>group</UiLabel> and <UiLabel>session</UiLabel> are empty. The folder also has a ready STUDY called `animal.study`. We build our own copy, `animal_mine.study`, by hand to learn, and compare it with the ready one at the end of the lesson.
 
@@ -123,7 +123,7 @@ Write this table on paper before you start, because the window does not know gen
 
 **2. Open the creation window**
 
-1. Start with the converted D6 files in their folder. If you don't have them, open "Script to reach this state" under "Starts from" at the top of the lesson, and run it.
+1. Start with the converted D6 files in their folder. If you don't have them, open "Script to reach this state" at the end of the lesson, and run it.
 2. Open <MenuPath>File > Create study > Browse for datasets</MenuPath>. First a <UiLabel>Study warning</UiLabel> window about memory appears, suggesting you cancel and change <MenuPath>File > Preferences</MenuPath>. Press <UiLabel>OK</UiLabel>: the files of the 14 participants fit in memory, and the warning's sentence about the "tutorial study" refers to an old STUDY without data. Then a window titled <UiLabel>Create a new STUDY set -- pop_studywizard()</UiLabel> opens, with a table called <UiLabel>Select datasets</UiLabel>.
 3. The table columns are: <UiLabel>Raw dataset filename</UiLabel>, a <UiLabel>...</UiLabel> button to browse, then <UiLabel>subject</UiLabel>, <UiLabel>session</UiLabel>, <UiLabel>run</UiLabel>, <UiLabel>condition</UiLabel>, <UiLabel>group</UiLabel> and <UiLabel>task</UiLabel>, and a <UiLabel>CLear</UiLabel> button to empty the row.
 4. Each page has 10 rows, and the <UiLabel>></UiLabel> button under the table moves to the next page. The 28 files need 3 pages.
@@ -219,7 +219,7 @@ eeglab redraw;
 - **A participant's code differs between their two files.** `cba` in one file and `CBA ` (with a space) in the other become two participants, so <UiLabel>Nb of subjects</UiLabel> shows more than 14 and <UiLabel>Nb of conditions</UiLabel> shows <UiLabel>(some missing)</UiLabel>.
 - **The group is empty for some files.** If you type a group for one file, type it for all. A file without a group drops out of any design that uses the group.
 - **Pressing No when asked to resave.** The STUDY stays correct, but the files themselves do not know their group. If you later open them with <MenuPath>Using all loaded datasets</MenuPath>, the group box is empty.
-- **Resaving files that still use `.dat`.** In EEGLAB 2026.1, resaving a dataset whose data are in an old `.dat` file writes the data in the wrong order, and the damage grows with every save. Convert the files first, as the script under "Starts from" at the top of the lesson does: after it, each participant folder has two `.fdt` files and no `.dat` file. {/* Folder size: measured in the combined run */}
+- **Resaving files that still use `.dat`.** In EEGLAB 2026.1, resaving a dataset whose data are in an old `.dat` file writes the data in the wrong order, and the damage grows with every save. Convert the files first, as "Script to reach this state" at the end of the lesson does: after it, each participant folder has two `.fdt` files and no `.dat` file. {/* Folder size: measured in the combined run */}
 - **Moving the folder after saving.** The .study file stores the location of each file. Move the whole folder together with the .study file, not the files alone.
 - **Opening the ready STUDY and saving over it.** Save your copy under a new name (`animal_mine.study`), so `animal.study` stays available for comparison.
 

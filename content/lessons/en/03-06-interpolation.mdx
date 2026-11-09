@@ -88,14 +88,14 @@ There is another valid approach: run ICA without the removed channels, interpola
 **About D1:** we found no bad channel in it, so there is nothing to interpolate on the path. You will practice on a temporary copy: remove a good channel, `C3`, then rebuild it and compare it with the original. This way you see for yourself how accurate interpolation is. Do not save the exercise copies; the path continues from `D1 badch`.
 </Callout>
 
-Run "Script to reach this state" under "Starts from" at the top of the lesson. It puts the dataset from before channel removal, `D1 hp0.1 notch60`, in dataset 1, and the main dataset `D1 badch` in dataset 2. You will need the number of dataset 1 for your own data, because it holds the locations of all channels.
+Run "Script to reach this state" at the end of the lesson. It puts the dataset from before channel removal, `D1 hp0.1 notch60`, in dataset 1, and the main dataset `D1 badch` in dataset 2. For your own data you will need the number of the dataset that has all channels from before the removal (here `D1 hp0.1 notch60`, dataset 1 if you started with the script), because it holds the locations of all channels. If you continued from the previous lesson in the same session, the numbers may differ, so read each dataset's number from the <MenuPath>Datasets</MenuPath> menu.
 
 **First: practice on a good channel**
 
 1. With `D1 badch` current, open <MenuPath>Edit > Select data</MenuPath>. Type `C3` in <UiLabel>Channel(s)</UiLabel>, check the box under <UiLabel>on->remove these</UiLabel>, then press <UiLabel>OK</UiLabel>.
 2. Name the new dataset `D1 noC3`. In the main window, <UiLabel>Channels per frame</UiLabel> is now 31.
 3. Open <MenuPath>Tools > Interpolate electrodes</MenuPath>. A window titled <UiLabel>Interpolate channel(s) -- pop_interp()</UiLabel> appears.
-4. Press <UiLabel>Use all channels from other dataset</UiLabel>, type `2`, the number of the `D1 badch` dataset, in <UiLabel>Dataset index</UiLabel>, then press <UiLabel>OK</UiLabel>. The name `C3` appears under <UiLabel>What channel(s) do you want to interpolate</UiLabel>.
+4. Press <UiLabel>Use all channels from other dataset</UiLabel>, type the number of `D1 badch` as shown in the <MenuPath>Datasets</MenuPath> menu (2 if you started with the script) in <UiLabel>Dataset index</UiLabel>, then press <UiLabel>OK</UiLabel>. The name `C3` appears under <UiLabel>What channel(s) do you want to interpolate</UiLabel>.
 5. In <UiLabel>Interpolation method</UiLabel>, keep <UiLabel>Spherical</UiLabel>, leave <UiLabel>Time range [min max] (s)</UiLabel> empty, then press <UiLabel>OK</UiLabel>.
 6. The Command Window prints `Interpolating 1 channels...`. Name the dataset `D1 C3 back`. The channel count is 32 again.
 7. Compare `C3` in `D1 badch` and in `D1 C3 back` with <MenuPath>Plot > Channel data (scroll)</MenuPath>. The two signals are very similar.
@@ -105,14 +105,16 @@ Run "Script to reach this state" under "Starts from" at the top of the lesson. I
 
 1. Make the dataset you removed bad channels from the current one, then open <MenuPath>Tools > Interpolate electrodes</MenuPath>.
 2. Press <UiLabel>Use all channels from other dataset</UiLabel>, type in <UiLabel>Dataset index</UiLabel> the number of the dataset that has all channels from before the removal, then press <UiLabel>OK</UiLabel>. The names of the removed channels appear.
-3. Keep <UiLabel>Spherical</UiLabel> and press <UiLabel>OK</UiLabel>. Name the result `D1 interp` and save it with <MenuPath>File > Save current dataset as</MenuPath> as `D1_interp.set`.
-4. In D1, no channel was removed, so if you try, EEGLAB says `No new channels selected`. The main dataset stays `D1 badch`, and [the re-referencing lesson](/en/lesson/rereferencing/) starts from it.
+3. Keep <UiLabel>Spherical</UiLabel> and press <UiLabel>OK</UiLabel>. With your own data, name the result `D1 interp` and save it with <MenuPath>File > Save current dataset as</MenuPath> as `D1_interp.set` in your work folder (`eeg-course`).
+4. In D1 there is no channel to interpolate, so if you try, EEGLAB says `No new channels selected`, and you save nothing. The file you continue with is `D1_badch.set` from [the bad channels lesson](/en/lesson/bad-channels/), and [the re-referencing lesson](/en/lesson/rereferencing/) starts from it. The script of this lesson saves `D1_interp.set`, which is the same data.
 
 <Callout type="warning">
 **A warning you will see when you open the dialog:** when you open the interpolation window from the menu, EEGLAB prints `Warning: do not interpolate channels before running ICA` in the Command Window. A script that calls `pop_interp` does not print it. Around the warning, EEGLAB prints two hints for another way: define the missing channels in the channel editor as non-data channels and interpolate later, or interpolate on the fly in a STUDY. So the warning is about the data rank, not a sign that interpolation is wrong.
 </Callout>
 
 ## How do I interpolate with a script?
+
+The script saves to the current folder (`pwd`), so your Current Folder must be your work folder `eeg-course`.
 
 ```matlab
 % Rebuild the removed channels from the full channel list (fullLocs)
@@ -133,7 +135,7 @@ r = corrcoef(double(EEG.data(iOrig, :)), double(EEG_back.data(iBack, :)));
 fprintf('Correlation between original and interpolated %s: %.2f\n', testChan, r(1, 2));
 ```
 
-The variable `fullLocs` comes from the "Script to reach this state" at the top of the lesson: a copy of all channel locations before any removal. Always keep it at the start of processing.
+The variable `fullLocs` comes from the "Script to reach this state" at the end of the lesson: a copy of all channel locations before any removal. Always keep it at the start of processing.
 
 ## Which interpolation settings do I choose?
 

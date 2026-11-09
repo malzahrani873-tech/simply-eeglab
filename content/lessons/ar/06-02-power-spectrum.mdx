@@ -28,38 +28,41 @@ startingPoint:
   file: eeglab_data.set
   applied: [filtering, line-noise, bad-channels, interpolation, rereferencing, run-ica, ica-1hz-copy-weights, iclabel]
   script: |
-    % Shortcut: if you saved D1_main_clean.set in the ICLabel lesson, keep
-    % the first line and the last three lines, and replace every line between them with:
-    % EEG = pop_loadset('D1_main_clean.set', pwd);
     [ALLEEG, EEG, CURRENTSET, ALLCOM] = eeglab;
-    eeglabRoot = fileparts(which('eeglab'));
-    EEG = pop_loadset('eeglab_data.set', fullfile(eeglabRoot, 'sample_data'));
-    fullLocs = EEG.chanlocs;
+    % Your Current Folder must be your work folder (eeg-course)
+    if exist(fullfile(pwd, 'D1_main_ica.set'), 'file')
+        % Saved in the run-ica lesson: load it instead of running ICA again (minutes)
+        EEG = pop_loadset('D1_main_ica.set', pwd);
+    else
+        eeglabRoot = fileparts(which('eeglab'));
+        EEG = pop_loadset('eeglab_data.set', fullfile(eeglabRoot, 'sample_data'));
+        fullLocs = EEG.chanlocs;
 
-    % Main dataset: high-pass at 0.1 Hz, then 60 Hz line-noise removal
-    EEG = pop_eegfiltnew(EEG, 'locutoff', 0.1);
-    EEG = pop_eegfiltnew(EEG, 'locutoff', 58, 'hicutoff', 62, 'revfilt', 1);
+        % Main dataset: high-pass at 0.1 Hz, then 60 Hz line-noise removal
+        EEG = pop_eegfiltnew(EEG, 'locutoff', 0.1);
+        EEG = pop_eegfiltnew(EEG, 'locutoff', 58, 'hicutoff', 62, 'revfilt', 1);
 
-    % Bad channels you removed earlier, e.g. {'T7'}; leave empty if none
-    badChans = {};
-    if ~isempty(badChans)
-        EEG = pop_select(EEG, 'rmchannel', badChans);
-        EEG = pop_interp(EEG, fullLocs, 'spherical');
+        % Bad channels you removed earlier, e.g. {'T7'}; leave empty if none
+        badChans = {};
+        if ~isempty(badChans)
+            EEG = pop_select(EEG, 'rmchannel', badChans);
+            EEG = pop_interp(EEG, fullLocs, 'spherical');
+        end
+
+        % Average reference, EOG channels excluded
+        eogIdx = find(ismember({EEG.chanlocs.labels}, {'EOG1', 'EOG2'}));
+        EEG = pop_reref(EEG, [], 'exclude', eogIdx);
+
+        % ICA on a 1-Hz copy, then copy the weights back
+        EEG_ica = pop_eegfiltnew(EEG, 'locutoff', 1);
+        EEG_ica = pop_runica(EEG_ica, 'icatype', 'runica', 'extended', 1);
+        EEG.icaweights  = EEG_ica.icaweights;
+        EEG.icasphere   = EEG_ica.icasphere;
+        EEG.icachansind = EEG_ica.icachansind;
+        EEG.icawinv     = [];
+        EEG.icaact      = [];
+        EEG = eeg_checkset(EEG);
     end
-
-    % Average reference, EOG channels excluded
-    eogIdx = find(ismember({EEG.chanlocs.labels}, {'EOG1', 'EOG2'}));
-    EEG = pop_reref(EEG, [], 'exclude', eogIdx);
-
-    % ICA on a 1-Hz copy, then copy the weights back
-    EEG_ica = pop_eegfiltnew(EEG, 'locutoff', 1);
-    EEG_ica = pop_runica(EEG_ica, 'icatype', 'runica', 'extended', 1);
-    EEG.icaweights  = EEG_ica.icaweights;
-    EEG.icasphere   = EEG_ica.icasphere;
-    EEG.icachansind = EEG_ica.icachansind;
-    EEG.icawinv     = [];
-    EEG.icaact      = [];
-    EEG = eeg_checkset(EEG);
 
     % Remove components ICLabel rates above 90% Eye or Muscle
     EEG = pop_iclabel(EEG, 'default');
@@ -96,15 +99,16 @@ updated: 2026-10-28
 
 نحسب الطيف هنا على البيانات المستمرة بعد حذف مكوّنات ICA الخاصة بالعين والعضلات وقبل الـ <En>low-pass</En> عند 30 هرتز، حتى يظهر كاملاً إلى 64 هرتز.
 
-ابدأ والداتاست (<En>dataset</En>) `D1 main clean` مفتوحة، وهي داتاست مستمرة غير مقطّعة إلى epochs. إن لم تكن عندك، فافتح «سكربت للوصول إلى هذه الحالة» أعلى الدرس. هذا السكربت يعيد تشغيل ICA، فقد يأخذ بضع دقائق، إلا إذا استخدمت سطر الاختصار في أوله.
+هذا الدرس يحتاج الداتاست (<En>dataset</En>) المتصلة، لا الـ epochs التي استعملتها في الدرس السابق.
 
-1. افتح <MenuPath>Plot > Channel spectra and maps</MenuPath>.
-2. تظهر نافذة <UiLabel>Channel spectra and maps -- pop_spectopo()</UiLabel>. اترك <UiLabel>Epoch time range to analyze [min_ms max_ms]:</UiLabel> على قيمته الافتراضية، أي كل التسجيل.
-3. اترك <UiLabel>Percent data to sample (1 to 100):</UiLabel> على `100`.
-4. في <UiLabel>Frequencies to plot as scalp maps (Hz):</UiLabel> اكتب `10` بدلاً من الافتراضي `6 10 22`.
-5. في <UiLabel>Plotting frequency range [lo_Hz hi_Hz]:</UiLabel> اكتب `1 64` بدلاً من الافتراضي `2 25`. الافتراضي يخفي ضوضاء الكهرباء وكل ما فوق 25 هرتز.
-6. اترك <UiLabel>Spectral and scalp map options (see topoplot):</UiLabel> كما هي، واضغط <UiLabel>Ok</UiLabel>.
-7. اقرأ الرسم كما في الشكل أعلاه: قمة ألفا، ثم الانحدار، ثم أي قمة ضيقة. اضغط على أي خط لترى اسم قناته.
+1. افتح الملف `D1_main_clean.set` (المتصل، قبل التقطيع إلى epochs) من <MenuPath>File > Load existing dataset</MenuPath>، من مجلد عملك (`eeg-course`). حفظته في [درس ICLabel](/lesson/iclabel/)، واسمه في قائمة <UiLabel>Datasets</UiLabel> هو `D1 main clean`. إن لم يكن عندك، فشغّل «سكربت للوصول إلى هذه الحالة» في آخر الدرس. السكربت يحمّل `D1_main_ica.set` إن وجده في مجلد عملك، وإلا يعيد تشغيل ICA، وهذا يأخذ بضع دقائق.
+2. افتح <MenuPath>Plot > Channel spectra and maps</MenuPath>.
+3. تظهر نافذة <UiLabel>Channel spectra and maps -- pop_spectopo()</UiLabel>. اترك <UiLabel>Epoch time range to analyze [min_ms max_ms]:</UiLabel> على قيمته الافتراضية، أي كل التسجيل.
+4. اترك <UiLabel>Percent data to sample (1 to 100):</UiLabel> على `100`.
+5. في <UiLabel>Frequencies to plot as scalp maps (Hz):</UiLabel> اكتب `10` بدلاً من الافتراضي `6 10 22`.
+6. في <UiLabel>Plotting frequency range [lo_Hz hi_Hz]:</UiLabel> اكتب `1 64` بدلاً من الافتراضي `2 25`. الافتراضي يخفي ضوضاء الكهرباء وكل ما فوق 25 هرتز.
+7. اترك <UiLabel>Spectral and scalp map options (see topoplot):</UiLabel> كما هي، واضغط <UiLabel>Ok</UiLabel>.
+8. اقرأ الرسم كما في الشكل أعلاه: قمة ألفا، ثم الانحدار، ثم أي قمة ضيقة. اضغط على أي خط لترى اسم قناته.
 
 <Callout type="note" title="عن خريطة الرأس">
 خريطة الرأس في هذه النافذة ترسمها الدالة `topoplot`. خيارات `topoplot` وطريقة قراءة الخريطة بالتفصيل في [درس خرائط الرأس](/lesson/topoplot/) في المحطة 7.

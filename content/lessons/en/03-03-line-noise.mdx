@@ -74,7 +74,7 @@ On our path, we keep the high frequencies until after ICA, so we remove line noi
 
 ## How do I find the peak and remove it from the menus?
 
-Start with the main dataset `D1 hp0.1` open, the result of [the filtering lesson](/en/lesson/filtering/). If you don't have it, open "Script to reach this state" under "Starts from" at the top of the lesson.
+Start with the main dataset `D1 hp0.1` open, the result of [the filtering lesson](/en/lesson/filtering/). If you don't have it, open "Script to reach this state" at the end of the lesson.
 
 **First: find the peak in the spectrum**
 
@@ -92,11 +92,13 @@ Start with the main dataset `D1 hp0.1` open, the result of [the filtering lesson
 5. Leave the other fields as they are and press <UiLabel>OK</UiLabel>. The filter response window appears, because <UiLabel>Plot frequency response</UiLabel> is checked by default: a dip at 60 Hz only.
 6. The Command Window prints a line that starts with `pop_eegfiltnew() - performing` and gives the filter length in points and the filter type.
 7. Name the new dataset `D1 hp0.1 notch60` and leave <UiLabel>Overwrite it in memory (set=yes; unset=create a new dataset)</UiLabel> unchecked.
-8. Save it with <MenuPath>File > Save current dataset as</MenuPath> as `D1_hp0.1_notch60.set`. [The bad channels lesson](/en/lesson/bad-channels/) starts from it.
+8. Save it with <MenuPath>File > Save current dataset as</MenuPath> as `D1_hp0.1_notch60.set` in your work folder (`eeg-course`). [The bad channels lesson](/en/lesson/bad-channels/) starts from it.
 
 **Third: compare the spectrum** as in the first part, on the new dataset.
 
 ## How do I remove it with a script?
+
+The script saves to the current folder (`pwd`), so your Current Folder must be your work folder `eeg-course`.
 
 ```matlab
 % Line frequency: 60 Hz in Saudi Arabia and the US, 50 Hz in Europe

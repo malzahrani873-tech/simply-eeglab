@@ -65,8 +65,8 @@ updated: 2026-10-28
 نستخدم ملفاً واحداً من داتاست PhysioNet المفتوحة لحركة اليد وتخيّلها: `S001R03.edf`. فيه 64 قناة بمعدل 160 هرتز، ومدته حوالي دقيقتين، وأحداثه مخزّنة داخل الملف.
 
 1. افتح صفحة الداتاست: [EEG Motor Movement/Imagery Dataset](https://physionet.org/content/eegmmidb/1.0.0/).
-2. ادخل مجلد `S001` ونزّل الملف `S001R03.edf`.
-3. ضعه في مجلد خاص بهذه الدروس، بعيداً عن مجلد EEGLAB.
+2. انزل إلى قسم Files في أسفل الصفحة، وادخل مجلد `S001`، ونزّل الملف `S001R03.edf`.
+3. ضعه في مجلد عملك (`eeg-course`)، بعيداً عن مجلد EEGLAB. هذا المجلد الواحد تحفظ فيه كل ملفات الموقع، فاجعله مجلد MATLAB الحالي (<En>Current Folder</En>).
 
 <Callout type="note" title="مصدر البيانات">
 البيانات: Schalk, G. (2009). EEG Motor Movement/Imagery Dataset (version 1.0.0). PhysioNet. DOI: 10.13026/C28G6P. الرخصة: Open Data Commons Attribution v1.0. ومعها الورقة الأصلية: Schalk et al. (2004), IEEE Transactions on Biomedical Engineering 51(6):1034-1043. واستشهاد PhysioNet القياسي: Pollard, T., Moody, B. E., Lehman, L., Gow, B., Fernandes, C., Xie, C., Johnson, A., Mark, R. G., & Heldt, T. (2026). PhysioNet as a global platform for biomedical research. Nature Health. https://doi.org/10.1038/s44360-026-00096-z
@@ -87,7 +87,7 @@ updated: 2026-10-28
 ### 3. سمِّ الداتاست واحفظها
 
 1. تظهر نافذة لتسمية الداتاست الجديدة. في خانة <UiLabel>Name it:</UiLabel> اكتب `S001R03`.
-2. فعّل خانة <UiLabel>Save it as file:</UiLabel> واختر اسماً مثل `S001R03.set` في مجلد الدروس.
+2. فعّل خانة <UiLabel>Save it as file:</UiLabel> واختر اسماً مثل `S001R03.set` في مجلد عملك (`eeg-course`).
 3. اضغط <UiLabel>OK</UiLabel>.
 
 الحفظ بصيغة `.set` يعني أنك لن تكرر الاستيراد في الدرس التالي. والملف الأصلي `.edf` يبقى كما هو.
@@ -154,7 +154,7 @@ EEG = pop_loadbv(dataFolder, 'sub01.vhdr');
 2. **من الـ Command Window:** `EEG.nbchan` يعطي `64`، و `EEG.srate` يعطي `160`، و `EEG.pnts / EEG.srate` يعطي الطول بالثواني (حوالي دقيقتين).
 3. **الأحداث:** `eeg_eventtypes(EEG)` يعرض الرموز الثلاثة `T0` (راحة)، و `T1` و `T2` (حركتان حسب المهمة). إذا كان عدد الأحداث صفراً، أعد الاستيراد وتأكد من تفعيل خانة الـ annotations.
 4. **بالعين:** افتح <MenuPath>Plot > Channel data (scroll)</MenuPath>. يجب أن ترى القنوات بإشارة متغيّرة، وخطوطاً عمودية ملوّنة عند الأحداث.
-5. **الملف المحفوظ:** يجب أن يظهر `S001R03.set` في مجلد الدروس. احتفظ به، فالدرسان التاليان ([مواقع القنوات](/lesson/channel-locations/) و[الأحداث](/lesson/events/)) يبدآن منه.
+5. **الملف المحفوظ:** يجب أن يظهر `S001R03.set` في مجلد عملك (`eeg-course`). احتفظ به، فالدرسان التاليان ([مواقع القنوات](/lesson/channel-locations/) و[الأحداث](/lesson/events/)) يبدآن منه.
 
 <Methods>
 EEG recordings in EDF+ format (64 channels, 160 Hz) were imported into EEGLAB 2026.1 with pop_biosig (Biosig plugin [version]), and event markers were read from the EDF+ annotations.

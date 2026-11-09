@@ -18,9 +18,6 @@ const published = (slug: string) => pub.has(`${lang}/${slug}`);
 const nodes = roadmap.nodes.filter((n: any) => n.station === station);
 const title = lang === 'ar' ? st.title : st.titleEn;
 const nodeT = (n: any) => (lang === 'ar' ? n.title : n.titleEn);
-const count = (lvl: string) => nodes.filter((n: any) => n.level === lvl).length;
-const glyph: Record<string, string> = { core: '●', recommended: '◐', optional: '○' };
-const cls: Record<string, string> = { core: 'c', recommended: 'r', optional: 'o' };
 const anyPublished = nodes.some((n: any) => published(n.id));
 // Nearest station that has a published lesson, for the "all soon" line.
 const nearest = anyPublished ? null : roadmap.stations
@@ -38,13 +35,7 @@ const next = roadmap.stations.find((s: any) => s.station === station + 1);
 const hasQuiz = !!quizFor(station, lang);
 const sTitle = (s: any) => (lang === 'ar' ? s.title : s.titleEn);
 const allSoon = t(lang, 'station.allSoon', { station: '{station}' }).split(/(\{station\})/).filter(Boolean);
-// "{lessons}: {core} core, {rec} recommended, {opt} optional", without the levels this station has none of.
-const countsTpl = t(lang, 'station.counts');
-const [countsHead, countsTail] = [countsTpl.slice(0, countsTpl.indexOf(':') + 1), countsTpl.slice(countsTpl.indexOf(':') + 1)];
-const levelVars: Record<string, number> = { core: count('core'), rec: count('recommended'), opt: count('optional') };
-const counts = countsHead.replace('{lessons}', tn(lang, 'map.station.lessons', nodes.length)) + ' ' +
-  countsTail.split(/[،,]/).map((p) => p.trim()).filter((p) => levelVars[p.match(/\{(\w+)\}/)![1]] > 0)
-    .map((p) => p.replace(/\{(\w+)\}/, (_, k) => String(levelVars[k]))).join(lang === 'ar' ? '، ' : ', ');
+const counts = tn(lang, 'map.station.lessons', nodes.length);
 const outcomes = lang === 'ar' ? text.outcomes : text.outcomesEn;
 ---
 <Base lang={lang} title={`${t(lang, 'station.label', { n: station })}: ${title}`} description={lang === 'ar' ? text.description : text.descriptionEn} path={`station/${pad(station)}/`} bodyClass="station-page">
@@ -76,12 +67,10 @@ const outcomes = lang === 'ar' ? text.outcomes : text.outcomesEn;
           const p = published(n.id);
           const soon = p ? null : soonInfo(n.id);
           return (
-            <li class={`srow ${cls[n.level]}${p ? '' : ' soon'}`} id={p ? undefined : `card-${n.id}`} data-id={n.id}>
-              <span class="g" aria-hidden="true">{glyph[n.level]}</span>
+            <li class={`srow${p ? '' : ' soon'}`} id={p ? undefined : `card-${n.id}`} data-id={n.id}>
               <div class="sr-main">
                 {p ? <a class="st" href={url(`lesson/${n.id}/`, lang)}><T s={nodeT(n)} lang={lang} /></a> : <span class="st"><T s={nodeT(n)} lang={lang} /></span>}
                 <span class="smeta">
-                  <span class={`badge ${cls[n.level]}`}>{t(lang, `level.${n.level}`)}</span>
                   <span>{tn(lang, 'common.minutes', n.minutes)}</span>
                   {!p && <span class="soonp">{t(lang, 'status.soon')}</span>}
                   <span class="done" hidden><Icon name="check" class="ico s16" /> {t(lang, 'status.done')}</span>

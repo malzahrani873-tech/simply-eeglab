@@ -12,12 +12,11 @@ interface Props { lang: Lang }
 const { lang } = Astro.props;
 const slots = readFileSync('src/data/progress-slots.lock', 'utf8').split('\n').map((s) => s.trim()).filter((s) => s && !s.startsWith('#'));
 const ids = roadmap.nodes.map((n: any) => n.id);
-const cores = roadmap.nodes.filter((n: any) => n.level === 'core').map((n: any) => n.id);
 const L = (k: string, v?: Record<string, string>) => t(lang, k, v);
 ---
 <Base lang={lang} title={L('progressPage.title')} path="progress/" current="progress" noindex>
-  <div class="wrap narrow simple prog" id="prog" data-slots={JSON.stringify(slots)} data-ids={JSON.stringify(ids)} data-cores={JSON.stringify(cores)}
-    data-l-count={L('progress.count', { n: '{n}', total: '{total}' })} data-l-core={L('progress.coreCount', { n: '{n}', total: '{total}' })}
+  <div class="wrap narrow simple prog" id="prog" data-slots={JSON.stringify(slots)} data-ids={JSON.stringify(ids)}
+    data-l-count={L('progress.count', { n: '{n}', total: '{total}' })}
     data-l-code-sr={L('progressPage.code.sr', { code: '{code}' })} data-l-copied={L('progressPage.copied')}
     data-l-bad-code={L('progressPage.badCode')} data-l-arabic={L('progressPage.arabicLetters')} data-l-bad-file={L('progressPage.badFile')}
     data-l-newer={L('progressPage.newer')} data-l-done={L('progressPage.done', { n: '{n}', total: '{total}' })}
@@ -34,7 +33,6 @@ const L = (k: string, v?: Record<string, string>) => t(lang, k, v);
       <section aria-labelledby="pp-sum" class="pcard js-only">
         <h2 id="pp-sum">{L('progressPage.summary')}</h2>
         <p class="big" data-sum-count>&nbsp;</p>
-        <p data-sum-core>&nbsp;</p>
       </section>
 
       <section aria-labelledby="pp-where" class="pcard">

@@ -7,7 +7,6 @@ const L = root.dataset;
 const $ = <T extends HTMLElement = HTMLElement>(s: string) => root.querySelector<T>(s)!;
 const slots = new Map<string, number>(JSON.parse(L.slots!).map((s: string, i: number) => [s, i + 1]));
 const ids: string[] = JSON.parse(L.ids!);
-const cores: string[] = JSON.parse(L.cores!);
 const fill = (s: string, v: Record<string, string | number>) => s.replace(/\{(\w+)\}/g, (_, k) => String(v[k] ?? ''));
 const today = () => new Date().toISOString().slice(0, 10);
 const PREFIX = 'simplyeeglab:';
@@ -22,7 +21,6 @@ function render() {
   const done = all();
   const n = ids.filter((i) => i in done).length;
   $('[data-sum-count]').textContent = fill(L.lCount!, { n, total: ids.length });
-  $('[data-sum-core]').textContent = fill(L.lCore!, { n: cores.filter((i) => i in done).length, total: cores.length });
   const c = code();
   const box = $('[data-code]');
   box.textContent = c;

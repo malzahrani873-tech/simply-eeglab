@@ -157,7 +157,7 @@ The gain comes from what LIMO allows next: weighting noisy trials, adding a cont
 
 ## Why do I need a new STUDY for LIMO?
 
-**About the data (D6):** LIMO needs **one dataset per participant**. In `animal_mine.study` each participant has two files, one per picture type, and LIMO stops with `Cannot estimate the model because there is more than 1 dataset per session per subject. Merge datasets for each subject and try again.` So "Script to reach this state" under "Starts from" at the top of the lesson builds a second STUDY, `animal_limo.study`, in its own folder `limo` next to `animal_mine.study`:
+**About the data (D6):** LIMO needs **one dataset per participant**. In `animal_mine.study` each participant has two files, one per picture type, and LIMO stops with `Cannot estimate the model because there is more than 1 dataset per session per subject. Merge datasets for each subject and try again.` So "Script to reach this state" at the end of the lesson builds a second STUDY, `animal_limo.study`, in its own folder `limo` next to `animal_mine.study`:
 
 - For each participant it marks every trial with its picture type (a new event field `image`), then merges the two files into one (for example `cba_merged.set`). The merge drops the ICA, which LIMO does not need for ERPs.
 - Gender stays in `group`. The single design, `image`, has one categorical variable at the level of the trial, with the values `animal` and `distractor`.
@@ -175,7 +175,7 @@ The first run takes several minutes and adds about 1 GB to the course folder (es
 
 **2. First level: one model per participant**
 
-1. Start with `animal_limo.study` open. If you don't have it, open "Script to reach this state" under "Starts from" at the top of the lesson.
+1. Start with `animal_limo.study` open. If you don't have it, open "Script to reach this state" at the end of the lesson.
 2. Check that the STUDY shown in the EEGLAB window is `Go-nogo animal (LIMO)`, with 14 datasets. Its only design, `image`, is the current one.
 3. Open <MenuPath>Study > LInear MOdeling of EEG Data > Estimate Model Parameters (channel)</MenuPath>.
 4. A warning says that your STUDY has groups of subjects, and that groups are ignored at the first level. This is expected: gender is between participants, so it belongs to the second level. Press <UiLabel>OK</UiLabel>.
@@ -270,7 +270,7 @@ In your own data, try `WLS` with a shorter window (the <UiLabel>Options</UiLabel
 
 ## Common mistakes with LIMO
 
-- **Two datasets per participant.** LIMO stops with `Merge datasets for each subject and try again.` Merge the files of each participant first, after marking each trial with its condition in an event field, as in "Starts from" at the top of the lesson.
+- **Two datasets per participant.** LIMO stops with `Merge datasets for each subject and try again.` Merge the files of each participant first, after marking each trial with its condition in an event field, as in "Script to reach this state" at the end of the lesson.
 - **No single trials.** LIMO reads the trials saved by `savetrials` in the precompute lesson. Without them it stops with `Measures must be computed first`.
 - **Working directory not set.** LIMO writes second-level files in the current folder. Choose an empty folder for each test, or results from different tests get mixed.
 - **Wrong parameter numbers.** The order of the betas follows the values of the design variable. Check it with <UiLabel>See GLM variables</UiLabel> in the first-level window before you enter `1 2`.

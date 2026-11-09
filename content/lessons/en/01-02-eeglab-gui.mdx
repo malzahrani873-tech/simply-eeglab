@@ -136,7 +136,7 @@ pop_eegplot(EEG, 1, 1, 1);
 - **Menus are gray and do not respond.** You have not opened a dataset yet, or that menu does not apply to the open dataset. Open a dataset first.
 - **Reading <UiLabel>Frames per epoch</UiLabel> as time.** It is a sample count, not seconds. Divide it by the sampling rate to get seconds.
 - **Picking the `.fdt` file in the open window.** Always open the `.set` file. The `.fdt` file holds the signal only, and EEGLAB reads it automatically with the `.set` file (details in the optional [.set and .fdt lesson](/en/lesson/set-fdt-files/)).
-- **Saving over the sample file.** Do not use <MenuPath>File > Resave current dataset(s)</MenuPath> after changing `eeglab_data.set`. Save any modified copy under a new name in your own folder with <MenuPath>File > Save current dataset as</MenuPath>, so the original sample stays intact for the other lessons.
+- **Saving over the sample file.** Do not use <MenuPath>File > Resave current dataset(s)</MenuPath> after changing `eeglab_data.set`. Save any modified copy under a new name in your work folder (`eeg-course`) with <MenuPath>File > Save current dataset as</MenuPath>, so the original sample stays intact for the other lessons.
 - **Closing the main window by mistake.** The data stays in memory. Type `eeglab redraw` in the Command Window to bring the window back with the same data.
 
 {/* "From experience" box: waiting for a story from the project owner. Do not write it before it arrives. */}

@@ -193,7 +193,7 @@ Clustering has no single correct answer. Change the measures or the number of cl
 **About the data (D6):** `animal_mine.study` with its designs and channel measures. Clustering needs three things for each component in every file:
 
 - **ICA:** the ready files already hold the authors' ICA (31 components per participant, 29 for `cba`), so we do not compute it again.
-- **A dipole:** also present, fitted by the authors with the spherical BESA head model (`standard_BESA.mat`, which comes with the dipfit plugin), so we keep it. "Script to reach this state" under "Starts from" at the top of the lesson fits dipoles only if they are missing or their head model file cannot be found.
+- **A dipole:** also present, fitted by the authors with the spherical BESA head model (`standard_BESA.mat`, which comes with the dipfit plugin), so we keep it. "Script to reach this state" at the end of the lesson fits dipoles only if they are missing or their head model file cannot be found.
 - **ICLabel:** there are no results yet, so that script runs it.
 
 <Callout type="warning">
@@ -208,7 +208,7 @@ Clustering has no single correct answer. Change the measures or the number of cl
 
 **1. Prepare the files and check them**
 
-1. Start with `animal_mine.study` open, with ICLabel and dipoles. If you don't have it, open "Script to reach this state" under "Starts from" at the top of the lesson, run it and wait for it to finish.
+1. Start with `animal_mine.study` open, with ICLabel and dipoles. If you don't have it, open "Script to reach this state" at the end of the lesson, run it and wait for it to finish.
 2. Both files of each participant should hold **the same ICA**, because EEGLAB recognizes them as one decomposition only if their weights are identical. The script checks this: when the weights match, it fits the dipoles once and copies them to the second file, and otherwise it fits each file separately.
 
 **2. Choose the components to cluster**

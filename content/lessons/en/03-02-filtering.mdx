@@ -67,7 +67,7 @@ Notice also that a 30 Hz low-pass removed the line-noise peak. If you keep the h
 
 ## How do I apply the two filters from the menus?
 
-Start with `eeglab_data.set` open. If you don't have it, open "Script to reach this state" under "Starts from" at the top of the lesson. On our path, you save only a 0.1 Hz high-pass copy now, and try the low-pass as an exercise without saving it. Each filter is a separate step.
+Start with `eeglab_data.set` open. If you don't have it, open "Script to reach this state" at the end of the lesson. On our path, you save only a 0.1 Hz high-pass copy now, and try the low-pass as an exercise without saving it. Each filter is a separate step.
 
 **First: high-pass filter**
 
@@ -79,7 +79,7 @@ Start with `eeglab_data.set` open. If you don't have it, open "Script to reach t
 6. The filter response window opens. Notice how the response rises from zero to one around 0.1 Hz, then close it.
 7. A window asks what to do with the new dataset. In <UiLabel>Name it:</UiLabel>, type a clear name such as `D1 hp0.1`.
 8. Leave <UiLabel>Overwrite it in memory (set=yes; unset=create a new dataset)</UiLabel> unchecked, so the original stays available for comparison. Press <UiLabel>OK</UiLabel>.
-9. Save this dataset now with <MenuPath>File > Save current dataset as</MenuPath> as `D1_hp0.1.set`. It is the main dataset of the path and the starting point of the next lesson.
+9. Save this dataset now with <MenuPath>File > Save current dataset as</MenuPath> as `D1_hp0.1.set` in your work folder (`eeg-course`). It is the main dataset of the path and the starting point of the next lesson.
 
 **Second, exercise: low-pass filter** on the new dataset
 
@@ -101,6 +101,8 @@ The filter order field says that manual definition is recommended. That is true 
 </Callout>
 
 ## How do I apply the two filters with a script?
+
+The script saves to the current folder (`pwd`), so your Current Folder must be your work folder `eeg-course`.
 
 Each filter is on its own line, and the low-pass goes into a separate variable because it is an exercise.
 

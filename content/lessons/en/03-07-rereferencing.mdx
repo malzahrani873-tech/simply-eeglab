@@ -84,7 +84,7 @@ Try the references in the simulation, then compare real D1 channels before and a
 
 ## How do I apply the average reference from the menus?
 
-Start with the main dataset after interpolation open. If you don't have it, open "Script to reach this state" under "Starts from" at the top of the lesson. In D1, this is `D1 badch` from [the bad channels lesson](/en/lesson/bad-channels/), because there was nothing to interpolate. If you ran the script, it is named `D1 interp`, and it is the same data.
+Start with the main dataset after interpolation open. If you don't have it, open "Script to reach this state" at the end of the lesson. In D1, this is `D1 badch` from [the bad channels lesson](/en/lesson/bad-channels/), because there was nothing to interpolate. If you ran the script, it is named `D1 interp`, and it is the same data.
 
 1. First, make sure the channel count is complete: <UiLabel>Channels per frame</UiLabel> is 32 in D1.
 2. Open <MenuPath>Tools > Re-reference the data</MenuPath>. A window titled <UiLabel>pop_reref - average reference or re-reference data</UiLabel> appears.
@@ -95,10 +95,12 @@ Start with the main dataset after interpolation open. If you don't have it, open
 7. Leave <UiLabel>Add old ref. channel back to the data</UiLabel> empty, because the mastoid channel is not in D1.
 8. Press <UiLabel>OK</UiLabel>. The Command Window prints `Re-referencing data`.
 9. Name the new dataset `D1 main` and leave <UiLabel>Overwrite it in memory (set=yes; unset=create a new dataset)</UiLabel> unchecked.
-10. Save it with <MenuPath>File > Save current dataset as</MenuPath> as `D1_main.set`. This is the "main dataset" that [the ICA lessons](/en/lesson/ica-concept/) start from.
+10. Save it with <MenuPath>File > Save current dataset as</MenuPath> as `D1_main.set` in your work folder (`eeg-course`). This is the "main dataset" that [the ICA lessons](/en/lesson/ica-concept/) start from.
 11. Compare the two datasets with <MenuPath>Plot > Channel data (scroll)</MenuPath>: all scalp channels changed, and `EOG1` and `EOG2` stayed the same.
 
 ## How do I apply it with a script?
+
+The script saves to the current folder (`pwd`), so your Current Folder must be your work folder `eeg-course`.
 
 ```matlab
 % Keep a copy to compare before and after

@@ -159,10 +159,12 @@ cmd = [trystrs.check_data 'LASTCOM = pop_chanvar(EEG);' catchstrs.add_to_hist];
 uimenu(plotmenu, 'Label', 'Channel variance', 'CallBack', cmd, 'Separator', 'on');
 ```
 
+بعد حفظ الملفين، ارجع إلى مجلد عملك قبل أن تكمل، لأن `cd(pluginDir)` في الخطوة 1 جعل مجلد الإضافة داخل EEGLAB هو مجلد MATLAB الحالي، وأي حفظ بعدها سيذهب إلى هناك. اكتب `cd` ثم مسافة ثم مسار مجلد عملك `eeg-course`، أو اختره من لوحة <UiLabel>Current Folder</UiLabel>.
+
 **رابعاً: جرّب الإضافة**
 
 4. أغلق نافذة EEGLAB واكتب `eeglab` من جديد، لأن EEGLAB يبحث عن الإضافات عند تشغيله فقط. تطبع نافذة الأوامر سطراً فيه `adding "chanvar" v1.0`.
-5. حمّل D1 (الملف `eeglab_data.set`، كما في «تبدأ من» أعلى الدرس)، لكن من الواجهة: <MenuPath>File > Load existing dataset</MenuPath>.
+5. حمّل D1 (الملف `eeglab_data.set`، كما في سكربت «للوصول إلى هذه الحالة» في آخر الدرس)، لكن من الواجهة: <MenuPath>File > Load existing dataset</MenuPath>.
 6. افتح <MenuPath>Plot > Channel variance</MenuPath>. تظهر نافذتك، وفي خانة <UiLabel>Robust z-score threshold</UiLabel> القيمة `3`. اضغط <UiLabel>Ok</UiLabel>. يظهر الرسم.
 7. اكتب `eegh`. آخر سطر: `pop_chanvar(EEG, 3);`. أداتك الآن جزء من سجل الأوامر مثل أي أداة رسمية.
 

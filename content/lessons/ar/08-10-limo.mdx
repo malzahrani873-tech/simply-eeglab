@@ -157,7 +157,7 @@ updated: 2026-10-29
 
 ## لماذا أحتاج STUDY جديدة لـ LIMO؟
 
-**عن البيانات (D6):** LIMO يحتاج **ملفاً واحداً لكل مشارك**. في `animal_mine.study` لكل مشارك ملفان، ملف لكل نوع صورة، فيتوقف LIMO بالرسالة `Cannot estimate the model because there is more than 1 dataset per session per subject. Merge datasets for each subject and try again.` لذلك يبني «سكربت للوصول إلى هذه الحالة» تحت «تبدأ من» أعلى الدرس STUDY ثانية، `animal_limo.study`، في مجلدها الخاص `limo` بجانب `animal_mine.study`:
+**عن البيانات (D6):** LIMO يحتاج **ملفاً واحداً لكل مشارك**. في `animal_mine.study` لكل مشارك ملفان، ملف لكل نوع صورة، فيتوقف LIMO بالرسالة `Cannot estimate the model because there is more than 1 dataset per session per subject. Merge datasets for each subject and try again.` لذلك يبني «سكربت للوصول إلى هذه الحالة» في آخر الدرس STUDY ثانية، `animal_limo.study`، في مجلدها الخاص `limo` بجانب `animal_mine.study`:
 
 - لكل مشارك يعلّم كل محاولة بنوع صورتها (حقل حدث جديد `image`)، ثم يدمج الملفين في ملف واحد (مثل `cba_merged.set`). الدمج يحذف ICA، ولا يحتاج LIMO إليه لحساب ERP.
 - الجنس يبقى في `group`. التصميم الوحيد، `image`، فيه متغيّر فئوي واحد على مستوى المحاولة، بالقيمتين `animal` و `distractor`.
@@ -175,7 +175,7 @@ updated: 2026-10-29
 
 **ثانياً: المستوى الأول، نموذج لكل مشارك**
 
-1. ابدأ و`animal_limo.study` مفتوحة. إن لم تكن عندك، فافتح «سكربت للوصول إلى هذه الحالة» تحت «تبدأ من» أعلى الدرس.
+1. ابدأ و`animal_limo.study` مفتوحة. إن لم تكن عندك، فافتح «سكربت للوصول إلى هذه الحالة» في آخر الدرس.
 2. تأكد أن STUDY الظاهرة في نافذة EEGLAB هي `Go-nogo animal (LIMO)`، وفيها 14 ملفاً. تصميمها الوحيد `image` هو التصميم الحالي.
 3. افتح <MenuPath>Study > LInear MOdeling of EEG Data > Estimate Model Parameters (channel)</MenuPath>.
 4. يظهر تحذير يقول إن في STUDY مجموعات من المشاركين، وإن المجموعات تُهمل في المستوى الأول. هذا متوقع: الجنس بين المشاركين، فمكانه المستوى الثاني. اضغط <UiLabel>OK</UiLabel>.
@@ -270,7 +270,7 @@ fprintf('Channels inside a significant cluster: %s\n', strjoin(chanNames(any(mas
 
 ## أخطاء شائعة مع LIMO
 
-- **ملفان لكل مشارك.** يتوقف LIMO بالرسالة `Merge datasets for each subject and try again.` ادمج ملفات كل مشارك أولاً، بعد أن تعلّم كل محاولة بشرطها في حقل حدث، كما في «تبدأ من» أعلى الدرس.
+- **ملفان لكل مشارك.** يتوقف LIMO بالرسالة `Merge datasets for each subject and try again.` ادمج ملفات كل مشارك أولاً، بعد أن تعلّم كل محاولة بشرطها في حقل حدث، كما في سكربت «للوصول إلى هذه الحالة» في آخر الدرس.
 - **لا توجد محاولات مفردة.** LIMO يقرأ المحاولات التي حفظها `savetrials` في درس الحساب المسبق. بدونها يتوقف بالرسالة `Measures must be computed first`.
 - **عدم تحديد مجلد العمل.** LIMO يكتب ملفات المستوى الثاني في المجلد الحالي. اختر مجلداً فارغاً لكل اختبار، وإلا اختلطت نتائج الاختبارات.
 - **أرقام معاملات خاطئة.** ترتيب الـ betas يتبع قيم متغيّر التصميم. تحقق منه بـ <UiLabel>See GLM variables</UiLabel> في نافذة المستوى الأول قبل أن تكتب `1 2`.

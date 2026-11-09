@@ -24,39 +24,41 @@ startingPoint:
   file: eeglab_data.set
   applied: [filtering, line-noise, bad-channels, interpolation, rereferencing, run-ica, ica-1hz-copy-weights, iclabel, extract-epochs, baseline-correction, epoch-rejection]
   script: |
-    % Shortcut: if you saved D1_epochs_clean.set in the epoch rejection lesson, keep
-    % the first line and the last two lines (pop_newset, eeglab redraw), and replace
-    % every line between them with:
-    % EEG = pop_loadset('D1_epochs_clean.set', pwd);
     [ALLEEG, EEG, CURRENTSET, ALLCOM] = eeglab;
-    eeglabRoot = fileparts(which('eeglab'));
-    EEG = pop_loadset('eeglab_data.set', fullfile(eeglabRoot, 'sample_data'));
-    fullLocs = EEG.chanlocs;
+    % Your Current Folder must be your work folder (eeg-course)
+    if exist(fullfile(pwd, 'D1_main_ica.set'), 'file')
+        % Saved in the run-ica lesson: load it instead of running ICA again (minutes)
+        EEG = pop_loadset('D1_main_ica.set', pwd);
+    else
+        eeglabRoot = fileparts(which('eeglab'));
+        EEG = pop_loadset('eeglab_data.set', fullfile(eeglabRoot, 'sample_data'));
+        fullLocs = EEG.chanlocs;
 
-    % Main dataset: high-pass at 0.1 Hz, then 60 Hz line-noise removal
-    EEG = pop_eegfiltnew(EEG, 'locutoff', 0.1);
-    EEG = pop_eegfiltnew(EEG, 'locutoff', 58, 'hicutoff', 62, 'revfilt', 1);
+        % Main dataset: high-pass at 0.1 Hz, then 60 Hz line-noise removal
+        EEG = pop_eegfiltnew(EEG, 'locutoff', 0.1);
+        EEG = pop_eegfiltnew(EEG, 'locutoff', 58, 'hicutoff', 62, 'revfilt', 1);
 
-    % Bad channels you removed earlier, e.g. {'T7'}; leave empty if none
-    badChans = {};
-    if ~isempty(badChans)
-        EEG = pop_select(EEG, 'rmchannel', badChans);
-        EEG = pop_interp(EEG, fullLocs, 'spherical');
+        % Bad channels you removed earlier, e.g. {'T7'}; leave empty if none
+        badChans = {};
+        if ~isempty(badChans)
+            EEG = pop_select(EEG, 'rmchannel', badChans);
+            EEG = pop_interp(EEG, fullLocs, 'spherical');
+        end
+
+        % Average reference, EOG channels excluded
+        eogIdx = find(ismember({EEG.chanlocs.labels}, {'EOG1', 'EOG2'}));
+        EEG = pop_reref(EEG, [], 'exclude', eogIdx);
+
+        % ICA on a 1-Hz copy, then copy the weights back
+        EEG_ica = pop_eegfiltnew(EEG, 'locutoff', 1);
+        EEG_ica = pop_runica(EEG_ica, 'icatype', 'runica', 'extended', 1);
+        EEG.icaweights  = EEG_ica.icaweights;
+        EEG.icasphere   = EEG_ica.icasphere;
+        EEG.icachansind = EEG_ica.icachansind;
+        EEG.icawinv     = [];
+        EEG.icaact      = [];
+        EEG = eeg_checkset(EEG);
     end
-
-    % Average reference, EOG channels excluded
-    eogIdx = find(ismember({EEG.chanlocs.labels}, {'EOG1', 'EOG2'}));
-    EEG = pop_reref(EEG, [], 'exclude', eogIdx);
-
-    % ICA on a 1-Hz copy, then copy the weights back
-    EEG_ica = pop_eegfiltnew(EEG, 'locutoff', 1);
-    EEG_ica = pop_runica(EEG_ica, 'icatype', 'runica', 'extended', 1);
-    EEG.icaweights  = EEG_ica.icaweights;
-    EEG.icasphere   = EEG_ica.icasphere;
-    EEG.icachansind = EEG_ica.icachansind;
-    EEG.icawinv     = [];
-    EEG.icaact      = [];
-    EEG = eeg_checkset(EEG);
 
     % Remove eye and muscle components, then low-pass at 30 Hz
     EEG = pop_iclabel(EEG, 'default');
@@ -104,7 +106,7 @@ updated: 2026-10-28
 
 ## كيف أثبّت المقياس وأصدّر الخرائط والأرقام من القوائم؟
 
-ابدأ والداتاست (<En>dataset</En>) `D1 epochs clean` مفتوحة. إن لم تكن عندك، فافتح «سكربت للوصول إلى هذه الحالة» أعلى الدرس.
+ابدأ والداتاست (<En>dataset</En>) `D1 epochs clean` مفتوحة. إن لم تكن عندك، فافتح «سكربت للوصول إلى هذه الحالة» في آخر الدرس.
 
 للخرائط استخدم `D1 epochs clean scalp`، وهي النسخة ذات الـ 30 قناة دون EOG1 و EOG2. إن لم تكن مفتوحة، فاصنعها كما في أول خطوة من [درس خرائط الرأس](/lesson/topoplot/) (<MenuPath>Edit > Select data</MenuPath>). الواجهة تكفي لخرائط داتاست واحدة، أما مقارنة شرطين في رسمة واحدة فتحتاج إلى السكربت.
 
@@ -117,21 +119,31 @@ updated: 2026-10-28
 **ثانياً: ثبّت المقياس وصدّر**
 
 1. افتح نفس النافذة مرة ثانية. في آخر خانة في النافذة (الخيارات الإضافية) اكتب `'electrodes', 'on', 'maplimits', [-5 5]`، وضع حدّك مكان الرقم 5 في الموضعين، مثلاً `[-12 12]` إذا كان حدّك 12. استخدم نفس الحد لكل خريطة ستقارنها بهذه، حتى من داتاست أخرى.
-2. في نافذة الرسمة افتح <MenuPath>File > Save As</MenuPath>، واختر نوع الملف PDF أو SVG. هذه قائمة MATLAB نفسها، لا قائمة EEGLAB.
+2. في نافذة الرسمة افتح <MenuPath>File > Save As</MenuPath>، واختر نوع الملف PDF أو SVG، واحفظه في مجلد عملك (`eeg-course`) باسم `maps_2d.pdf` مثلاً. هذه قائمة MATLAB نفسها، لا قائمة EEGLAB.
 3. افتح الملف وكبّره: الخطوط والحروف حادة، ونص العناوين يمكن تحديده. هذا معنى «متّجهة».
 
 **ثالثاً: صدّر الأرقام التي وراء الرسمة**
 
 1. افتح <MenuPath>File > Export > Data and ICA activity to text file</MenuPath>.
-2. في <UiLabel>Output file name</UiLabel> اكتب `erp_all.txt`.
+2. في <UiLabel>Output file name</UiLabel> اكتب `erp_all.txt`. يُحفظ الملف في مجلد MATLAB الحالي، وهو مجلد عملك (`eeg-course`).
 3. فعّل <UiLabel>Export ERP average instead of trials:</UiLabel>، واترك <UiLabel>Transpose matrix (elec -> cols):</UiLabel> و <UiLabel>Export channel labels/component numbers:</UiLabel> و <UiLabel>Export time values:</UiLabel> مفعّلة كما هي. اضغط <UiLabel>Ok</UiLabel>.
 4. يظهر ملف نصي: الصف الأول أسماء القنوات، والعمود الأول الزمن بالميلي ثانية، وكل صف بعده نقطة زمنية. هذا ما تضعه في المواد الإضافية للورقة، أو ترسم منه في برنامج آخر.
 
 ## كيف أصدّر رسمة الموجات وخرائط الشرطين بالسكربت؟
 
+في D1 ظهر المربع في موقعين على الشاشة، فهما شرطان. لكل epoch حدث `square` عند الزمن 0، ولهذا الحدث حقل اسمه `position` قيمته 1 أو 2. السكربت يفعل ثلاثة أشياء:
+
+1. يقرأ قيمة `position` لكل epoch بالدالة `eeg_getepochevent`.
+2. يأخذ أرقام الـ epochs التي قيمتها 1، ثم التي قيمتها 2، ويصنع من كل مجموعة داتاست بالدالة `pop_select`.
+3. يحسب متوسط كل مجموعة، ثم يرسم الشرطين معاً بنفس المقياس.
+
+مجلد MATLAB الحالي (Current Folder) يجب أن يكون مجلد عملك (`eeg-course`)، لأن السكربت يقرأ منه ويحفظ فيه بـ `pwd`.
+
 ```matlab
 EEG = pop_loadset('D1_epochs_clean.set', pwd);
+% The 'position' value (1 or 2) of the 'square' event at time 0 in each epoch
 pos = eeg_getepochevent(EEG, 'type', {'square'}, 'timewin', [-5 5], 'fieldname', 'position');
+% Keep only the epochs of each condition: one dataset per position
 EEG_pos1 = pop_select(EEG, 'trial', find(pos == 1));
 EEG_pos2 = pop_select(EEG, 'trial', find(pos == 2));
 EEG_pos1.setname = 'D1 epochs clean pos1';

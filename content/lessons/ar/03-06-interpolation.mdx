@@ -88,14 +88,14 @@ updated: 2026-10-29
 **عن D1:** لم نجد فيها قناة سيئة، فلا شيء لتستوفيه في المسار. ستتدرّب على نسخة مؤقتة: تحذف قناة سليمة هي `C3`، ثم تعيد بناءها، وتقارنها بالأصل. هكذا ترى بنفسك مدى دقة الاستيفاء. لا تحفظ نسخ التمرين، فالمسار يكمل من `D1 badch`.
 </Callout>
 
-شغّل «سكربت للوصول إلى هذه الحالة» تحت «تبدأ من» أعلى الدرس. هو يضع الداتاست كما كانت قبل حذف القنوات، أي `D1 hp0.1 notch60`، في الداتاست 1، والنسخة الرئيسية `D1 badch` في الداتاست 2. ومع بياناتك ستحتاج إلى رقم الداتاست التي فيها كل القنوات قبل الحذف (هنا الداتاست 1)، لأنها تحفظ مواقع كل القنوات.
+شغّل «سكربت للوصول إلى هذه الحالة» في آخر الدرس. هو يضع الداتاست كما كانت قبل حذف القنوات، أي `D1 hp0.1 notch60`، في الداتاست 1، والنسخة الرئيسية `D1 badch` في الداتاست 2. ومع بياناتك ستحتاج إلى رقم الداتاست التي فيها كل القنوات قبل الحذف (هنا `D1 hp0.1 notch60`، وهي الداتاست 1 إن بدأت بالسكربت)، لأنها تحفظ مواقع كل القنوات. وإن أكملت من الدرس السابق في نفس الجلسة فقد تختلف الأرقام، فاقرأ رقم كل داتاست من قائمة <MenuPath>Datasets</MenuPath>.
 
 **أولاً: تمرين على قناة سليمة**
 
 1. تأكد أن `D1 badch` هي الداتاست الحالية، ثم افتح <MenuPath>Edit > Select data</MenuPath>. اكتب `C3` في خانة <UiLabel>Channel(s)</UiLabel>، وفعّل المربع تحت <UiLabel>on->remove these</UiLabel>، ثم اضغط <UiLabel>OK</UiLabel>.
 2. سمِّ الداتاست الجديدة `D1 noC3`. في النافذة الرئيسية صار <UiLabel>Channels per frame</UiLabel> يساوي 31.
 3. افتح <MenuPath>Tools > Interpolate electrodes</MenuPath>. تظهر نافذة بعنوان <UiLabel>Interpolate channel(s) -- pop_interp()</UiLabel>.
-4. اضغط <UiLabel>Use all channels from other dataset</UiLabel>، واكتب `2`، أي رقم الداتاست `D1 badch`، في خانة <UiLabel>Dataset index</UiLabel>، ثم اضغط <UiLabel>OK</UiLabel>. يظهر اسم `C3` تحت <UiLabel>What channel(s) do you want to interpolate</UiLabel>.
+4. اضغط <UiLabel>Use all channels from other dataset</UiLabel>، واكتب رقم `D1 badch` كما يظهر في قائمة <MenuPath>Datasets</MenuPath> (هو 2 إن بدأت بالسكربت) في خانة <UiLabel>Dataset index</UiLabel>، ثم اضغط <UiLabel>OK</UiLabel>. يظهر اسم `C3` تحت <UiLabel>What channel(s) do you want to interpolate</UiLabel>.
 5. في <UiLabel>Interpolation method</UiLabel> اترك <UiLabel>Spherical</UiLabel>، واترك <UiLabel>Time range [min max] (s)</UiLabel> فارغة، ثم اضغط <UiLabel>OK</UiLabel>.
 6. يطبع الـ Command Window `Interpolating 1 channels...`. سمِّ الداتاست `D1 C3 back`. صار عدد القنوات 32 من جديد.
 7. قارن `C3` في `D1 badch` وفي `D1 C3 back` من <MenuPath>Plot > Channel data (scroll)</MenuPath>. الإشارتان متشابهتان جداً.
@@ -105,14 +105,16 @@ updated: 2026-10-29
 
 1. تأكد أن الداتاست التي حذفت منها القنوات السيئة هي الحالية، ثم افتح <MenuPath>Tools > Interpolate electrodes</MenuPath>.
 2. اضغط <UiLabel>Use all channels from other dataset</UiLabel>، واكتب في خانة <UiLabel>Dataset index</UiLabel> رقم الداتاست التي فيها كل القنوات قبل الحذف، ثم اضغط <UiLabel>OK</UiLabel>. تظهر أسماء القنوات المحذوفة.
-3. اترك <UiLabel>Spherical</UiLabel>، واضغط <UiLabel>OK</UiLabel>. سمِّ الناتج `D1 interp` واحفظه من <MenuPath>File > Save current dataset as</MenuPath> باسم `D1_interp.set`.
-4. في D1 لم تُحذف قناة، فإذا جرّبت يقول EEGLAB `No new channels selected`. النسخة الرئيسية تبقى `D1 badch`، و[درس إعادة المرجع](/lesson/rereferencing/) يبدأ منها.
+3. اترك <UiLabel>Spherical</UiLabel>، واضغط <UiLabel>OK</UiLabel>. مع بياناتك سمِّ الناتج `D1 interp` واحفظه من <MenuPath>File > Save current dataset as</MenuPath> باسم `D1_interp.set` في مجلد عملك (`eeg-course`).
+4. في D1 لا توجد قناة لاستيفائها، فإذا جرّبت يقول EEGLAB `No new channels selected`، ولا تحفظ شيئاً. الملف الذي تكمل به هو `D1_badch.set` من [درس القنوات السيئة](/lesson/bad-channels/)، و[درس إعادة المرجع](/lesson/rereferencing/) يبدأ منه. أما سكربت هذا الدرس فيحفظ `D1_interp.set`، وهو نفس البيانات.
 
 <Callout type="warning">
 **تحذير ستراه عند فتح النافذة:** عندما تفتح نافذة الاستيفاء من القائمة، يطبع EEGLAB في الـ Command Window `Warning: do not interpolate channels before running ICA`. السكربت الذي يستدعي `pop_interp` لا يطبعه. وحول التحذير يطبع EEGLAB تلميحين لطريقة أخرى: أن تعرّف القنوات الناقصة في محرّر القنوات على أنها ليست قنوات بيانات (<En>non-data channels</En>) وتستوفيها لاحقاً، أو أن تستوفيها أثناء التحليل في STUDY. التحذير إذن يتعلّق برتبة البيانات، ولا يعني أن الاستيفاء خطأ.
 </Callout>
 
 ## كيف أستوفيها بسكربت؟
+
+يحفظ السكربت في المجلد الحالي (`pwd`)، فيجب أن يكون مجلد MATLAB الحالي (<En>Current Folder</En>) هو مجلد عملك `eeg-course`.
 
 ```matlab
 % Rebuild the removed channels from the full channel list (fullLocs)
@@ -133,7 +135,7 @@ r = corrcoef(double(EEG.data(iOrig, :)), double(EEG_back.data(iBack, :)));
 fprintf('Correlation between original and interpolated %s: %.2f\n', testChan, r(1, 2));
 ```
 
-المتغيّر `fullLocs` من «سكربت للوصول إلى هذه الحالة» أعلى الدرس: نسخة من مواقع كل القنوات قبل أي حذف. احتفظ بها دائماً في بداية المعالجة.
+المتغيّر `fullLocs` من «سكربت للوصول إلى هذه الحالة» في آخر الدرس: نسخة من مواقع كل القنوات قبل أي حذف. احتفظ بها دائماً في بداية المعالجة.
 
 ## أي إعدادات أختار للاستيفاء؟
 

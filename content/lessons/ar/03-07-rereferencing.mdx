@@ -84,7 +84,7 @@ updated: 2026-10-27
 
 ## كيف أطبّق المرجع المتوسط من القوائم؟
 
-ابدأ والنسخة الرئيسية بعد الاستيفاء مفتوحة. إن لم تكن عندك، فافتح «سكربت للوصول إلى هذه الحالة» تحت «تبدأ من» أعلى الدرس. في D1 هي `D1 badch` من [درس القنوات السيئة](/lesson/bad-channels/)، لأنه لم يكن فيها شيء لتستوفيه. وإذا شغّلت السكربت فاسمها `D1 interp`، وهي نفس البيانات.
+ابدأ والنسخة الرئيسية بعد الاستيفاء مفتوحة. إن لم تكن عندك، فافتح «سكربت للوصول إلى هذه الحالة» في آخر الدرس. في D1 هي `D1 badch` من [درس القنوات السيئة](/lesson/bad-channels/)، لأنه لم يكن فيها شيء لتستوفيه. وإذا شغّلت السكربت فاسمها `D1 interp`، وهي نفس البيانات.
 
 1. تأكد أولاً من أن عدد القنوات كامل: <UiLabel>Channels per frame</UiLabel> يساوي 32 في D1.
 2. افتح <MenuPath>Tools > Re-reference the data</MenuPath>. تظهر نافذة بعنوان <UiLabel>pop_reref - average reference or re-reference data</UiLabel>.
@@ -95,10 +95,12 @@ updated: 2026-10-27
 7. اترك <UiLabel>Add old ref. channel back to the data</UiLabel> فارغاً، لأن قناة الماستويد ليست في D1.
 8. اضغط <UiLabel>OK</UiLabel>. يطبع الـ Command Window `Re-referencing data`.
 9. سمِّ الداتاست الجديدة `D1 main`، واترك <UiLabel>Overwrite it in memory (set=yes; unset=create a new dataset)</UiLabel> غير مفعّل.
-10. احفظها من <MenuPath>File > Save current dataset as</MenuPath> باسم `D1_main.set`. هذه «النسخة الرئيسية» التي تبدأ منها [دروس ICA](/lesson/ica-concept/).
+10. احفظها من <MenuPath>File > Save current dataset as</MenuPath> باسم `D1_main.set` في مجلد عملك (`eeg-course`). هذه «النسخة الرئيسية» التي تبدأ منها [دروس ICA](/lesson/ica-concept/).
 11. قارن الداتاستين من <MenuPath>Plot > Channel data (scroll)</MenuPath>: كل قنوات الرأس تغيّرت، و `EOG1` و `EOG2` بقيتا كما هما.
 
 ## كيف أطبّقه بسكربت؟
+
+يحفظ السكربت في المجلد الحالي (`pwd`)، فيجب أن يكون مجلد MATLAB الحالي (<En>Current Folder</En>) هو مجلد عملك `eeg-course`.
 
 ```matlab
 % Keep a copy to compare before and after

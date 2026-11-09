@@ -159,10 +159,12 @@ cmd = [trystrs.check_data 'LASTCOM = pop_chanvar(EEG);' catchstrs.add_to_hist];
 uimenu(plotmenu, 'Label', 'Channel variance', 'CallBack', cmd, 'Separator', 'on');
 ```
 
+After saving both files, go back to your work folder before you continue: `cd(pluginDir)` in step 1 made the plugin folder inside EEGLAB MATLAB's current folder, and anything you save afterwards would go there. Type `cd`, a space and the path of your work folder `eeg-course`, or pick it in the <UiLabel>Current Folder</UiLabel> panel.
+
 **Fourth: try the plugin**
 
 4. Close the EEGLAB window and type `eeglab` again, because EEGLAB looks for plugins only at startup. The command window prints a line containing `adding "chanvar" v1.0`.
-5. Load D1 (the file `eeglab_data.set`, as in "Starts from" at the top of the lesson), but from the GUI: <MenuPath>File > Load existing dataset</MenuPath>.
+5. Load D1 (the file `eeglab_data.set`, as in "Script to reach this state" at the end of the lesson), but from the GUI: <MenuPath>File > Load existing dataset</MenuPath>.
 6. Open <MenuPath>Plot > Channel variance</MenuPath>. Your window appears, with `3` in <UiLabel>Robust z-score threshold</UiLabel>. Click <UiLabel>Ok</UiLabel>. The plot appears.
 7. Type `eegh`. The last line is `pop_chanvar(EEG, 3);`. Your tool is now part of the command history like any official tool.
 

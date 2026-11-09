@@ -81,7 +81,7 @@ Do not download the ZIP file from the EEGLAB page on GitHub. That file is missin
 
 ### 2. Unzip it in a permanent place
 
-Unzip the file in a folder you will not move later, such as `Documents/MATLAB`. You get a folder whose name starts with `eeglab` followed by the version number.
+Unzip the file in a folder you will not move later, such as `Documents/MATLAB`. You get a folder whose name starts with `eeglab` followed by the version number. This is the main EEGLAB folder: the folder that holds the file `eeglab.m` directly. If unzipping gives you a folder inside a folder with the same name, the main one is the inner folder, the one that holds `eeglab.m`.
 
 ### 3. Save the path before the first run
 
@@ -89,7 +89,7 @@ Save the path **before** you type `eeglab`. The reason: when it starts, EEGLAB a
 
 1. Open MATLAB, and do not start EEGLAB yet. If you already started it in this session, close MATLAB and open it again.
 2. Type `pathtool` in the Command Window (or open <UiLabel>Set Path</UiLabel> from the MATLAB interface).
-3. Click <UiLabel>Add Folder</UiLabel> and select the main EEGLAB folder only.
+3. Click <UiLabel>Add Folder</UiLabel> and select the main EEGLAB folder only, the folder that holds the file `eeglab.m`.
 4. Click <UiLabel>Save</UiLabel>, then <UiLabel>Close</UiLabel>.
 
 ### 4. Start EEGLAB
@@ -113,6 +113,16 @@ The extension manager shows each plugin's star rating and download count, and so
 <ImageSpec optional>
 The extension manager window (Manage EEGLAB extensions) with Biosig selected in the list and the Install/Update button at the bottom.
 </ImageSpec>
+
+### 6. Create your work folder
+
+Every file you save in this site's lessons goes into one folder, your work folder (`eeg-course`).
+
+1. Create a folder named `eeg-course` inside your Documents folder, outside the EEGLAB folder.
+2. In MATLAB, make it the current folder: go to it in the Current Folder panel, or type the `cd` command with your path in the Command Window, such as `cd('C:\Users\me\Documents\eeg-course')`.
+3. In every new MATLAB session, check that the Current Folder is `eeg-course` before you start a lesson.
+
+When a lesson says "save in your work folder", it means `eeg-course`. Lesson scripts write its path in the line `dataFolder = 'C:\Users\me\Documents\eeg-course';`, so change that line to your own path.
 
 ### Should I update EEGLAB?
 
@@ -147,10 +157,11 @@ end
 ## How do I check the installation worked?
 
 1. **The window:** the EEGLAB main window opened with its seven menus.
-2. **The path:** close MATLAB, open it again, and type `which eeglab`. It should print the path of `eeglab.m` inside your folder. Also, when you run `eeglab`, no red warning about subfolders should appear.
+2. **The path:** close MATLAB, open it again, and type `which eeglab`. It should print the path of `eeglab.m` inside the EEGLAB folder. Also, when you run `eeglab`, no red warning about subfolders should appear.
 3. **The version:** type `eeg_getversion`. It should print a version number starting with `2026.1`.
 4. **The plugin:** type `exist('sopen', 'file')`. A result of `2` means Biosig is installed. Its name also appears in bold in the extension manager.
 5. **Startup lines:** each time EEGLAB starts, it prints in the Command Window one line for each plugin it loads, starting with `EEGLAB: adding` followed by the plugin name and version. Look for Biosig.
+6. **The work folder:** the `eeg-course` folder exists, and the Current Folder in MATLAB shows it.
 
 ## Which mistakes break the installation?
 

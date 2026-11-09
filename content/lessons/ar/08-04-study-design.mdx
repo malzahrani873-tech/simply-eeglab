@@ -94,6 +94,10 @@ eeglabVersion: "2026.1"
 updated: 2026-10-28
 ---
 
+<Callout type="warning">
+درس إنشاء STUDY سينزل قريباً. حتى ذلك الحين، شغّل «سكربت للوصول إلى هذه الحالة» في آخر الدرس. هذا السكربت ينشئ STUDY باسم `animal_mine.study` بالمشاركين الـ14، ويضع جنس كل مشارك في المتغيّر `group` (القيمتان `F` و`M`). ويحوّل أيضاً ملفات البيانات القديمة `.dat` إلى `.fdt` ثم يحذف القديمة، وهذا مقصود: حفظ ملفات `.dat` بصيغتها القديمة يفسد البيانات في EEGLAB 2026.1.
+</Callout>
+
 ## الفكرة
 
 الـ STUDY تعرف لكل ملف المشارك (<En>subject</En>) والشرط (<En>condition</En>) والمجموعة (<En>group</En>). لكنها لا تعرف سؤالك. التصميم (design) هو السؤال مكتوباً بلغة EEGLAB: أي متغيّرات تقارن، وأي قيم منها، وأي مشاركين.
@@ -140,7 +144,7 @@ updated: 2026-10-28
 
 **أولاً: انظر إلى التصميم الذي أنشأه EEGLAB**
 
-1. ابدأ والـ STUDY `animal_mine.study` مفتوحة. إن لم تكن عندك، فافتح «سكربت للوصول إلى هذه الحالة» تحت «تبدأ من» أعلى الدرس، وشغّله.
+1. ابدأ والـ STUDY `animal_mine.study` مفتوحة. إن لم تكن عندك، فافتح «سكربت للوصول إلى هذه الحالة» في آخر الدرس، وشغّله.
 2. افتح <MenuPath>Study > Select/Edit study design(s)</MenuPath>. تفتح نافذة <UiLabel>Edit STUDY design -- pop_studydesign()</UiLabel>.
 3. في قائمة <UiLabel>Design name</UiLabel> تصميم واحد اسمه `STUDY.design 1`. أنشأه EEGLAB تلقائياً عند إنشاء الـ STUDY.
 4. في الجزء <UiLabel>Edit the independent variables for this design</UiLabel> سطران: `Categorical variable: condition - Values (animal - distractor)` و `Categorical variable: group - Values (F - M)`. EEGLAB يضع في التصميم الأول كل متغيّر أساسي في الـ STUDY (مثل `condition` و`group`) له أكثر من قيمة.

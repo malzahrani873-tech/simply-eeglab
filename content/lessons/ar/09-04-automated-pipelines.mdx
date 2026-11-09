@@ -80,7 +80,7 @@ PREP واحد من البايبلاينات الجاهزة، وستشغّله ع
 
 **ثانياً: انظر إلى البيانات قبل PREP**
 
-2. ابدأ والداتاست `D1 raw` مفتوحة في EEGLAB. إن لم تكن عندك، فافتح «سكربت للوصول إلى هذه الحالة» تحت «تبدأ من» أعلى الدرس. هذه البيانات كما نزّلتها، بلا فلترة.
+2. ابدأ والداتاست `D1 raw` مفتوحة في EEGLAB. إن لم تكن عندك، فافتح «سكربت للوصول إلى هذه الحالة» في آخر الدرس. هذه البيانات كما نزّلتها، بلا فلترة.
 3. افتح <MenuPath>Plot > Channel spectra and maps</MenuPath> واترك القيم الافتراضية. لاحظ القمة الحادة عند 60 هرتز، كما في [درس ضوضاء الكهرباء](/lesson/line-noise/).
 
 **ثالثاً: شغّل PREP**
@@ -88,7 +88,7 @@ PREP واحد من البايبلاينات الجاهزة، وستشغّله ع
 4. افتح <MenuPath>Tools > Run PREP pipeline</MenuPath>. تفتح نافذة <UiLabel>PREP pipeline control panel</UiLabel> وفيها ستة أزرار، زر لكل مرحلة.
 5. اضغط <UiLabel>Reference</UiLabel>. في <UiLabel>Reference channels</UiLabel> و <UiLabel>Evaluation channels</UiLabel> و <UiLabel>Re-referenced channels</UiLabel> اكتب `[1 3:5 7:32]`، أي كل القنوات ما عدا `EOG1` (القناة 2) و `EOG2` (القناة 6). اضغط <UiLabel>Ok</UiLabel>.
 6. اضغط <UiLabel>Line noise</UiLabel> وتأكد أن خانة <UiLabel>Line frequencies removed</UiLabel> فيها `60`. يحسبها PREP من معدل العيّنات (<En>sampling rate</En>): مضاعفات 60 التي تقع تحت تردد Nyquist، وهو 64 هرتز في D1. اضغط <UiLabel>Ok</UiLabel>.
-7. اضغط <UiLabel>Ok</UiLabel> في لوحة التحكم. يطبع PREP كل مرحلة في نافذة الأوامر (<UiLabel>Command Window</UiLabel>)، ويأخذ حوالي دقيقة على D1. عندما ينتهي يكتب ملف ملخّص (`.html`) وتقريراً مفصّلاً (`.pdf`) في مجلد العمل، ويطلب منك اسماً للداتاست (<En>dataset</En>) الجديدة. اكتب `D1 prep` واضغط <UiLabel>Ok</UiLabel>.
+7. اضغط <UiLabel>Ok</UiLabel> في لوحة التحكم. يطبع PREP كل مرحلة في نافذة الأوامر (<UiLabel>Command Window</UiLabel>)، ويأخذ حوالي دقيقة على D1. عندما ينتهي يكتب ملف ملخّص (`.html`) وتقريراً مفصّلاً (`.pdf`) في مجلد عملك (`eeg-course`)، ويطلب منك اسماً للداتاست (<En>dataset</En>) الجديدة. اكتب `D1 prep` واضغط <UiLabel>Ok</UiLabel>.
 
 **رابعاً: تحقق من المخرجات**
 
@@ -98,7 +98,7 @@ PREP واحد من البايبلاينات الجاهزة، وستشغّله ع
 
 ## كيف أشغّل PREP من سكربت؟
 
-هذا السكربت يكمل من الحالة في «تبدأ من» أعلى الدرس. استدعاء دالة PREP نفسها، `prepPipeline`، هو أوضح طريقة لتشغيله من سكربت، كما في المثال المرفق مع الإضافة. السكربت لا يكتب التقرير، بل يطبع النتائج مباشرة.
+هذا السكربت يكمل من الحالة التي يصل إليها سكربت «للوصول إلى هذه الحالة» في آخر الدرس. استدعاء دالة PREP نفسها، `prepPipeline`، هو أوضح طريقة لتشغيله من سكربت، كما في المثال المرفق مع الإضافة. السكربت لا يكتب التقرير، بل يطبع النتائج مباشرة.
 
 ```matlab
 % PREP is not bundled with EEGLAB: install it from the extension manager

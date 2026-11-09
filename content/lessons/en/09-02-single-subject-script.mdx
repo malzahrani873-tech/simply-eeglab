@@ -72,6 +72,8 @@ Each section starts with a `%%` line, and its title names the station it comes f
 
 ## What does the full script look like, from raw data to clean epochs?
 
+Before you run it, MATLAB's <UiLabel>Current Folder</UiLabel> must be your work folder `eeg-course`, because the script saves its files there (`outDir = pwd`).
+
 ```matlab
 %% D1 single-subject pipeline: raw data to clean epochs
 % Each line comes from the lesson of its step (station in the section title)
@@ -212,7 +214,7 @@ fprintf('Saved: D1_main_clean_lp30.set and D1_epochs_clean.set in %s\n', outDir)
 
 - After `clear`, the script runs from start to end with no window waiting for you.
 - The summary prints the number of bad channels, removed components, and epochs remaining out of 80.
-- The working folder holds two files: `D1_main_clean_lp30.set` and `D1_epochs_clean.set`.
+- Your work folder (`eeg-course`) holds two files: `D1_main_clean_lp30.set` and `D1_epochs_clean.set`.
 - `size(EEG.data)` at the end is 32 × 384 × the number of remaining epochs, as in [the epoch rejection lesson](/en/lesson/epoch-rejection/).
 
 ## Common mistakes when assembling the script

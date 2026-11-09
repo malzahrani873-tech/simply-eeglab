@@ -155,7 +155,7 @@ In this task, the animal pictures are the go trials (the participant lifts a fin
 
 **1. Prepare the plot**
 
-1. Start with `animal_mine.study` open and its measures computed. If you don't have it, open "Script to reach this state" under "Starts from" at the top of the lesson.
+1. Start with `animal_mine.study` open and its measures computed. If you don't have it, open "Script to reach this state" at the end of the lesson.
 2. Open <MenuPath>Study > Plot channel measures</MenuPath>. In <UiLabel>Select design:</UiLabel> choose `image only`, then choose `Pz` in the left list.
 3. Press <UiLabel>Params</UiLabel> next to <UiLabel>Plot ERPs</UiLabel>. Tick <UiLabel>Plot first variable on the same panel</UiLabel>, leave <UiLabel>Time range (ms) [low high]</UiLabel> empty, and make sure <UiLabel>Multiple channels selection</UiLabel> is on <UiLabel>Plot channels individually</UiLabel>. Press <UiLabel>Ok</UiLabel>.
 
@@ -190,7 +190,7 @@ The window is 150 to 250 ms. The section "Why choose the time window before look
 **5. Cluster correction (requires Fieldtrip-lite)**
 
 1. **Check whether it is installed.** Open <UiLabel>STATS</UiLabel>. If the line reads <UiLabel>Use Fieldtrip statistics (to use install "Fieldtrip-lite" using File > Manage EEGLAB extensions)</UiLabel> and cannot be ticked, the plugin is missing. You can also type `exist('ft_freqstatistics', 'file')` in the command window: `2` means installed, `0` means missing.
-2. **To install it:** open <MenuPath>File > Manage EEGLAB extensions</MenuPath>. In <UiLabel>List of plugins (bolded means installed)</UiLabel> click `Fieldtrip-lite`, then press <UiLabel>Install/Update</UiLabel>. Open <UiLabel>STATS</UiLabel> again: the line should now read <UiLabel>Use Fieldtrip statistics</UiLabel>. If it is still grey, restart EEGLAB, then run "Script to reach this state" under "Starts from" at the top of the lesson again.
+2. **To install it:** open <MenuPath>File > Manage EEGLAB extensions</MenuPath>. In <UiLabel>List of plugins (bolded means installed)</UiLabel> click `Fieldtrip-lite`, then press <UiLabel>Install/Update</UiLabel>. Open <UiLabel>STATS</UiLabel> again: the line should now read <UiLabel>Use Fieldtrip statistics</UiLabel>. If it is still grey, restart EEGLAB, then run "Script to reach this state" at the end of the lesson again.
 3. **To run it:** select `Pz` alone, open <UiLabel>STATS</UiLabel>, make sure only the first variable is ticked, tick <UiLabel>Use Fieldtrip statistics</UiLabel>, choose <UiLabel>Use montecarlo/permutation statistics</UiLabel> and <UiLabel>Use cluster correction (CC)</UiLabel>, and type `0.05` as the threshold. Press <UiLabel>Ok</UiLabel>, then <UiLabel>Plot ERPs</UiLabel>.
 4. Tick <UiLabel>Use EEGLAB statistics</UiLabel> again afterwards, for the next step.
 

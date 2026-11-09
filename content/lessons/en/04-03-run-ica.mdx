@@ -88,7 +88,7 @@ Why this copying is valid, how much P3 shrinks in the 1 Hz copy, and when you ne
 
 ## How do I run ICA from the menus?
 
-Start with the main dataset `D1 main` open. If you don't have it, open "Script to reach this state" under "Starts from" at the top of the lesson. We call it dataset 1.
+Start with the main dataset `D1 main` open. If you don't have it, open "Script to reach this state" at the end of the lesson. We call it dataset 1.
 
 **First: create the ICA copy**
 
@@ -120,15 +120,17 @@ The main dataset is already filtered at 0.1 Hz. A 1 Hz filter on top of it gives
 2. Open <MenuPath>Edit > Dataset info</MenuPath>.
 3. Next to <UiLabel>ICA weights array or text/binary file (if any):</UiLabel>, press <UiLabel>from other dataset</UiLabel>, type `2`, then <UiLabel>OK</UiLabel>. Three fields fill in automatically: `ALLEEG(2).icaweights`, `ALLEEG(2).icasphere`, and `ALLEEG(2).icachansind`.
 4. Press <UiLabel>OK</UiLabel> to close the window.
-5. Save the main dataset with <MenuPath>File > Save current dataset as</MenuPath> as `D1_main_ica.set`. The ICLabel lesson starts from it.
+5. Save the main dataset with <MenuPath>File > Save current dataset as</MenuPath> as `D1_main_ica.set` in your work folder (`eeg-course`). The ICLabel lesson starts from it.
 
 ## What do I see in the component maps?
 
 <Figure src="run-ica/run-ica-maps-20.png" alt="Scalp maps of the first 20 ICA components of D1, numbered IC 1 to IC 20, in the EEGLAB default colors." source="D1" />
 
-These are the maps of the first 20 components of D1. The blink component is a strong map at the front of the head. Your component order may differ from the picture, so find a component by its shape.
+These are the maps of the first 20 components of D1. The blink component has a strong map only at the very front of the head: in this picture it is IC 2 (your number may differ). Your component order may differ from the picture, so find a component by its shape.
 
 ## How do I run ICA with a script?
+
+Before you run the script, make your work folder `eeg-course` the MATLAB Current Folder, because the script reads and saves your files there.
 
 ```matlab
 % Main dataset (high-pass 0.1 Hz, line noise removed, average reference) is in EEG

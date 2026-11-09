@@ -74,7 +74,7 @@ updated: 2026-10-28
 
 ## كيف أجد القمة وأزيلها من القوائم؟
 
-ابدأ والنسخة الرئيسية `D1 hp0.1` مفتوحة، وهي ناتج [درس الفلترة](/lesson/filtering/). إن لم تكن عندك، فافتح «سكربت للوصول إلى هذه الحالة» تحت «تبدأ من» أعلى الدرس.
+ابدأ والنسخة الرئيسية `D1 hp0.1` مفتوحة، وهي ناتج [درس الفلترة](/lesson/filtering/). إن لم تكن عندك، فافتح «سكربت للوصول إلى هذه الحالة» في آخر الدرس.
 
 **أولاً: ابحث عن القمة في الطيف**
 
@@ -92,11 +92,13 @@ updated: 2026-10-28
 5. اترك باقي الخانات كما هي، واضغط <UiLabel>OK</UiLabel>. تظهر نافذة استجابة الفلتر، لأن <UiLabel>Plot frequency response</UiLabel> مفعّل افتراضياً: حفرة عند 60 هرتز فقط.
 6. يطبع الـ Command Window سطراً يبدأ بـ `pop_eegfiltnew() - performing`، وفيه طول الفلتر بالنقاط ونوعه.
 7. سمِّ الداتاست الجديدة `D1 hp0.1 notch60`، واترك <UiLabel>Overwrite it in memory (set=yes; unset=create a new dataset)</UiLabel> غير مفعّل.
-8. احفظها من <MenuPath>File > Save current dataset as</MenuPath> باسم `D1_hp0.1_notch60.set`. [درس القنوات السيئة](/lesson/bad-channels/) يبدأ منها.
+8. احفظها من <MenuPath>File > Save current dataset as</MenuPath> باسم `D1_hp0.1_notch60.set` في مجلد عملك (`eeg-course`). [درس القنوات السيئة](/lesson/bad-channels/) يبدأ منها.
 
 **ثالثاً: قارن الطيف** كما في الخطوة الأولى، على الداتاست الجديدة.
 
 ## كيف أزيلها بسكربت؟
+
+يحفظ السكربت في المجلد الحالي (`pwd`)، فيجب أن يكون مجلد MATLAB الحالي (<En>Current Folder</En>) هو مجلد عملك `eeg-course`.
 
 ```matlab
 % Line frequency: 60 Hz in Saudi Arabia and the US, 50 Hz in Europe
