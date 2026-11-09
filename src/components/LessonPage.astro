@@ -60,7 +60,7 @@ const jsonLd = {
 <Base lang={lang} title={d.title} description={d.description} path={`lesson/${slug}/`} bodyClass="lesson-page">
   <script slot="head" type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
   <script slot="head" is:inline>(()=>{const o=()=>{const i=decodeURIComponent(location.hash.slice(1)),e=i&&document.getElementById(i),d=e&&(e.tagName==='DETAILS'?e:e.closest('details'));if(d&&!d.open){d.open=true;e.scrollIntoView()}};addEventListener('hashchange',o);addEventListener('pageshow',o)})();</script>
-  <div class="wrap">
+  <div class="wrap lwrap">
     <nav class="crumbs" aria-label={t(lang, 'nav.breadcrumb')}>
       <a href={url('', lang) + `#${slug}`}>{t(lang, 'nav.map')}</a><span class="sep" aria-hidden="true">›</span>
       <a href={url(`station/${String(d.station).padStart(2, '0')}/`, lang)}><T s={`${t(lang, 'station.label', { n: d.station })}: ${stationTitle(lang, d.station)}`} lang={lang} /></a>
