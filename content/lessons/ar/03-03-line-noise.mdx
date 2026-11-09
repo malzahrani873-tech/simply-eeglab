@@ -23,6 +23,18 @@ references:
     url: https://www.youtube.com/watch?v=nshi47blz7Q
     section: "الفيديو كاملاً"
     duration: "10:46"
+  - title: "Klug & Kloosterman (2022), Zapline-plus, Human Brain Mapping 43:2743–2758"
+    url: https://doi.org/10.1002/hbm.25832
+    section: "Full paper"
+    type: paper
+  - title: "de Cheveigné (2020), ZapLine, NeuroImage 207:116356"
+    url: https://doi.org/10.1016/j.neuroimage.2019.116356
+    section: "Full paper"
+    type: paper
+  - title: "Bigdely-Shamlo et al. (2015), The PREP pipeline, Frontiers in Neuroinformatics 9:16"
+    url: https://doi.org/10.3389/fninf.2015.00016
+    section: "Line noise; Robust referencing; Bad channels"
+    type: paper
 datasets: [D1]
 startingPoint:
   dataset: D1
@@ -139,6 +151,10 @@ EEG = pop_saveset(EEG, 'filename', 'D1_hp0.1_notch60.set', 'filepath', pwd);
 | فلتر <En>notch</En> (`pop_eegfiltnew`) | ERP وأغلب الحالات. هي طريقة سلسلة المعالجة عندنا | نعم، ضمن إضافة firfilt |
 | CleanLine | تحليل طيفي تريد فيه الإبقاء على الترددات حول 50 أو 60 هرتز. تقدّر موجة الكهرباء وتطرحها بدل حذف نطاق كامل. التوثيق الرسمي يقول إن نتيجتها ممتازة عندما تنجح، وإنها لا تنجح دائماً | لا، تُثبّت من <MenuPath>File > Manage EEGLAB extensions</MenuPath> |
 | Zapline-plus | تحليل طيفي أو زمني-ترددي فوق 40 هرتز، أو ضوضاء كهرباء قوية مع توافقيات كثيرة. تبحث عن الضوضاء وتزيلها تلقائياً | لا، تُثبّت من نفس القائمة |
+
+الشكل التالي ناتج حقيقي من Zapline-plus، من الورقة التي قدّمتها. يعرض تسجيلاً فيه ضوضاء 50 هرتز: الطيف الخام بقمة الكهرباء وتوافقياتها، والطيف بعد التنظيف، والجزء المحذوف وحده.
+
+<Figure src="line-noise/zapline-plus-output-klug2022.webp" alt="رسوم ناتج Zapline-plus لضوضاء 50 هرتز: الطيف حول 50 هرتز قبل التنظيف وفيه قمة حادة، وعدد المكوّنات المحذوفة في كل جزء من التسجيل، والطيف بعد التنظيف بلا قمة، والطيف الكامل قبل وبعد مع القدرة المحذوفة منفصلة." caption="مثال لناتج Zapline-plus لضوضاء 50 هرتز (بيانات MEG من الورقة)" source="ext" credit="Klug &amp; Kloosterman (2022), Human Brain Mapping 43:2743, Fig. 2" creditUrl="https://doi.org/10.1002/hbm.25832" license="CC BY 4.0" licenseUrl="https://creativecommons.org/licenses/by/4.0/" />
 
 ## كيف أتأكد أن الضوضاء زالت؟
 

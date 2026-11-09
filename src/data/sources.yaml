@@ -16,8 +16,8 @@
   url: https://socialsci.libretexts.org/Bookshelves/Psychology/Biological_Psychology/Applied_Event-Related_Potential_Data_Analysis_(Luck)
   free: true
   lang: en
-  stations: [5, 6, 8]
-  license: { ar: 'CC BY-NC 4.0', en: 'CC BY-NC 4.0' }
+  stations: [2, 3, 5, 6, 8]
+  license: { ar: 'CC BY 4.0', en: 'CC BY 4.0' }
 - title: Luck, An Introduction to the Event-Related Potential Technique (2nd ed., MIT Press 2014)
   url: https://mitpressbookstore.mit.edu/book/9780262525855
   free: false
@@ -36,3 +36,51 @@
   lang: en
   stations: [4, 8, 10]
   license: { ar: 'مقاطع فيديو وشرائح', en: 'Videos and slides' }
+- title: EEGLAB workshop slides (SCCN)
+  url: https://eeglab.org/workshops/
+  free: true
+  lang: en
+  stations: [2, 3]
+  license: { ar: 'للقراءة فقط، بلا رخصة إعادة نشر', en: 'Free to read, no reuse licence' }
+- title: Pernet et al. (2019), EEG-BIDS, Scientific Data 6:103
+  url: https://doi.org/10.1038/s41597-019-0104-8
+  free: true
+  lang: en
+  stations: [2]
+  license: { ar: 'CC BY 4.0', en: 'CC BY 4.0' }
+- title: Gorgolewski et al. (2016), The brain imaging data structure, Scientific Data 3:160044
+  url: https://doi.org/10.1038/sdata.2016.44
+  free: true
+  lang: en
+  stations: [2]
+  license: { ar: 'CC BY 4.0', en: 'CC BY 4.0' }
+- title: Bigdely-Shamlo et al. (2015), The PREP pipeline, Frontiers in Neuroinformatics 9:16
+  url: https://doi.org/10.3389/fninf.2015.00016
+  free: true
+  lang: en
+  stations: [3]
+  license: { ar: 'CC BY 4.0', en: 'CC BY 4.0' }
+- title: Klug & Kloosterman (2022), Zapline-plus, Human Brain Mapping 43:2743–2758
+  url: https://doi.org/10.1002/hbm.25832
+  free: true
+  lang: en
+  stations: [3]
+  license: { ar: 'CC BY 4.0', en: 'CC BY 4.0' }
+- title: Delorme (2023), EEG is better left alone, Scientific Reports 13:2372
+  url: https://doi.org/10.1038/s41598-023-27528-0
+  free: true
+  lang: en
+  stations: [3]
+  license: { ar: 'CC BY 4.0', en: 'CC BY 4.0' }
+- title: Widmann, Schröger & Maess (2015), Digital filter design for electrophysiological data, J Neurosci Methods 250:34–46
+  url: https://doi.org/10.1016/j.jneumeth.2014.08.002
+  free: false
+  lang: en
+  stations: [3]
+  license: { ar: 'ورقة علمية', en: 'Journal article' }
+- title: Chang et al. (2020), Evaluation of artifact subspace reconstruction, IEEE Trans Biomed Eng 67:1114–1121
+  url: https://doi.org/10.1109/TBME.2019.2930186
+  free: false
+  lang: en
+  stations: [3]
+  license: { ar: 'ورقة علمية', en: 'Journal article' }

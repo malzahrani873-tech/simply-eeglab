@@ -19,11 +19,14 @@ are licensed under the
 | Figures made from ERP CORE data | CC BY-SA 4.0, the licence of the data; stated under each figure |
 | Figures made from other datasets | This licence, with the credit the dataset asks for; stated under each figure |
 | Screenshots of the EEGLAB interface | EEGLAB (SCCN); stated under each screenshot |
+| Figures taken from openly licensed papers and books (for example CC BY 4.0) | The licence of the source; the source and its licence are linked under each figure |
 | Vazirmatn and JetBrains Mono fonts | SIL Open Font License 1.1, see `public/fonts/` |
 | Phosphor icons | MIT, see `src/icons/phosphor/LICENSE` |
 
-We do not copy text or figures from the EEGLAB documentation, the SCCN wiki or
-any textbook. Lessons describe them in our own words and link to the source.
+We do not copy text or figures from the EEGLAB documentation, the SCCN wiki,
+workshop slides or any source whose licence does not allow it. Lessons describe
+them in our own words and link to the source. We only reuse a figure when its
+licence allows it (for example CC BY 4.0), and we credit it under the figure.
 
 This site is not affiliated with EEGLAB or SCCN.
 
@@ -43,9 +46,10 @@ This site is not affiliated with EEGLAB or SCCN.
 | الصور المولّدة من بيانات ERP CORE | CC BY-SA 4.0، رخصة البيانات، ومكتوبة تحت كل صورة |
 | الصور المولّدة من باقي الداتاست | هذه الرخصة، مع النسبة التي تطلبها الداتاست، مكتوبة تحت كل صورة |
 | لقطات واجهة EEGLAB | EEGLAB (SCCN)، مكتوبة تحت كل لقطة |
+| صور مأخوذة من أوراق وكتب برخصة مفتوحة (مثل CC BY 4.0) | رخصة المصدر، ورابط المصدر ورخصته تحت كل صورة |
 | خطّا Vazirmatn و JetBrains Mono | SIL Open Font License 1.1، انظر `public/fonts/` |
 | أيقونات Phosphor | MIT، انظر `src/icons/phosphor/LICENSE` |
 
-لا ننسخ نصاً أو صورة من توثيق EEGLAB أو ويكي SCCN أو أي كتاب. الدروس تشرحها بكلماتنا وتربط بالمصدر.
+لا ننسخ نصاً أو صورة من توثيق EEGLAB أو ويكي SCCN أو شرائح الورش أو أي مصدر لا تسمح رخصته بذلك. الدروس تشرحها بكلماتنا وتربط بالمصدر. ولا نعيد استخدام صورة إلا إذا سمحت رخصتها (مثل CC BY 4.0)، ونذكر مصدرها تحتها.
 
 الموقع غير تابع رسمياً لـ EEGLAB أو SCCN.

@@ -25,6 +25,18 @@ references:
   - title: Face processing EEG dataset for EEGLAB (OpenNeuro ds002718)
     url: https://openneuro.org/datasets/ds002718
     section: "README; dataset_description.json"
+  - title: "Pernet et al. (2019), EEG-BIDS, Scientific Data 6:103"
+    url: https://doi.org/10.1038/s41597-019-0104-8
+    section: "Fig. 1; Methods"
+    type: paper
+  - title: "Gorgolewski et al. (2016), The brain imaging data structure, Scientific Data 3:160044"
+    url: https://doi.org/10.1038/sdata.2016.44
+    section: "Full paper"
+    type: paper
+  - title: "BIDS specification: Electroencephalography"
+    url: https://bids-specification.readthedocs.io/en/stable/modality-specific-files/electroencephalography.html
+    section: "EEG files"
+    type: docs
 datasets: [D4]
 startingPoint:
   dataset: D4
@@ -62,7 +74,7 @@ So how do you import a participant from a BIDS dataset into EEGLAB, with its eve
 
 At the root are files that describe the whole dataset. Inside each participant's folder is the signal file, with side files for the channels, the electrodes and the events.
 
-<ImageSpec>Real screenshot from MATLAB or EEGLAB coming soon.</ImageSpec>
+<Figure src="bids-openneuro/eeg-bids-tree-pernet2019.webp" alt="An example EEG-BIDS folder tree. At the root: README, CHANGES, dataset_description.json, participants.tsv and participants.json. Inside sub-01/eeg: the signal file (_eeg.edf) with its side files _eeg.json, _events.tsv, _channels.tsv, _electrodes.tsv and _coordsystem.json. Arrows show a preview of each file: the recording settings, the event onsets, the channel list with bad channels marked, and the electrode coordinates." caption="An example EEG-BIDS dataset: each side file and what is inside it" source="ext" credit="Pernet et al. (2019), Scientific Data 6:103, Fig. 1" creditUrl="https://doi.org/10.1038/s41597-019-0104-8" license="CC BY 4.0" licenseUrl="https://creativecommons.org/licenses/by/4.0/" />
 
 ## How do I import a participant from the menus?
 

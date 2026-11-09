@@ -23,6 +23,18 @@ references:
     url: https://www.youtube.com/watch?v=nshi47blz7Q
     section: "Full video"
     duration: "10:46"
+  - title: "Klug & Kloosterman (2022), Zapline-plus, Human Brain Mapping 43:2743–2758"
+    url: https://doi.org/10.1002/hbm.25832
+    section: "Full paper"
+    type: paper
+  - title: "de Cheveigné (2020), ZapLine, NeuroImage 207:116356"
+    url: https://doi.org/10.1016/j.neuroimage.2019.116356
+    section: "Full paper"
+    type: paper
+  - title: "Bigdely-Shamlo et al. (2015), The PREP pipeline, Frontiers in Neuroinformatics 9:16"
+    url: https://doi.org/10.3389/fninf.2015.00016
+    section: "Line noise; Robust referencing; Bad channels"
+    type: paper
 datasets: [D1]
 startingPoint:
   dataset: D1
@@ -139,6 +151,10 @@ The line that enters the path is the filter line itself, and it appears in the "
 | Notch filter (`pop_eegfiltnew`) | ERPs and most cases. This is the method on our path | Yes, in the firfilt extension |
 | CleanLine | Spectral analysis where you want to keep the frequencies around 50 or 60 Hz. It estimates the line-noise wave and subtracts it instead of removing a whole band. The official tutorial says its result can be spectacular when it works, and that it does not always work | No, install it from <MenuPath>File > Manage EEGLAB extensions</MenuPath> |
 | Zapline-plus | Spectral or time-frequency analysis above 40 Hz, or strong line noise with many harmonics. It finds the noise and removes it automatically | No, install it from the same menu |
+
+The figure below is real output from Zapline-plus, from the paper that introduced it. It shows a 50 Hz recording: the raw spectrum with the line peak and its harmonics, the cleaned spectrum, and the removed part on its own.
+
+<Figure src="line-noise/zapline-plus-output-klug2022.webp" alt="Zapline-plus output plots for 50 Hz line noise: the spectrum around 50 Hz before cleaning with a sharp peak, the number of components removed in each chunk of the recording, the cleaned spectrum with no peak, and the full spectrum before and after with the removed power shown separately." caption="Example output of Zapline-plus for 50 Hz line noise (MEG data from the paper)" source="ext" credit="Klug &amp; Kloosterman (2022), Human Brain Mapping 43:2743, Fig. 2" creditUrl="https://doi.org/10.1002/hbm.25832" license="CC BY 4.0" licenseUrl="https://creativecommons.org/licenses/by/4.0/" />
 
 ## How do I verify that the line noise is gone?
 

@@ -22,6 +22,8 @@ const roadmap = loadRoadmap();
 const datasets = new Map(loadDatasets().map((d) => [d.code, d]));
 const OFFICIAL = /^https:\/\/([a-z0-9-]+\.)?(eeglab\.org|sccn\.ucsd\.edu|mne\.tools|fieldtriptoolbox\.org)\/|^https:\/\/github\.com\/(sccn|ucdavis\/erplab)\b/;
 const REFERENCE_LIMIT_EXCEPTIONS = { 'install-eeglab': 6, 'run-ica': 5 };
+// Stations 2–3 gather the open slides, papers and book sections for each step in one place (owner, 2026-11-09).
+for (const s of ['import-raw', 'events', 'bids-openneuro', 'filtering', 'line-noise', 'bad-channels', 'asr', 'interpolation', 'rereferencing']) REFERENCE_LIMIT_EXCEPTIONS[s] = 7;
 const REFERENCE_ORDER_EXCEPTIONS = new Set(['electrode-10-20']);
 const CALLOUT_TYPES = new Set(['note', 'warning', 'expert', 'experience']);
 
