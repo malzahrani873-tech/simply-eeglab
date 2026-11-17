@@ -396,6 +396,7 @@ filter-demo,reref-demo,epoch-reject-demo{display:block}
 .win-f li{padding:8px 10px;border-radius:var(--r2);background:var(--surface-2)}
 .win-f li.used{outline:2px solid var(--primary);outline-offset:-2px}
 .win-f .wf-l{margin:0 0 2px}
+.win-f .wf-n{display:inline-grid;place-items:center;min-width:22px;height:22px;border-radius:11px;background:#d71920;color:#fff;font-size:13px;font-weight:700;margin-inline-end:6px;vertical-align:1px}
 .win-f .wf-k{font-size:13px;color:var(--muted);font-weight:400}
 .win-f .wf-d{font-size:15px;margin:0 0 2px}
 .win-f .wf-v{font-size:14px;margin:0}

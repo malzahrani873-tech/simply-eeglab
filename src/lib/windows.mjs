@@ -21,6 +21,7 @@ export function loadWindows() {
       if (keys.has(fl.key)) throw new Error(`windows/${f}: duplicate key ${fl.key}`);
       keys.add(fl.key);
     }
+    w.fields.forEach((fl, i) => { fl.n = i + 1; });   // number on the screenshot (numbered: true)
     all.set(w.id, w);
   }
   cache = all;

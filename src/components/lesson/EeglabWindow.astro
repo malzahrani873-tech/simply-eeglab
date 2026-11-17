@@ -24,6 +24,8 @@ const shot = windowShot(shotName ? { ...w, shot: shotName } : w);
 const path = menu ?? w.menu;
 const md = (s: string) => mdInline(String(s), lang);
 const alt = t(lang, 'win.alt', { title: w.title });
+// red numbers on the screenshot match the numbers of the field list (numbered: true in the YAML)
+const numbered = Boolean(shot && w.numbered && !shotName);
 ---
 <section class="win" aria-label={t(lang, 'win.label', { title: w.title })}>
   <p class="win-h">
@@ -40,8 +42,8 @@ const alt = t(lang, 'win.alt', { title: w.title });
   )}
   {compact ? (
     <>
-      {Object.keys(use).length > 0 && <WindowFields fields={w.fields.filter((f: any) => f.key in use)} use={use} lang={lang} />}
-      <details class="inline-fold win-more"><summary><span>{t(lang, 'win.allFields')}</span></summary><WindowFields fields={w.fields} use={use} lang={lang} /></details>
+      {Object.keys(use).length > 0 && <WindowFields fields={w.fields.filter((f: any) => f.key in use)} use={use} lang={lang} numbered={numbered} />}
+      <details class="inline-fold win-more"><summary><span>{t(lang, 'win.allFields')}</span></summary><WindowFields fields={w.fields} use={use} lang={lang} numbered={numbered} /></details>
     </>
-  ) : <WindowFields fields={w.fields} use={use} lang={lang} />}
+  ) : <WindowFields fields={w.fields} use={use} lang={lang} numbered={numbered} />}
 </section>
