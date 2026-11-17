@@ -224,7 +224,9 @@ for i = 1:numel(e.run)
         continue
     end
     parts{end + 1} = sprintf(['fprintf(''\\n>>> %s\\n'');\ntry\n%s\ncatch vbX_stepErr\n' ...
-        '    fprintf(''VERIFY-ERROR %s: %%s\\n'', vbX_stepErr.message);\nend'], ...
+        '    fprintf(''VERIFY-ERROR %s: %%s\\n'', vbX_stepErr.message);\n' ...
+        '    for vbX_k = 1:numel(vbX_stepErr.stack), fprintf(''  at %%s line %%d\\n'', ' ...
+        'vbX_stepErr.stack(vbX_k).name, vbX_stepErr.stack(vbX_k).line); end\nend'], ...
         name, no_gui(apply_paths(txt, pairs)), name); %#ok<AGROW>
 end
 % run() switches to the script's folder, so the file lives in the lesson work folder:
@@ -239,6 +241,9 @@ end
 function code = lesson_code(slug, cfg)
 % Starting-point script and ```matlab blocks of the English lesson (code is identical in both languages).
 hit = dir(fullfile(cfg.lessons, 'en', ['*-' slug '.md']));
+if isempty(hit)   % site repository layout: content/lessons/en/<NN>-<NN>-<slug>.mdx
+    hit = dir(fullfile(cfg.root, 'content', 'lessons', 'en', ['*-' slug '.mdx']));
+end
 if isempty(hit)
     error('verify:lesson', 'lesson file not found: lessons/en/*-%s.md', slug);
 end
