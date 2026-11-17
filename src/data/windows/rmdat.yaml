@@ -4,6 +4,7 @@ source: "EEGLAB pop_rmdat.m (uilist)"
 title: "Remove data portions around events - pop_rmdat()"
 menu: "Edit > Select data using events"
 shot: rmdat-dialog
+numbered: true
 intro:
   ar: "تُبقي أو تحذف أجزاء البيانات حول نوع حدث معيّن، وتبقى البيانات مستمرة."
   en: "Keeps or removes the parts of the data around one event type. The data stay continuous."

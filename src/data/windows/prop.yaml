@@ -4,6 +4,7 @@ source: "EEGLAB pop_prop.m (uitext, lines 87-94)"
 title: "Channel properties - pop_prop()"
 menu: "Plot > Channel properties"
 shot: prop-dialog
+numbered: true
 intro:
   ar: "نافذة صغيرة تسألك عن القناة، ثم يفتح رسم يجمع موقعها على الرأس ونشاطها عبر الزمن وطيفها."
   en: "A small window asks which channel, then a plot opens with its place on the head, its activity over time and its spectrum."

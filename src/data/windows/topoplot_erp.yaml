@@ -4,6 +4,7 @@ source: "EEGLAB pop_topoplot.m (uilist, typeplot = 1)"
 title: "Plot ERP scalp maps in 2-D -- pop_topoplot()"
 menu: "Plot > ERP map series > In 2-D"
 shot: topoplot-erp-dialog
+numbered: true
 intro:
   ar: "ترسم خريطة رأس لمتوسط الـ ERP عند كل زمن تكتبه."
   en: "Plots a scalp map of the average ERP at each time you type."

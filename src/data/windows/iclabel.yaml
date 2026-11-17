@@ -4,6 +4,7 @@ source: "ICLabel plugin, pop_iclabel.m (inputdlg3)"
 title: "ICLabel"
 menu: "Tools > Classify components using ICLabel > Label components"
 shot: iclabel-dialog
+numbered: true
 intro:
   ar: "نافذة صغيرة تختار فيها نسخة المصنّف، ثم يعطي ICLabel كل مكوّن احتمالات سبع فئات."
   en: "A small window to choose the classifier version, then ICLabel gives each component probabilities for seven classes."

@@ -4,6 +4,7 @@ source: "dipfit plugin, pop_multifit.m (uilist, lines 65-78)"
 title: "Fit multiple ICA components -- pop_multifit()"
 menu: "Tools > Source localization using DIPFIT > Component dipole autofit"
 shot: multifit-dialog
+numbered: true
 intro:
   ar: "توطّن dipole لكل مكوّن ICA تلقائياً. قد يأخذ دقائق."
   en: "Fits a dipole to each ICA component automatically. It can take minutes."

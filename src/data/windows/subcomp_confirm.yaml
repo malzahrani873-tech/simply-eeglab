@@ -4,6 +4,7 @@ source: "EEGLAB pop_subcomp.m (questdlg2, lines 184-185)"
 title: "Confirmation"
 menu: "Tools > Remove components from data"
 shot: subcomp-confirm-dialog
+numbered: true
 intro:
   ar: "آخر نافذة قبل الحذف. فيها تقارن البيانات قبل الحذف وبعده."
   en: "The last window before removal. Here you compare the data before and after."

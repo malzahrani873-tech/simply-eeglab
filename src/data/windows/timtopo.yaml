@@ -4,6 +4,7 @@ source: "EEGLAB pop_timtopo.m (uilist, lines 62-74)"
 title: "pop_timtopo()"
 menu: "Plot > Channel ERPs > With scalp maps"
 shot: timtopo-dialog
+numbered: true
 intro:
   ar: "ترسم موجات الـ ERP لكل القنوات فوق بعضها، مع خرائط رأس عند أزمنة تختارها."
   en: "Plots the ERP of every channel on top of each other, with scalp maps at times you choose."

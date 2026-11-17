@@ -4,6 +4,7 @@ source: "EEGLAB pop_chanedit.m (lookup uilist, lines 940-963)"
 title: "Look up channel locations?"
 menu: "Edit > Channel locations"
 shot: chanlookup-dialog
+numbered: true
 intro:
   ar: "تظهر قبل نافذة تحرير القنوات إذا كانت للقنوات أسماء بلا مواقع. تسألك هل يبحث EEGLAB عن مواقعها بالاسم في ملف قياسي."
   en: "It shows before the channel editor when channels have names but no positions. It asks whether EEGLAB should look up their positions by name in a standard file."

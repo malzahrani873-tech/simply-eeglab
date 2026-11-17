@@ -4,6 +4,7 @@ source: "EEGLAB pop_plottopo.m (uilist, lines 64-76)"
 title: "Topographic ERP plot - pop_plottopo()"
 menu: "Plot > Channel ERPs > In scalp/rect. array"
 shot: plottopo-dialog
+numbered: true
 intro:
   ar: "ترسم موجة الـ ERP لكل قناة في مكانها على الرأس."
   en: "Plots each channel's ERP in its place on the head."

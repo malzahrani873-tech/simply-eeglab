@@ -4,6 +4,7 @@ source: "EEGLAB pop_subcomp.m (uilist, lines 120-128)"
 title: "Remove components from data -- pop_subcomp()"
 menu: "Tools > Remove components from data"
 shot: subcomp-dialog
+numbered: true
 intro:
   ar: "تكتب فيها أرقام المكوّنات التي تُطرح من البيانات."
   en: "Here you type the numbers of the components to subtract from the data."

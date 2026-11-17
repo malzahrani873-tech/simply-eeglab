@@ -4,6 +4,7 @@ source: "EEGLAB pop_topoplot.m (uilist, typeplot = 0)"
 title: "Plot component scalp maps in 2-D -- pop_topoplot()"
 menu: "Plot > Component maps > In 2-D"
 shot: topoplot-ic-dialog
+numbered: true
 intro:
   ar: "ترسم خريطة رأس لكل مكوّن ICA."
   en: "Plots a scalp map for each ICA component."
