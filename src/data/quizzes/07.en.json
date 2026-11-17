@@ -50,8 +50,8 @@
       "image": {
         "src": "/quiz/07/s07-q02.webp",
         "w": 720,
-        "h": 400,
-        "status": "pending",
+        "h": 448,
+        "status": "ready",
         "alt": "Two curves in two colors from -200 to 800, with no labels on either axis, no line at time zero or at 0 µV, no legend naming the curves, and the vertical axis flipped with no sign of it.",
         "spec": "The same \"before\" image of the channel-erp-plot lesson (the Pz ERP for position 1 and position 2 from D1 epochs clean, with no labels, no zero lines, no legend, and the vertical axis flipped). One version for both languages."
       },
