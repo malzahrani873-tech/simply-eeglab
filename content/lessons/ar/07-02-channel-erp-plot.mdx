@@ -5,7 +5,7 @@ description: كيف ترسم ERP لكل القنوات ولقناة واحدة �
 station: 7
 order: 2
 level: core
-status: review
+status: approved
 objectives:
   - يرسم ERP كل القنوات في ترتيبها على الرأس ويفتح قناة واحدة بالضغط عليها.
   - يقسّم الـ epochs إلى شرطين حسب حقل في الحدث ويرسم الشرطين على محور واحد.
@@ -117,6 +117,8 @@ updated: 2026-10-28
 
 **أولاً: ERP كل القنوات في مكانها على الرأس**
 
+<EeglabWindow id="plottopo" use={{ chan: "اتركها `1:32`", cbst: "اتركه بلا علامة", cbra: "بلا علامة، أو ضع علامة لترى الشبكة", opt: "اتركها `'ydir', 1`" }} />
+
 1. افتح <MenuPath>Plot > Channel ERPs > In scalp/rect. array</MenuPath>. تظهر نافذة <UiLabel>Topographic ERP plot - pop_plottopo()</UiLabel>.
 2. اترك <UiLabel>Channels to plot</UiLabel> على `1:32`.
 3. اترك <UiLabel>Plot single trials</UiLabel> و <UiLabel>Plot in rect. array</UiLabel> غير مفعّلتين.
@@ -144,6 +146,8 @@ updated: 2026-10-28
 
 - الجزء الأخير من السكربت أدناه يحفظ الشرطين في داتاستين داخل EEGLAB، ويطبع رقميهما (مثلاً `Datasets for Sum/Compare ERPs: 2 (position 1) and 3 (position 2)`)، ثم يستدعي `pop_comperp` مرة واحدة.
 - تظهر رسمة فيها ثلاثة منحنيات في كل قناة: position 1 و position 2 والفرق بينهما (position 1 ناقص position 2)، والموجب للأعلى بسبب `'tplotopt', {'ydir', 1}`. اضغط على `Pz` لتفتحها وحدها.
+
+<Figure src="channel-erp-plot/comperp-ar.webp" alt="رسمة pop_comperp الحقيقية من EEGLAB لـ D1: موجة صغيرة لكل قناة في مكانها على الرأس، فيها ثلاثة منحنيات: الأخضر position 1، والسماوي position 2، والبنفسجي الفرق. ملاحظات حمراء على Pz، وعلى المقياس من -19.6 إلى +19.6 ميكروفولت، وعلى قناتي العين." caption="المخرج الحقيقي: الشرطان والفرق بينهما في كل قناة" source="D1" />
 
 اختياري: لهذه الرسمة قائمة أيضاً هي <MenuPath>Plot > Sum/Compare ERPs</MenuPath>، لكنها مخفية افتراضياً في EEGLAB 2026.1. لا تظهر إلا بعد تفعيل <UiLabel>If set, show all menu items from previous EEGLAB versions. You must restart EEGLAB for this to take effect.</UiLabel> في <MenuPath>File > Preferences</MenuPath> وإعادة تشغيل EEGLAB. هذا الخيار يجعل كل القوائم مختلفة عن صور هذه الدروس، فأطفئه بعد ذلك.
 

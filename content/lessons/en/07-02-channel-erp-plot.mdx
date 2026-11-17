@@ -5,7 +5,7 @@ description: How to plot ERPs for all channels and for one channel in EEGLAB, an
 station: 7
 order: 2
 level: core
-status: review
+status: approved
 objectives:
   - Plot the ERPs of all channels at their scalp positions and open one channel by clicking it.
   - Split epochs into two conditions using an event field and plot both conditions on one axis.
@@ -117,6 +117,8 @@ Start with the dataset `D1 epochs clean` open. If you don't have it, open "Scrip
 
 **1. All channel ERPs at their scalp positions**
 
+<EeglabWindow id="plottopo" use={{ chan: "leave it at `1:32`", cbst: "leave it unchecked", cbra: "unchecked, or check it to see the grid", opt: "leave it at `'ydir', 1`" }} />
+
 1. Open <MenuPath>Plot > Channel ERPs > In scalp/rect. array</MenuPath>. The window <UiLabel>Topographic ERP plot - pop_plottopo()</UiLabel> appears.
 2. Leave <UiLabel>Channels to plot</UiLabel> at `1:32`.
 3. Leave <UiLabel>Plot single trials</UiLabel> and <UiLabel>Plot in rect. array</UiLabel> unchecked.
@@ -144,6 +146,8 @@ The difference wave is one condition minus the other, at every time point. It sh
 
 - The last part of the script below stores the two conditions as datasets in EEGLAB, prints their numbers (for example `Datasets for Sum/Compare ERPs: 2 (position 1) and 3 (position 2)`), and calls `pop_comperp` once.
 - A plot appears with three curves at each channel: position 1, position 2, and their difference (position 1 minus position 2), positive up because of `'tplotopt', {'ydir', 1}`. Click `Pz` to open it on its own.
+
+<Figure src="channel-erp-plot/comperp-en.webp" alt="The real pop_comperp plot from EEGLAB for D1: a small waveform for each channel at its place on the head, with three curves: green position 1, cyan position 2, magenta the difference. Red notes on Pz, on the scale from -19.6 to +19.6 µV, and on the two eye channels." caption="The real output: both conditions and their difference at every channel" source="D1" />
 
 Optional: the same plot has a menu, <MenuPath>Plot > Sum/Compare ERPs</MenuPath>, but it is hidden by default in EEGLAB 2026.1. It appears only after you check <UiLabel>If set, show all menu items from previous EEGLAB versions. You must restart EEGLAB for this to take effect.</UiLabel> in <MenuPath>File > Preferences</MenuPath> and restart EEGLAB. This option changes how every menu looks compared with the images in these lessons, so turn it off again afterward.
 
