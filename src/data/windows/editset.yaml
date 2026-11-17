@@ -69,7 +69,7 @@ fields:
     ar: "القنوات التي دخلت في حساب ICA. تمتلئ وحدها مع الخانتين السابقتين."
     en: "The channels that went into the ICA. It fills itself with the two boxes above."
   - key: buttons
-    label: "Help · Cancel · OK"
+    label: "Help · Cancel · Ok"
     kind: button
-    ar: "«OK» يحفظ التعديلات في الداتاست. «Cancel» يغلقها دون تغيير."
-    en: "OK saves the changes into the dataset. Cancel closes it with no change."
+    ar: "«Ok» يحفظ التعديلات في الداتاست. «Cancel» يغلقها دون تغيير."
+    en: "Ok saves the changes into the dataset. Cancel closes it with no change."

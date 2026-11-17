@@ -52,7 +52,7 @@ fields:
     ar: "بلا علامة: يعلّم فقط ويفتح عرض الإشارة لتراجع. بعلامة: يحذف الـ epochs المعلّمة مباشرة."
     en: "Unchecked: it only marks and opens the scrolling view for review. Checked: it removes the marked epochs straight away."
   - key: buttons
-    label: "Help · Cancel · OK"
+    label: "Help · Cancel · Ok"
     kind: button
-    ar: "«OK» يشغّل الفحص."
-    en: "OK runs the check."
+    ar: "«Ok» يشغّل الفحص."
+    en: "Ok runs the check."

@@ -36,7 +36,7 @@ fields:
     ar: "خيارات الرسم. اتركها كما هي."
     en: "Plot options. Leave as is."
   - key: buttons
-    label: "Help · Cancel · OK"
+    label: "Help · Cancel · Ok"
     kind: button
-    ar: "«OK» يرسم الخرائط. لا تتغيّر البيانات."
-    en: "OK draws the maps. The data do not change."
+    ar: "«Ok» يرسم الخرائط. لا تتغيّر البيانات."
+    en: "Ok draws the maps. The data do not change."

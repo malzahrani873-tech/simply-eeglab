@@ -31,7 +31,7 @@ fields:
     ar: "تحدد القنوات بالنوع أو بالاسم. فارغة تعني كل القنوات."
     en: "Choose channels by type or by name. Empty means all channels."
   - key: buttons
-    label: "Help · Cancel · OK"
+    label: "Help · Cancel · Ok"
     kind: button
-    ar: "«OK» يطرح خط الأساس ثم تفتح نافذة تسمية الداتاست الجديدة."
-    en: "OK removes the baseline, then the window for naming the new dataset opens."
+    ar: "«Ok» يطرح خط الأساس ثم تفتح نافذة تسمية الداتاست الجديدة."
+    en: "Ok removes the baseline, then the window for naming the new dataset opens."

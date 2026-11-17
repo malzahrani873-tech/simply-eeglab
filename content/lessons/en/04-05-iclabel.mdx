@@ -117,9 +117,10 @@ Start with the main dataset open and holding ICA weights: open `D1_main_ica.set`
 <EeglabWindow id="iclabel" use={{ version: "Default (recommended)" }} />
 
 1. Open <MenuPath>Tools > Classify components using ICLabel > Label components</MenuPath>.
-2. In <UiLabel>Select which icversion of ICLabel to use:</UiLabel>, keep <UiLabel>Default (recommended)</UiLabel> and press <UiLabel>OK</UiLabel>.
-3. The component scalp maps appear, each with its most likely class and probability above it.
-4. Click any component to open its panels: scalp map, spectrum, time series, and the probability of each class.
+2. In <UiLabel>Select which icversion of ICLabel to use:</UiLabel>, keep <UiLabel>Default (recommended)</UiLabel> and press <UiLabel>Ok</UiLabel>.
+3. ICLabel classifies in a few seconds, then a second window opens by itself, titled <UiLabel>View many chan or comp. properties -- pop_viewprops</UiLabel>. Its <UiLabel>Component indices to plot:</UiLabel> field holds all components (`1:31` in D1). Leave everything as it is and press <UiLabel>Ok</UiLabel>.
+4. The component scalp maps appear, each with its most likely class and probability above it.
+5. Click any component to open its panels: scalp map, spectrum, time series, and the probability of each class.
 
 <Callout type="note" title="Where do the component panels come from?">
 The component panels you open by clicking a component come from the Viewprops extension, which ships inside ICLabel. You can open them for all components at once from <MenuPath>Tools > Classify components using ICLabel > View extended component properties</MenuPath>; the window title starts with <UiLabel>View components properties - pop_viewprops()</UiLabel>. The Viewprops files are in the folder `<EEGLAB>/plugins/ICLabel/viewprops`. The menu adds this folder to the MATLAB path automatically, but a script must add it with an `addpath` line before `pop_viewprops`, as this lesson's script does.
@@ -137,7 +138,7 @@ A flag is a mark on the component, not a removal. Removal is the next step.
 
 1. Open <MenuPath>Tools > Classify components using ICLabel > Flag components as artifacts</MenuPath>.
 2. The <UiLabel>Select range for flagging component for rejection</UiLabel> window shows a <UiLabel>Min</UiLabel> and a <UiLabel>Max</UiLabel> for each class. Defaults: <UiLabel>Muscle</UiLabel> from 0.9 to 1, <UiLabel>Eye</UiLabel> from 0.9 to 1, the rest empty.
-3. Press <UiLabel>OK</UiLabel>. The command window prints how many components were flagged.
+3. Press <UiLabel>Ok</UiLabel>. The command window prints how many components were flagged.
 
 **Fourth: remove the components and compare**
 
@@ -149,10 +150,10 @@ A flag is a mark on the component, not a removal. Removal is the next step.
 
 1. Open <MenuPath>Tools > Remove components from data</MenuPath>.
 2. A window lists the flagged component numbers and asks whether to remove them. Press <UiLabel>Manual rej.</UiLabel> to see and edit the list, not <UiLabel>Yes</UiLabel>, because <UiLabel>Yes</UiLabel> removes them without review. Ignore the STUDY note in that window for now; it is for multi-participant analysis in station 8.
-3. The <UiLabel>List of component(s) to remove from data</UiLabel> field holds the flagged components. Edit it based on your review: add the number of a component you are sure is an artifact, or delete the number of a component you are not sure about, so it stays in the data. If you are not sure about a component, keep it, and come back to it after [the Reading artifact components lesson](/en/lesson/ic-artifacts/). Then press <UiLabel>OK</UiLabel>.
-4. A confirmation window appears. Press <UiLabel>Plot single trials</UiLabel>: black is before removal, red is after.
-5. If the blinks are gone and the rest of the signal is unchanged, press <UiLabel>Accept</UiLabel>.
-6. Name the new dataset `D1 main clean` and leave <UiLabel>Overwrite it in memory (set=yes; unset=create a new dataset)</UiLabel> unchecked. Save it with <MenuPath>File > Save current dataset as</MenuPath> as `D1_main_clean.set` in your work folder (`eeg-course`); [the power spectrum lesson](/en/lesson/power-spectrum/) can start from it.
+3. The <UiLabel>List of component(s) to remove from data</UiLabel> field holds the flagged components. Edit it based on your review: add the number of a component you are sure is an artifact, or delete the number of a component you are not sure about, so it stays in the data. If you are not sure about a component, keep it, and come back to it after [the Reading artifact components lesson](/en/lesson/ic-artifacts/). Then press <UiLabel>Ok</UiLabel>.
+4. A confirmation window appears. Press <UiLabel>Plot single trials</UiLabel>: a scroll window opens, black before removal and red after, and the same confirmation window comes back. Move the confirmation window aside if it covers the plot.
+5. If the blinks are gone and the rest of the signal is unchanged, close the scroll window and press <UiLabel>Accept</UiLabel> in the confirmation window.
+6. The new-dataset window opens with the suggested name `D1 main pruned with ICA`. Change it in <UiLabel>Name it:</UiLabel> to `D1 main clean`, leave <UiLabel>Overwrite it in memory (set=yes; unset=create a new dataset)</UiLabel> unchecked, and press <UiLabel>Ok</UiLabel>. Save it with <MenuPath>File > Save current dataset as</MenuPath> as `D1_main_clean.set` in your work folder (`eeg-course`); [the power spectrum lesson](/en/lesson/power-spectrum/) can start from it.
 
 **Fifth: apply the postponed low-pass**
 
@@ -160,7 +161,13 @@ A flag is a mark on the component, not a removal. Removal is the next step.
 **Do not move to station 5 before this step.** Every lesson in station 5 starts from the file `D1_main_clean_lp30.set` that you save here.
 </Callout>
 
-Now that the data are clean, apply the 30 Hz low-pass from [the filtering lesson](/en/lesson/filtering/): <MenuPath>Tools > Filter the data > Basic FIR filter (new, default)</MenuPath>, and type `30` in <UiLabel>Higher edge of the frequency pass band (Hz)</UiLabel>. Name the resulting dataset `D1 main clean lp30`, then save it with <MenuPath>File > Save current dataset as</MenuPath> as `D1_main_clean_lp30.set` in your work folder (`eeg-course`). [The Extracting epochs lesson](/en/lesson/extract-epochs/) starts from it.
+Now that the data are clean, apply the 30 Hz low-pass from [the filtering lesson](/en/lesson/filtering/):
+
+1. Make sure `D1 main clean` is the current dataset: its name shows at the top of the main window.
+2. Open <MenuPath>Tools > Filter the data > Basic FIR filter (new, default)</MenuPath>.
+3. Leave <UiLabel>Lower edge of the frequency pass band (Hz)</UiLabel> empty, type `30` in <UiLabel>Higher edge of the frequency pass band (Hz)</UiLabel>, and press <UiLabel>Ok</UiLabel>. Close the frequency-response plot when it appears.
+4. In the new-dataset window, type `D1 main clean lp30` in <UiLabel>Name it:</UiLabel> and press <UiLabel>Ok</UiLabel>.
+5. Save it with <MenuPath>File > Save current dataset as</MenuPath> as `D1_main_clean_lp30.set` in your work folder (`eeg-course`). [The Extracting epochs lesson](/en/lesson/extract-epochs/) starts from it.
 
 ## How do I classify and remove components with a script?
 

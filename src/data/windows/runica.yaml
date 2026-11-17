@@ -3,7 +3,7 @@ func: pop_runica
 source: "EEGLAB pop_runica.m (promptstr, lines 217-225)"
 title: "Run ICA decomposition -- pop_runica()"
 menu: "Tools > Decompose data by ICA"
-shot: S7-ica-dialog
+shot: runica-dialog
 intro:
   ar: "تختار فيها خوارزمية ICA وتشغّلها. الحساب قد يأخذ دقائق، وتتابع تقدّمه في الـ Command Window."
   en: "Choose the ICA algorithm and run it. It can take minutes; follow its progress in the Command Window."
@@ -31,7 +31,7 @@ fields:
     ar: "تحدد القنوات التي تدخل ICA. زرا «... types» و«... channels» يفتحان قائمة تختار منها. فارغة تعني كل القنوات."
     en: "Sets which channels go into ICA. The «... types» and «... channels» buttons open a list to pick from. Empty means all channels."
   - key: buttons
-    label: "Help · Cancel · OK"
+    label: "Help · Cancel · Ok"
     kind: button
-    ar: "«OK» يبدأ الحساب. نتيجة ICA تُضاف إلى الداتاست نفسها ولا تُنشأ داتاست جديدة."
-    en: "OK starts the computation. The ICA result is added to the same dataset; no new dataset is made."
+    ar: "«Ok» يبدأ الحساب. نتيجة ICA تُضاف إلى الداتاست نفسها ولا تُنشأ داتاست جديدة."
+    en: "Ok starts the computation. The ICA result is added to the same dataset; no new dataset is made."

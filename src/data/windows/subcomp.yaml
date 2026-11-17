@@ -26,7 +26,7 @@ fields:
     ar: "بديل: تكتب المكوّنات التي تبقى، ويُحذف الباقي. اتركها فارغة."
     en: "The alternative: type the components to keep, and the rest are removed. Leave it empty."
   - key: buttons
-    label: "Help · Cancel · OK"
+    label: "Help · Cancel · Ok"
     kind: button
-    ar: "«OK» يفتح نافذة التأكيد."
-    en: "OK opens the confirmation window."
+    ar: "«Ok» يفتح نافذة التأكيد."
+    en: "Ok opens the confirmation window."

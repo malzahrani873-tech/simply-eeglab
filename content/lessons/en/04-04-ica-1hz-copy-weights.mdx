@@ -97,7 +97,7 @@ So why is it valid to compute the weights on one copy and apply them to another,
 
 ## How much smaller is P3 in the 1 Hz copy?
 
-<ImageSpec>Real screenshot from MATLAB or EEGLAB coming soon.</ImageSpec>
+<ImageSpec>EEGLAB's Sum/Compare ERPs window for channel Pz in D1: the ERP around the square in the 0.1 Hz main dataset in blue, and in the 1 Hz ICA copy in red.</ImageSpec>
 
 Blue is the main dataset at 0.1 Hz, red is the ICA copy at 1 Hz. In D1 the mean at Pz between 300 and 600 ms is about 4.3 µV in the main dataset, and about 3.1 µV in the 1 Hz copy. If you continued on the ICA copy, you would lose about 30% of the P3.
 
@@ -134,12 +134,12 @@ This is the same step as in the Running ICA lesson. You repeat it here because t
 <EeglabWindow id="editset" use={{ weightfile: "press «from other dataset», type `2`" }} compact />
 
 1. With dataset 1 current, open <MenuPath>Edit > Dataset info</MenuPath>.
-2. Next to <UiLabel>ICA weights array or text/binary file (if any):</UiLabel>, press <UiLabel>from other dataset</UiLabel>, type `2`, then <UiLabel>OK</UiLabel>. Three fields fill in automatically: `ALLEEG(2).icaweights`, `ALLEEG(2).icasphere`, and `ALLEEG(2).icachansind`.
-3. Press <UiLabel>OK</UiLabel> to close the window. <UiLabel>ICA weights</UiLabel> now shows <UiLabel>Yes</UiLabel> for dataset 1.
+2. Next to <UiLabel>ICA weights array or text/binary file (if any):</UiLabel>, press <UiLabel>from other dataset</UiLabel>. In <UiLabel>Enter dataset index (with same channels)</UiLabel>, replace the 1 with `2`, then press <UiLabel>Ok</UiLabel>. Three fields fill in automatically: `ALLEEG(2).icaweights`, `ALLEEG(2).icasphere`, and `ALLEEG(2).icachansind`.
+3. Press <UiLabel>Ok</UiLabel> to close the window. <UiLabel>ICA weights</UiLabel> now shows <UiLabel>Yes</UiLabel> for dataset 1.
 
 **Third: compare the maps**
 
-1. With dataset 1 current, open <MenuPath>Plot > Component maps > In 2-D</MenuPath>.
+1. With dataset 1 current, open <MenuPath>Plot > Component maps > In 2-D</MenuPath>, keep the defaults, and press <UiLabel>Ok</UiLabel>. A window with the component maps opens.
 2. Choose dataset 2 and open the same window. The maps are identical, in the same order. The blink component is in the same place in both.
 3. Save dataset 1 (the 0.1 Hz main dataset, not the 1 Hz ICA copy) with <MenuPath>File > Save current dataset as</MenuPath> as `D1_main_ica.set` in your work folder (`eeg-course`). [The ICLabel lesson](/en/lesson/iclabel/) starts from it.
 

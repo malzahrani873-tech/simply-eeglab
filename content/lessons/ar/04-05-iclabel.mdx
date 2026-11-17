@@ -117,9 +117,10 @@ updated: 2026-10-28
 <EeglabWindow id="iclabel" use={{ version: "Default (recommended)" }} />
 
 1. افتح <MenuPath>Tools > Classify components using ICLabel > Label components</MenuPath>.
-2. في <UiLabel>Select which icversion of ICLabel to use:</UiLabel> اترك <UiLabel>Default (recommended)</UiLabel> واضغط <UiLabel>OK</UiLabel>.
-3. تظهر خرائط رأس المكوّنات، وفوق كل خريطة الفئة الأرجح واحتمالها.
-4. اضغط على خريطة أي مكوّن لتفتح لوحاته: خريطة الرأس، والطيف، والسلسلة الزمنية، واحتمال كل فئة.
+2. في <UiLabel>Select which icversion of ICLabel to use:</UiLabel> اترك <UiLabel>Default (recommended)</UiLabel> واضغط <UiLabel>Ok</UiLabel>.
+3. يحسب ICLabel التصنيف في ثوانٍ، ثم تظهر وحدها نافذة ثانية عنوانها <UiLabel>View many chan or comp. properties -- pop_viewprops</UiLabel>. خانة <UiLabel>Component indices to plot:</UiLabel> فيها كل المكوّنات (`1:31` في D1). اترك كل شيء كما هو واضغط <UiLabel>Ok</UiLabel>.
+4. تظهر خرائط رأس المكوّنات، وفوق كل خريطة الفئة الأرجح واحتمالها.
+5. اضغط على خريطة أي مكوّن لتفتح لوحاته: خريطة الرأس، والطيف، والسلسلة الزمنية، واحتمال كل فئة.
 
 <Callout type="note" title="من أين تأتي لوحات المكوّن؟">
 لوحات المكوّن التي تفتحها بالضغط عليه تأتي من إضافة Viewprops، وهي مرفقة داخل ICLabel. تفتحها لكل المكوّنات معاً من <MenuPath>Tools > Classify components using ICLabel > View extended component properties</MenuPath>، وعنوان نافذتها يبدأ بـ <UiLabel>View components properties - pop_viewprops()</UiLabel>. ملفات Viewprops موجودة في المجلد `<EEGLAB>/plugins/ICLabel/viewprops`. القائمة تضيف هذا المجلد إلى مسار MATLAB بنفسها، أما السكربت فيضيفه بسطر `addpath` قبل `pop_viewprops`، كما في سكربت هذا الدرس.
@@ -137,7 +138,7 @@ updated: 2026-10-28
 
 1. افتح <MenuPath>Tools > Classify components using ICLabel > Flag components as artifacts</MenuPath>.
 2. تظهر نافذة <UiLabel>Select range for flagging component for rejection</UiLabel>، فيها حد أدنى <UiLabel>Min</UiLabel> وحد أعلى <UiLabel>Max</UiLabel> لكل فئة. الافتراضي: <UiLabel>Muscle</UiLabel> من 0.9 إلى 1، و<UiLabel>Eye</UiLabel> من 0.9 إلى 1، والباقي فارغ.
-3. اضغط <UiLabel>OK</UiLabel>. ستطبع نافذة الأوامر عدد المكوّنات التي عُلّمت.
+3. اضغط <UiLabel>Ok</UiLabel>. ستطبع نافذة الأوامر عدد المكوّنات التي عُلّمت.
 
 **رابعاً: احذف المكوّنات وقارن**
 
@@ -149,10 +150,10 @@ updated: 2026-10-28
 
 1. افتح <MenuPath>Tools > Remove components from data</MenuPath>.
 2. تظهر نافذة تذكر أرقام المكوّنات الموسومة وتسأل هل تحذفها. اضغط <UiLabel>Manual rej.</UiLabel> لترى القائمة وتعدّلها، لا <UiLabel>Yes</UiLabel>، لأن <UiLabel>Yes</UiLabel> يحذفها بدون مراجعة. تجاهل ملاحظة STUDY في النافذة الآن، فهي لتحليل عدة مشاركين وتأتي في المحطة 8.
-3. خانة <UiLabel>List of component(s) to remove from data</UiLabel> فيها المكوّنات الموسومة. عدّلها حسب مراجعتك: أضف رقم مكوّن أنت متأكد أنه آرتفاكت، أو امسح من الخانة رقم مكوّن لست متأكداً منه، فيبقى في البيانات. إن لم تتأكد من مكوّن فأبقِه، وارجع إليه بعد درس [قراءة مكوّنات الآرتفاكت](/lesson/ic-artifacts/). ثم اضغط <UiLabel>OK</UiLabel>.
-4. تظهر نافذة تأكيد. اضغط <UiLabel>Plot single trials</UiLabel>: الأسود قبل الحذف والأحمر بعده.
-5. إذا اختفى الرمش وبقي باقي الإشارة كما هو، اضغط <UiLabel>Accept</UiLabel>.
-6. سمِّ الداتاست الجديدة `D1 main clean`، واترك <UiLabel>Overwrite it in memory (set=yes; unset=create a new dataset)</UiLabel> غير مفعّل. احفظها من <MenuPath>File > Save current dataset as</MenuPath> باسم `D1_main_clean.set` في مجلد عملك (`eeg-course`)، ويمكن أن يبدأ منها [درس طيف القدرة](/lesson/power-spectrum/).
+3. خانة <UiLabel>List of component(s) to remove from data</UiLabel> فيها المكوّنات الموسومة. عدّلها حسب مراجعتك: أضف رقم مكوّن أنت متأكد أنه آرتفاكت، أو امسح من الخانة رقم مكوّن لست متأكداً منه، فيبقى في البيانات. إن لم تتأكد من مكوّن فأبقِه، وارجع إليه بعد درس [قراءة مكوّنات الآرتفاكت](/lesson/ic-artifacts/). ثم اضغط <UiLabel>Ok</UiLabel>.
+4. تظهر نافذة تأكيد. اضغط <UiLabel>Plot single trials</UiLabel>: تفتح نافذة تمرير، الأسود فيها قبل الحذف والأحمر بعده، وتعود نافذة التأكيد نفسها. حرّك نافذة التأكيد جانباً إذا غطّت الرسم.
+5. إذا اختفى الرمش وبقي باقي الإشارة كما هو، أغلق نافذة التمرير، واضغط <UiLabel>Accept</UiLabel> في نافذة التأكيد.
+6. تظهر نافذة الداتاست الجديدة، والاسم المقترح فيها `D1 main pruned with ICA`. غيّره في <UiLabel>Name it:</UiLabel> إلى `D1 main clean`، واترك <UiLabel>Overwrite it in memory (set=yes; unset=create a new dataset)</UiLabel> غير مفعّل، ثم اضغط <UiLabel>Ok</UiLabel>. احفظها من <MenuPath>File > Save current dataset as</MenuPath> باسم `D1_main_clean.set` في مجلد عملك (`eeg-course`)، ويمكن أن يبدأ منها [درس طيف القدرة](/lesson/power-spectrum/).
 
 **خامساً: طبّق فلتر low-pass الذي أجّلته**
 
@@ -160,7 +161,13 @@ updated: 2026-10-28
 **لا تنتقل إلى المحطة 5 قبل هذه الخطوة.** كل دروس المحطة 5 تبدأ من الملف `D1_main_clean_lp30.set` الذي تحفظه هنا.
 </Callout>
 
-الآن بعد تنظيف البيانات، طبّق فلتر <En>low-pass</En> عند 30 هرتز كما في [درس الفلترة](/lesson/filtering/): <MenuPath>Tools > Filter the data > Basic FIR filter (new, default)</MenuPath>، واكتب `30` في <UiLabel>Higher edge of the frequency pass band (Hz)</UiLabel>. سمِّ الداتاست الناتجة `D1 main clean lp30`، ثم احفظها من <MenuPath>File > Save current dataset as</MenuPath> باسم `D1_main_clean_lp30.set` في مجلد عملك (`eeg-course`). [درس استخراج epochs](/lesson/extract-epochs/) يبدأ منها.
+الآن بعد تنظيف البيانات، طبّق فلتر <En>low-pass</En> عند 30 هرتز كما في [درس الفلترة](/lesson/filtering/):
+
+1. تأكد من أن `D1 main clean` هي الداتاست الحالية: اسمها يظهر في أعلى النافذة الرئيسية.
+2. افتح <MenuPath>Tools > Filter the data > Basic FIR filter (new, default)</MenuPath>.
+3. اترك <UiLabel>Lower edge of the frequency pass band (Hz)</UiLabel> فارغة، واكتب `30` في <UiLabel>Higher edge of the frequency pass band (Hz)</UiLabel>، ثم اضغط <UiLabel>Ok</UiLabel>. أغلق نافذة استجابة الفلتر عندما تظهر.
+4. في نافذة الداتاست الجديدة اكتب `D1 main clean lp30` في <UiLabel>Name it:</UiLabel> واضغط <UiLabel>Ok</UiLabel>.
+5. احفظها من <MenuPath>File > Save current dataset as</MenuPath> باسم `D1_main_clean_lp30.set` في مجلد عملك (`eeg-course`). [درس استخراج epochs](/lesson/extract-epochs/) يبدأ منها.
 
 ## كيف أصنّف المكوّنات وأحذفها بسكربت؟
 

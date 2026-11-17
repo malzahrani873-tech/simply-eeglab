@@ -94,12 +94,12 @@ updated: 2026-10-28
 1. اصنع نسخة ICA مفلترة عند 1 هرتز، كما في [درس تشغيل ICA](/lesson/run-ica/).
 2. افتح <MenuPath>Tools > Decompose data by ICA</MenuPath>. في <UiLabel>ICA algorithm to use (click to select)</UiLabel> اختر <UiLabel>Infomax picard.m</UiLabel>. خانة <UiLabel>Commandline options (See help messages)</UiLabel> تُظهر `'maxiter', 500, 'mode', 'standard'`.
 3. أضف رتبة البيانات (<En>rank</En>) إلى الخيارات بنفسك: في D1 تصبح الخانة `'maxiter', 500, 'mode', 'standard', 'pca', 31`. مع Picard لا يفحص `pop_runica` الرتبة نيابة عنك.
-4. اضغط <UiLabel>OK</UiLabel>، ثم قارن الخرائط من <MenuPath>Plot > Component maps > In 2-D</MenuPath> بخرائط `runica`.
+4. اضغط <UiLabel>Ok</UiLabel>، ثم قارن الخرائط من <MenuPath>Plot > Component maps > In 2-D</MenuPath> بخرائط `runica`.
 
 **ثالثاً (اختياري): AMICA**
 
 1. بعد تثبيت AMICA، افتح <MenuPath>Tools > Run AMICA</MenuPath> على نسخة ICA.
-2. تأكد من أن خانة <UiLabel>In File:</UiLabel> فارغة. إذا ظهر فيها `eeglab_data.fdt` فامسحها، وإلا قرأ AMICA البيانات الأصلية من القرص بدل نسخة ICA. واجعل <UiLabel># PCA Dims.:</UiLabel> مساوياً للرتبة المتوقّعة، 31 في D1، واختر مجلد مخرجات تعرف مكانه، ثم اضغط <UiLabel>OK</UiLabel>.
+2. تأكد من أن خانة <UiLabel>In File:</UiLabel> فارغة. إذا ظهر فيها `eeglab_data.fdt` فامسحها، وإلا قرأ AMICA البيانات الأصلية من القرص بدل نسخة ICA. واجعل <UiLabel># PCA Dims.:</UiLabel> مساوياً للرتبة المتوقّعة، 31 في D1، واختر مجلد مخرجات تعرف مكانه، ثم اضغط <UiLabel>Ok</UiLabel>.
 3. AMICA يستغرق وقتاً أطول بكثير من `runica`. اتركه يعمل، وقارن الخرائط عندما ينتهي.
 
 أياً كانت الخوارزمية، انسخ الأوزان إلى النسخة الرئيسية بنفس طريقة [درس فلتر 1 هرتز ونسخ الأوزان](/lesson/ica-1hz-copy-weights/).

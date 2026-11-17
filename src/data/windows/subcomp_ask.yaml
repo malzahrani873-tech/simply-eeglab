@@ -3,7 +3,7 @@ func: pop_subcomp
 source: "EEGLAB pop_subcomp.m (questdlg2, line 93)"
 title: "Remove components from data"
 menu: "Tools > Remove components from data"
-shot: S9-subcomp-dialog
+shot: subcomp-ask-dialog
 intro:
   ar: "أول نافذة تظهر إذا كانت هناك مكوّنات معلّمة. تذكر أرقامها وتسألك هل تحذفها."
   en: "The first window, shown when some components are flagged. It lists their numbers and asks whether to remove them."

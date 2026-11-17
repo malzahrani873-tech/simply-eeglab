@@ -15,7 +15,7 @@ fields:
     ar: "«Default (recommended)» هو المناسب. «Lite» نسخة أخف، و«Beta» موجودة فقط لإعادة نتائج دراسات قديمة."
     en: "«Default (recommended)» is the right choice. «Lite» is a lighter version, and «Beta» is kept only to reproduce old studies."
   - key: buttons
-    label: "Help · Cancel · OK"
+    label: "Help · Cancel · Ok"
     kind: button
-    ar: "«OK» يشغّل التصنيف. بعده افتح خرائط المكوّنات لترى الفئة فوق كل خريطة."
-    en: "OK runs the classification. Then open the component maps to see the class above each map."
+    ar: "«Ok» يشغّل التصنيف. بعده تفتح وحدها نافذة pop_viewprops: اضغط فيها «Ok» لترى خرائط المكوّنات وفوق كل خريطة فئتها الأرجح."
+    en: "Ok runs the classification. Then the pop_viewprops window opens by itself: press «Ok» there to see the component maps with the most likely class above each map."

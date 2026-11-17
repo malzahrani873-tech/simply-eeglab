@@ -31,7 +31,7 @@ fields:
     ar: "يحذف أي epoch تتجاوز إشارتها هذين الحدّين بالميكروفولت. اتركها فارغة، فالرفض له درس خاص."
     en: "Drops any epoch whose signal goes beyond these limits in microvolts. Leave it empty; rejection has its own lesson."
   - key: buttons
-    label: "Help · Cancel · OK"
+    label: "Help · Cancel · Ok"
     kind: button
-    ar: "«OK» يقطّع، ثم تفتح نافذة تسمية الداتاست، ثم نافذة تسأل عن إزالة خط الأساس."
-    en: "OK cuts the data, then the naming window opens, then a window asks about baseline removal."
+    ar: "«Ok» يقطّع، ثم تفتح نافذة تسمية الداتاست. لا تظهر بعدها نافذة لإزالة خط الأساس (baseline) في EEGLAB 2026.1، بل رسالة تذكير في نافذة الأوامر فقط."
+    en: "Ok cuts the data, then the naming window opens. In EEGLAB 2026.1 no baseline-removal window follows, only a reminder in the command window."

@@ -3,7 +3,7 @@ func: pop_icflag
 source: "ICLabel plugin, pop_icflag.m (allRows)"
 title: "pop_icflag()"
 menu: "Tools > Classify components using ICLabel > Flag components as artifacts"
-shot: S8-icflag-dialog
+shot: icflag-dialog
 intro:
   ar: "تعلّم المكوّنات للحذف حسب احتمالات ICLabel. لكل فئة سطر فيه حدّ أدنى وأعلى. هذه النافذة تعلّم فقط ولا تحذف شيئاً."
   en: "Flags components for removal from the ICLabel probabilities. Each class has a row with a minimum and a maximum. This window only flags; it removes nothing."
@@ -29,7 +29,7 @@ fields:
     ar: "فارغة افتراضياً. تملؤها إذا أردت تعليم هذه الفئات أيضاً."
     en: "Empty by default. Fill them if you also want to flag these classes."
   - key: buttons
-    label: "Help · Cancel · OK"
+    label: "Cancel · Ok"
     kind: button
-    ar: "«OK» يعلّم المكوّنات. الحذف الفعلي يكون بعدها من Tools > Remove components from data."
-    en: "OK flags the components. The actual removal comes after, from Tools > Remove components from data."
+    ar: "«Ok» يعلّم المكوّنات. الحذف الفعلي يكون بعدها من Tools > Remove components from data."
+    en: "Ok flags the components. The actual removal comes after, from Tools > Remove components from data."

@@ -97,7 +97,7 @@ updated: 2026-10-29
 
 ## كم يصغر P3 في نسخة 1 هرتز؟
 
-<ImageSpec>صورة حقيقية من MATLAB أو EEGLAB قريباً.</ImageSpec>
+<ImageSpec>نافذة Sum/Compare ERPs من EEGLAB لقناة Pz في D1: الـ ERP حول المربع في النسخة الرئيسية بـ 0.1 هرتز بالأزرق، وفي نسخة ICA بـ 1 هرتز بالأحمر.</ImageSpec>
 
 الأزرق هو النسخة الرئيسية بـ 0.1 هرتز، والأحمر نسخة ICA بـ 1 هرتز. في D1 يبلغ متوسط السعة (<En>mean amplitude</En>) في Pz بين 300 و600 ميلي ثانية نحو 4.3 ميكروفولت في النسخة الرئيسية، ونحو 3.1 في نسخة 1 هرتز. أي أنك تخسر نحو 30% من P3 إذا أكملت التحليل على نسخة ICA.
 
@@ -134,12 +134,12 @@ ICA لا يتعلّم إشارة. يتعلّم طريقة ثابتة لجمع ا
 <EeglabWindow id="editset" use={{ weightfile: "اضغط «from other dataset» واكتب `2`" }} compact />
 
 1. والداتاست 1 هي الحالية، افتح <MenuPath>Edit > Dataset info</MenuPath>.
-2. بجانب <UiLabel>ICA weights array or text/binary file (if any):</UiLabel> اضغط <UiLabel>from other dataset</UiLabel>، واكتب `2` ثم اضغط <UiLabel>OK</UiLabel>. تمتلئ ثلاث خانات تلقائياً: `ALLEEG(2).icaweights` و `ALLEEG(2).icasphere` و `ALLEEG(2).icachansind`.
-3. اضغط <UiLabel>OK</UiLabel> لإغلاق النافذة. تظهر الآن <UiLabel>ICA weights</UiLabel> بقيمة <UiLabel>Yes</UiLabel> في الداتاست 1.
+2. بجانب <UiLabel>ICA weights array or text/binary file (if any):</UiLabel> اضغط <UiLabel>from other dataset</UiLabel>. في خانة <UiLabel>Enter dataset index (with same channels)</UiLabel> امسح الرقم 1 واكتب `2`، ثم اضغط <UiLabel>Ok</UiLabel>. تمتلئ ثلاث خانات تلقائياً: `ALLEEG(2).icaweights` و `ALLEEG(2).icasphere` و `ALLEEG(2).icachansind`.
+3. اضغط <UiLabel>Ok</UiLabel> لإغلاق النافذة. تظهر الآن <UiLabel>ICA weights</UiLabel> بقيمة <UiLabel>Yes</UiLabel> في الداتاست 1.
 
 **ثالثاً: قارن الخرائط**
 
-1. والداتاست 1 هي الحالية، افتح <MenuPath>Plot > Component maps > In 2-D</MenuPath>.
+1. والداتاست 1 هي الحالية، افتح <MenuPath>Plot > Component maps > In 2-D</MenuPath>، واترك الإعدادات الافتراضية، واضغط <UiLabel>Ok</UiLabel>. تظهر نافذة فيها خرائط المكوّنات.
 2. اختر الداتاست 2 وافتح نفس النافذة. الخرائط متطابقة وبنفس الترتيب، ومكوّن الرمش في نفس المكان في النسختين.
 3. احفظ الداتاست 1، وهي النسخة الرئيسية بـ 0.1 هرتز لا نسخة ICA بـ 1 هرتز، من <MenuPath>File > Save current dataset as</MenuPath> باسم `D1_main_ica.set` في مجلد عملك (`eeg-course`). [درس ICLabel](/lesson/iclabel/) يبدأ منها.
 

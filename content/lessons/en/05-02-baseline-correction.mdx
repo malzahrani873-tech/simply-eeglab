@@ -99,11 +99,11 @@ So which pre-stimulus period do you choose, and how do you subtract it?
 ## What does correction do to the epochs?
 
 <BeforeAfter>
-<ImageSpec>Real screenshot from MATLAB or EEGLAB coming soon.</ImageSpec>
-<ImageSpec>Real screenshot from MATLAB or EEGLAB coming soon.</ImageSpec>
+<ImageSpec>EEGLAB's Channel ERP image window for channel Pz in `D1 epochs` before baseline correction: each horizontal row is one epoch, colour is amplitude, and the average is below.</ImageSpec>
+<ImageSpec>The same window for Pz in `D1 epochs bl` after baseline correction from -200 to 0 ms, with the same colour scale.</ImageSpec>
 </BeforeAfter>
 
-Look at the shaded period: before correction the lines start at different levels, and after it they meet around zero. Any change after the stimulus is now measured relative to what came just before it.
+Both images are the <MenuPath>Plot > Channel ERP image</MenuPath> window for channel Pz: each horizontal row is one epoch, and colour is amplitude. Before correction, the colour of the rows just before zero changes from epoch to epoch, because each epoch starts at a different level. After correction, the part from -200 to 0 has the colour of zero in every row. Any change after the stimulus is now measured relative to what came just before it.
 
 ## Why do I need it if the filter already removed most of the drift?
 
