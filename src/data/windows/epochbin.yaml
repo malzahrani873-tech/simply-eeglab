@@ -1,0 +1,27 @@
+id: epochbin
+func: pop_epochbin
+source: "ERPLAB 13.10 epochbinGUI (window as captured)"
+title: "ERPLAB 13.10 - EXTRACT BIN-BASED EPOCHS"
+menu: "ERPLAB > Extract bin-based epochs"
+shot: epochbin-dialog
+numbered: true
+intro:
+  ar: "تقطع epoch حول كل حدث له bin، وتصحّح خط الأساس في نفس الخطوة."
+  en: "Cuts an epoch around each event that has a bin, and corrects the baseline in the same step."
+fields:
+  - key: range
+    label: "Bin-based epoch time range (ms)"
+    default: "`-200 1000`"
+    ar: "بداية الـ epoch ونهايتها بالميلي ثانية حول الحدث."
+    en: "The start and end of the epoch, in milliseconds around the event."
+  - key: baseline
+    label: "Baseline Correction: None · Pre · Post · Whole · Custom (ms)"
+    kind: list
+    default: "Pre"
+    ar: "«Pre» يطرح متوسط ما قبل الحدث. «Custom» لفترة تكتبها بنفسك."
+    en: "Pre subtracts the mean before the event. Custom is for a period you type yourself."
+  - key: buttons
+    label: "CANCEL · ? · RUN"
+    kind: button
+    ar: "«RUN» يقطع الـ epochs وتفتح بعدها نافذة تسمية الداتاست الجديدة."
+    en: "RUN cuts the epochs, then the window for naming the new dataset opens."

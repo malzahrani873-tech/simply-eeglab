@@ -5,7 +5,7 @@ description: How to train a classifier that tells faces from cars using the patt
 station: 10
 order: 3
 level: optional
-status: review
+status: approved
 objectives:
   - "Prepare data for decoding in ERPLAB: event list, then bins, then bin-based epochs."
   - Extract a BEST file and run SVM decoding with cross-validation.
@@ -110,7 +110,11 @@ Cars, Correct
 .{41-80}{t<200-1000>201}
 ```
 
+<EeglabWindow id="binlister" use={{ bdf: "choose `n170_faces_cars_bins.txt` with Browse", readcur: "keep it", writecur: "keep it", transfer: "keep it" }} />
+
 6. Open <MenuPath>ERPLAB > Assign bins (BINLISTER)</MenuPath>, choose the file `n170_faces_cars_bins.txt`, and click <UiLabel>RUN</UiLabel>.
+<EeglabWindow id="epochbin" use={{ range: "`-200 800`", baseline: "Pre" }} />
+
 7. Open <MenuPath>ERPLAB > Extract bin-based epochs</MenuPath>. Type the range `-200 800`, choose baseline correction from the pre-stimulus period (<UiLabel>Pre</UiLabel>), and click <UiLabel>RUN</UiLabel>. Name the dataset `N170 sub2 faces cars`.
 
 **Third: the BEST file, then decoding**

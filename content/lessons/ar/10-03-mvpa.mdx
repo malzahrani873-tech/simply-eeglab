@@ -5,7 +5,7 @@ description: كيف تدرّب مصنّفاً يميّز الوجوه من ال�
 station: 10
 order: 3
 level: optional
-status: review
+status: approved
 objectives:
   - "يجهّز البيانات للتصنيف في ERPLAB: قائمة الأحداث، ثم الـ bins، ثم epochs حسب الـ bin."
   - يستخرج ملف BEST ويشغّل التصنيف بـ SVM مع التحقق المتقاطع.
@@ -110,7 +110,11 @@ Cars, Correct
 .{41-80}{t<200-1000>201}
 ```
 
+<EeglabWindow id="binlister" use={{ bdf: "اختر `n170_faces_cars_bins.txt` بزر Browse", readcur: "أبقه", writecur: "أبقه", transfer: "أبقه" }} />
+
 6. افتح <MenuPath>ERPLAB > Assign bins (BINLISTER)</MenuPath>، واختر الملف `n170_faces_cars_bins.txt`، واضغط <UiLabel>RUN</UiLabel>.
+<EeglabWindow id="epochbin" use={{ range: "`-200 800`", baseline: "Pre" }} />
+
 7. افتح <MenuPath>ERPLAB > Extract bin-based epochs</MenuPath>. اكتب النطاق `-200 800`، واختر تصحيح الخط القاعدي من الفترة قبل المثير (<UiLabel>Pre</UiLabel>)، واضغط <UiLabel>RUN</UiLabel>. سمِّ الداتاست `N170 sub2 faces cars`.
 
 **ثالثاً: ملف BEST، ثم التصنيف**

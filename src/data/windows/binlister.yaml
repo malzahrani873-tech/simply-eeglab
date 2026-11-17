@@ -1,0 +1,62 @@
+id: binlister
+func: pop_binlister
+source: "ERPLAB 13.10 binlisterGUI (window as captured)"
+title: "ERPLAB 13.10 - BINLISTER GUI"
+menu: "ERPLAB > Assign bins (BINLISTER)"
+shot: binlister-dialog
+numbered: true
+intro:
+  ar: "تقرأ ملف وصف الـ bins، وتضع كل حدث في الـ bin الذي يطابقه."
+  en: "Reads the bin descriptor file and puts each event into the bin it matches."
+fields:
+  - key: bdf
+    label: "Load Bin Descriptor File from · Browse · Take a look"
+    default: ""
+    ar: "مسار ملف وصف الـ bins (BDF). «Browse» لاختياره، و«Take a look» لعرض محتواه. المسار في الصورة مموّه."
+    en: "The path of the bin descriptor file (BDF). Browse chooses it, Take a look shows its content. The path in the picture is blurred."
+  - key: readcur
+    label: "Read EVENTLIST from: Current dataset"
+    kind: checkbox
+    default: checked
+    ar: "يقرأ قائمة الأحداث من الداتاست المفتوحة. أبقه."
+    en: "Reads the event list from the open dataset. Keep it."
+  - key: writecur
+    label: "Write resulting EVENTLIST to: Current dataset"
+    kind: checkbox
+    default: checked
+    ar: "يكتب النتيجة في الداتاست نفسها. أبقه."
+    en: "Writes the result into the same dataset. Keep it."
+  - key: warn
+    label: "Warn if bins have already being assigned to this dataset"
+    kind: checkbox
+    default: checked
+    ar: "ينبّهك إذا كانت الداتاست فيها bins من قبل."
+    en: "Warns you if the dataset already has bins."
+  - key: transfer
+    label: "Transfer EVENTLIST info to EEG.event (for plotting and other EEGLAB functions)"
+    kind: checkbox
+    default: checked
+    ar: "ينسخ أرقام الـ bins إلى أحداث EEGLAB، فتظهر في الرسوم. أبقه."
+    en: "Copies the bin numbers into the EEGLAB events, so they show in plots. Keep it."
+  - key: textout
+    label: "Text file · Matlab workspace (as EVENTLIST variable)"
+    kind: checkbox
+    default: unchecked
+    ar: "نسخ إضافية من النتيجة في ملف نصي أو في متغير. اتركهما بلا علامة."
+    en: "Extra copies of the result in a text file or a variable. Leave them unchecked."
+  - key: codes
+    label: "Forbidden Code(s) · Ignored Code(s)"
+    default: ""
+    ar: "رموز أحداث تمنع الـ bin أو تُتجاهل. اتركهما فارغتين."
+    en: "Event codes that block a bin or are ignored. Leave them empty."
+  - key: reset
+    label: "Reset Artifact Flags · Reset User Flags"
+    kind: checkbox
+    default: unchecked
+    ar: "يمسح علامات سابقة. اتركهما بلا علامة."
+    en: "Clears earlier flags. Leave them unchecked."
+  - key: buttons
+    label: "CANCEL · ? · RUN"
+    kind: button
+    ar: "«RUN» يوزّع الأحداث على الـ bins ويطبع عدد كل bin."
+    en: "RUN sorts the events into bins and prints how many fell in each bin."
