@@ -88,6 +88,8 @@ matlab -batch "run_ica_d4"
 
 `-batch` يشغّل السكربت بلا واجهة، ثم يغلق MATLAB. إذا حدث خطأ، يخرج برمز خطأ يراه العنقود.
 
+إذا ظهرت رسالة أن `matlab` أمر غير معروف، فسطر أوامر النظام لا يعرف مكان MATLAB. اكتب المسار الكامل بدلاً منه، مثل `"C:\Program Files\MATLAB\R2026a\bin\matlab.exe"` في Windows (رقم الإصدار عندك قد يختلف). وإذا توقف السكربت عند `eeglab nogui` برسالة <UiLabel>Unrecognized function or variable 'eeglab'</UiLabel>، فـ MATLAB الجديد لا يعرف مكان EEGLAB: افتح MATLAB العادي، واكتب `cd` ثم مسافة ثم مسار مجلد EEGLAB، ثم `addpath(pwd); savepath`، وجرّب من جديد.
+
 **ثانياً: عنقود جامعتك**
 
 3. اسأل قسم الحوسبة في جامعتك: هل MATLAB مثبّت؟ أي نظام مهام (<En>job scheduler</En>) يستخدمون (SLURM هو الأشهر)؟ وأين تضع EEGLAB؟
@@ -112,7 +114,7 @@ matlab -batch "run_ica_d4"
 **ثالثاً: بوابة NSG (بديل مجاني)**
 
 7. إذا لم يكن عند جامعتك عنقود، فبوابة <En>Neuroscience Gateway</En> (NSG) مجانية للباحثين الأكاديميين، وفيها MATLAB و EEGLAB جاهزان. سجّل حساباً في [موقع NSG](https://www.nsgportal.org/).
-8. ثبّت إضافة nsgportal من <MenuPath>File > Manage EEGLAB extensions</MenuPath> (آخر إصدار عند كتابة الدرس 2.1.1).
+8. ثبّت إضافة nsgportal من <MenuPath>File > Manage EEGLAB extensions</MenuPath>: اضغط على اسمها في القائمة، ثم <UiLabel>Install/Update</UiLabel>، ثم أعد تشغيل `eeglab` (آخر إصدار عند كتابة الدرس 2.1.1).
 9. افتح <MenuPath>Tools > NSG Tools > NSG account info</MenuPath>، واكتب اسم المستخدم وكلمة المرور.
 10. ضع السكربت والبيانات التي يحتاجها في مجلد واحد، ثم افتح <MenuPath>Tools > NSG Tools > Manage NSG jobs</MenuPath>، واختر المجلد، واكتب اسم السكربت، وأرسل المهمة. من نفس النافذة تتابع حالتها وتنزّل النتائج. على NSG لا يعطي النظام رقم المشارك، فيعالج السكربت المشارك الأول فقط: أرسل مهمة لكل مشارك بعد تغيير القيمة 1 في سطر `taskId`.
 

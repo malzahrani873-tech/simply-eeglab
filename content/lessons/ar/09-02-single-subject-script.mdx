@@ -56,7 +56,7 @@ updated: 2026-10-28
 
 كل سطر فيه هو السطر نفسه من درسه، بلا تغيير. الجديد هو الترتيب والتنظيم فقط. فكيف ترتّب هذه السطور في سكربت واحد يعمل من البداية إلى النهاية بلا أي ضغطة؟
 
-## من أي درس يأتي كل قسم في السكربت؟
+## كيف يبدو ملف مقسّم إلى أقسام؟
 
 <Figure src="single-subject-script/script-sections-luck.webp" alt="محرر MATLAB وفيه سكربت قصير من ثلاثة أقسام. كل قسم يبدأ بسطر أخضر أوله %%: Create a variable named DIR، ثم Load data from Subject 1، ثم Load data from Subject 2. يرسم المحرر خطاً رفيعاً فوق كل سطر %%، والقسم الذي فيه المؤشر مظلّل بالأصفر. وفي الأعلى أزرار Run وRun Section وRun and Advance." caption="مثال من دورة أخرى: كل سطر %% يبدأ قسماً، والزر Run Section يشغّل القسم الذي أنت فيه فقط. سكربتك بالشكل نفسه، بقسم لكل محطة." source="external" credit="Luck, Applied Event-Related Potential Data Analysis, §11.8, Screenshot 11.4" creditUrl="https://socialsci.libretexts.org/Bookshelves/Psychology/Biological_Psychology/Applied_Event-Related_Potential_Data_Analysis_(Luck)/11%3A_EEGLAB_and_ERPLAB_Scripting/11.08%3A_Exercise-_From_the_Command_Line_to_a_Script" license="CC BY 4.0" licenseUrl="https://creativecommons.org/licenses/by/4.0/" />
 
@@ -66,10 +66,12 @@ updated: 2026-10-28
 
 **أولاً: افتح ملفاً جديداً بأقسام**
 
-1. اكتب `edit d1_pipeline.m` في نافذة الأوامر (<UiLabel>Command Window</UiLabel>). يفتح محرر MATLAB ملفاً فارغاً.
+1. اجعل مجلد عملك `eeg-course` هو مجلد MATLAB الحالي (<UiLabel>Current Folder</UiLabel>): اكتب `cd` ثم مسافة ثم مسار المجلد، أو اختره من لوحة <UiLabel>Current Folder</UiLabel>. السكربت يحفظ ملفاته في هذا المجلد. ثم اكتب `edit d1_pipeline.m` في نافذة الأوامر (<UiLabel>Command Window</UiLabel>). يسألك MATLAB هل ينشئ الملف لأنه غير موجود: اضغط <UiLabel>Yes</UiLabel>، فيفتح المحرر ملفاً فارغاً.
 2. قسّم الملف بأسطر تبدأ بـ `%%`. كل سطر منها بداية قسم، ويستطيع المحرر تشغيل كل قسم وحده (<UiLabel>Run Section</UiLabel>). اجعل قسماً لكل محطة.
 
 **ثانياً: املأ الأقسام من دروسك**
+
+السكربت الكامل في القسم التالي هو نتيجة الخطوات 3 إلى 6. إذا كانت هذه أول مرة لك، فانسخه كما هو والصقه في الملف، ثم اقرأ كل قسم وطابقه بدرسه. وإذا أردت التمرين، فابنه بنفسك بهذه الخطوات ثم قارنه به.
 
 3. القسم الأول للإعدادات: مجلد البيانات، ومجلد الحفظ، وتردد الكهرباء. ضع هنا كل ما يتغيّر بين مشروع وآخر، لا في وسط الكود.
 4. لكل خطوة، انسخ السطر من قسم السكربت في درسها، أو من `eegh` بعد أن تنفّذها من الواجهة كما في [درس سجل الأوامر](/lesson/eegh-history/). انسخ سطور المعالجة فقط، لا سطور الرسم والتمارين.
@@ -78,7 +80,7 @@ updated: 2026-10-28
 
 **ثالثاً: شغّله من الصفر**
 
-7. أغلق EEGLAB، واكتب `clear` في نافذة الأوامر، ثم شغّل الملف كله بـ <UiLabel>Run</UiLabel> في المحرر أو بكتابة `d1_pipeline`.
+7. احفظ الملف بزر <UiLabel>Save</UiLabel> في المحرر. أغلق EEGLAB، واكتب `clear` في نافذة الأوامر، ثم شغّل الملف كله بـ <UiLabel>Run</UiLabel> في المحرر أو بكتابة `d1_pipeline`. يأخذ التشغيل بضع دقائق، أغلبها في ICA، وتطبع نافذة الأوامر تقدّمه.
 8. أثناء التشغيل لا تضغط شيئاً. إذا فُتحت نافذة تنتظرك، فهناك سطر بلا معاملات كافية. اضغط <UiLabel>Cancel</UiLabel>، وانظر إلى عنوان النافذة لتعرف اسم الدالة، ثم انسخ سطرها كاملاً بمعاملاته من قسم السكربت في درسها.
 9. قارن الناتج بما صنعته من الواجهة في المحطة 5: نفس عدد القنوات، ونفس عدد الـ epochs تقريباً.
 

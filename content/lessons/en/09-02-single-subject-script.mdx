@@ -56,7 +56,7 @@ This file is your real project. It rebuilds lost processed files. It answers a r
 
 Every line is taken unchanged from its lesson. Only the order and organization are new. So how do you arrange them into one script that runs from start to end without a click?
 
-## Which lesson does each section of the script come from?
+## What does a file split into sections look like?
 
 <Figure src="single-subject-script/script-sections-luck.webp" alt="The MATLAB Editor with a short script in three sections. Each section starts with a green line that begins with %%: Create a variable named DIR, Load data from Subject 1, Load data from Subject 2. The editor draws a thin line above each %% line, and the section with the cursor is shaded yellow. At the top, the Run, Run Section and Run and Advance buttons." caption="An example from another course: each %% line starts a section, and the Run Section button runs only the section you are in. Your script has the same shape, with one section for each station." source="external" credit="Luck, Applied Event-Related Potential Data Analysis, §11.8, Screenshot 11.4" creditUrl="https://socialsci.libretexts.org/Bookshelves/Psychology/Biological_Psychology/Applied_Event-Related_Potential_Data_Analysis_(Luck)/11%3A_EEGLAB_and_ERPLAB_Scripting/11.08%3A_Exercise-_From_the_Command_Line_to_a_Script" license="CC BY 4.0" licenseUrl="https://creativecommons.org/licenses/by/4.0/" />
 
@@ -66,10 +66,12 @@ Each section starts with a `%%` line, and its title names the station it comes f
 
 **First: open a new file with sections**
 
-1. Type `edit d1_pipeline.m` in the command window. The MATLAB editor opens an empty file.
+1. Make your work folder `eeg-course` the MATLAB <UiLabel>Current Folder</UiLabel>: type `cd`, a space and the folder path, or pick it in the <UiLabel>Current Folder</UiLabel> panel. The script saves its files in this folder. Then type `edit d1_pipeline.m` in the command window. MATLAB asks whether to create the file because it does not exist: press <UiLabel>Yes</UiLabel>, and the editor opens an empty file.
 2. Split the file with lines starting with `%%`. Each of them starts a section, and the editor can run each section alone (<UiLabel>Run Section</UiLabel>). Make one section per station.
 
 **Second: fill the sections from your lessons**
+
+The full script in the next section is the result of steps 3 to 6. If this is your first time, copy it as it is and paste it into the file, then read each section and match it to its lesson. If you want the practice, build it yourself with these steps, then compare.
 
 3. The first section is for settings: the data folder, the output folder, and the line frequency. Everything that changes between projects goes here, not in the middle of the code.
 4. For each step, copy the line from the script section of its lesson, or from `eegh` after running it in the GUI, as in [the command history lesson](/en/lesson/eegh-history/). Do not copy plotting and exercise lines, only processing lines.
@@ -78,7 +80,7 @@ Each section starts with a `%%` line, and its title names the station it comes f
 
 **Third: run it from scratch**
 
-7. Close EEGLAB, type `clear` in the command window, then run the whole file with <UiLabel>Run</UiLabel> in the editor or by typing `d1_pipeline`.
+7. Save the file with the <UiLabel>Save</UiLabel> button in the editor. Close EEGLAB, type `clear` in the command window, then run the whole file with <UiLabel>Run</UiLabel> in the editor or by typing `d1_pipeline`. The run takes a few minutes, mostly for ICA, and the command window prints its progress.
 8. Do not click anything while it runs. If a window opens and waits for you, there is a line without enough arguments. Press <UiLabel>Cancel</UiLabel>, read the window title to learn the function name, then copy that function's full line, with its arguments, from the script section of its lesson.
 9. Compare the output with what you made in the GUI in station 5: the same number of channels, and about the same number of epochs.
 

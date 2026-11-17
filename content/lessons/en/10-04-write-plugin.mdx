@@ -85,7 +85,7 @@ The folder name carries the version: EEGLAB reads `chanvar1.0` as a plugin named
 
 **Second: write the function `pop_chanvar.m`**
 
-2. Type `edit pop_chanvar.m`, paste this code, and save:
+2. Type `edit pop_chanvar.m`. MATLAB asks whether to create the file because it does not exist: press <UiLabel>Yes</UiLabel>. Paste this code into the empty file and save it with the <UiLabel>Save</UiLabel> button:
 
 ```matlab
 function com = pop_chanvar(EEG, zThresh)
@@ -151,7 +151,7 @@ com = sprintf('pop_chanvar(EEG, %g);', zThresh);
 
 **Third: write the file `eegplugin_chanvar.m`**
 
-3. Type `edit eegplugin_chanvar.m`, paste this code, and save:
+3. Type `edit eegplugin_chanvar.m` and press <UiLabel>Yes</UiLabel> to create the file, as in step 2. Paste this code and save:
 
 ```matlab
 function vers = eegplugin_chanvar(fig, trystrs, catchstrs)

@@ -85,7 +85,7 @@ mkdir(pluginDir); cd(pluginDir);
 
 **ثانياً: اكتب الدالة `pop_chanvar.m`**
 
-2. اكتب `edit pop_chanvar.m`، والصق هذا الكود، واحفظ:
+2. اكتب `edit pop_chanvar.m`. يسألك MATLAB هل ينشئ الملف لأنه غير موجود: اضغط <UiLabel>Yes</UiLabel>. الصق هذا الكود في الملف الفارغ، واحفظه بزر <UiLabel>Save</UiLabel>:
 
 ```matlab
 function com = pop_chanvar(EEG, zThresh)
@@ -151,7 +151,7 @@ com = sprintf('pop_chanvar(EEG, %g);', zThresh);
 
 **ثالثاً: اكتب الملف `eegplugin_chanvar.m`**
 
-3. اكتب `edit eegplugin_chanvar.m`، والصق هذا الكود، واحفظ:
+3. اكتب `edit eegplugin_chanvar.m`، واضغط <UiLabel>Yes</UiLabel> لإنشاء الملف كما في الخطوة 2. الصق هذا الكود، واحفظ:
 
 ```matlab
 function vers = eegplugin_chanvar(fig, trystrs, catchstrs)
