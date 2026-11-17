@@ -1,0 +1,53 @@
+id: chanplot
+func: pop_chanplot
+source: "EEGLAB pop_chanplot.m (uilist)"
+title: "View and edit current channels -- pop_chanplot()"
+menu: "Study > Plot channel measures"
+shot: study-chanplot
+numbered: true
+intro:
+  ar: "من هنا ترسم مقاييس القنوات لكل المشاركين: ERP والطيف و ERSP، وتضبط الإحصاء."
+  en: "From here you plot channel measures for all participants: ERP, spectrum and ERSP, and set the statistics."
+fields:
+  - key: design
+    label: "Select design:"
+    kind: menu
+    default: "STUDY.design 1"
+    ar: "التصميم الذي ترسمه. اختر رقم التصميم الذي يناسب سؤالك."
+    en: "The design to plot. Choose the design that fits your question."
+  - key: chans
+    label: "Select channel to plot · Sel. all"
+    kind: list
+    ar: "القناة التي ترسمها لكل المشاركين، مثل `All Pz`. «Sel. all» يختار كل القنوات لخرائط الرأس."
+    en: "The channel to plot for all participants, such as `All Pz`. Sel. all selects every channel, for scalp maps."
+  - key: stats
+    label: "STATS params"
+    kind: button
+    ar: "يفتح نافذة الإحصاء: نوع الاختبار والتصحيح والعتبة."
+    en: "Opens the statistics window: the test, the correction and the threshold."
+  - key: subjects
+    label: "Select subject(s) to plot"
+    kind: list
+    default: "All subjects"
+    ar: "مشارك واحد، أو كل المشاركين."
+    en: "One participant, or all of them."
+  - key: plotleft
+    label: "Plot ERPs · Plot spectra · Plot ERPimage · Plot ERSPs · Plot ITCs"
+    kind: button
+    ar: "ترسم متوسط المجموعة للقناة المختارة. الأزرار الرمادية لمقاييس لم تُحسب مسبقاً."
+    en: "Plot the group average for the chosen channel. The grey buttons are measures that were not precomputed."
+  - key: params
+    label: "Params"
+    kind: button
+    ar: "إعدادات كل رسمة: نطاق الزمن أو التردد، ورسم الشروط معاً أو منفصلة، وزمن خريطة الرأس."
+    en: "Settings for each plot: the time or frequency range, conditions together or apart, and the scalp map time."
+  - key: plotright
+    label: "Plot ERP(s) · Plot spectra · Plot ERPimage(s) · Plot ERSP(s) · Plot ITC(s)"
+    kind: button
+    ar: "نفس الرسوم، لكن لكل مشارك اخترته في القائمة اليمنى."
+    en: "The same plots, but for each participant chosen in the right list."
+  - key: buttons
+    label: "Help · Cancel · Ok"
+    kind: button
+    ar: "«Ok» يغلق النافذة ويحفظ ما غيّرته في الـ STUDY."
+    en: "Ok closes the window and keeps your changes to the STUDY."

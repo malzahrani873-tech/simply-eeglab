@@ -1,0 +1,50 @@
+id: limo
+func: pop_limo
+source: "EEGLAB pop_limo.m (uilist)"
+title: "LInear MOdeling of EEG data -- pop_limo()"
+menu: "Study > LInear MOdeling of EEG Data > Estimate Model Parameters (channel)"
+shot: limo-dialog
+numbered: true
+intro:
+  ar: "تقدّر فيها نموذج LIMO للمستوى الأول: نموذج خطي لكل مشارك وكل قناة وكل نقطة زمنية."
+  en: "Here you estimate the first-level LIMO model: a linear model for each participant, channel and time point."
+fields:
+  - key: vars
+    label: "See GLM variables"
+    kind: button
+    ar: "يعرض المتغيرات التي سيدخلها النموذج من التصميم الحالي."
+    en: "Shows the variables the model takes from the current design."
+  - key: split
+    label: "Split regressions (continuous indep. var.)"
+    kind: checkbox
+    default: unchecked
+    ar: "للمتغيرات المستمرة فقط. اتركه بلا علامة."
+    en: "Only for continuous variables. Leave it unchecked."
+  - key: measure
+    label: "Input data to use for the GLM"
+    kind: menu
+    default: "ERP"
+    ar: "المقياس الذي يُبنى عليه النموذج."
+    en: "The measure the model is built on."
+  - key: method
+    label: "Estimation method"
+    kind: menu
+    default: "WLS"
+    ar: "طريقة تقدير النموذج. WLS تعطي وزناً أقل للمحاولات الشاذة، لكنها تحتاج محاولات أكثر من عدد النقاط الزمنية."
+    en: "How the model is estimated. WLS gives less weight to outlier trials, but needs more trials than time points."
+  - key: options
+    label: "Options"
+    default: ""
+    ar: "خيارات إضافية بصيغة السكربت. اتركها فارغة."
+    en: "Extra options in script form. Leave it empty."
+  - key: erase
+    label: "Erase previous model"
+    kind: checkbox
+    default: checked
+    ar: "يحذف نتائج النموذج السابق قبل البدء."
+    en: "Deletes the results of the previous model before starting."
+  - key: buttons
+    label: "Help · Cancel · Ok"
+    kind: button
+    ar: "«Ok» يبدأ التقدير لكل مشارك، وقد يستغرق دقائق."
+    en: "Ok starts the estimation for each participant, which can take minutes."

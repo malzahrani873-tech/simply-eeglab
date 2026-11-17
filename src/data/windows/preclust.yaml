@@ -1,0 +1,50 @@
+id: preclust
+func: pop_preclust
+source: "EEGLAB pop_preclust.m (uilist)"
+title: "Select and compute component measures for later clustering -- pop_preclust()"
+menu: "Study > PCA clustering (original) > Build preclustering array"
+shot: preclust-dialog
+numbered: true
+intro:
+  ar: "تختار فيها على أي مقاييس تُجمَّع المكوّنات، ووزن كل مقياس."
+  en: "You choose which measures the components are clustered on, and the weight of each."
+fields:
+  - key: time
+    label: "Time-based info: spectra · ERPs · ERSPs · ITCs"
+    kind: checkbox
+    default: unchecked
+    ar: "مقاييس زمنية وترددية. اتركها بلا علامة إذا ستختبر هذه المقاييس لاحقاً، حتى لا تبني المجموعات من الأثر الذي تختبره."
+    en: "Time and frequency measures. Leave them unchecked if you will test these measures later, so the clusters are not built from the effect you test."
+  - key: pca
+    label: "PCA"
+    default: "`3`"
+    ar: "عدد الأبعاد التي يُختصر إليها كل مقياس قبل التجميع."
+    en: "How many dimensions each measure is reduced to before clustering."
+  - key: weight
+    label: "Weight"
+    default: "`1`"
+    ar: "أهمية المقياس في التجميع مقارنة بغيره. وزن أكبر يعني تأثيراً أكبر."
+    en: "How much the measure counts in clustering compared with the others. A larger weight means more influence."
+  - key: dipoles
+    label: "dipole locations"
+    kind: checkbox
+    default: unchecked
+    ar: "يجمع المكوّنات حسب موقع ثنائي القطب في الدماغ."
+    en: "Clusters the components by the location of their dipole in the brain."
+  - key: orient
+    label: "dipole orient."
+    kind: checkbox
+    default: unchecked
+    ar: "يجمعها حسب اتجاه ثنائي القطب. لا نستعمله."
+    en: "Clusters them by dipole orientation. We do not use it."
+  - key: maps
+    label: "scalp maps · Use channel values · Absolute values"
+    kind: checkbox
+    default: unchecked
+    ar: "يجمعها حسب خريطة الرأس. «Absolute values» يتجاهل الإشارة، لأن إشارة الخريطة في ICA عشوائية."
+    en: "Clusters them by scalp map. Absolute values ignores the sign, because the sign of an ICA map is arbitrary."
+  - key: buttons
+    label: "Help · Cancel · Ok"
+    kind: button
+    ar: "«Ok» يبني مصفوفة التجميع. بعدها تفتح Cluster components."
+    en: "Ok builds the clustering array. Then you open Cluster components."

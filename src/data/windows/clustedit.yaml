@@ -1,0 +1,56 @@
+id: clustedit
+func: pop_clustedit
+source: "EEGLAB pop_clustedit.m (uilist)"
+title: "View and edit current component clusters -- pop_clustedit()"
+menu: "Study > Edit/plot component clusters"
+shot: clustedit-dialog
+numbered: true
+intro:
+  ar: "تعرض المجموعات ومكوّناتها، وترسم خرائطها وثنائيات أقطابها، وتتيح حذف المكوّن الشاذ."
+  en: "Shows the clusters and their components, plots their maps and dipoles, and lets you remove an outlier component."
+fields:
+  - key: design
+    label: "Select design:"
+    kind: menu
+    ar: "التصميم المستخدم في رسوم المجموعات."
+    en: "The design used for the cluster plots."
+  - key: clusters
+    label: "Select cluster to plot"
+    kind: list
+    ar: "كل مجموعة بعدد مكوّناتها، مثل `Cls 3 (14 ICs)`."
+    en: "Each cluster with its number of components, such as `Cls 3 (14 ICs)`."
+  - key: stats
+    label: "STATS"
+    kind: button
+    ar: "إعدادات الإحصاء لرسوم المجموعات."
+    en: "Statistics settings for the cluster plots."
+  - key: comps
+    label: "Select component to plot"
+    kind: list
+    ar: "مكوّنات المجموعة المختارة، ولكل مكوّن المشارك ورقمه، مثل `clm IC16`."
+    en: "The components of the chosen cluster, each with its participant and number, such as `clm IC16`."
+  - key: plotleft
+    label: "Plot scalp maps · Plot dipoles · Plot ERPs · Plot spectra"
+    kind: button
+    ar: "ترسم متوسط المجموعة: الخريطة، وثنائيات الأقطاب، و ERP، والطيف."
+    en: "Plot the cluster mean: map, dipoles, ERP and spectrum."
+  - key: plotright
+    label: "Plot scalp map(s) · Plot dipole(s) · Plot ERP(s) · Plot spectra"
+    kind: button
+    ar: "نفس الرسوم لكل مكوّن اخترته على حدة."
+    en: "The same plots for each chosen component on its own."
+  - key: edit
+    label: "Create new cluster · Rename selected cluster"
+    kind: button
+    ar: "تنشئ مجموعة جديدة، أو تسمّي المجموعة باسم يصفها."
+    en: "Create a new cluster, or give the cluster a name that describes it."
+  - key: outliers
+    label: "Reassign selected component(s) · Remove selected outlier comps."
+    kind: button
+    ar: "تنقل مكوّناً إلى مجموعة أخرى، أو تحذف مكوّناً شاذاً من المجموعة."
+    en: "Move a component to another cluster, or remove an outlier component from the cluster."
+  - key: buttons
+    label: "Help · Cancel · Ok"
+    kind: button
+    ar: "«Ok» يحفظ تعديلاتك في الـ STUDY. احفظ الـ STUDY بعدها."
+    en: "Ok keeps your changes in the STUDY. Save the STUDY afterwards."
