@@ -47,9 +47,7 @@ updated: 2026-10-28
 
 <BeforeAfter>
 <Figure src="eeglab-gui/S2-eeglab-empty.png" alt="نافذة EEGLAB الرئيسية قبل فتح أي ملف: تظهر عبارة No current dataset وتحتها خطوات مقترحة للبدء." caption="قبل فتح البيانات، EEGLAB 2026.1" source="eeglab-ui" />
-<ImageSpec>
-بعد: نفس نافذة EEGLAB الرئيسية بعد فتح eeglab_data.set. في الأعلى السطر #1: Continuous EEG Data ثم سطر Filename، وتحتهما الأسطر بقيمها: Channels per frame = 32، Frames per epoch = 30504، Epochs = 1، Events = 154، Sampling rate (Hz) = 128، Epoch start (sec) = 0.000، Epoch end (sec) = 238.305، Reference = unknown، Channel locations = Yes، ICA weights = No، Dataset size (Mb). كل سطر عليه رقم صغير يقابل صفاً في جدول «ماذا يعني كل سطر في النافذة الرئيسية؟».
-</ImageSpec>
+<Figure src="eeglab-gui/main-with-d1-numbered.webp" alt="نفس نافذة EEGLAB الرئيسية بعد فتح eeglab_data.set: العنوان #1: Continuous EEG Data، و Filename هو eeglab_data.set، و Channels per frame = 32، و Frames per epoch = 30504، و Epochs = 1، و Events = 154، و Sampling rate (Hz) = 128، و Epoch start = 0.000 و Epoch end = 238.305 ثانية، و Reference = unknown، و Channel locations = Yes، و ICA weights = No، و Dataset size = 4.3. أرقام حمراء من 1 إلى 9 على الأسطر المشروحة في الجدول تحت." caption="بعد فتح eeglab_data.set. الأرقام الحمراء تقابل صفوف الجدول تحت." source="eeglab-ui" />
 </BeforeAfter>
 
 ## كيف أفتح الداتاست وأستعرض الإشارة من القوائم؟
@@ -103,15 +101,15 @@ updated: 2026-10-28
 
 | السطر | معناه | القيمة في `eeglab_data.set` |
 |---|---|---|
-| <UiLabel>Channels per frame</UiLabel> | عدد القنوات | 32 |
-| <UiLabel>Frames per epoch</UiLabel> | عدد العيّنات في كل قناة (في البيانات المستمرة: كل التسجيل) | 30504 |
-| <UiLabel>Epochs</UiLabel> | عدد المقاطع. القيمة 1 تعني بيانات مستمرة لم تُقطَّع | 1 |
-| <UiLabel>Events</UiLabel> | عدد الأحداث | 154 |
-| <UiLabel>Sampling rate (Hz)</UiLabel> | معدل العيّنات: عدد العيّنات في الثانية | 128 |
-| <UiLabel>Epoch start (sec)</UiLabel> و <UiLabel>Epoch end (sec)</UiLabel> | بداية البيانات ونهايتها بالثواني | 0.000 و 238.305 |
-| <UiLabel>Reference</UiLabel> | المرجع الذي سُجّلت القنوات بالنسبة إليه | unknown: لا يعرف EEGLAB مرجع هذا الملف، مع أنه سُجّل بمرجع الماستويد. ستعود إلى هذا في [درس إعادة المرجع](/lesson/rereferencing/) |
-| <UiLabel>Channel locations</UiLabel> | هل للقنوات مواقع على الرأس؟ | Yes |
-| <UiLabel>ICA weights</UiLabel> | هل حُسب ICA لهذه الداتاست؟ | No |
+| 1. <UiLabel>Channels per frame</UiLabel> | عدد القنوات | 32 |
+| 2. <UiLabel>Frames per epoch</UiLabel> | عدد العيّنات في كل قناة (في البيانات المستمرة: كل التسجيل) | 30504 |
+| 3. <UiLabel>Epochs</UiLabel> | عدد المقاطع. القيمة 1 تعني بيانات مستمرة لم تُقطَّع | 1 |
+| 4. <UiLabel>Events</UiLabel> | عدد الأحداث | 154 |
+| 5. <UiLabel>Sampling rate (Hz)</UiLabel> | معدل العيّنات: عدد العيّنات في الثانية | 128 |
+| 6. <UiLabel>Epoch start (sec)</UiLabel> و <UiLabel>Epoch end (sec)</UiLabel> | بداية البيانات ونهايتها بالثواني | 0.000 و 238.305 |
+| 7. <UiLabel>Reference</UiLabel> | المرجع الذي سُجّلت القنوات بالنسبة إليه | unknown: لا يعرف EEGLAB مرجع هذا الملف، مع أنه سُجّل بمرجع الماستويد. ستعود إلى هذا في [درس إعادة المرجع](/lesson/rereferencing/) |
+| 8. <UiLabel>Channel locations</UiLabel> | هل للقنوات مواقع على الرأس؟ | Yes |
+| 9. <UiLabel>ICA weights</UiLabel> | هل حُسب ICA لهذه الداتاست؟ | No |
 
 **طول التسجيل** = عدد العيّنات ÷ معدل العيّنات = 30504 ÷ 128 = 238.3 ثانية، أي حوالي 4 دقائق. وهذا نفس الرقم في <UiLabel>Epoch end (sec)</UiLabel> تقريباً.
 

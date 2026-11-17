@@ -47,9 +47,7 @@ You will practice on the official EEGLAB sample, `eeglab_data.set`, in the `samp
 
 <BeforeAfter>
 <Figure src="eeglab-gui/S2-eeglab-empty.png" alt="The EEGLAB main window before any dataset is opened: it shows &quot;No current dataset&quot; and a list of suggested first steps." caption="Before loading data, EEGLAB 2026.1" source="eeglab-ui" />
-<ImageSpec>
-After: the same EEGLAB main window after opening eeglab_data.set. At the top the line #1: Continuous EEG Data, then a Filename line, and below them the lines with their values: Channels per frame = 32, Frames per epoch = 30504, Epochs = 1, Events = 154, Sampling rate (Hz) = 128, Epoch start (sec) = 0.000, Epoch end (sec) = 238.305, Reference = unknown, Channel locations = Yes, ICA weights = No, Dataset size (Mb). Each line carries a small number matching a row in the "What does each line in the main window mean?" table.
-</ImageSpec>
+<Figure src="eeglab-gui/main-with-d1-numbered.webp" alt="The same EEGLAB main window after opening eeglab_data.set: #1: Continuous EEG Data, Filename eeglab_data.set, Channels per frame 32, Frames per epoch 30504, Epochs 1, Events 154, Sampling rate (Hz) 128, Epoch start 0.000 and Epoch end 238.305 sec, Reference unknown, Channel locations Yes, ICA weights No, Dataset size 4.3 Mb. Red numbers 1 to 9 mark the lines explained in the table below." caption="After opening eeglab_data.set. The red numbers match the rows of the table below." source="eeglab-ui" />
 </BeforeAfter>
 
 ## How do I open the dataset and scroll the signal from the menus?
@@ -103,15 +101,15 @@ This is what each line means, and its value in the tutorial dataset:
 
 | Line | Meaning | Value in `eeglab_data.set` |
 |---|---|---|
-| <UiLabel>Channels per frame</UiLabel> | Number of channels | 32 |
-| <UiLabel>Frames per epoch</UiLabel> | Number of samples per channel (for continuous data: the whole recording) | 30504 |
-| <UiLabel>Epochs</UiLabel> | Number of segments. A value of 1 means continuous data that has not been epoched | 1 |
-| <UiLabel>Events</UiLabel> | Number of events | 154 |
-| <UiLabel>Sampling rate (Hz)</UiLabel> | Sampling rate: samples per second | 128 |
-| <UiLabel>Epoch start (sec)</UiLabel> and <UiLabel>Epoch end (sec)</UiLabel> | Start and end of the data in seconds | 0.000 and 238.305 |
-| <UiLabel>Reference</UiLabel> | The reference the channels were recorded against | unknown: EEGLAB does not know this file's reference, although it was recorded with a mastoid reference. You will come back to this in the [re-referencing lesson](/en/lesson/rereferencing/) |
-| <UiLabel>Channel locations</UiLabel> | Do the channels have positions on the head? | Yes |
-| <UiLabel>ICA weights</UiLabel> | Has ICA been computed for this dataset? | No |
+| 1. <UiLabel>Channels per frame</UiLabel> | Number of channels | 32 |
+| 2. <UiLabel>Frames per epoch</UiLabel> | Number of samples per channel (for continuous data: the whole recording) | 30504 |
+| 3. <UiLabel>Epochs</UiLabel> | Number of segments. A value of 1 means continuous data that has not been epoched | 1 |
+| 4. <UiLabel>Events</UiLabel> | Number of events | 154 |
+| 5. <UiLabel>Sampling rate (Hz)</UiLabel> | Sampling rate: samples per second | 128 |
+| 6. <UiLabel>Epoch start (sec)</UiLabel> and <UiLabel>Epoch end (sec)</UiLabel> | Start and end of the data in seconds | 0.000 and 238.305 |
+| 7. <UiLabel>Reference</UiLabel> | The reference the channels were recorded against | unknown: EEGLAB does not know this file's reference, although it was recorded with a mastoid reference. You will come back to this in the [re-referencing lesson](/en/lesson/rereferencing/) |
+| 8. <UiLabel>Channel locations</UiLabel> | Do the channels have positions on the head? | Yes |
+| 9. <UiLabel>ICA weights</UiLabel> | Has ICA been computed for this dataset? | No |
 
 **Recording length** = number of samples ÷ sampling rate = 30504 ÷ 128 = 238.3 seconds, about 4 minutes. This is roughly the number in <UiLabel>Epoch end (sec)</UiLabel>.
 

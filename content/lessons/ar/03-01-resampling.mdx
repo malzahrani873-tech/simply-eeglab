@@ -55,12 +55,8 @@ updated: 2026-10-29
 قارن النافذة الرئيسية قبل التخفيض وبعده. معدل العيّنات وعدد العيّنات ينزلان إلى النصف، أما عدد القنوات وعدد الأحداث وطول التسجيل بالثواني فلا تتغيّر.
 
 <BeforeAfter>
-<ImageSpec>
-قبل: نافذة EEGLAB الرئيسية وفيها D1. سطر Sampling rate (Hz) يعرض 128، و Frames per epoch يعرض 30504، و Events يعرض 154.
-</ImageSpec>
-<ImageSpec>
-بعد: نفس النافذة والداتاست D1 64Hz هي الحالية. سطر Sampling rate (Hz) يعرض 64، و Frames per epoch يعرض 15252، و Events ما زال 154.
-</ImageSpec>
+<Figure src="resampling/main-128hz-ar.webp" alt="نافذة EEGLAB الرئيسية وفيها D1 (eeglab_data.set) قبل تخفيض المعدل. دائرتان حمراوان على Frames per epoch = 30504 و Sampling rate (Hz) = 128، مع تعليق: عدد العيّنات في كل قناة، و 128 عيّنة في الثانية." caption="قبل: 128 هرتز" source="eeglab-ui" />
+<Figure src="resampling/main-64hz-ar.webp" alt="نفس النافذة بعد التخفيض إلى 64 هرتز (العنوان Continuous EEG Data resampled). دوائر حمراء على Frames per epoch = 15252 (نصف العيّنات)، و Events ما زال 154، و Sampling rate (Hz) = 64. عدد القنوات ما زال 32، و Epoch end = 238.297 ثانية." caption="بعد: 64 هرتز" source="eeglab-ui" />
 </BeforeAfter>
 
 ## لماذا لا أخفّض المعدل كما أشاء؟

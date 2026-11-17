@@ -55,12 +55,8 @@ So you lower the rate once, at the start of processing, and every later step bec
 Compare the main window before and after. The sampling rate and the number of samples drop by half, while the number of channels, the number of events and the length in seconds stay the same.
 
 <BeforeAfter>
-<ImageSpec>
-Before: the EEGLAB main window with D1. Sampling rate (Hz) shows 128, Frames per epoch shows 30504, and Events shows 154.
-</ImageSpec>
-<ImageSpec>
-After: the same window with D1 64Hz as the current dataset. Sampling rate (Hz) shows 64, Frames per epoch shows 15252, and Events is still 154.
-</ImageSpec>
+<Figure src="resampling/main-128hz-en.webp" alt="The EEGLAB main window with D1 (eeglab_data.set) before resampling. Red outlines mark Frames per epoch 30504 and Sampling rate (Hz) 128, with notes: samples in each channel, and 128 samples per second." caption="Before: 128 Hz" source="eeglab-ui" />
+<Figure src="resampling/main-64hz-en.webp" alt="The same window after resampling to 64 Hz (title Continuous EEG Data resampled). Red outlines mark Frames per epoch 15252 (half the samples), Events still 154, and Sampling rate (Hz) 64. Channels per frame stays 32, and Epoch end is 238.297 sec." caption="After: 64 Hz" source="eeglab-ui" />
 </BeforeAfter>
 
 ## Why can I not lower the rate as far as I like?
