@@ -9,9 +9,6 @@ content/lessons/ar/06-01-erp-average.mdx 1
 content/lessons/ar/06-03-erplab-amplitude-latency.mdx 1
 content/lessons/ar/06-05-data-quality-sme.mdx 1
 content/lessons/ar/07-03-erp-image.mdx 2
-content/lessons/ar/08-02-create-study.mdx 1
-content/lessons/ar/08-03-study-from-bids.mdx 1
-content/lessons/ar/08-05-study-precompute.mdx 1
 content/lessons/ar/08-06-study-plot-channels.mdx 1
 content/lessons/ar/10-04-write-plugin.mdx 1
 content/lessons/en/01-02-eeglab-gui.mdx 1
@@ -23,8 +20,5 @@ content/lessons/en/06-01-erp-average.mdx 1
 content/lessons/en/06-03-erplab-amplitude-latency.mdx 1
 content/lessons/en/06-05-data-quality-sme.mdx 1
 content/lessons/en/07-03-erp-image.mdx 2
-content/lessons/en/08-02-create-study.mdx 1
-content/lessons/en/08-03-study-from-bids.mdx 1
-content/lessons/en/08-05-study-precompute.mdx 1
 content/lessons/en/08-06-study-plot-channels.mdx 1
 content/lessons/en/10-04-write-plugin.mdx 1
