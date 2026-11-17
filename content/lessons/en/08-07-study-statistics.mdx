@@ -5,7 +5,7 @@ description: "How to test condition differences across participants in EEGLAB, c
 station: 8
 order: 7
 level: core
-status: review
+status: approved
 objectives:
   - Run a paired test of the two picture types at Pz with the STATS button, and mark the significant times with FDR correction.
   - Compare the number of significant time points with and without correction, and explain the difference.
@@ -171,6 +171,8 @@ In this task, the animal pictures are the go trials (the participant lifts a fin
 **1. Prepare the plot**
 
 1. Start with `animal_mine.study` open and its measures computed. If you don't have it, open "Script to reach this state" at the end of the lesson.
+<EeglabWindow id="chanplot" use={{ design: "`image only`", chans: "`All PZ` (Pz)", stats: "press it to set the test in part 2", params: "the button next to Plot ERPs" }} />
+
 2. Open <MenuPath>Study > Plot channel measures</MenuPath>. In <UiLabel>Select design:</UiLabel> choose `image only`, then choose `Pz` in the left list.
 3. Press <UiLabel>Params</UiLabel> next to <UiLabel>Plot ERPs</UiLabel>. Tick <UiLabel>Plot first variable on the same panel</UiLabel>, leave <UiLabel>Time range (ms) [low high]</UiLabel> empty, and make sure <UiLabel>Multiple channels selection</UiLabel> is on <UiLabel>Plot channels individually</UiLabel>. Press <UiLabel>Ok</UiLabel>.
 

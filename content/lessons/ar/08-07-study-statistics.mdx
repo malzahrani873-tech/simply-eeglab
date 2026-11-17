@@ -5,7 +5,7 @@ description: "كيف تختبر في EEGLAB فرق الشرطين عبر الم�
 station: 8
 order: 7
 level: core
-status: review
+status: approved
 objectives:
   - يجري اختباراً مزدوجاً لنوعي الصور في Pz من زر STATS، ويحدد الأزمنة الدالة مع تصحيح FDR.
   - يقارن عدد النقاط الزمنية الدالة مع التصحيح وبدونه، ويشرح سبب الفرق.
@@ -171,6 +171,8 @@ EEGLAB يختبر كل نقطة زمنية وحدها، والـ epoch فيه م
 **أولاً: جهّز الرسم**
 
 1. ابدأ و`animal_mine.study` مفتوحة بمقاييسها المحسوبة. إن لم تكن عندك، فافتح «سكربت للوصول إلى هذه الحالة» في آخر الدرس.
+<EeglabWindow id="chanplot" use={{ design: "`image only`", chans: "`All PZ` (Pz)", stats: "اضغطه لضبط الاختبار في «ثانياً»", params: "الزر بجانب Plot ERPs" }} />
+
 2. افتح <MenuPath>Study > Plot channel measures</MenuPath>. في <UiLabel>Select design:</UiLabel> اختر `image only`، ثم اختر `Pz` في القائمة اليسرى.
 3. اضغط <UiLabel>Params</UiLabel> بجانب <UiLabel>Plot ERPs</UiLabel>. فعّل <UiLabel>Plot first variable on the same panel</UiLabel>، واترك <UiLabel>Time range (ms) [low high]</UiLabel> فارغاً، وتأكد أن <UiLabel>Multiple channels selection</UiLabel> على <UiLabel>Plot channels individually</UiLabel>. اضغط <UiLabel>Ok</UiLabel>.
 
