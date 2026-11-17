@@ -96,7 +96,9 @@ updated: 2026-10-29
 **عن D1:** لم نجد فيها قناة سيئة، فلا شيء لتستوفيه في المسار. ستتدرّب على نسخة مؤقتة: تحذف قناة سليمة هي `C3`، ثم تعيد بناءها، وتقارنها بالأصل. هكذا ترى بنفسك مدى دقة الاستيفاء. لا تحفظ نسخ التمرين، فالمسار يكمل من `D1 badch`.
 </Callout>
 
-شغّل «سكربت للوصول إلى هذه الحالة» في آخر الدرس. هو يضع الداتاست كما كانت قبل حذف القنوات، أي `D1 hp0.1 notch60`، في الداتاست 1، والنسخة الرئيسية `D1 badch` في الداتاست 2. ومع بياناتك ستحتاج إلى رقم الداتاست التي فيها كل القنوات قبل الحذف (هنا `D1 hp0.1 notch60`، وهي الداتاست 1 إن بدأت بالسكربت)، لأنها تحفظ مواقع كل القنوات. وإن أكملت من الدرس السابق في نفس الجلسة فقد تختلف الأرقام، فاقرأ رقم كل داتاست من قائمة <MenuPath>Datasets</MenuPath>.
+ابدأ والنسخة الرئيسية `D1 badch` مفتوحة، وهي ناتج [درس القنوات السيئة](/lesson/bad-channels/). إن لم تكن مفتوحة، فافتح `D1_badch.set` من <MenuPath>File > Load existing dataset</MenuPath>: تفتح نافذة اختيار ملف، فادخل مجلد عملك (`eeg-course`) واختر `D1_badch.set` ثم اضغط <UiLabel>Open</UiLabel>. أو شغّل «سكربت للوصول إلى هذه الحالة» في آخر الدرس.
+
+في التمرين تحذف `C3` من `D1 badch` في داتاست جديدة، ثم تستوفيها من `D1 badch` نفسها، لأن فيها كل القنوات. لذلك تحتاج رقم `D1 badch`: افتح قائمة <MenuPath>Datasets</MenuPath> واقرأ الرقم قبل اسمها. يكون 1 إذا فتحت الملف في جلسة جديدة، و2 إذا شغّلت السكربت، لأن السكربت يضع `D1 hp0.1 notch60` في الداتاست 1. ومع بياناتك ستحتاج رقم الداتاست التي فيها كل القنوات قبل حذف القنوات السيئة، لأنها تحفظ مواقع كل القنوات.
 
 **أولاً: تمرين على قناة سليمة**
 
@@ -107,7 +109,7 @@ updated: 2026-10-29
 1. تأكد أن `D1 badch` هي الداتاست الحالية، ثم افتح <MenuPath>Edit > Select data</MenuPath>. اكتب `C3` في خانة <UiLabel>Channel(s)</UiLabel>، وفعّل المربع تحت <UiLabel>on->remove these</UiLabel>، ثم اضغط <UiLabel>OK</UiLabel>.
 2. سمِّ الداتاست الجديدة `D1 noC3`. في النافذة الرئيسية صار <UiLabel>Channels per frame</UiLabel> يساوي 31.
 3. افتح <MenuPath>Tools > Interpolate electrodes</MenuPath>. تظهر نافذة بعنوان <UiLabel>Interpolate channel(s) -- pop_interp()</UiLabel>.
-4. اضغط <UiLabel>Use all channels from other dataset</UiLabel>، واكتب رقم `D1 badch` كما يظهر في قائمة <MenuPath>Datasets</MenuPath> (هو 2 إن بدأت بالسكربت) في خانة <UiLabel>Dataset index</UiLabel>، ثم اضغط <UiLabel>OK</UiLabel>. يظهر اسم `C3` تحت <UiLabel>What channel(s) do you want to interpolate</UiLabel>.
+4. اضغط <UiLabel>Use all channels from other dataset</UiLabel>، واكتب رقم `D1 badch` الذي قرأته من قائمة <MenuPath>Datasets</MenuPath> في خانة <UiLabel>Dataset index</UiLabel>، ثم اضغط <UiLabel>OK</UiLabel>. يظهر اسم `C3` تحت <UiLabel>What channel(s) do you want to interpolate</UiLabel>.
 5. في <UiLabel>Interpolation method</UiLabel> اترك <UiLabel>Spherical</UiLabel>، واترك <UiLabel>Time range [min max] (s)</UiLabel> فارغة، ثم اضغط <UiLabel>OK</UiLabel>.
 6. يطبع الـ Command Window `Interpolating 1 channels...`. سمِّ الداتاست `D1 C3 back`. صار عدد القنوات 32 من جديد.
 7. قارن `C3` في `D1 badch` وفي `D1 C3 back` من <MenuPath>Plot > Channel data (scroll)</MenuPath>. الإشارتان متشابهتان جداً.

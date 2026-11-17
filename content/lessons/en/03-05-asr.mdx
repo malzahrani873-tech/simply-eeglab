@@ -90,10 +90,10 @@ For recorded data, the official tutorial advises removing the marked portions ra
 ## How do I try ASR from the menus?
 
 <Callout type="warning">
-**This lesson is off the main path.** You try ASR on a copy of D1 and measure what it removes, without saving the result. The path continues from `D1 hp0.1 notch60`.
+**This lesson is off the main path.** You try ASR on a copy of D1 and measure what it removes, without saving the result. The path continues from `D1 badch` (the file `D1_badch.set` from [the bad channels lesson](/en/lesson/bad-channels/)).
 </Callout>
 
-Start with `D1 hp0.1 notch60` open. If you don't have it, open "Script to reach this state" at the end of the lesson. It is already high-pass filtered.
+Start with `D1 hp0.1 notch60` open; it is already high-pass filtered. If you continue from the previous lesson in the same session, choose it in the <MenuPath>Datasets</MenuPath> menu, or work on `D1 badch`: in D1 they are the same data, because no channel was removed. If you start a new session, open `D1_hp0.1_notch60.set` with <MenuPath>File > Load existing dataset</MenuPath>: a file window opens; go to your work folder (`eeg-course`), choose `D1_hp0.1_notch60.set` and press <UiLabel>Open</UiLabel>. Or run "Script to reach this state" at the end of the lesson.
 
 <EeglabWindow id="clean_rawdata" use={{ filter: "leave it unchecked", chanignore: "check it, `EOG1 EOG2`", rmflat: "uncheck it", rmnoise: "uncheck it", rmcorr: "uncheck it", asr: "keep it checked", asrstdval: "`20`", asrrej: "keep it checked", distance: "leave it unchecked", rejwin: "keep it checked", rejwinval1: "`-Inf 7`", rejwinval2: "`25`", vis: "keep it checked" }} compact />
 
@@ -107,7 +107,7 @@ Start with `D1 hp0.1 notch60` open. If you don't have it, open "Script to reach 
 8. Keep <UiLabel>Pop up scrolling data window with rejected data highlighted</UiLabel> checked and press <UiLabel>OK</UiLabel>.
 9. A scrolling window shows the original and cleaned data together. Scroll through it and look at what was removed.
 10. Name the new dataset `D1 asr`. In the main window, compare <UiLabel>Frames per epoch</UiLabel> and <UiLabel>Events</UiLabel> with `D1 hp0.1 notch60`. The extra events are the boundary events.
-11. Do not save `D1 asr`. The main path continues from `D1 hp0.1 notch60`.
+11. Do not save `D1 asr`. The main path continues from `D1_badch.set`, the starting point of [the interpolation lesson](/en/lesson/interpolation/).
 
 ## How do I try it with a script and count what was removed?
 
@@ -163,7 +163,7 @@ The script prints how many seconds were kept, how many boundary events were adde
 1. **The scrolling window** showed the original and cleaned data, and you saw what was removed.
 2. **The script check:** it prints the seconds kept, the number of boundary events, and the epochs before and after.
 3. **The event count increased** in the main window by the number of boundary events.
-4. **The path is unchanged:** `D1 asr` is not saved, and the next lesson starts from `D1 hp0.1 notch60`.
+4. **The path is unchanged:** `D1 asr` is not saved, and the next lesson starts from `D1_badch.set`.
 
 <Methods>
 High-amplitude bursts were identified with Artifact Subspace Reconstruction (burst criterion 20 SD; clean_rawdata plugin 2.11, EEGLAB 2026.1), and the affected periods were removed together with windows in which more than 25% of channels exceeded 7 SD ([N] s, [P]% of the data); EOG channels were excluded.

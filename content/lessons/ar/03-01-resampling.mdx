@@ -50,11 +50,18 @@ updated: 2026-10-29
 
 لذلك تخفّض معدل العيّنات (<En>downsampling</En>) مرة واحدة في بداية المعالجة، فتصبح كل الخطوات التالية أسرع. فإلى أي معدل تخفّض، دون أن تفقد ما يحتاجه تحليلك؟
 
-## كيف تبدو الإشارة بعد تخفيض المعدل إلى النصف؟
+## ماذا يتغيّر في نافذة EEGLAB بعد تخفيض المعدل إلى النصف؟
 
-يعرض الرسم ثانيتين من القناة Cz بالمعدلين، إحداهما فوق الأخرى. الشكل العام نفسه، والخط بـ 64 هرتز أنعم قليلاً.
+قارن النافذة الرئيسية قبل التخفيض وبعده. معدل العيّنات وعدد العيّنات ينزلان إلى النصف، أما عدد القنوات وعدد الأحداث وطول التسجيل بالثواني فلا تتغيّر.
 
-<ImageSpec>صورة حقيقية من MATLAB أو EEGLAB قريباً.</ImageSpec>
+<BeforeAfter>
+<ImageSpec>
+قبل: نافذة EEGLAB الرئيسية وفيها D1. سطر Sampling rate (Hz) يعرض 128، و Frames per epoch يعرض 30504، و Events يعرض 154.
+</ImageSpec>
+<ImageSpec>
+بعد: نفس النافذة والداتاست D1 64Hz هي الحالية. سطر Sampling rate (Hz) يعرض 64، و Frames per epoch يعرض 15252، و Events ما زال 154.
+</ImageSpec>
+</BeforeAfter>
 
 ## لماذا لا أخفّض المعدل كما أشاء؟
 
@@ -72,7 +79,9 @@ updated: 2026-10-29
 **عن D1:** معدلها 128 هرتز، وهو منخفض أصلاً. التوثيق الرسمي يقول إنك لا تحتاج إلى تغيير المعدل في الداتاست التعليمية. لذلك ستصنع في هذا الدرس نسخة مؤقتة بـ 64 هرتز للمقارنة فقط، ثم تتركها. ويستمر المسار على D1 بـ 128 هرتز. هذه الخطوة تهمّك فعلاً مع بياناتك الخام بـ 500 أو 1000 هرتز.
 </Callout>
 
-ابدأ و D1 مفتوحة. إن لم تكن عندك، فافتح «سكربت للوصول إلى هذه الحالة» في آخر الدرس. في نافذة EEGLAB الرئيسية لاحظ القيم الحالية: <UiLabel>Sampling rate (Hz)</UiLabel> تساوي 128، و <UiLabel>Frames per epoch</UiLabel> تساوي 30504، و <UiLabel>Events</UiLabel> تساوي 154.
+**افتح D1.** هي الداتاست التعليمية `eeglab_data.set` التي تأتي مع EEGLAB، ونسمّيها في الموقع D1. إذا كانت عندك STUDY من درس BIDS فأغلقها أولاً من <MenuPath>File > Clear study / Clear all</MenuPath>. ثم افتح <MenuPath>File > Load existing dataset</MenuPath>، وادخل في نافذة الملفات مجلد EEGLAB نفسه (مثل `eeglab2026.1`)، ثم مجلد `sample_data`، واختر `eeglab_data.set` واضغط <UiLabel>Open</UiLabel>. أو شغّل «سكربت للوصول إلى هذه الحالة» في آخر الدرس، فهو يفعل الشيء نفسه.
+
+في نافذة EEGLAB الرئيسية لاحظ القيم الحالية: <UiLabel>Sampling rate (Hz)</UiLabel> تساوي 128، و <UiLabel>Frames per epoch</UiLabel> تساوي 30504، و <UiLabel>Events</UiLabel> تساوي 154.
 
 <EeglabWindow id="resample" use={{ srate: "`64`" }} />
 
@@ -80,7 +89,7 @@ updated: 2026-10-29
 2. تظهر نافذة بعنوان <UiLabel>Resample current dataset -- pop_resample()</UiLabel>. في خانة <UiLabel>New sampling rate</UiLabel> اكتب `64`، ثم اضغط <UiLabel>OK</UiLabel>.
 3. يطبع الـ Command Window أرقام القنوات واحداً تلو الآخر أثناء المعالجة، ثم `resampling finished`.
 4. تظهر نافذة تسمية الداتاست الجديدة، وتقترح الاسم `Continuous EEG Data resampled`. غيّره إلى `D1 64Hz`، واترك خانة <UiLabel>Overwrite it in memory (set=yes; unset=create a new dataset)</UiLabel> غير مفعّلة. صارت عندك داتاست ثانية، والأولى لم تتغيّر.
-5. قارن الداتاستين في نافذة التمرير: افتح <MenuPath>Plot > Channel data (scroll)</MenuPath> على كل واحدة. الشكل العام متشابه، والنسخة الجديدة أنعم قليلاً.
+5. قارن الداتاستين في نافذة التمرير: افتح <MenuPath>Plot > Channel data (scroll)</MenuPath> والداتاست الجديدة هي الحالية، ثم اختر الأولى من قائمة <MenuPath>Datasets</MenuPath> وافتح نافذة التمرير مرة ثانية. في قائمة Datasets ترى الاثنتين برقميهما: 1 للأصلية و2 لـ `D1 64Hz`، والعلامة بجانب الداتاست الحالية. الشكل العام متشابه، والنسخة الجديدة أنعم قليلاً.
 6. ارجع إلى الداتاست الأولى من قائمة <MenuPath>Datasets</MenuPath>. لا تحفظ `D1 64Hz`، فالمسار لا يستخدمها.
 
 ## كيف أخفّض المعدل بسكربت؟

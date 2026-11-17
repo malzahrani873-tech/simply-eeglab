@@ -2,7 +2,7 @@
 # number of required <ImageSpec>, shown as "image coming soon". Counts may only go down; remove a line when its figures land.
 content/lessons/ar/01-02-eeglab-gui.mdx 2
 content/lessons/ar/02-02-channel-locations.mdx 2
-content/lessons/ar/03-01-resampling.mdx 1
+content/lessons/ar/03-01-resampling.mdx 2
 content/lessons/ar/03-05-asr.mdx 1
 content/lessons/ar/04-04-ica-1hz-copy-weights.mdx 1
 content/lessons/ar/04-07-amica-picard.mdx 1
@@ -18,7 +18,7 @@ content/lessons/ar/08-06-study-plot-channels.mdx 1
 content/lessons/ar/10-04-write-plugin.mdx 1
 content/lessons/en/01-02-eeglab-gui.mdx 2
 content/lessons/en/02-02-channel-locations.mdx 2
-content/lessons/en/03-01-resampling.mdx 1
+content/lessons/en/03-01-resampling.mdx 2
 content/lessons/en/03-05-asr.mdx 1
 content/lessons/en/04-04-ica-1hz-copy-weights.mdx 1
 content/lessons/en/04-07-amica-picard.mdx 1

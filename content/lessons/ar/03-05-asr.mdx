@@ -90,10 +90,10 @@ updated: 2026-10-29
 ## كيف أجرّب ASR من القوائم؟
 
 <Callout type="warning">
-**هذا الدرس خارج المسار الأساسي.** تجرّب ASR على نسخة من D1 وتقيس ما يحذفه، دون أن تحفظ النتيجة. المسار يكمل من `D1 hp0.1 notch60`.
+**هذا الدرس خارج المسار الأساسي.** تجرّب ASR على نسخة من D1 وتقيس ما يحذفه، دون أن تحفظ النتيجة. المسار يكمل من `D1 badch` (الملف `D1_badch.set` من [درس القنوات السيئة](/lesson/bad-channels/)).
 </Callout>
 
-ابدأ و `D1 hp0.1 notch60` مفتوحة. إن لم تكن عندك، فافتح «سكربت للوصول إلى هذه الحالة» في آخر الدرس. وهي مفلترة مسبقاً بـ <En>high-pass</En>.
+ابدأ و `D1 hp0.1 notch60` مفتوحة، وهي مفلترة مسبقاً بـ <En>high-pass</En>. إذا أكملت من الدرس السابق في نفس الجلسة، فاخترها من قائمة <MenuPath>Datasets</MenuPath>، أو اعمل على `D1 badch`، فهما في D1 نفس البيانات لأن لا قناة حُذفت. وإذا بدأت جلسة جديدة، فافتح `D1_hp0.1_notch60.set` من <MenuPath>File > Load existing dataset</MenuPath>: تفتح نافذة اختيار ملف، فادخل مجلد عملك (`eeg-course`) واختر `D1_hp0.1_notch60.set` ثم اضغط <UiLabel>Open</UiLabel>. أو شغّل «سكربت للوصول إلى هذه الحالة» في آخر الدرس.
 
 <EeglabWindow id="clean_rawdata" use={{ filter: "اتركها بلا علامة", chanignore: "ضع علامة، و `EOG1 EOG2`", rmflat: "أزل العلامة", rmnoise: "أزل العلامة", rmcorr: "أزل العلامة", asr: "أبقِ العلامة", asrstdval: "`20`", asrrej: "أبقِ العلامة", distance: "اتركها بلا علامة", rejwin: "أبقِ العلامة", rejwinval1: "`-Inf 7`", rejwinval2: "`25`", vis: "أبقِ العلامة" }} compact />
 
@@ -107,7 +107,7 @@ updated: 2026-10-29
 8. أبقِ <UiLabel>Pop up scrolling data window with rejected data highlighted</UiLabel> مفعّلاً، واضغط <UiLabel>OK</UiLabel>.
 9. تظهر نافذة تمرير فيها البيانات الأصلية والمنظّفة معاً. مرّر فيها وانظر إلى ما حُذف.
 10. سمِّ الداتاست الجديدة `D1 asr`. في النافذة الرئيسية قارن <UiLabel>Frames per epoch</UiLabel> و <UiLabel>Events</UiLabel> مع `D1 hp0.1 notch60`. الأحداث الزائدة هي أحداث boundary.
-11. لا تحفظ `D1 asr`. المسار الأساسي يكمل من `D1 hp0.1 notch60`.
+11. لا تحفظ `D1 asr`. المسار الأساسي يكمل من `D1_badch.set`، وهو نقطة بداية [درس الاستيفاء](/lesson/interpolation/).
 
 ## كيف أجرّبه بسكربت وأعدّ ما حُذف؟
 
@@ -163,7 +163,7 @@ vis_artifacts(EEG_asr, EEG);
 1. **نافذة التمرير** أظهرت البيانات الأصلية والمنظّفة، ورأيت ما حُذف.
 2. **تحقق السكربت:** يطبع الثواني الباقية، وعدد أحداث boundary، والـ epochs قبل ASR وبعده.
 3. **زادت الأحداث** في النافذة الرئيسية بعدد أحداث boundary.
-4. **المسار لم يتغيّر:** `D1 asr` غير محفوظة، والدرس التالي يبدأ من `D1 hp0.1 notch60`.
+4. **المسار لم يتغيّر:** `D1 asr` غير محفوظة، والدرس التالي يبدأ من `D1_badch.set`.
 
 <Methods>
 High-amplitude bursts were identified with Artifact Subspace Reconstruction (burst criterion 20 SD; clean_rawdata plugin 2.11, EEGLAB 2026.1), and the affected periods were removed together with windows in which more than 25% of channels exceeded 7 SD ([N] s, [P]% of the data); EOG channels were excluded.

@@ -96,7 +96,9 @@ There is another valid approach: run ICA without the removed channels, interpola
 **About D1:** we found no bad channel in it, so there is nothing to interpolate on the path. You will practice on a temporary copy: remove a good channel, `C3`, then rebuild it and compare it with the original. This way you see for yourself how accurate interpolation is. Do not save the exercise copies; the path continues from `D1 badch`.
 </Callout>
 
-Run "Script to reach this state" at the end of the lesson. It puts the dataset from before channel removal, `D1 hp0.1 notch60`, in dataset 1, and the main dataset `D1 badch` in dataset 2. For your own data you will need the number of the dataset that has all channels from before the removal (here `D1 hp0.1 notch60`, dataset 1 if you started with the script), because it holds the locations of all channels. If you continued from the previous lesson in the same session, the numbers may differ, so read each dataset's number from the <MenuPath>Datasets</MenuPath> menu.
+Start with the main dataset `D1 badch` open, the result of [the bad channels lesson](/en/lesson/bad-channels/). If it is not open, open `D1_badch.set` with <MenuPath>File > Load existing dataset</MenuPath>: a file window opens; go to your work folder (`eeg-course`), choose `D1_badch.set` and press <UiLabel>Open</UiLabel>. Or run "Script to reach this state" at the end of the lesson.
+
+In the exercise you remove `C3` from `D1 badch` into a new dataset, then rebuild it from `D1 badch` itself, because it still has every channel. So you need the number of `D1 badch`: open the <MenuPath>Datasets</MenuPath> menu and read the number before its name. It is 1 if you opened the file in a new session, and 2 if you ran the script, because the script puts `D1 hp0.1 notch60` in dataset 1. With your own data you will need the number of the dataset that has all channels from before the bad channels were removed, because it holds the locations of every channel.
 
 **First: practice on a good channel**
 
@@ -107,7 +109,7 @@ Run "Script to reach this state" at the end of the lesson. It puts the dataset f
 1. With `D1 badch` current, open <MenuPath>Edit > Select data</MenuPath>. Type `C3` in <UiLabel>Channel(s)</UiLabel>, check the box under <UiLabel>on->remove these</UiLabel>, then press <UiLabel>OK</UiLabel>.
 2. Name the new dataset `D1 noC3`. In the main window, <UiLabel>Channels per frame</UiLabel> is now 31.
 3. Open <MenuPath>Tools > Interpolate electrodes</MenuPath>. A window titled <UiLabel>Interpolate channel(s) -- pop_interp()</UiLabel> appears.
-4. Press <UiLabel>Use all channels from other dataset</UiLabel>, type the number of `D1 badch` as shown in the <MenuPath>Datasets</MenuPath> menu (2 if you started with the script) in <UiLabel>Dataset index</UiLabel>, then press <UiLabel>OK</UiLabel>. The name `C3` appears under <UiLabel>What channel(s) do you want to interpolate</UiLabel>.
+4. Press <UiLabel>Use all channels from other dataset</UiLabel>, type the number of `D1 badch` that you read in the <MenuPath>Datasets</MenuPath> menu in <UiLabel>Dataset index</UiLabel>, then press <UiLabel>OK</UiLabel>. The name `C3` appears under <UiLabel>What channel(s) do you want to interpolate</UiLabel>.
 5. In <UiLabel>Interpolation method</UiLabel>, keep <UiLabel>Spherical</UiLabel>, leave <UiLabel>Time range [min max] (s)</UiLabel> empty, then press <UiLabel>OK</UiLabel>.
 6. The Command Window prints `Interpolating 1 channels...`. Name the dataset `D1 C3 back`. The channel count is 32 again.
 7. Compare `C3` in `D1 badch` and in `D1 C3 back` with <MenuPath>Plot > Channel data (scroll)</MenuPath>. The two signals are very similar.

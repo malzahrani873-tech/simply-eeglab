@@ -79,7 +79,7 @@ Notice also that a 30 Hz low-pass removed the line-noise peak. If you keep the h
 
 ## How do I apply the two filters from the menus?
 
-Start with `eeglab_data.set` open. If you don't have it, open "Script to reach this state" at the end of the lesson. On our path, you save only a 0.1 Hz high-pass copy now, and try the low-pass as an exercise without saving it. Each filter is a separate step.
+Start with `eeglab_data.set` (D1) open. If you don't have it, open it with <MenuPath>File > Load existing dataset</MenuPath>: go to the EEGLAB folder, then `sample_data`, and choose `eeglab_data.set`. Or run "Script to reach this state" at the end of the lesson. If `D1 64Hz` from the previous lesson is still in memory, choose the original in the <MenuPath>Datasets</MenuPath> menu, because it is the one that continues the path. On our path, you save only a 0.1 Hz high-pass copy now, and try the low-pass as an exercise without saving it. Each filter is a separate step.
 
 **First: high-pass filter**
 
@@ -93,7 +93,7 @@ Start with `eeglab_data.set` open. If you don't have it, open "Script to reach t
 6. The filter response window opens. Notice how the response rises from zero to one around 0.1 Hz, then close it.
 7. A window asks what to do with the new dataset. In <UiLabel>Name it:</UiLabel>, type a clear name such as `D1 hp0.1`.
 8. Leave <UiLabel>Overwrite it in memory (set=yes; unset=create a new dataset)</UiLabel> unchecked, so the original stays available for comparison. Press <UiLabel>OK</UiLabel>.
-9. Save this dataset now with <MenuPath>File > Save current dataset as</MenuPath> as `D1_hp0.1.set` in your work folder (`eeg-course`). It is the main dataset of the path and the starting point of the next lesson.
+9. Save this dataset now with <MenuPath>File > Save current dataset as</MenuPath>. A save-file window opens: go to your work folder (`eeg-course`), type `D1_hp0.1.set` as the file name, then press <UiLabel>Save</UiLabel>. You save every file in the next lessons the same way. It is the main dataset of the path and the starting point of the next lesson.
 
 <EeglabWindow id="newset" use={{ name: "`D1 hp0.1`", overwrite: "leave it unchecked" }} compact />
 

@@ -50,11 +50,18 @@ A high rate makes files large and slows every later step, especially ICA. Most E
 
 So you lower the rate once, at the start of processing, and every later step becomes faster. But to which rate can you go down without losing what your analysis needs?
 
-## What does the signal look like at half the rate?
+## What changes in the EEGLAB window at half the rate?
 
-The figure overlays two seconds of channel Cz at both rates. The overall shape is the same, and the 64 Hz line is slightly smoother.
+Compare the main window before and after. The sampling rate and the number of samples drop by half, while the number of channels, the number of events and the length in seconds stay the same.
 
-<ImageSpec>Real screenshot from MATLAB or EEGLAB coming soon.</ImageSpec>
+<BeforeAfter>
+<ImageSpec>
+Before: the EEGLAB main window with D1. Sampling rate (Hz) shows 128, Frames per epoch shows 30504, and Events shows 154.
+</ImageSpec>
+<ImageSpec>
+After: the same window with D1 64Hz as the current dataset. Sampling rate (Hz) shows 64, Frames per epoch shows 15252, and Events is still 154.
+</ImageSpec>
+</BeforeAfter>
 
 ## Why can I not lower the rate as far as I like?
 
@@ -72,7 +79,9 @@ That is why EEGLAB automatically applies an anti-aliasing low-pass filter before
 **About D1:** its rate is 128 Hz, which is already low. The official tutorial says you do not need to change the sampling rate of the tutorial data. So in this lesson you make a temporary copy at 64 Hz to compare, then leave it. The path continues on D1 at 128 Hz. This step really matters for your own raw data at 500 or 1000 Hz.
 </Callout>
 
-Start with D1 open. If you don't have it, open "Script to reach this state" at the end of the lesson. In the main EEGLAB window, note the current values: <UiLabel>Sampling rate (Hz)</UiLabel> is 128, <UiLabel>Frames per epoch</UiLabel> is 30504, and <UiLabel>Events</UiLabel> is 154.
+**Open D1.** It is the tutorial dataset `eeglab_data.set` that comes with EEGLAB; this site calls it D1. If a STUDY from the BIDS lesson is still loaded, close it first with <MenuPath>File > Clear study / Clear all</MenuPath>. Then open <MenuPath>File > Load existing dataset</MenuPath>, go in the file window to the EEGLAB folder itself (such as `eeglab2026.1`), then to `sample_data`, choose `eeglab_data.set` and press <UiLabel>Open</UiLabel>. Or run "Script to reach this state" at the end of the lesson, which does the same.
+
+In the main EEGLAB window, note the current values: <UiLabel>Sampling rate (Hz)</UiLabel> is 128, <UiLabel>Frames per epoch</UiLabel> is 30504, and <UiLabel>Events</UiLabel> is 154.
 
 <EeglabWindow id="resample" use={{ srate: "`64`" }} />
 
@@ -80,7 +89,7 @@ Start with D1 open. If you don't have it, open "Script to reach this state" at t
 2. A window titled <UiLabel>Resample current dataset -- pop_resample()</UiLabel> appears. In <UiLabel>New sampling rate</UiLabel>, type `64`, then press <UiLabel>OK</UiLabel>.
 3. The Command Window prints the channel numbers one by one while it works, then `resampling finished`.
 4. The window for naming the new dataset appears, suggesting `Continuous EEG Data resampled`. Replace it with `D1 64Hz` and leave <UiLabel>Overwrite it in memory (set=yes; unset=create a new dataset)</UiLabel> unchecked. You now have a second dataset, and the first one is unchanged.
-5. Compare the two datasets in the scrolling view: open <MenuPath>Plot > Channel data (scroll)</MenuPath> on each one. The overall shape is similar, and the new copy is a little smoother.
+5. Compare the two datasets in the scrolling view: open <MenuPath>Plot > Channel data (scroll)</MenuPath> while the new dataset is current, then choose the first one in the <MenuPath>Datasets</MenuPath> menu and open the scrolling view again. The Datasets menu lists both with their numbers, 1 for the original and 2 for `D1 64Hz`, with a check mark beside the current one. The overall shape is similar, and the new copy is a little smoother.
 6. Go back to the first dataset from the <MenuPath>Datasets</MenuPath> menu. Do not save `D1 64Hz`; the path does not use it.
 
 ## How do I lower the rate with a script?

@@ -92,7 +92,7 @@ Try the references in the simulation, then compare real D1 channels before and a
 
 ## How do I apply the average reference from the menus?
 
-Start with the main dataset after interpolation open. If you don't have it, open "Script to reach this state" at the end of the lesson. In D1, this is `D1 badch` from [the bad channels lesson](/en/lesson/bad-channels/), because there was nothing to interpolate. If you ran the script, it is named `D1 interp`, and it is the same data.
+Start with the main dataset after interpolation open. In D1 this is `D1 badch` from [the bad channels lesson](/en/lesson/bad-channels/), because there was nothing to interpolate. If you continue in the same session, choose it in the <MenuPath>Datasets</MenuPath> menu, not the interpolation exercise copies `D1 noC3` and `D1 C3 back`. If you start a new session, open `D1_badch.set` with <MenuPath>File > Load existing dataset</MenuPath>: a file window opens; go to your work folder (`eeg-course`), choose `D1_badch.set` and press <UiLabel>Open</UiLabel>. Or run "Script to reach this state" at the end of the lesson: the dataset is then named `D1 interp`, and it is the same data.
 
 <EeglabWindow id="reref" use={{ ave: "keep it checked", huber: "leave it unchecked", exclude: "`EOG1 EOG2` from the `...` list", refloc: "leave it empty" }} />
 
