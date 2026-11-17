@@ -68,14 +68,16 @@ Start `eeglab`. The menu bar has seven menus, roughly in the order you use them:
 | <UiLabel>Datasets</UiLabel> | Switching between the datasets open in memory. |
 | <UiLabel>Help</UiLabel> | Documentation and function help. |
 
-Most menus are grayed out for now, because they need an open dataset.
+Four menus are grayed out for now: <UiLabel>Edit</UiLabel>, <UiLabel>Plot</UiLabel>, <UiLabel>Study</UiLabel> and <UiLabel>Datasets</UiLabel>, because they need an open dataset. Most commands in the <UiLabel>Tools</UiLabel> menu are gray for the same reason.
+
+If you installed plugins that add their own menus, such as ERPLAB, you will see more menus after <UiLabel>Help</UiLabel>, such as <UiLabel>ERPLAB</UiLabel> and <UiLabel>ERPsets</UiLabel>. That is normal, and you will not need them before station 6.
 
 <EeglabWindow id="eeglab_main" />
 
 ### 2. Open the dataset
 
 1. Open <MenuPath>File > Load existing dataset</MenuPath>.
-2. A file selection window opens. Go into the EEGLAB folder, then the `sample_data` folder.
+2. A file selection window opens. Go into the EEGLAB folder, then the `sample_data` folder. If you followed the [installation lesson](/en/lesson/install-eeglab/), the path is `Documents\MATLAB\eeglab2026.1\sample_data`. If you cannot find it, type `fileparts(which('eeglab'))` in the Command Window and it prints where the EEGLAB folder is.
 3. Select `eeglab_data.set` and click <UiLabel>Open</UiLabel>.
 
 The main window fills with the dataset summary, and the menus become available.

@@ -19,15 +19,15 @@ fields:
     ar: "يحصر القائمة في موضوع، مثل «Filter by import» لإضافات قراءة الملفات."
     en: "Narrows the list to a topic, such as «Filter by import» for file-reading extensions."
   - key: search
-    label: "(search button)"
+    label: "Search"
     kind: button
-    ar: "زر العدسة يبحث عن إضافة بالاسم."
-    en: "The magnifier button searches for an extension by name."
+    ar: "اضغطه فيتحوّل إلى خانة كتابة. اكتب اسم الإضافة واضغط Enter، فتبقى في القائمة الإضافات التي تذكره."
+    en: "Click it and it turns into a text box. Type the extension name and press Enter: only the extensions that mention it stay in the list."
   - key: list
     label: "List of plugins (bolded means installed)"
     kind: list
-    ar: "قائمة الإضافات. الخط العريض يعني أنها مثبّتة. اضغط على اسم لترى وصفه تحت."
-    en: "The list of extensions. Bold means installed. Click a name to see its description below."
+    ar: "قائمة الإضافات. المثبّتة يحيط باسمها `****` (وتظهر بخط عريض في إصدارات MATLAB الأقدم من R2025a). اضغط على اسم لترى وصفه تحت."
+    en: "The list of extensions. An installed one has `****` around its name (bold in MATLAB versions older than R2025a). Click a name to see its description below."
   - key: info
     label: "Tags: · Status: · Size: · Description of the plugin:"
     kind: text

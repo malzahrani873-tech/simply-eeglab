@@ -107,23 +107,20 @@ From now on, typing `eeglab` in any new MATLAB session is enough.
 <EeglabWindow id="plugin_menu" use={{ search: "search for `Biosig`", list: "select Biosig", buttons: "press Install/Update" }} />
 
 1. In the EEGLAB window, open <MenuPath>File > Manage EEGLAB extensions</MenuPath>. This needs an internet connection.
-2. The list of plugins appears. Plugins in bold are installed on your computer, and red ones need an update.
-3. Click the search button at the top of the window and type `Biosig`.
-4. Select Biosig in the list, then click <UiLabel>Install/Update</UiLabel>.
+2. The list of plugins appears. An installed plugin has four asterisks around its name, such as `****ICLabel v1.7 (17653 downloads)****`, and one with an update shows `update available` after its name. (In MATLAB versions older than R2025a, installed plugins are in bold instead, and ones that need an update are red.)
+3. Click the <UiLabel>Search</UiLabel> button at the top right of the window. The button turns into a text box. Type `biosig` in it and press <kbd>Enter</kbd>. Only the plugins that mention Biosig stay in the list.
+4. Click the line that starts with `Biosig v`, then click <UiLabel>Install/Update</UiLabel> at the bottom right of the window. If its name already has the asterisks around it, it is installed and there is nothing to do: click <UiLabel>Cancel</UiLabel>.
 5. EEGLAB downloads the plugin and rebuilds its window. Biosig reads EDF, BDF and many other formats.
 
-The extension manager shows each plugin's star rating and download count, and sorts the list by downloads. When two plugins do the same job, these two numbers are a quick first guide. For what each common plugin does and when you need it, see the [Plugins guide](/en/plugins/).
+The extension manager shows each plugin's download count (and its star rating in older MATLAB versions), and sorts the list by downloads. When two plugins do the same job, these two numbers are a quick first guide. For what each common plugin does and when you need it, see the [Plugins guide](/en/plugins/).
 
-<ImageSpec optional>
-The extension manager window (Manage EEGLAB extensions) with Biosig selected in the list and the Install/Update button at the bottom.
-</ImageSpec>
 
 ### 6. Create your work folder
 
 Every file you save in this site's lessons goes into one folder, your work folder (`eeg-course`).
 
 1. Create a folder named `eeg-course` inside your Documents folder, outside the EEGLAB folder.
-2. In MATLAB, make it the current folder: go to it in the Current Folder panel, or type the `cd` command with your path in the Command Window, such as `cd('C:\Users\me\Documents\eeg-course')`.
+2. In MATLAB, make it the current folder: go to it in the Current Folder panel (called Files in MATLAB R2025a and later), or type the `cd` command with your path in the Command Window, such as `cd('C:\Users\me\Documents\eeg-course')`.
 3. In every new MATLAB session, check that the Current Folder is `eeg-course` before you start a lesson.
 
 When a lesson says "save in your work folder", it means `eeg-course`. Lesson scripts write its path in the line `dataFolder = 'C:\Users\me\Documents\eeg-course';`, so change that line to your own path.
@@ -163,7 +160,7 @@ end
 1. **The window:** the EEGLAB main window opened with its seven menus.
 2. **The path:** close MATLAB, open it again, and type `which eeglab`. It should print the path of `eeglab.m` inside the EEGLAB folder. Also, when you run `eeglab`, no red warning about subfolders should appear.
 3. **The version:** type `eeg_getversion`. It should print a version number starting with `2026.1`.
-4. **The plugin:** type `exist('sopen', 'file')`. A result of `2` means Biosig is installed. Its name also appears in bold in the extension manager.
+4. **The plugin:** type `exist('sopen', 'file')`. A result of `2` means Biosig is installed. In the extension manager its name also has four asterisks `****` around it (or is in bold in MATLAB versions older than R2025a).
 5. **Startup lines:** each time EEGLAB starts, it prints in the Command Window one line for each plugin it loads, starting with `EEGLAB: adding` followed by the plugin name and version. Look for Biosig.
 6. **The work folder:** the `eeg-course` folder exists, and the Current Folder in MATLAB shows it.
 

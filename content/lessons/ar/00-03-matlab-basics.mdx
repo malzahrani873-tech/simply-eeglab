@@ -41,7 +41,7 @@ EEGLAB مكتوب بلغة <En>MATLAB</En>، ويعمل داخلها. كل ضغ�
 
 ## أين أجد أجزاء نافذة MATLAB الثلاثة؟
 
-<Figure src="matlab-basics/sdc-matlab-desktop.webp" alt="سطح MATLAB: على اليسار Current Folder فيه مجلدات المشروع، وفي الوسط Command Window وفيه الأمران x=[1,2,3,4,5]; و mean(x) والنتيجة ans = 3، وعلى اليمين Workspace فيه المتغيّران x و ans بقيمهما، وفوقه نافذة Editor مفتوح فيها الملف mean.m." caption="واجهة MATLAB R2012b. شكل النسخ الأحدث يختلف قليلاً، لكن الأجزاء الثلاثة بنفس الأسماء." source="external" credit="من درس SDC-BIDS-EEG-EEGLAB في The Carpentries Incubator (Desjardins و Stephenson و Collins)، محوّلة إلى WebP" creditUrl="https://github.com/carpentries-incubator/SDC-BIDS-EEG-EEGLAB" license="CC BY 4.0" licenseUrl="https://creativecommons.org/licenses/by/4.0/" />
+<Figure src="matlab-basics/sdc-matlab-desktop.webp" alt="سطح MATLAB: على اليسار Current Folder فيه مجلدات المشروع، وفي الوسط Command Window وفيه الأمران x=[1,2,3,4,5]; و mean(x) والنتيجة ans = 3، وعلى اليمين Workspace فيه المتغيّران x و ans بقيمهما، وفوقه نافذة Editor مفتوح فيها الملف mean.m." caption="واجهة MATLAB R2012b. شكل النسخ الأحدث يختلف، لكن الأجزاء الثلاثة موجودة فيها كلها." source="external" credit="من درس SDC-BIDS-EEG-EEGLAB في The Carpentries Incubator (Desjardins و Stephenson و Collins)، محوّلة إلى WebP" creditUrl="https://github.com/carpentries-incubator/SDC-BIDS-EEG-EEGLAB" license="CC BY 4.0" licenseUrl="https://creativecommons.org/licenses/by/4.0/" />
 
 - <UiLabel>Command Window</UiLabel>: تكتب فيه الأوامر وترى نتيجتها.
 - <UiLabel>Workspace</UiLabel>: يعرض المتغيّرات الموجودة الآن في الذاكرة.
@@ -49,14 +49,18 @@ EEGLAB مكتوب بلغة <En>MATLAB</En>، ويعمل داخلها. كل ضغ�
 
 قد يختلف ترتيبها عندك لأن MATLAB يسمح بنقلها، فابحث عنها بأسمائها.
 
+<Callout type="note" title="عندك MATLAB R2025a أو أحدث؟">
+في واجهة MATLAB الجديدة (من R2025a) اسم لوحة <UiLabel>Current Folder</UiLabel> صار <UiLabel>Files</UiLabel>، وهي ولوحة <UiLabel>Workspace</UiLabel> على جانب النافذة. إذا لم ترَ إحداهما، فاضغط أيقونتها على الشريط الجانبي لتفتحها. في دروس هذا الموقع نسمّيها Current Folder، والمقصود عندك لوحة Files.
+</Callout>
+
 ## كيف أكتب أول أمر وأشغّل سكربتاً؟
 
-1. افتح MATLAB.
+1. افتح MATLAB. إذا لم يكن عندك MATLAB بعد، فاقرأ أولاً قسم «من أين أحصل على MATLAB؟» في [درس التثبيت](/lesson/install-eeglab/)، ثم ارجع إلى هنا. لا تحتاج EEGLAB في هذا الدرس.
 2. في الـ Command Window اكتب `x = 5` ثم اضغط <kbd>Enter</kbd>. يطبع MATLAB الناتج، ويظهر المتغيّر `x` في الـ Workspace.
 3. اكتب `y = 7;` مع فاصلة منقوطة في آخره، ثم اضغط <kbd>Enter</kbd>. لا يُطبع شيء، لكن `y` يظهر في الـ Workspace. الفاصلة المنقوطة تمنع الطباعة فقط.
 4. اضغط مرتين على `x` في الـ Workspace. يُفتح محرّر المتغيّرات (<UiLabel>Variables</UiLabel>) ويعرض قيمته.
-5. افتح سكربتاً جديداً من زر <UiLabel>New Script</UiLabel> في تبويب <UiLabel>Home</UiLabel>. انسخ سكربت القسم التالي والصقه فيه «كيف أبني تسجيلاً صغيراً وأقرأ منه؟».
-6. احفظه باسم `demo_basics.m` في المجلد الظاهر في الـ Current Folder.
+5. افتح سكربتاً جديداً من زر <UiLabel>New Script</UiLabel> في تبويب <UiLabel>Home</UiLabel>. انسخ السكربت من القسم التالي «كيف أبني تسجيلاً صغيراً وأقرأ منه؟» والصقه فيه.
+6. احفظه: اضغط <kbd>Ctrl+S</kbd> (أو زر <UiLabel>Save</UiLabel> في تبويب <UiLabel>Editor</UiLabel>). تظهر نافذة حفظ مفتوحة على المجلد الحالي. اكتب الاسم `demo_basics.m` واضغط <UiLabel>Save</UiLabel>. يظهر الملف الآن في الـ Current Folder.
 7. شغّله بزر <UiLabel>Run</UiLabel> في تبويب <UiLabel>Editor</UiLabel>، أو اكتب اسمه بدون `.m` في الـ Command Window: `demo_basics`.
 
 <Callout type="note" title="تسمية ملف السكربت">

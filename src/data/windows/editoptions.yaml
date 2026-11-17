@@ -59,7 +59,7 @@ fields:
     ar: "ذاكرة التخزين المؤقت لـ STUDY بالميغابايت."
     en: "The STUDY cache size in megabytes."
   - key: buttons
-    label: "Help · Cancel · OK"
+    label: "Help · Cancel · Ok"
     kind: button
-    ar: "«OK» يحفظ الإعدادات. «Cancel» يغلق دون تغيير."
-    en: "OK saves the settings. Cancel closes with no change."
+    ar: "«Ok» يحفظ الإعدادات. «Cancel» يغلق دون تغيير."
+    en: "Ok saves the settings. Cancel closes with no change."

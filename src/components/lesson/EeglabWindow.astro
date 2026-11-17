@@ -11,15 +11,16 @@ import MenuPath from './MenuPath.astro';
 import WindowFields from './WindowFields.astro';
 // compact: for a window already explained fully in an earlier lesson. The fields this lesson sets stay
 // visible; the full list folds into a toggle.
-interface Props { id: string; use?: Record<string, string>; menu?: string; compact?: boolean }
-const { id, use = {}, menu, compact } = Astro.props;
+// shot: another capture of the same window, when this lesson opens it on a different dataset.
+interface Props { id: string; use?: Record<string, string>; menu?: string; compact?: boolean; shot?: string }
+const { id, use = {}, menu, compact, shot: shotName } = Astro.props;
 const lang = langOf(Astro.url);
 const w = loadWindows().get(id);
 if (!w) throw new Error(`EeglabWindow: no src/data/windows/${id}.yaml`);
 for (const k of Object.keys(use)) {
   if (!w.fields.some((f: any) => f.key === k)) throw new Error(`EeglabWindow ${id}: unknown field "${k}" in use`);
 }
-const shot = windowShot(w);
+const shot = windowShot(shotName ? { ...w, shot: shotName } : w);
 const path = menu ?? w.menu;
 const md = (s: string) => mdInline(String(s), lang);
 const alt = t(lang, 'win.alt', { title: w.title });

@@ -78,7 +78,7 @@ Each line in the list is a field. The signal itself sits in one field, `data`, a
 
 ### 2. Read the events from EEGLAB
 
-<EeglabWindow id="editeventvals" use={{ latency: "look only: about `1.0001` s for the first event", buttons: "press Cancel" }} />
+<EeglabWindow id="editeventvals" shot="event-values-d1" use={{ latency: "look only: about `1.0001` s for the first event", buttons: "press Cancel" }} />
 
 1. Open <MenuPath>Edit > Event values</MenuPath>.
 2. A window shows one event at a time: `type`, `position` and `latency`. (The `urevent` field is not shown in this window.)
@@ -87,7 +87,11 @@ Each line in the list is a field. The signal itself sits in one field, `data`, a
 
 ### 3. Read the dataset information
 
-Open <MenuPath>Edit > Dataset info</MenuPath>. Values such as the dataset name and sampling rate appear. Close it with <UiLabel>Cancel</UiLabel>.
+<EeglabWindow id="editset" use={{ setname: "`Continuous EEG Data`, which is `EEG.setname`", srate: "`128`, which is `EEG.srate`", pnts: "`30504`, which is `EEG.pnts`", nbchan: "`32`, which is `EEG.nbchan`" }} compact />
+
+1. Open <MenuPath>Edit > Dataset info</MenuPath>.
+2. Compare four boxes with the `EEG` fields in the table above: <UiLabel>Dataset name</UiLabel> shows `Continuous EEG Data`, <UiLabel>Data sampling rate (Hz)</UiLabel> shows `128`, <UiLabel>Time points per epoch (0->continuous)</UiLabel> shows `30504`, and <UiLabel>Number of channels (0->set from data)</UiLabel> shows `32`. This window shows the same `EEG` fields under longer names.
+3. Close it with <UiLabel>Cancel</UiLabel> so nothing changes.
 
 ## How do I read the fields from the Command Window?
 

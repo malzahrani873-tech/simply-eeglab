@@ -68,14 +68,16 @@ updated: 2026-10-28
 | <UiLabel>Datasets</UiLabel> | التنقّل بين الداتاست المفتوحة في الذاكرة. |
 | <UiLabel>Help</UiLabel> | التوثيق ومساعدة الدوال. |
 
-أغلب القوائم رمادية الآن، لأنها تحتاج داتاست مفتوحة.
+أربع قوائم رمادية الآن: <UiLabel>Edit</UiLabel> و <UiLabel>Plot</UiLabel> و <UiLabel>Study</UiLabel> و <UiLabel>Datasets</UiLabel>، لأنها تحتاج داتاست مفتوحة. وفي قائمة <UiLabel>Tools</UiLabel> أغلب الأوامر رمادية للسبب نفسه.
+
+إذا ثبّتّ إضافات تضيف قوائمها الخاصة، مثل ERPLAB، فسترى بعد <UiLabel>Help</UiLabel> قوائم أخرى، مثل <UiLabel>ERPLAB</UiLabel> و <UiLabel>ERPsets</UiLabel>. هذا طبيعي، ولن تحتاجها قبل المحطة 6.
 
 <EeglabWindow id="eeglab_main" />
 
 ### 2. افتح الداتاست
 
 1. افتح <MenuPath>File > Load existing dataset</MenuPath>.
-2. تظهر نافذة اختيار ملف. ادخل إلى مجلد EEGLAB ثم مجلد `sample_data`.
+2. تظهر نافذة اختيار ملف. ادخل إلى مجلد EEGLAB ثم مجلد `sample_data`. إذا اتبعت [درس التثبيت](/lesson/install-eeglab/) فالمسار هو `Documents\MATLAB\eeglab2026.1\sample_data`. وإذا لم تجده، فاكتب `fileparts(which('eeglab'))` في الـ Command Window ليطبع لك مكان مجلد EEGLAB.
 3. اختر `eeglab_data.set` واضغط <UiLabel>Open</UiLabel>.
 
 تمتلئ النافذة الرئيسية بملخص الداتاست، وتصبح القوائم متاحة.

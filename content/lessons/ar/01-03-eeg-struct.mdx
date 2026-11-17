@@ -78,7 +78,7 @@ updated: 2026-10-28
 
 ### 2. اقرأ الأحداث من EEGLAB
 
-<EeglabWindow id="editeventvals" use={{ latency: "للنظر فقط: حوالي `1.0001` ثانية لأول حدث", buttons: "اضغط Cancel" }} />
+<EeglabWindow id="editeventvals" shot="event-values-d1" use={{ latency: "للنظر فقط: حوالي `1.0001` ثانية لأول حدث", buttons: "اضغط Cancel" }} />
 
 1. افتح <MenuPath>Edit > Event values</MenuPath>.
 2. تظهر نافذة تعرض حدثاً (<En>event</En>) واحداً في كل مرة: `type` و `position` و `latency`. (لا تظهر هنا حقول داخلية مثل `urevent`، ولن تحتاجها الآن.)
@@ -87,7 +87,11 @@ updated: 2026-10-28
 
 ### 3. اقرأ معلومات الداتاست
 
-افتح <MenuPath>Edit > Dataset info</MenuPath>. تظهر قيم مثل اسم الداتاست ومعدل العيّنات. أغلق النافذة بـ <UiLabel>Cancel</UiLabel>.
+<EeglabWindow id="editset" use={{ setname: "`Continuous EEG Data`، وهو `EEG.setname`", srate: "`128`، وهو `EEG.srate`", pnts: "`30504`، وهو `EEG.pnts`", nbchan: "`32`، وهو `EEG.nbchan`" }} compact />
+
+1. افتح <MenuPath>Edit > Dataset info</MenuPath>.
+2. قارن أربع خانات بحقول `EEG` في الجدول أعلاه: <UiLabel>Dataset name</UiLabel> فيها `Continuous EEG Data`، و <UiLabel>Data sampling rate (Hz)</UiLabel> فيها `128`، و <UiLabel>Time points per epoch (0->continuous)</UiLabel> فيها `30504`، و <UiLabel>Number of channels (0->set from data)</UiLabel> فيها `32`. هذه النافذة تعرض حقول `EEG` نفسها بأسماء أطول.
+3. أغلق النافذة بـ <UiLabel>Cancel</UiLabel> حتى لا تغيّر شيئاً.
 
 ## كيف أقرأ الحقول من الـ Command Window؟
 

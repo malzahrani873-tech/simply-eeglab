@@ -70,10 +70,10 @@ Only two things tie the files together: the same name and the same folder. If th
 
 1. Open <MenuPath>File > Preferences</MenuPath>.
 2. In the first group of options, find the checkbox that starts with <UiLabel>If set, save not one but two files for each dataset (header and data).</UiLabel>
-3. Leave the checkbox as it is, and close the window with <UiLabel>Cancel</UiLabel> without clicking <UiLabel>OK</UiLabel>. EEGLAB 2026.1 saves two files by default, and that is what all the lessons use.
+3. Leave the checkbox as it is, and close the window with <UiLabel>Cancel</UiLabel> without clicking <UiLabel>Ok</UiLabel>. EEGLAB 2026.1 saves two files by default, and that is what all the lessons use.
 
 <Callout type="note" title="If you are curious: why the checkbox may look unticked">
-You may find the checkbox unticked, even though EEGLAB just saved two files. The window reads its value from one settings file, while saving follows another one, until you click <UiLabel>OK</UiLabel> in this window for the first time. After that, saving follows the checkbox.
+You may find the checkbox unticked, even though EEGLAB just saved two files. The window reads its value from one settings file, while saving follows another one, until you click <UiLabel>Ok</UiLabel> in this window for the first time. After that, saving follows the checkbox.
 
 Some pages of the official documentation say that EEGLAB saves one file by default since 2021, and the window says so too. But the settings file that ships with EEGLAB 2026.1 turns the two-file option on, so saving writes two files. Trust what you see in your work folder.
 </Callout>
@@ -109,7 +109,7 @@ dir(fullfile(dataFolder, 'D1_onefile.*'))        % D1_onefile.set only, about 4 
 | Choice | When | What you get |
 |---|---|---|
 | Two files (the default in 2026.1) | Almost always, and with a STUDY in station 8, because EEGLAB can quickly read the description alone. | `name.set` and `name.fdt`, always together |
-| One file (untick the option in <MenuPath>File > Preferences</MenuPath> and click <UiLabel>OK</UiLabel>, or `'savemode', 'onefile'`) | You want to email one dataset or copy it without forgetting a file. | `name.set` only |
+| One file (untick the option in <MenuPath>File > Preferences</MenuPath> and click <UiLabel>Ok</UiLabel>, or `'savemode', 'onefile'`) | You want to email one dataset or copy it without forgetting a file. | `name.set` only |
 
 **Resaving keeps the format on disk.** <MenuPath>File > Resave current dataset(s)</MenuPath> on a two-file dataset writes two files again, even if your preference is one file. In that case the Command Window prints a note starting with `Note that your memory options for saving datasets does not correspond`. This is normal.
 
@@ -128,7 +128,7 @@ You can delete `D1_copy.*` and `D1_onefile.set` after the lesson. The next lesso
 - **Renaming one of the two files in the file explorer.** The `.set` file remembers the name of its `.fdt`. To rename a dataset, open it in EEGLAB and use <MenuPath>File > Save current dataset as</MenuPath> with the new name.
 - **Opening the `.fdt` file.** Always open the `.set`. EEGLAB reads the `.fdt` with it.
 - **An error that starts with `file` and ends with `you must also rename/move the associated data file.`** The `.fdt` file is not next to the `.set` file, so the dataset does not open. Find it and put it in the same folder. The sample `eeglab_data.set` is an exception: EEGLAB puts the `sample_data` folder on the MATLAB path, so MATLAB finds `eeglab_data.fdt` there even if you copy the `.set` alone. Your own files are not treated this way.
-- **Clicking <UiLabel>OK</UiLabel> in <MenuPath>File > Preferences</MenuPath> by accident.** If the two-files checkbox is unticked, saving then writes one file. That is fine, but do not be surprised when your files change.
+- **Clicking <UiLabel>Ok</UiLabel> in <MenuPath>File > Preferences</MenuPath> by accident.** If the two-files checkbox is unticked, saving then writes one file. That is fine, but do not be surprised when your files change.
 - **Being surprised that the old `.fdt` disappeared.** If you save a two-file dataset as one file with the same name in the same folder, EEGLAB deletes the old `.fdt`, because the signal is now inside the `.set` file. It prints `Old .fdt file detected on disk, deleting file since the Matlab file now contains all the data`. This is why you should save your copies in your own folder, never over the sample.
 
 {/* "From experience" box: waiting for a story from the project owner. Do not write it before it arrives. */}
