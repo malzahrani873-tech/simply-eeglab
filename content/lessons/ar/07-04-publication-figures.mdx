@@ -10,7 +10,7 @@ objectives:
   - يصدّر رسمة ERP وخريطة رأس بصيغة متّجهة (PDF أو SVG) بمقاس عمود المجلة.
   - يضبط حجم الخط (font) وسُمك الخطوط والمحاور والعناوين حتى تُقرأ بعد التصغير.
   - يرسم خرائط شرطين بمقياس ألوان واحد متماثل، ويصدّر الأرقام التي وراء الرسمة.
-prerequisites: [topoplot, channel-erp-plot]
+prerequisites: [topoplot]
 references:
   - title: EEGLAB Tutorial
     url: https://eeglab.org/tutorials/11_Scripting/EEG_scalp_measures.html
@@ -110,7 +110,7 @@ updated: 2026-10-28
 <Figure src="publication-figures/publication-after.png" alt="الرسم نفسه بعد التصدير بـ exportgraphics: خلفية بيضاء، وخطان بلونين ونمطين (متصل ومتقطع)، والمحور الرأسي Potential (µV)، وعدد المحاولات في المفتاح." caption="بعد: ملف متّجه، معروض هنا صورةً" source="D1" />
 </BeforeAfter>
 
-تجهّز هنا رسمتين تعرفهما من [درس خرائط الرأس](/lesson/topoplot/) ودرس «رسم ERP للقنوات»، وتعطي كلاً منهما: صيغة متّجهة، ومقاساً محدداً، وخطاً مقروءاً، ومقياس ألوان واحداً، وملف أرقام يثبت ما فيها.
+تجهّز هنا رسمتين: خرائط الرأس التي تعرفها من [درس خرائط الرأس](/lesson/topoplot/)، وموجتي Pz لشرطين ترسمهما في هذا الدرس بالسكربت. وتعطي كلاً منهما: صيغة متّجهة، ومقاساً محدداً، وخطاً مقروءاً، ومقياس ألوان واحداً، وملف أرقام يثبت ما فيها.
 
 ## كيف أثبّت المقياس وأصدّر الخرائط والأرقام من القوائم؟
 
@@ -152,7 +152,11 @@ updated: 2026-10-28
 مجلد MATLAB الحالي (Current Folder) يجب أن يكون مجلد عملك (`eeg-course`)، لأن السكربت يقرأ منه ويحفظ فيه بـ `pwd`.
 
 ```matlab
-EEG = pop_loadset('D1_epochs_clean.set', pwd);
+% Saved in the epoch-rejection lesson. If you used the starting script instead,
+% D1 epochs clean is already in EEG and this step is skipped.
+if exist(fullfile(pwd, 'D1_epochs_clean.set'), 'file')
+    EEG = pop_loadset('D1_epochs_clean.set', pwd);
+end
 % The 'position' value (1 or 2) of the 'square' event at time 0 in each epoch
 pos = eeg_getepochevent(EEG, 'type', {'square'}, 'timewin', [-5 5], 'fieldname', 'position');
 % Keep only the epochs of each condition: one dataset per position

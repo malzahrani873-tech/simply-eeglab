@@ -109,7 +109,7 @@ updated: 2026-10-28
 ---
 
 <Callout type="warning">
-The lesson on creating a STUDY is coming soon. Until then, run "Script to reach this state" at the end of the lesson. The script creates a STUDY named `animal_mine.study` with the 14 participants, and stores each participant's gender in the `group` variable (values `F` and `M`). It also converts the old `.dat` data files to `.fdt` and then deletes the old ones. This is on purpose: resaving `.dat` files in their old format damages the data in EEGLAB 2026.1.
+The lesson on creating a STUDY is coming soon. Until then, run "Script to reach this state" at the end of the lesson, after you change its line `dataFolder = ...` to the path of your work folder (`eeg-course`). The script creates a STUDY named `animal_mine.study` with the 14 participants, and stores each participant's gender in the `group` variable (values `F` and `M`). It also converts the old `.dat` data files to `.fdt` and then deletes the old ones. This is on purpose: resaving `.dat` files in their old format damages the data in EEGLAB 2026.1.
 </Callout>
 
 ## The idea
@@ -124,7 +124,7 @@ So which measures do you compute, and with which options, so that every later re
 
 <ImageSpec>Real screenshot from MATLAB or EEGLAB coming soon.</ImageSpec>
 
-Notice two things about these files:
+You open these files yourself in step 5 below. Notice two things about them:
 
 - **Your choices are baked in.** The baseline, interpolation and ICA component removal are applied at compute time, so they enter every later result. If you change your mind, you compute again.
 - **They hold every trial separately, not only the average.** This lets the design select trials later, but it takes a lot of space with ERSPs.
@@ -139,7 +139,7 @@ Do not tick it if the components were already removed from the data before the S
 
 ## How do I precompute the measures from the menus?
 
-**About the data (D6):** the same `animal_mine.study` from the lesson on creating a STUDY, with design 2, `image x gender`, from [the design lesson](/en/lesson/study-design/).
+**About the data (D6):** the same `animal_mine.study` that "Script to reach this state" created, with design 2, `image x gender`, from [the design lesson](/en/lesson/study-design/).
 
 **1. Open the compute window**
 

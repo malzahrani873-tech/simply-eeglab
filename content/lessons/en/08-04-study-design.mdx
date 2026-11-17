@@ -103,7 +103,7 @@ updated: 2026-10-28
 ---
 
 <Callout type="warning">
-The lesson on creating a STUDY is coming soon. Until then, run "Script to reach this state" at the end of the lesson. The script creates a STUDY named `animal_mine.study` with the 14 participants, and stores each participant's gender in the `group` variable (values `F` and `M`). It also converts the old `.dat` data files to `.fdt` and then deletes the old ones. This is on purpose: resaving `.dat` files in their old format damages the data in EEGLAB 2026.1.
+The lesson on creating a STUDY is coming soon. Until then, run "Script to reach this state" at the end of the lesson, after you change its line `dataFolder = ...` to the path of your work folder (`eeg-course`). The script creates a STUDY named `animal_mine.study` with the 14 participants, and stores each participant's gender in the `group` variable (values `F` and `M`). It also converts the old `.dat` data files to `.fdt` and then deletes the old ones. This is on purpose: resaving `.dat` files in their old format damages the data in EEGLAB 2026.1.
 </Callout>
 
 ## The idea
@@ -118,7 +118,7 @@ So how do you write your question as a design, and choose the current one?
 
 <Figure src="study-design/study-design-2x2.svg" alt="A 2×2 grid. The columns animal and distractor are shaded in two colors, a within-subjects factor, with a double arrow between them labeled same participants: paired. The rows F and M are a between-subjects factor, separated by a dividing line labeled different participants: unpaired. Each cell holds small circles with participant codes: seven per row, and the same circles repeat in both columns." caption="Illustration, no data" source="original" />
 
-We use the same `animal_mine.study` from the creation lesson. Every participant saw both kinds of picture (animal and distractor), so picture type is **within subjects**. Each participant has one gender (7 women and 7 men), so gender is **between subjects**. Together: a 2×2 mixed design.
+We use the `animal_mine.study` that "Script to reach this state" created. Every participant saw both kinds of picture (animal and distractor), so picture type is **within subjects**. Each participant has one gender (7 women and 7 men), so gender is **between subjects**. Together: a 2×2 mixed design.
 
 ## What is the difference between a within-subject and a between-subject variable?
 

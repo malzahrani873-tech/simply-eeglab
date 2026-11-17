@@ -102,7 +102,7 @@ updated: 2026-10-28
 | متى تستخدمه | مقارنة سريعة بين ملفين أو ثلاثة لمشارك واحد | أي تحليل لمجموعة مشاركين |
 
 <Callout type="note" title="الذاكرة مع عشرات المشاركين">
-مع عشرات المشاركين لا تتسع الذاكرة لكل الملفات. فعّل في <MenuPath>File > Preferences</MenuPath> الخيار <UiLabel>If set, keep at most one dataset in memory. This allows processing hundreds of datasets within studies.</UiLabel>، فيقرأ EEGLAB الملفات من القرص عند الحاجة. مع 14 مشاركاً هنا لا يلزم غالباً. عند إنشاء STUDY أو فتحها تظهر نافذة <UiLabel>Study warning</UiLabel> تقترح هذا الخيار، ودرس إنشاء STUDY التالي يشرح ما تختاره فيها.
+مع عشرات المشاركين لا تتسع الذاكرة لكل الملفات. فعّل في <MenuPath>File > Preferences</MenuPath> الخيار <UiLabel>If set, keep at most one dataset in memory. This allows processing hundreds of datasets within studies.</UiLabel>، فيقرأ EEGLAB الملفات من القرص عند الحاجة. مع 14 مشاركاً هنا لا يلزم غالباً. عند إنشاء STUDY أو فتحها من القوائم تظهر نافذة <UiLabel>Study warning</UiLabel> تقترح هذا الخيار. اضغط فيها <UiLabel>OK</UiLabel> وأكمل، لأن الذاكرة تتسع لملفات المشاركين الـ 14.
 </Callout>
 
 ## كيف أفحص ملفين من مشاركَين مختلفين بالقوائم؟
@@ -113,7 +113,7 @@ updated: 2026-10-28
 
 **أولاً: نزّل البيانات وافتح المجلد**
 
-1. افتح «سكربت للوصول إلى هذه الحالة» في آخر الدرس، وشغّله. ينزّل `animal_study.zip` من صفحة بيانات EEGLAB ويفك ضغطه مرة واحدة، ويطبع مكان المجلد.
+1. افتح «سكربت للوصول إلى هذه الحالة» في آخر الدرس. غيّر فيه السطر `dataFolder = ...` إلى مسار مجلد عملك (`eeg-course`)، كما في [درس التثبيت](/lesson/install-eeglab/)، ثم شغّله. ينزّل `animal_study.zip` من صفحة بيانات EEGLAB ويفك ضغطه مرة واحدة، ويطبع مكان المجلد.
 2. افتح المجلد في مستعرض الملفات. فيه ملف `animal.study` الجاهز، ومجلد لكل مشارك باسم رمزه، من `cba` إلى `wpa`. في كل مجلد داتاستان، مثل `sphanimal.set` و `sphdistractor.set`. بيانات كل داتاست في ملف `.dat` بجانبه (صيغة EEGLAB الأقدم؛ أما `cba` وحده فبياناته داخل `.set`). وسترى أيضاً ملفات مثل `sphanimal.daterp` و `sphanimal.icaerp`: مقاييس قديمة حُسبت بإصدار EEGLAB 6 سنة 2007. لا نستعملها، ويشرح [درس الحساب المسبق](/lesson/study-precompute/) السبب.
 3. لا تفتح `animal.study` الآن. نحن نفحص الملفات قبل أي STUDY.
 

@@ -102,7 +102,7 @@ You may ask: ALLEEG already holds several datasets, as in [the ALLEEG lesson](/e
 | When to use it | A quick comparison of two or three files from one participant | Any analysis of a group of participants |
 
 <Callout type="note" title="Memory with many participants">
-With dozens of participants, memory cannot hold every file. In <MenuPath>File > Preferences</MenuPath>, turn on <UiLabel>If set, keep at most one dataset in memory. This allows processing hundreds of datasets within studies.</UiLabel>, and EEGLAB reads files from disk when needed. With the 14 participants here you usually do not need it. When you create or open a STUDY, a <UiLabel>Study warning</UiLabel> window suggests this option, and the next lesson, on creating a STUDY, explains what to press.
+With dozens of participants, memory cannot hold every file. In <MenuPath>File > Preferences</MenuPath>, turn on <UiLabel>If set, keep at most one dataset in memory. This allows processing hundreds of datasets within studies.</UiLabel>, and EEGLAB reads files from disk when needed. With the 14 participants here you usually do not need it. When you create or open a STUDY from the menus, a <UiLabel>Study warning</UiLabel> window suggests this option. Press <UiLabel>OK</UiLabel> and go on: memory holds the files of the 14 participants.
 </Callout>
 
 ## How do I check two participants' files from the menus?
@@ -113,7 +113,7 @@ Why not continue with D1? Because D1 is one participant's recording, and a STUDY
 
 **1. Download the data and open the folder**
 
-1. Open "Script to reach this state" at the end of the lesson, and run it. It downloads `animal_study.zip` from the EEGLAB data page, unzips it once, and prints the folder location.
+1. Open "Script to reach this state" at the end of the lesson. Change its line `dataFolder = ...` to the path of your work folder (`eeg-course`), as in [the installation lesson](/en/lesson/install-eeglab/), then run it. It downloads `animal_study.zip` from the EEGLAB data page, unzips it once, and prints the folder location.
 2. Open the folder in your file browser. It holds the ready file `animal.study` and one folder per participant named by its code, from `cba` to `wpa`. Each folder holds two datasets, such as `sphanimal.set` and `sphdistractor.set`. Each dataset's data are in a `.dat` file next to it (the older EEGLAB format; only `cba` keeps its data inside the `.set`). You will also see files such as `sphanimal.daterp` and `sphanimal.icaerp`: old measures precomputed with EEGLAB 6 in 2007. We do not use them, and [the precompute lesson](/en/lesson/study-precompute/) explains why.
 3. Do not open `animal.study` yet. We check the files before any STUDY.
 

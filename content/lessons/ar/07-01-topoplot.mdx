@@ -160,7 +160,11 @@ updated: 2026-10-28
 مجلد MATLAB الحالي (Current Folder) يجب أن يكون مجلد عملك (`eeg-course`)، لأن السكربت يقرأ منه بـ `pwd`.
 
 ```matlab
-EEG = pop_loadset('D1_epochs_clean.set', pwd);
+% Saved in the epoch-rejection lesson. If you used the starting script instead,
+% D1 epochs clean is already in EEG and this step is skipped.
+if exist(fullfile(pwd, 'D1_epochs_clean.set'), 'file')
+    EEG = pop_loadset('D1_epochs_clean.set', pwd);
+end
 
 % Scalp channels only: the EOG channels are not on the average reference
 EEG = pop_select(EEG, 'rmchannel', {'EOG1', 'EOG2'});
@@ -212,7 +216,7 @@ Scalp topographies of the ERP at 30 average-referenced scalp channels (EOG chann
 ## ما الأخطاء التي تجعل الخريطة تخدعك؟
 
 - **مقارنة خرائط بمقاييس مختلفة.** انظر إلى أرقام شريط الألوان قبل الألوان. خريطتان متشابهتا اللون قد تختلفان عشر مرات في السعة.
-- **الثقة بخانة <UiLabel>Window size at latencies in ms</UiLabel>.** الرقم نصف عرض النافذة، فـ 50 عند 100 ميلي ثانية تعني من 50 إلى 150 ميلي ثانية. في EEGLAB 2026.1 يكتب EEGLAB العبارة «50 to 150 ميلي ثانية» فوق الخرائط التي يرسمها أول مرة، لكنه يرسم كل خريطة منها من عيّنة واحدة، ولا تحسب متوسط النافذة الحقيقي إلا عند الضغط على الموجة. لخريطة نافذة موثوقة، استخدم السكربت أعلاه.
+- **الثقة بخانة <UiLabel>Window size at latencies in ms</UiLabel>.** الرقم نصف عرض النافذة، فـ 50 عند 100 ميلي ثانية تعني من 50 إلى 150 ميلي ثانية. في EEGLAB 2026.1 يكتب EEGLAB العبارة «50 to 150 ميلي ثانية» فوق الخرائط التي يرسمها أول مرة، لكنه يرسم كل خريطة منها من عيّنة واحدة، ولا يحسب متوسط النافذة الحقيقي إلا عند الضغط على الموجة. لخريطة نافذة موثوقة، استخدم السكربت أعلاه.
 - **قراءة الخريطة على أنها مكان المصدر.** البقعة الحمراء فوق Pz لا تعني أن المصدر تحت Pz. التوصيل في الجمجمة ينشر الجهد، واتجاه المصدر يغيّر مكان القمة. تحديد موقع المصدر (<En>source localization</En>) موضوع [درس DIPFIT](/lesson/dipfit/) في المحطة 10.
 - **خريطة بلا مواقع أقطاب صحيحة.** إذا كانت المواقع ناقصة أو خاطئة، فالخريطة كلها خاطئة. تحقق منها كما في [درس مواقع الأقطاب](/lesson/channel-locations/).
 - **نسيان المرجع.** الخريطة تتغيّر كلياً مع المرجع. خرائطنا بمرجع متوسط من 30 قناة رأس، فاذكر ذلك تحت كل شكل.

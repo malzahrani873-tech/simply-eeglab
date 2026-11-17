@@ -161,7 +161,11 @@ updated: 2026-10-28
 مجلد MATLAB الحالي (Current Folder) يجب أن يكون مجلد عملك (`eeg-course`)، لأن السكربت يقرأ منه بـ `pwd`.
 
 ```matlab
-EEG = pop_loadset('D1_epochs_clean.set', pwd);
+% Saved in the epoch-rejection lesson. If you used the starting script instead,
+% D1 epochs clean is already in EEG and this step is skipped.
+if exist(fullfile(pwd, 'D1_epochs_clean.set'), 'file')
+    EEG = pop_loadset('D1_epochs_clean.set', pwd);
+end
 chan = find(strcmp({EEG.chanlocs.labels}, 'Pz'));
 
 % Response latency per epoch, NaN when no response follows the stimulus

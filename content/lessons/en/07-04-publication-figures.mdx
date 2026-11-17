@@ -10,7 +10,7 @@ objectives:
   - Export an ERP plot and a scalp map as vector files (PDF or SVG) at journal column width.
   - Set the font, line widths, axes, and labels so the figure stays readable at final size.
   - Plot maps of two conditions on one symmetric color scale, and export the numbers behind the figure.
-prerequisites: [topoplot, channel-erp-plot]
+prerequisites: [topoplot]
 references:
   - title: EEGLAB Tutorial
     url: https://eeglab.org/tutorials/11_Scripting/EEG_scalp_measures.html
@@ -110,7 +110,7 @@ So how do you export an ERP plot and scalp maps from EEGLAB in a format and size
 <Figure src="publication-figures/publication-after.png" alt="The same plot exported with exportgraphics: white background, two lines in two colors and two styles (solid and dashed), the vertical axis labeled Potential (µV), and trial counts in the legend." caption="After: a vector file, shown here as an image" source="D1" />
 </BeforeAfter>
 
-Here you prepare two figures you know from [the scalp maps lesson](/en/lesson/topoplot/) and the "Plotting channel ERPs" lesson, and give each one a vector format, a fixed size, a readable font, one color scale, and a data file that backs up what it shows.
+Here you prepare two figures: the scalp maps you know from [the scalp maps lesson](/en/lesson/topoplot/), and the Pz waveforms of two conditions, which you plot in this lesson with the script. You give each one a vector format, a fixed size, a readable font, one color scale, and a data file that backs up what it shows.
 
 ## How do I fix the scale and export maps and numbers from the menus?
 
@@ -150,7 +150,11 @@ In D1 the square appeared at two places on the screen, so there are two conditio
 MATLAB's Current Folder must be your work folder (`eeg-course`), because the script reads from it and saves into it with `pwd`.
 
 ```matlab
-EEG = pop_loadset('D1_epochs_clean.set', pwd);
+% Saved in the epoch-rejection lesson. If you used the starting script instead,
+% D1 epochs clean is already in EEG and this step is skipped.
+if exist(fullfile(pwd, 'D1_epochs_clean.set'), 'file')
+    EEG = pop_loadset('D1_epochs_clean.set', pwd);
+end
 % The 'position' value (1 or 2) of the 'square' event at time 0 in each epoch
 pos = eeg_getepochevent(EEG, 'type', {'square'}, 'timewin', [-5 5], 'fieldname', 'position');
 % Keep only the epochs of each condition: one dataset per position

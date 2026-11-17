@@ -160,7 +160,11 @@ Use this dataset for every map in this lesson.
 MATLAB's Current Folder must be your work folder (`eeg-course`), because the script reads from it with `pwd`.
 
 ```matlab
-EEG = pop_loadset('D1_epochs_clean.set', pwd);
+% Saved in the epoch-rejection lesson. If you used the starting script instead,
+% D1 epochs clean is already in EEG and this step is skipped.
+if exist(fullfile(pwd, 'D1_epochs_clean.set'), 'file')
+    EEG = pop_loadset('D1_epochs_clean.set', pwd);
+end
 
 % Scalp channels only: the EOG channels are not on the average reference
 EEG = pop_select(EEG, 'rmchannel', {'EOG1', 'EOG2'});

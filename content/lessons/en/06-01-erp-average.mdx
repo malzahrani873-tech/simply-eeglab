@@ -104,7 +104,7 @@ The result is the event-related potential (<En>ERP</En>), the basis for measurem
 
 ## What happens to the waveform as trials add up?
 
-One trial looks like noise. With 10 trials the waveform starts to appear, and with all of them (77 in the figure; your number may differ slightly, depending on what you rejected), a clear positive peak appears after 400 ms.
+One trial looks like noise. With 10 trials the waveform starts to appear, and with all of them (about 77; your number may differ slightly, depending on what you rejected), a clear positive peak appears after 400 ms.
 
 <ImageSpec>Real screenshot from MATLAB or EEGLAB coming soon.</ImageSpec>
 
@@ -175,7 +175,7 @@ ERPs were computed by averaging the [N] artifact-free epochs time-locked to the 
 
 ## Which mistakes spoil the average?
 
-- **Mixing conditions in one average.** In D1 the square appeared at two positions (the `position` field). Averaging both positions together is fine as an example here, but comparing positions needs one average per position. Comparing conditions is covered in the channel ERP plotting lesson in station 7.
+- **Mixing conditions in one average.** In D1 the square appeared at two positions (the `position` field). Averaging both positions together is fine as an example here, but comparing positions needs one average per position. The script in [the publication figures lesson](/en/lesson/publication-figures/) in station 7 splits the epochs by position and averages each one.
 - **Reading the highest peak as "the component".** A peak at one channel can come from more than one overlapping ERP component. The approximate latency here is for recognizing the waveform, not for a scientific conclusion.
 - **Confusing the axis direction.** A positive wave plotted downward is misread as negative. Check the axis.
 - **Averaging before rejection.** One epoch with a large artifact is enough to change the average. Reject first, as in [the epoch rejection lesson](/en/lesson/epoch-rejection/).
