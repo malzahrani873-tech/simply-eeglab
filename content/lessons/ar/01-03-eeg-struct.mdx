@@ -49,7 +49,7 @@ updated: 2026-10-28
 
 ## كيف يبدو EEG من الداخل؟
 
-<Figure src="eeg-struct/sdc-eeg-structure.webp" alt="ناتج كتابة EEG في Command Window: قائمة حقول بقيمها، منها setname و nbchan: 128 و pnts: 286464 و srate: 256 و data: [128×286464 double] و chanlocs: [128×1 struct] و event: [1×1586 struct] و icaweights: [] الفارغ لأن ICA لم يُحسب." caption="EEGLAB 2019.1 مع داتاست فيها 128 قناة. الحقول الأساسية هي نفسها في EEGLAB 2026.1." source="external" credit="من درس SDC-EEGLAB في The Carpentries Incubator (Desjardins و Stephenson)، محوّلة إلى WebP" creditUrl="https://github.com/carpentries-incubator/SDC-EEGLAB" license="CC BY 4.0" licenseUrl="https://creativecommons.org/licenses/by/4.0/" />
+<Figure src="eeg-struct/eeg-variables-ar.webp" alt="المتغير EEG لملف eeglab_data.set مفتوحاً في محرر المتغيرات في MATLAB: ‏1×1 struct فيه 43 حقلاً بقيمها. دوائر حمراء على nbchan = 32 (عدد القنوات)، و pnts = 30504 (العيّنات في كل قناة)، و srate = 128 (عيّنة في الثانية)، و data = 32×30504 single (الإشارة نفسها)." caption="المتغير EEG من eeglab_data.set في محرر المتغيرات، EEGLAB 2026.1" source="eeglab-ui" />
 
 كل سطر في القائمة حقل. الإشارة نفسها في حقل واحد هو `data`، جدول أرقام فيه صف لكل قناة (<En>channel</En>). وبقية الحقول تصف هذا الجدول: كم قناة، وبأي معدل عيّنات (<En>sampling rate</En>)، وأين الأحداث (<En>events</En>)، وهل حُسب تحليل المكوّنات المستقلة (<En>ICA</En>).
 
