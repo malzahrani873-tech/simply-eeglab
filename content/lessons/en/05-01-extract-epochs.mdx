@@ -148,6 +148,8 @@ EEGLAB has a menu for this, <MenuPath>Edit > Select epochs or events</MenuPath>,
 - In the command window: `size(EEG.data)` returns `32 384 80`, and the expected baseline reminder starting with `Warning:` appears.
 - Open <MenuPath>Plot > Channel data (scroll)</MenuPath>: the data now appear as separate epochs with dividing lines, and each epoch has a `square` event at zero.
 
+<Figure src="extract-epochs/d1-epochs-scroll-en.webp" alt="EEGLAB scroll window titled Continuous EEG Data epochs, showing epochs 1 to 5 side by side, each from -1000 to 1000 ms and more. Red outlines mark an epoch number with the note: the epoch number; a green square line with the note: the square event, time 0 of each epoch; and a blue dividing line with the note: one epoch ends, the next begins." caption="After epoching: separate epochs, each with its square at 0" source="eeglab-ui" />
+
 ## What are the common mistakes when epoching?
 
 - **Epoching before filtering.** Filtering short epochs distorts their edges. Filter the continuous data first, then epoch, as we did in [the filtering lesson](/en/lesson/filtering/).

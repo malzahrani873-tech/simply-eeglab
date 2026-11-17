@@ -102,13 +102,8 @@ An ERP image shows every trial as one colored row, stacked. How do you plot one 
 ## What changes when you sort trials by reaction time?
 
 <BeforeAfter>
-{/* Capture note: both images must use exactly the same frame, size, and axes. */}
-<ImageSpec>
-Before: an EEGLAB 2026.1 ERP image of channel Pz in the D1 epochs clean dataset, from -200 to 800 ms, with trials in recording order and no smoothing (Smoothing = 1). Each row is one trial. The image is crowded with broken horizontal streaks and shows no clear pattern. Below it is the averaged ERP, on the right a color bar in microvolts, and at the top left a small scalp map with a dot at Pz.
-</ImageSpec>
-<ImageSpec>
-After: the same channel, frame and axes, but trials sorted by the latency of the rt event (fastest at the bottom, slowest at the top) and smoothed with a 10-trial moving average. A slanted black curve marks the response time on each trial, and patterns stand out more clearly. EEGLAB default colors (turbo) with a color scale symmetric around zero.
-</ImageSpec>
+<Figure src="erp-image/pz-raw.webp" alt="EEGLAB ERP image of channel Pz from -200 to 800 ms, trials in recording order: rows of scattered colour with no clear pattern, the averaged ERP below and a colour bar on the right." caption="Before: trials in recording order" source="eeglab-ui" />
+<Figure src="erp-image/pz-sorted-en.webp" alt="The same ERP image titled Pz sorted by RT. A slanted black curve runs from about 350 ms at the bottom to 520 ms at the top. One red outline marks the curve with the note: when the button was pressed in each trial, fastest at the bottom. Another marks red patches to its right with the note: the red follows the curve, the wave is tied to the response." caption="After: trials sorted by response time" source="eeglab-ui" />
 </BeforeAfter>
 
 ## How do I read an ERP image?
