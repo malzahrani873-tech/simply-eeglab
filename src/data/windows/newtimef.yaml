@@ -4,6 +4,7 @@ source: "EEGLAB pop_newtimef.m (uilist, lines 166-223)"
 title: "Plot channel time frequency -- pop_newtimef()"
 menu: "Plot > Time-frequency transforms > Channel time-frequency"
 shot: newtimef-dialog
+numbered: true
 intro:
   ar: "تحسب ERSP (تغيّر القدرة) و ITC (ثبات الطور) لقناة واحدة وترسمهما."
   en: "Computes and plots ERSP (power change) and ITC (phase consistency) for one channel."

@@ -4,6 +4,7 @@ source: "EEGLAB pop_editset.m (uilist)"
 title: "Edit dataset information - pop_editset()"
 menu: "Edit > Dataset info"
 shot: editset-dialog
+numbered: true
 intro:
   ar: "تعرض معلومات الداتاست الحالية وتسمح بتعديلها. وفيها تنقل نتيجة ICA من داتاست أخرى."
   en: "Shows the current dataset's information and lets you change it. It is also where you copy an ICA result from another dataset."

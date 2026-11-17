@@ -4,6 +4,7 @@ source: "EEGLAB pop_chanedit.m (uilist, lines 307-432)"
 title: "Edit channel info -- pop_chanedit()"
 menu: "Edit > Channel locations"
 shot: chanedit-dialog
+numbered: true
 intro:
   ar: "تعرض قناة واحدة في كل مرة مع إحداثياتها. التغييرات لا تُطبّق إلا بعد الضغط على OK أسفل النافذة."
   en: "Shows one channel at a time with its coordinates. Changes take effect only after you press OK at the bottom."

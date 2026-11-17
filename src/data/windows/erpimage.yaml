@@ -4,6 +4,7 @@ source: "EEGLAB pop_erpimage.m (uilist, lines 299-383)"
 title: "Channel ERP image -- pop_erpimage()"
 menu: "Plot > Channel ERP image"
 shot: erpimage-dialog
+numbered: true
 intro:
   ar: "نافذة كبيرة. القسم الأول (القناة والتنعيم والزمن) هو ما تحتاجه دائماً. أقسام الترتيب حسب الطور والـ ITC والخيارات الأخرى متقدمة، فاتركها فارغة."
   en: "A large window. The first part (channel, smoothing, time) is what you always need. The phase sorting, ITC and other options parts are advanced, so leave them empty."

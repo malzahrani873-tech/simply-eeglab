@@ -4,6 +4,7 @@ source: "dipfit plugin, pop_dipfit_settings.m (uilist, lines 246-282)"
 title: "Dipole fit settings - pop_dipfit_settings()"
 menu: "Tools > Source localization using DIPFIT > Head model and settings"
 shot: dipfit-settings-dialog
+numbered: true
 intro:
   ar: "تختار نموذج الرأس، وتربط مواقع أقطابك به. يجب فتحها قبل أي توطين."
   en: "Choose the head model and align your electrode positions to it. Open it before any source fitting."

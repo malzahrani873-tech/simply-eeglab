@@ -4,6 +4,7 @@ source: "clean_rawdata plugin, pop_clean_rawdata.m (uilist)"
 title: "pop_clean_rawdata()"
 menu: "Tools > Reject data using Clean Rawdata and ASR"
 shot: clean-rawdata-dialog
+numbered: true
 intro:
   ar: "نافذة واحدة فيها أربعة أقسام بخط عريض. كل قسم يعمل فقط إذا عليه علامة: إزالة الانجراف، حذف القنوات السيئة، ASR، وحذف فترات إضافية."
   en: "One window with four bold sections. Each section runs only if it is checked: drift removal, bad channel removal, ASR, and extra removal of bad periods."

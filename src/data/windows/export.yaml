@@ -4,6 +4,7 @@ source: "EEGLAB pop_export.m (uilist, lines 77-96)"
 title: "Export data - pop_export()"
 menu: "File > Export > Data and ICA activity to text file"
 shot: export-dialog
+numbered: true
 intro:
   ar: "تحفظ الإشارة في ملف نصي تفتحه في Excel أو برنامج آخر."
   en: "Saves the signal to a text file you can open in Excel or another program."
