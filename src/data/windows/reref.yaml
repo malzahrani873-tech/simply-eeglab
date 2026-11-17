@@ -4,6 +4,7 @@ source: "EEGLAB pop_reref.m (uilist)"
 title: "pop_reref - average reference or re-reference data"
 menu: "Tools > Re-reference the data"
 shot: reref-dialog
+numbered: true
 intro:
   ar: "تغيّر المرجع الذي تُقاس منه كل القنوات: متوسط كل القنوات، أو قناة معيّنة."
   en: "Changes the reference every channel is measured against: the average of all channels, or a chosen channel."

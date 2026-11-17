@@ -4,6 +4,7 @@ source: "EEGLAB pop_select.m (uilist)"
 title: "Select data -- pop_select()"
 menu: "Edit > Select data"
 shot: select-dialog
+numbered: true
 intro:
   ar: "تختار جزءاً من البيانات: زمناً أو قنوات أو epochs. كل صف فيه خانة للمدى، ومربع تحت «on->remove these» يقلب المعنى من «أبقِ هذا» إلى «احذف هذا»."
   en: "Choose part of the data: a time range, channels or epochs. Each row has a box for the range, and a checkbox under «on->remove these» that flips the meaning from «keep this» to «remove this»."

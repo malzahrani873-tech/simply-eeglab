@@ -4,6 +4,7 @@ source: "EEGLAB pop_resample.m (inputdlg2)"
 title: "Resample current dataset -- pop_resample()"
 menu: "Tools > Change sampling rate"
 shot: resample-dialog
+numbered: true
 intro:
   ar: "نافذة بخانة واحدة لتغيير عدد العيّنات في الثانية."
   en: "A one-box window to change the number of samples per second."

@@ -4,6 +4,7 @@ source: "EEGLAB pop_rmbase.m (uilist, lines 89-123)"
 title: "Baseline removal - pop_rmbase()"
 menu: "Tools > Remove epoch baseline"
 shot: rmbase-dialog
+numbered: true
 intro:
   ar: "تطرح متوسط فترة ما قبل الحدث من كل epoch، فتبدأ كل القنوات من الصفر تقريباً."
   en: "Subtracts the mean of the pre-event period from each epoch, so every channel starts near zero."

@@ -4,6 +4,7 @@ source: "firfilt plugin, pop_eegfiltnew.m (uilist and help text)"
 title: "Filter the data -- pop_eegfiltnew()"
 menu: "Tools > Filter the data > Basic FIR filter (new, default)"
 shot: eegfiltnew-dialog
+numbered: true
 intro:
   ar: "نافذة الفلتر الأساسي في EEGLAB. تكتب فيها حدّ الترددات التي تبقى، ويحسب EEGLAB الباقي."
   en: "EEGLAB's basic filter window. You type the edge of the frequencies you keep, and EEGLAB works out the rest."

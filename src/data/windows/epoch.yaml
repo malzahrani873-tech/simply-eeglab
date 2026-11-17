@@ -4,6 +4,7 @@ source: "EEGLAB pop_epoch.m (uilist, lines 155-166)"
 title: "Extract data epochs - pop_epoch()"
 menu: "Tools > Extract epochs"
 shot: epoch-dialog
+numbered: true
 intro:
   ar: "تقطّع البيانات المستمرة إلى قطع (epochs) حول كل حدث تختاره."
   en: "Cuts the continuous data into pieces (epochs) around each event you choose."

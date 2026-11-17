@@ -4,6 +4,7 @@ source: "EEGLAB pop_spectopo.m (channel uilist, lines 144-155)"
 title: "Channel spectra and maps -- pop_spectopo()"
 menu: "Plot > Channel spectra and maps"
 shot: spectopo-dialog
+numbered: true
 intro:
   ar: "ترسم طيف كل القنوات في رسم واحد، مع خرائط رأس عند ترددات تختارها."
   en: "Plots the spectrum of all channels in one plot, with scalp maps at frequencies you choose."

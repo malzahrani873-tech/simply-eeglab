@@ -4,6 +4,7 @@ source: "EEGLAB pop_interp.m (uilist)"
 title: "Interpolate channel(s) -- pop_interp()"
 menu: "Tools > Interpolate electrodes"
 shot: interp-dialog
+numbered: true
 intro:
   ar: "تقدّر إشارة القنوات المحذوفة أو السيئة من القنوات المجاورة لها."
   en: "Estimates the signal of removed or bad channels from their neighbours."

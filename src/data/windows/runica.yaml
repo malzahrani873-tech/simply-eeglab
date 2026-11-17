@@ -4,6 +4,7 @@ source: "EEGLAB pop_runica.m (promptstr, lines 217-225)"
 title: "Run ICA decomposition -- pop_runica()"
 menu: "Tools > Decompose data by ICA"
 shot: runica-dialog
+numbered: true
 intro:
   ar: "تختار فيها خوارزمية ICA وتشغّلها. الحساب قد يأخذ دقائق، وتتابع تقدّمه في الـ Command Window."
   en: "Choose the ICA algorithm and run it. It can take minutes; follow its progress in the Command Window."

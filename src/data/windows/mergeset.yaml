@@ -4,6 +4,7 @@ source: "EEGLAB pop_mergeset.m (uilist)"
 title: "pop_mergeset()"
 menu: "Edit > Append datasets"
 shot: merge-dialog
+numbered: true
 intro:
   ar: "تلصق داتاستين أو أكثر في داتاست واحدة، بالترتيب الذي تكتبه. شريط عنوان هذه النافذة فارغ."
   en: "Joins two or more datasets into one, in the order you type. This window has an empty title bar."

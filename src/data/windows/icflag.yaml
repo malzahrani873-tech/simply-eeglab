@@ -4,6 +4,7 @@ source: "ICLabel plugin, pop_icflag.m (allRows)"
 title: "pop_icflag()"
 menu: "Tools > Classify components using ICLabel > Flag components as artifacts"
 shot: icflag-dialog
+numbered: true
 intro:
   ar: "تعلّم المكوّنات للحذف حسب احتمالات ICLabel. لكل فئة سطر فيه حدّ أدنى وأعلى. هذه النافذة تعلّم فقط ولا تحذف شيئاً."
   en: "Flags components for removal from the ICLabel probabilities. Each class has a row with a minimum and a maximum. This window only flags; it removes nothing."

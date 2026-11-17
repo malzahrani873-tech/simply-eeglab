@@ -4,6 +4,7 @@ source: "EEGLAB pop_eegthresh.m (promptstr, lines 110-139)"
 title: "Rejection abnormal elec. values -- pop_eegthresh()"
 menu: "Tools > Reject data epochs > Reject extreme values"
 shot: eegthresh-dialog
+numbered: true
 intro:
   ar: "تعلّم كل epoch تتجاوز إشارتها حدّين بالميكروفولت في قنوات تختارها."
   en: "Marks every epoch whose signal goes beyond two limits in microvolts, in channels you choose."
