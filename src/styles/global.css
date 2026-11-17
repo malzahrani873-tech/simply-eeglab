@@ -178,7 +178,8 @@ main{flex:1}
   .cl li{width:100%}
   .rs.sa .cl li{justify-content:flex-end}
   .node{width:auto}
-  .rm.packed .rs{position:absolute;inset-inline:0;margin:0}
+  .rm.packed .rs{position:absolute;inset-inline:0;margin:0;pointer-events:none}
+  .rm.packed .rs .sbox,.rm.packed .rs .node{pointer-events:auto}
 }
 @container site (min-width:1200px){.rs{column-gap:80px}}
 @media print{.rm svg.links{display:none!important}}
