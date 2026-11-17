@@ -181,7 +181,7 @@ In this task, the animal pictures are the go trials (the participant lifts a fin
 3. Keep <UiLabel>Use EEGLAB statistics</UiLabel> ticked, and choose <UiLabel>Use parametric statistics</UiLabel> in the list under it.
 4. In <UiLabel>Statistical threshold (p-value)</UiLabel> replace `exact` with `0.05`.
 5. In the correction list choose <UiLabel>Use FDR correction</UiLabel>. Press <UiLabel>Ok</UiLabel>.
-6. Press <UiLabel>Plot ERPs</UiLabel>. The two curves appear on one panel, and dark bars along the bottom of the panel mark the times where the difference passes the corrected threshold.
+6. Press <UiLabel>Plot ERPs</UiLabel>. The two curves appear on one panel. Times where the difference passes the corrected threshold appear as dark bars along the bottom of the panel. In D6 at Pz you may see no bar after FDR: in our run dozens of points passed before correction and none after it. This is a correct result, not a mistake in your steps: the difference at Pz alone does not survive the correction.
 
 <Callout type="note" title="The MATLAB statistics toolbox">
 The parametric test needs the `fcdf` function from the MATLAB Statistics and Machine Learning Toolbox. Without this toolbox, EEGLAB prints a message in the command window that starts with `statcond(): parametric testing requires fcdf()` and runs a permutation test instead. The result is still valid, but it is slower and can change slightly from one run to the next.
@@ -289,7 +289,7 @@ So use the two-way result here for exploring only. For a real mixed ANOVA, expor
 
 ## How do I check that the test worked?
 
-- **The Pz plot** for design 3 shows two curves on one panel and dark bars along its bottom at the significant times.
+- **The Pz plot** for design 3 shows two curves on one panel. Dark bars along its bottom appear only at significant times, and there may be none after FDR.
 - **The script prints** `Significant time points at Pz:` with two numbers, and the number after FDR is less than or equal to the uncorrected one.
 - **The window test** shows three maps (animal, distractor and the p-value map), and the script prints the list of significant channels (the list can be empty).
 - **Fieldtrip-lite:** the script prints either the number of points after cluster correction, or the line `Fieldtrip-lite is not installed`.
