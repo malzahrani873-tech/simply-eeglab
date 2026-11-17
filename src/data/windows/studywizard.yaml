@@ -1,0 +1,67 @@
+id: studywizard
+func: pop_studywizard
+source: "EEGLAB pop_studywizard.m (uilist, lines 104-148)"
+title: "Create a new STUDY set -- pop_studywizard()"
+menu: "File > Create study > Browse for datasets"
+shot: studywizard-dialog
+numbered: true
+intro:
+  ar: "جدول فيه سطر لكل ملف داتاست. تختار الملف، ثم تكتب لمن هو وما شرطه ومجموعته."
+  en: "A table with one row per dataset file. You choose the file, then type whose it is, its condition and its group."
+fields:
+  - key: file
+    label: "Raw dataset filename"
+    kind: edit
+    default: ""
+    ar: "مسار ملف `.set`. يمتلئ وحده بعد أن تختار الملف بزر `...`."
+    en: "The path of the `.set` file. It fills in by itself after you choose the file with the `...` button."
+  - key: browse
+    label: "browse (...)"
+    kind: button
+    ar: "يفتح نافذة الملفات لتختار ملف `.set` لهذا السطر."
+    en: "Opens the file window to choose the `.set` file for this row."
+  - key: subject
+    label: "subject"
+    default: ""
+    ar: "رمز المشارك. نفس الرمز بالضبط في كل ملفاته."
+    en: "The participant code. Exactly the same code in all of their files."
+  - key: session
+    label: "session"
+    default: ""
+    ar: "رقم الجلسة. اتركها فارغة إذا كانت جلسة واحدة."
+    en: "The session number. Leave it empty if there was one session."
+  - key: run
+    label: "run"
+    default: ""
+    ar: "رقم الشوط. اتركها فارغة إذا لم تقسم التسجيل إلى أشواط."
+    en: "The run number. Leave it empty if you did not split the recording into runs."
+  - key: condition
+    label: "condition"
+    default: ""
+    ar: "اسم الشرط، كلمة واحدة بنفس الكتابة في كل الملفات."
+    en: "The condition name, one word spelled the same in every file."
+  - key: group
+    label: "group"
+    default: ""
+    ar: "المجموعة التي ينتمي إليها المشارك، مثل الجنس أو مريض وسليم."
+    en: "The participant's group, such as gender, or patient and control."
+  - key: task
+    label: "task"
+    default: ""
+    ar: "اسم المهمة. تحتاجه فقط إذا جمعت مهمتين في STUDY واحدة."
+    en: "The task name. You need it only if one STUDY holds two tasks."
+  - key: clear
+    label: "Clear"
+    kind: button
+    ar: "يمسح هذا السطر كله."
+    en: "Clears this whole row."
+  - key: pages
+    label: "< · Page 1 · >"
+    kind: button
+    ar: "كل صفحة 10 أسطر. «>» ينقلك إلى الصفحة التالية."
+    en: "Each page holds 10 rows. > moves to the next page."
+  - key: buttons
+    label: "Help · Cancel · Ok"
+    kind: button
+    ar: "«Ok» ينشئ الـ STUDY من كل الأسطر المملوءة."
+    en: "Ok creates the STUDY from all the filled rows."

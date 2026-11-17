@@ -5,7 +5,7 @@ description: كيف تجمع ملفات 14 مشاركاً في STUDY واحدة 
 station: 8
 order: 2
 level: core
-status: review
+status: approved
 objectives:
   - ينشئ STUDY من ملفات D6 من نافذة Browse for datasets ومن السكربت.
   - يحدد لكل ملف المشارك والشرط والمجموعة بأسماء موحّدة.
@@ -125,11 +125,13 @@ updated: 2026-10-28
 | | | sph | M |
 | | | wpa | M |
 
+<EeglabWindow id="studywizard" use={{ file: "يمتلئ بعد زر `...`، مثل `cba/cbaanimal.set`", subject: "رمز المشارك، مثل `cba`", condition: "`animal` أو `distractor`", group: "`F` أو `M` من جدول الجنس", session: "اتركها فارغة", run: "اتركها فارغة", task: "اتركها فارغة" }} />
+
 **ثانياً: افتح نافذة الإنشاء**
 
 1. ابدأ وملفات D6 محوّلة في مجلدها. إن لم تكن عندك، فافتح «سكربت للوصول إلى هذه الحالة» في آخر الدرس، وشغّله.
 2. افتح <MenuPath>File > Create study > Browse for datasets</MenuPath>. تظهر أولاً نافذة <UiLabel>Study warning</UiLabel> عن الذاكرة، تقترح الإلغاء وتغيير <MenuPath>File > Preferences</MenuPath>. اضغط <UiLabel>OK</UiLabel>، لأن الذاكرة تتسع لملفات المشاركين الـ 14. أما جملتها عن "tutorial study" فتخص STUDY قديمة بلا بيانات. بعدها تفتح نافذة عنوانها <UiLabel>Create a new STUDY set -- pop_studywizard()</UiLabel>، وفيها جدول اسمه <UiLabel>Select datasets</UiLabel>.
-3. أعمدة الجدول: <UiLabel>Raw dataset filename</UiLabel>، وزر <UiLabel>...</UiLabel> للتصفح، ثم <UiLabel>subject</UiLabel> و <UiLabel>session</UiLabel> و <UiLabel>run</UiLabel> و <UiLabel>condition</UiLabel> و <UiLabel>group</UiLabel> و <UiLabel>task</UiLabel>، وزر <UiLabel>CLear</UiLabel> لمسح السطر.
+3. أعمدة الجدول: <UiLabel>Raw dataset filename</UiLabel>، وزر <UiLabel>...</UiLabel> للتصفح، ثم <UiLabel>subject</UiLabel> و <UiLabel>session</UiLabel> و <UiLabel>run</UiLabel> و <UiLabel>condition</UiLabel> و <UiLabel>group</UiLabel> و <UiLabel>task</UiLabel>، وزر <UiLabel>Clear</UiLabel> لمسح السطر.
 4. في الصفحة الواحدة 10 أسطر، والزر <UiLabel>></UiLabel> أسفل الجدول ينقلك إلى الصفحة التالية. الملفات الـ 28 تحتاج إلى 3 صفحات.
 
 **ثالثاً: املأ سطراً لكل ملف**
@@ -211,6 +213,8 @@ eeglab redraw;
 ```
 
 ## كيف أتأكد أن الـ STUDY صحيحة؟
+
+<Figure src="create-study/main-ready-study-ar.webp" alt="النافذة الرئيسية الحقيقية بعد فتح animal.study الجاهزة: Nb of subjects ‏14، و Nb of conditions ‏2 per subject، و Nb of groups ‏1 per subject، و Clusters ‏9. ملاحظات حمراء تقارنها بنسختك: نفس عدد المشاركين والشروط، ونسختك فيها مجموعتان وبلا مجموعات مكوّنات." caption="الـ STUDY الجاهزة في النافذة الرئيسية، للمقارنة مع نسختك" source="eeglab-ui" />
 
 - **النافذة الرئيسية** بعد فتح `animal_mine.study` تعرض <UiLabel>Nb of subjects</UiLabel> 14، و <UiLabel>Nb of conditions</UiLabel> 2 per subject، و <UiLabel>Nb of groups</UiLabel> 2.
 - **السكربت يطبع** `28 datasets, 14 subjects, conditions: animal distractor, groups: F M`.

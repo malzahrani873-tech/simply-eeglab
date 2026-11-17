@@ -5,7 +5,7 @@ description: "How to gather 14 participants' files into one EEGLAB STUDY, give e
 station: 8
 order: 2
 level: core
-status: review
+status: approved
 objectives:
   - Create a STUDY from the D6 files with the Browse for datasets window and with a script.
   - Give each file its subject, condition and group with consistent names.
@@ -125,11 +125,13 @@ Write this table on paper before you start, because the window does not know gen
 | | | sph | M |
 | | | wpa | M |
 
+<EeglabWindow id="studywizard" use={{ file: "fills in after the `...` button, such as `cba/cbaanimal.set`", subject: "the participant code, such as `cba`", condition: "`animal` or `distractor`", group: "`F` or `M` from the gender table", session: "leave it empty", run: "leave it empty", task: "leave it empty" }} />
+
 **2. Open the creation window**
 
 1. Start with the converted D6 files in their folder. If you don't have them, open "Script to reach this state" at the end of the lesson, and run it.
 2. Open <MenuPath>File > Create study > Browse for datasets</MenuPath>. First a <UiLabel>Study warning</UiLabel> window about memory appears, suggesting you cancel and change <MenuPath>File > Preferences</MenuPath>. Press <UiLabel>OK</UiLabel>: the files of the 14 participants fit in memory, and the warning's sentence about the "tutorial study" refers to an old STUDY without data. Then a window titled <UiLabel>Create a new STUDY set -- pop_studywizard()</UiLabel> opens, with a table called <UiLabel>Select datasets</UiLabel>.
-3. The table columns are: <UiLabel>Raw dataset filename</UiLabel>, a <UiLabel>...</UiLabel> button to browse, then <UiLabel>subject</UiLabel>, <UiLabel>session</UiLabel>, <UiLabel>run</UiLabel>, <UiLabel>condition</UiLabel>, <UiLabel>group</UiLabel> and <UiLabel>task</UiLabel>, and a <UiLabel>CLear</UiLabel> button to empty the row.
+3. The table columns are: <UiLabel>Raw dataset filename</UiLabel>, a <UiLabel>...</UiLabel> button to browse, then <UiLabel>subject</UiLabel>, <UiLabel>session</UiLabel>, <UiLabel>run</UiLabel>, <UiLabel>condition</UiLabel>, <UiLabel>group</UiLabel> and <UiLabel>task</UiLabel>, and a <UiLabel>Clear</UiLabel> button to empty the row.
 4. Each page has 10 rows, and the <UiLabel>></UiLabel> button under the table moves to the next page. The 28 files need 3 pages.
 
 **3. Fill one row per file**
@@ -211,6 +213,8 @@ eeglab redraw;
 ```
 
 ## How do I check that the STUDY is right?
+
+<Figure src="create-study/main-ready-study-en.webp" alt="The real main window after opening the ready animal.study: Nb of subjects 14, Nb of conditions 2 per subject, Nb of groups 1 per subject, Clusters 9. Red notes compare it with your copy: the same participants and conditions, while yours has two groups and no component clusters." caption="The ready STUDY in the main window, to compare with yours" source="eeglab-ui" />
 
 - **The main window** after opening `animal_mine.study` shows <UiLabel>Nb of subjects</UiLabel> 14, <UiLabel>Nb of conditions</UiLabel> 2 per subject, and <UiLabel>Nb of groups</UiLabel> 2.
 - **The script prints** `28 datasets, 14 subjects, conditions: animal distractor, groups: F M`.
