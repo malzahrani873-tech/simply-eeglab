@@ -5,7 +5,7 @@ description: "How to plot group ERPs, spectra and ERSPs at channels for each des
 station: 8
 order: 6
 level: core
-status: review
+status: approved
 objectives:
   - Plot the group ERP at a channel for each cell of the design with Study > Plot channel measures.
   - Show each participant's curve, and decide whether the average represents most participants.
@@ -129,10 +129,9 @@ So how do you plot group ERPs, maps and spectra from the precomputed measures, a
 
 ## What do the group ERP and the scalp maps look like?
 
-{/* An image from the lesson script on the run day, not a hand drawing. Axis text and titles come from EEGLAB in English, so one version serves both languages. */}
-<ImageSpec>
-Left: the group ERP window at Pz for design 2, two panels (F and M), each with two curves, animal and distractor, in two colors and two line styles. Right: two scalp maps of the 150 to 250 ms mean for design 3 (animal and distractor) on one color scale.
-</ImageSpec>
+<Figure src="study-plot-channels/erp-subjects-pz-en.webp" alt="The real EEGLAB window of the ERP at PZ for each participant with design 2: four panels for the two genders and two picture types, thin blue lines for participants and a black line for the average, with red notes." caption="ERP at Pz for each participant (design 2): the black line is the average" source="D6" />
+
+<Figure src="study-plot-channels/topo-150-250-en.webp" alt="The real EEGLAB window of two scalp maps, animal and distractor, for the 150 to 250 ms mean: red at the back and blue at the front, with red notes." caption="Scalp maps from 150 to 250 ms (design 3)" source="D6" />
 
 ## Why not stop at the average curve?
 
@@ -225,6 +224,13 @@ STUDY = std_erspplot(STUDY, ALLEEG, 'channels', pz, 'design', 3);
 - **The all-participants plot:** a thin curve for each participant, and you can tell whether most of them follow the direction of the average.
 - **The maps:** two maps for animal and distractor, with a title that shows 150 to 250 ms.
 - **The ERSP at Pz:** two time × frequency images, one per picture, with no error in the command window.
+
+
+<Figure src="study-plot-channels/spectrum-oz-en.webp" alt="The real EEGLAB window of the group spectrum at OZ: two close curves for animal and distractor with an alpha peak near 10 Hz." caption="Group spectrum at Oz (design 3)" source="D6" />
+
+<Figure src="study-plot-channels/ersp-pz-en.webp" alt="The real EEGLAB window of the ERSP at PZ: two time-frequency images for animal and distractor, red below 7 Hz and blue near 10 Hz after zero." caption="ERSP at Pz (design 3)" source="D6" />
+
+Note: the first group ERP window (two curves per panel) looks like the participants plot above, without the thin lines.
 
 ## Common mistakes when plotting group results
 
