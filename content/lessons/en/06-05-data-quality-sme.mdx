@@ -5,7 +5,7 @@ description: How to read the SME values ERPLAB computes during averaging, and co
 station: 6
 order: 5
 level: optional
-status: review
+status: approved
 objectives:
   - Show the aSME values of an ERPset in the ERPLAB table, and read them for each channel and time window.
   - Collect the SME for one channel and window across all participants in a script, and identify the outlier participant.
@@ -55,9 +55,7 @@ So how do you read SME values in ERPLAB, and spot the participant whose data are
 
 ## How does a weak participant stand out?
 
-<ImageSpec>
-Dot plot: participants 1 to 40 on the horizontal axis, aSME in µV at C3 in the 200 to 300 ms window, bin 1, on the vertical axis. A horizontal line at the median, and a dashed line at twice the median. Most dots sit near the median, and dots above the dashed line are in a different color with the participant number. Source: script on the chapter 10 data from Luck's book. Data: ERP CORE, image license CC BY-SA 4.0.
-</ImageSpec>
+<Figure src="data-quality-sme/sme-c3-dots-en.webp" alt="Dot plot of aSME at C3 in the 200 to 300 ms window for participants 1 to 40, with a solid line at the median (about 0.86 µV) and a dashed line at twice the median, with no dot above it, with red notes." caption="aSME at C3, 200 to 300 ms, bin 1: one dot per participant" source="D3" />
 
 Compare SME across participants. A participant whose SME is much larger than the others adds noise to the whole analysis, and deserves a look before their data enter the statistics.
 

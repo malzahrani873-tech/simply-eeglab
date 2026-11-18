@@ -5,7 +5,7 @@ description: Measure mean amplitude, peak amplitude, and latency with the ERPLAB
 station: 6
 order: 3
 level: recommended
-status: review
+status: approved
 objectives:
   - Measure the mean amplitude in a predefined time window for many ERPsets at once, from the GUI and from a script.
   - Measure the peak amplitude and latency of the same component, and compare the results with the mean amplitude.
@@ -58,9 +58,7 @@ So how do you measure amplitude and latency with ERPLAB's measurement tool, and 
 
 ## How do mean amplitude, peak amplitude, and latency differ?
 
-<ImageSpec>
-Grand average of the LRP difference wave at `C3/C4` across 40 participants, bin 1 (Compatible), from -200 to 800 ms, negative down. The window from 150 to 400 ms is shaded. Inside it, a dashed horizontal line at the mean amplitude, and a dot at the lowest value (the negative peak amplitude) with a vertical line down to the time axis (the latency). Source: script on the chapter 10 data from Luck's book. Data: ERP CORE, image license CC BY-SA 4.0.
-</ImageSpec>
+<Figure src="erplab-amplitude-latency/lrp-grand-c3c4-en.webp" alt="Grand average of the LRP difference wave at C3/C4 across 40 participants, bin 1 (compatible), negative down: the grey window from 150 to 400 ms, a dashed blue line at the mean amplitude, and a red dot at the negative peak with a red line marking its time, with red notes." caption="Grand average at C3/C4, compatible: mean amplitude, peak and latency. The peak of this average (about 285 ms) is not the same as the mean of each participant's peak (about 318 ms), which you measure later." source="D3" />
 
 Mean amplitude is the dashed line: the average of all points inside the window. Peak amplitude is the lowest point alone, and latency is its time.
 
