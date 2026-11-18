@@ -51,6 +51,7 @@ startingPoint:
 
     % Convert the old .dat data files to .fdt once: resaving them in their old format damages the data in EEGLAB 2026.1
     setFiles = dir(fullfile(studyDir, '*', '*.set'));
+    setFiles = setFiles(~endsWith({setFiles.folder}, 'limo'));   % skip the files the LIMO lesson writes in studyDir/limo
     for k = 1:numel(setFiles)
         [~, base] = fileparts(setFiles(k).name);
         folder = setFiles(k).folder;
@@ -69,6 +70,7 @@ startingPoint:
             {'cba','clm','ega','fsa','gro','hth','lmi','mba','mma','mta','pla','sce','sph','wpa'}, ...
             {'F',  'F',  'F',  'M',  'M',  'M',  'F',  'F',  'M',  'F',  'M',  'F',  'M',  'M'});
         files = dir(fullfile(studyDir, '*', '*.set'));
+        files = files(~endsWith({files.folder}, 'limo'));   % skip the files the LIMO lesson writes in studyDir/limo
         commands = {};
         for k = 1:numel(files)
             hdr = pop_loadset('filename', files(k).name, 'filepath', files(k).folder, 'loadmode', 'info');

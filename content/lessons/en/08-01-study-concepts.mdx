@@ -133,6 +133,7 @@ Why not continue with D1? Because D1 is one participant's recording, and a STUDY
 ```matlab
 % studyDir comes from the starting point script
 files = dir(fullfile(studyDir, '*', '*.set'));
+files = files(~endsWith({files.folder}, 'limo'));   % skip the files the LIMO lesson writes in studyDir/limo
 fprintf('%d dataset files under %s\n', numel(files), studyDir);
 
 % Header only (no data) of the animal file of the first and the last participant
