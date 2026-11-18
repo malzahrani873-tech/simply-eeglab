@@ -99,8 +99,8 @@ So which pre-stimulus period do you choose, and how do you subtract it?
 ## What does correction do to the epochs?
 
 <BeforeAfter>
-<ImageSpec>EEGLAB's Channel ERP image window for channel Pz in `D1 epochs` before baseline correction: each horizontal row is one epoch, colour is amplitude, and the average is below.</ImageSpec>
-<ImageSpec>The same window for Pz in `D1 epochs bl` after baseline correction from -200 to 0 ms, with the same colour scale.</ImageSpec>
+<Figure src="baseline-correction/erpimage-pz-before-en.webp" alt="The real Channel ERP image window for Pz before baseline correction: one row per epoch, colours from -30 to +30 µV, the average below. Notes on the part before zero, on the average and on the colour scale." caption="Before: D1 epochs" source="D1" />
+<Figure src="baseline-correction/erpimage-pz-after-en.webp" alt="The same window after baseline correction from -200 to 0 ms, with the same colour scale: the part just before zero is closer to green, and the average starts from zero." caption="After: D1 epochs bl" source="D1" />
 </BeforeAfter>
 
 Both images are the <MenuPath>Plot > Channel ERP image</MenuPath> window for channel Pz: each horizontal row is one epoch, and colour is amplitude. Before correction, the colour of the rows just before zero changes from epoch to epoch, because each epoch starts at a different level. After correction, the part from -200 to 0 has the colour of zero in every row. Any change after the stimulus is now measured relative to what came just before it.

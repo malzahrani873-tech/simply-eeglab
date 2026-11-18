@@ -99,8 +99,8 @@ updated: 2026-10-28
 ## ماذا يفعل التصحيح بالـ epochs؟
 
 <BeforeAfter>
-<ImageSpec>نافذة Channel ERP image من EEGLAB لقناة Pz في `D1 epochs` قبل تصحيح baseline: كل سطر أفقي epoch، واللون سعة الإشارة، وتحتها المتوسط.</ImageSpec>
-<ImageSpec>نفس النافذة لقناة Pz في `D1 epochs bl` بعد تصحيح baseline من -200 إلى 0 ميلي ثانية، وبنفس مقياس الألوان.</ImageSpec>
+<Figure src="baseline-correction/erpimage-pz-before-ar.webp" alt="نافذة Channel ERP image الحقيقية لـ Pz قبل تصحيح baseline: سطر لكل epoch، وألوان من -30 إلى +30 ميكروفولت، والمتوسط تحتها. ملاحظات على ما قبل الصفر وعلى المتوسط وعلى مقياس الألوان." caption="قبل: D1 epochs" source="D1" />
+<Figure src="baseline-correction/erpimage-pz-after-ar.webp" alt="نفس النافذة بعد تصحيح baseline من -200 إلى 0 ميلي ثانية وبنفس مقياس الألوان: الجزء قبل الصفر مباشرة أقرب إلى الأخضر، والمتوسط يبدأ من الصفر." caption="بعد: D1 epochs bl" source="D1" />
 </BeforeAfter>
 
 في الصورتين نافذة <MenuPath>Plot > Channel ERP image</MenuPath> لقناة Pz: كل سطر أفقي epoch، واللون سعة الإشارة. قبل التصحيح يختلف لون السطور في الجزء الذي يسبق الصفر من epoch إلى آخر، لأن كل epoch يبدأ من مستوى مختلف. بعد التصحيح يصير هذا الجزء من -200 إلى 0 بلون الصفر في كل السطور. فصار أي تغيّر بعد المثير يُقاس بالنسبة إلى ما قبله مباشرة.
