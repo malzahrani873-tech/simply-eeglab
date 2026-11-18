@@ -179,6 +179,9 @@ EEGLAB يختبر كل نقطة زمنية وحدها، والـ epoch فيه م
 **ثانياً: اضبط الاختبار**
 
 1. اضغط زر <UiLabel>STATS</UiLabel> بين العمودين (مكتوب تحته `params`). تفتح نافذة <UiLabel>Set statistical parameters -- pop_statparams()</UiLabel>.
+
+<EeglabWindow id="statparams" use={{ condstats: "اختره", mcorrect: "`Use FDR correction`", alpha: "`0.05`" }} />
+
 2. فعّل <UiLabel>Compute 1st independent variable statistics if any</UiLabel>. اترك <UiLabel>Compute 2nd independent variable statistics if any</UiLabel> غير مفعّل: التصميم 3 فيه متغيّر واحد فقط.
 3. أبقِ <UiLabel>Use EEGLAB statistics</UiLabel> مفعّلاً، واختر <UiLabel>Use parametric statistics</UiLabel> في القائمة تحته.
 4. في <UiLabel>Statistical threshold (p-value)</UiLabel> ضع `0.05` مكان `exact`.

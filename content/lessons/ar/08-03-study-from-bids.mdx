@@ -99,6 +99,9 @@ updated: 2026-10-28
 
 1. افتح <MenuPath>File > Import data > From BIDS folder structure</MenuPath>. (نفس النافذة موجودة في <MenuPath>File > BIDS tools > Import BIDS folder to STUDY</MenuPath>.)
 2. اختر مجلد `ds002680` الذي نزّلته. تفتح نافذة <UiLabel>Import BIDS data -- pop_importbids()</UiLabel>.
+
+<EeglabWindow id="importbids" use={{ eventtype: "`value`", subjects: "اختياري للتجربة السريعة" }} />
+
 3. في <UiLabel>Enter study name (default is BIDS folder name)</UiLabel> اكتب `gonogo_bids`.
 4. أبقِ <UiLabel>Use BIDS electrode.tsv files (when present) for channel locations; off: look up locations using channel labels</UiLabel> مفعّلاً. قنوات هذه البيانات بأسماء غير قياسية (مثل `CB1`)، فالبحث بالاسم لا يجد مواقعها.
 5. أبقِ <UiLabel>Use BIDS event.tsv files for events and use the following BIDS field for event type</UiLabel> مفعّلاً، وتأكد أن القائمة بجانبه على `value`.

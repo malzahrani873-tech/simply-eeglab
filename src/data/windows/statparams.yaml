@@ -1,0 +1,71 @@
+id: statparams
+func: pop_statparams
+source: "EEGLAB pop_statparams.m (uilist)"
+title: "Set statistical parameters -- pop_statparams()"
+menu: "Study > Plot channel measures > STATS params"
+shot: statparams-dialog
+numbered: true
+intro:
+  ar: "من هنا تختار الاختبار الإحصائي والعتبة والتصحيح قبل أن ترسم. تفتحها من زر STATS في نافذة رسم القنوات."
+  en: "Here you choose the statistical test, the threshold and the correction before you plot. Open it with the STATS button in the channel plotting window."
+fields:
+  - key: condstats
+    label: "Compute 1st independent variable statistics if any"
+    kind: checkbox
+    default: "off"
+    ar: "اختبار المتغير الأول في التصميم، مثل نوع الصورة."
+    en: "Test the first variable of the design, such as the picture type."
+  - key: groupstats
+    label: "Compute 2nd independent variable statistics if any"
+    kind: checkbox
+    default: "off"
+    ar: "اختبار المتغير الثاني، مثل الجنس. اتركه فارغاً إذا كان في التصميم متغير واحد."
+    en: "Test the second variable, such as gender. Leave it unticked when the design has one variable."
+  - key: marginal
+    label: "Plot marginal statistics (unckeck to plot main effect)"
+    kind: checkbox
+    default: "off"
+    ar: "في تصميم بمتغيرين: يرسم اختباراً لكل مستوى بدل الأثر الرئيسي. اتركه فارغاً في هذه الدروس."
+    en: "In a two-variable design: plots one test per level instead of the main effect. Leave it unticked in these lessons."
+  - key: singletrials
+    label: "Use single trials for statistics (not recommended if more than 1 subject in the study)"
+    kind: checkbox
+    default: "off"
+    ar: "يختبر المحاولات بدل المشاركين. لا تستعمله في دراسة فيها أكثر من مشارك."
+    en: "Tests trials instead of participants. Do not use it in a study with more than one participant."
+  - key: eeglab
+    label: "Use EEGLAB statistics"
+    kind: checkbox
+    default: "on"
+    ar: "يستعمل اختبارات EEGLAB نفسها. أبقه مختاراً."
+    en: "Uses EEGLAB's own tests. Keep it ticked."
+  - key: method
+    label: "Use parametric statistics"
+    kind: menu
+    default: "Use parametric statistics"
+    ar: "نوع الاختبار: parametric (اختبار t أو ANOVA عادي)، أو permutation، أو bootstrap."
+    en: "The kind of test: parametric (an ordinary t-test or ANOVA), permutation, or bootstrap."
+  - key: alpha
+    label: "Statistical threshold (p-value)"
+    kind: edit
+    default: "exact"
+    ar: "`exact` يرسم قيم p كما هي. اكتب `0.05` لترى أين يتجاوز الفرق العتبة."
+    en: "`exact` plots the p-values as they are. Type `0.05` to see where the difference passes the threshold."
+  - key: mcorrect
+    label: "Do not correct for multiple comparisons"
+    kind: menu
+    default: "Do not correct for multiple comparisons"
+    ar: "تصحيح الاختبارات الكثيرة: لا تصحيح، أو Bonferroni، أو Holms، أو FDR."
+    en: "The correction for many tests: none, Bonferroni, Holms or FDR."
+  - key: naccu
+    label: "Randomization (n)"
+    kind: edit
+    default: "auto"
+    ar: "عدد مرات الخلط في permutation أو bootstrap. رمادي مع parametric."
+    en: "The number of shuffles for permutation or bootstrap. Grey with parametric."
+  - key: fieldtrip
+    label: "Use Fieldtrip statistics"
+    kind: checkbox
+    default: "off"
+    ar: "اختبارات Fieldtrip، ومنها تصحيح العناقيد. تحتاج إضافة Fieldtrip-lite."
+    en: "Fieldtrip tests, including cluster correction. Needs the Fieldtrip-lite plugin."

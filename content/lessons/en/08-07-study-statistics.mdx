@@ -179,6 +179,9 @@ In this task, the animal pictures are the go trials (the participant lifts a fin
 **2. Set the test**
 
 1. Press the <UiLabel>STATS</UiLabel> button between the two columns (the word `params` is written under it). The <UiLabel>Set statistical parameters -- pop_statparams()</UiLabel> window opens.
+
+<EeglabWindow id="statparams" use={{ condstats: "tick it", mcorrect: "`Use FDR correction`", alpha: "`0.05`" }} />
+
 2. Tick <UiLabel>Compute 1st independent variable statistics if any</UiLabel>. Leave <UiLabel>Compute 2nd independent variable statistics if any</UiLabel> unticked: design 3 has one variable only.
 3. Keep <UiLabel>Use EEGLAB statistics</UiLabel> ticked, and choose <UiLabel>Use parametric statistics</UiLabel> in the list under it.
 4. In <UiLabel>Statistical threshold (p-value)</UiLabel> replace `exact` with `0.05`.

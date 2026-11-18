@@ -99,6 +99,9 @@ We download only two participants, sub-002 (female) and sub-005 (male), and run 
 
 1. Open <MenuPath>File > Import data > From BIDS folder structure</MenuPath>. (The same window is also at <MenuPath>File > BIDS tools > Import BIDS folder to STUDY</MenuPath>.)
 2. Choose the `ds002680` folder you downloaded. The <UiLabel>Import BIDS data -- pop_importbids()</UiLabel> window opens.
+
+<EeglabWindow id="importbids" use={{ eventtype: "`value`", subjects: "optional, for a quick try" }} />
+
 3. In <UiLabel>Enter study name (default is BIDS folder name)</UiLabel> type `gonogo_bids`.
 4. Keep <UiLabel>Use BIDS electrode.tsv files (when present) for channel locations; off: look up locations using channel labels</UiLabel> ticked. The channels in this data have non-standard names (such as `CB1`), so a lookup by name cannot find their positions.
 5. Keep <UiLabel>Use BIDS event.tsv files for events and use the following BIDS field for event type</UiLabel> ticked, and check that the list next to it is set to `value`.

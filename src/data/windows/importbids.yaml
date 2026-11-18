@@ -1,0 +1,64 @@
+id: importbids
+func: pop_importbids
+source: "EEG-BIDS pop_importbids.m (uilist)"
+title: "Import BIDS data -- pop_importbids()"
+menu: "File > Import data > From BIDS folder structure"
+shot: importbids-dialog
+numbered: true
+intro:
+  ar: "تفتح بعد أن تختار مجلد BIDS. تقرأ كل المشاركين وتصنع منهم STUDY واحدة."
+  en: "It opens after you choose the BIDS folder. It reads every participant and builds one STUDY from them."
+fields:
+  - key: studyName
+    label: "Enter study name (default is BIDS folder name)"
+    kind: edit
+    ar: "اسم الـ STUDY. إذا تركته فارغاً يأخذ اسم المجلد."
+    en: "The STUDY name. Left empty, it takes the folder name."
+  - key: bidschanloc
+    label: "Use BIDS electrode.tsv files (when present) for channel locations"
+    kind: checkbox
+    default: "on"
+    ar: "يأخذ مواقع الأقطاب من ملف electrodes.tsv. أبقه مختاراً."
+    en: "Takes electrode positions from electrodes.tsv. Keep it ticked."
+  - key: bidsevent
+    label: "Use BIDS event.tsv files for events"
+    kind: checkbox
+    default: "on"
+    ar: "يقرأ الأحداث من ملفات events.tsv. أبقه مختاراً."
+    en: "Reads the events from the events.tsv files. Keep it ticked."
+  - key: eventtype
+    label: "use the following BIDS field for event type"
+    kind: menu
+    default: "value"
+    ar: "العمود الذي يصير نوع الحدث في EEGLAB. في ds002680 هو `value`."
+    en: "The column that becomes the event type in EEGLAB. In ds002680 it is `value`."
+  - key: tasks
+    label: "Import only the following BIDS tasks"
+    kind: checkbox
+    default: "off"
+    ar: "لاستيراد مهمة واحدة فقط إذا كان في البيانات أكثر من مهمة."
+    en: "To import one task only when the data hold several."
+  - key: sessions
+    label: "Import only the following sessions"
+    kind: checkbox
+    default: "off"
+    ar: "لاستيراد جلسات محددة فقط."
+    en: "To import some sessions only."
+  - key: runs
+    label: "Import only the following runs"
+    kind: checkbox
+    default: "off"
+    ar: "لاستيراد تسجيلات (runs) محددة فقط."
+    en: "To import some runs only."
+  - key: subjects
+    label: "Import only the following participant indices"
+    kind: checkbox
+    default: "off"
+    ar: "أرقام المشاركين، مثل `1 2` لأول اثنين. مفيد للتجربة السريعة."
+    en: "Participant numbers, such as `1 2` for the first two. Useful for a quick try."
+  - key: outdir
+    label: "Study output folder"
+    kind: edit
+    default: "derivatives/eeglab inside the BIDS folder"
+    ar: "مكان حفظ ملفات .set والـ STUDY. القيمة الأصلية مجلد derivatives داخل مجلد BIDS."
+    en: "Where the .set files and the STUDY are saved. The default is a derivatives folder inside the BIDS folder."
