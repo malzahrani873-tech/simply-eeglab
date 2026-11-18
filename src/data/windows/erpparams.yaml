@@ -1,0 +1,44 @@
+id: erpparams
+func: pop_erpparams
+source: "EEGLAB pop_erpparams.m (uilist)"
+title: "ERP plotting options -- pop_erpparams()"
+menu: "Study > Plot channel measures > Params (next to Plot ERPs)"
+shot: erpparams-dialog
+numbered: true
+intro:
+  ar: "خيارات رسم ERP المجموعة. تفتحها من زر Params بجانب Plot ERPs. تغيّر الرسم فقط، لا البيانات."
+  en: "The options for plotting group ERPs. Open it with the Params button next to Plot ERPs. It changes the plot only, not the data."
+fields:
+  - key: timerange
+    label: "Time range (ms) [low high]"
+    kind: edit
+    ar: "الفترة الزمنية المرسومة. فارغ يعني كل الـ epoch. اكتب مثلاً `150 250` لخرائط الرأس."
+    en: "The time range to plot. Empty means the whole epoch. Type for example `150 250` for scalp maps."
+  - key: ylim
+    label: "Plot limits [low high]"
+    kind: edit
+    ar: "حدود المحور العمودي بالميكروفولت. ثبّتها عندما تقارن رسمين."
+    en: "The vertical axis limits in microvolts. Fix them when you compare two plots."
+  - key: filter
+    label: "Lowpass plotted data [Hz]"
+    kind: edit
+    ar: "ينعّم المنحنى في الرسم فقط. لا تستعمله لتحسين منحنى ضعيف."
+    en: "Smooths the curve in the plot only. Do not use it to improve a weak curve."
+  - key: plotconditions
+    label: "Plot first variable on the same panel"
+    kind: checkbox
+    default: "off"
+    ar: "يرسم قيم المتغير الأول (مثل animal و distractor) في لوحة واحدة لتقارن بينها."
+    en: "Plots the values of the first variable (such as animal and distractor) on one panel, to compare them."
+  - key: plotgroups
+    label: "Plot second variable on the same panel"
+    kind: checkbox
+    default: "off"
+    ar: "مثله للمتغير الثاني (مثل الجنس). رمادي إذا لم يكن في التصميم متغير ثانٍ."
+    en: "The same for the second variable (such as gender). Grey when the design has no second variable."
+  - key: multiplechan
+    label: "Multiple channels selection"
+    kind: menu
+    default: "Plot channels individually"
+    ar: "عند اختيار أكثر من قناة: كل قناة وحدها، أو خريطة رأس لمتوسط الفترة، أو متوسط القنوات، أو RMS."
+    en: "When several channels are selected: each channel alone, a scalp map of the window mean, the channel average, or the RMS."

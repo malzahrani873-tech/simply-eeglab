@@ -165,9 +165,10 @@ In a script, the frequency response window does not open, because `'plotfreqz'` 
    - The effect of the 0.1 Hz high-pass does not show in this spectrum, because its resolution is about 1 Hz. You check it in the next step.
 3. **Look at the signal itself.** Open <MenuPath>Plot > Channel data (scroll)</MenuPath> on the original, then on `D1 hp0.1`. Each channel should stay centered on a steady line instead of slowly rising and falling.
 
-<ImageSpec optional>
-D1 spectrum for all channels before and after filtering, from Plot > Channel spectra and maps with a plotting range of 1 to 64 Hz. Before: an alpha peak near 10 Hz and a sharp peak at 60 Hz. After a 0.1 Hz high-pass and a 30 Hz low-pass: a clear drop above about 34 Hz, the 60 Hz peak gone, and the alpha peak unchanged.
-</ImageSpec>
+<BeforeAfter>
+<Figure src="filtering/spectopo-before-en.webp" alt="The real EEGLAB spectrum of all D1 channels from 1 to 64 Hz before filtering: an alpha peak near 10 Hz and a sharp peak at 60 Hz." caption="Before" source="D1" />
+<Figure src="filtering/spectopo-after-en.webp" alt="The same spectrum after the 0.1 Hz high-pass and the 30 Hz low-pass: a sharp drop above about 34 Hz, no 60 Hz peak, and the same alpha peak." caption="After" source="D1" />
+</BeforeAfter>
 
 <Methods>
 Data were high-pass filtered using a zero-phase Hamming-windowed sinc FIR filter (passband edge 0.1 Hz, cutoff frequency [0.05] Hz at −6 dB, transition bandwidth [0.1] Hz, filter length [4225] points; pop_eegfiltnew, firfilt plugin 2.8, EEGLAB 2026.1; Widmann et al., 2015).

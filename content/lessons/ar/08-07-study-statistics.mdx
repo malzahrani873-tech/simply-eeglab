@@ -190,6 +190,9 @@ EEGLAB يختبر كل نقطة زمنية وحدها، والـ epoch فيه م
 5. في قائمة التصحيح اختر <UiLabel>Use FDR correction</UiLabel>. اضغط <UiLabel>Ok</UiLabel>.
 6. اضغط <UiLabel>Plot ERPs</UiLabel>. يظهر المنحنيان في لوحة واحدة. الأزمنة التي يجتاز فيها الفرق العتبة المصحّحة تظهر أشرطةً داكنة على طول أسفل اللوحة. في D6 عند Pz قد لا يظهر أي شريط بعد FDR: في تجربتنا اجتازت عشرات النقاط العتبة قبل التصحيح، ولم تبقَ نقطة بعده. هذه نتيجة صحيحة، لا خطأ في الخطوات، ومعناها أن الفرق عند Pz وحدها لا يصمد أمام التصحيح.
 
+<Figure src="study-statistics/erp-pz-fdr-ar.webp" alt="نافذة EEGLAB الحقيقية لـ ERP في PZ لـ animal و distractor مع اختبار FDR: شريط الإحصاء تحت المنحنيين فارغ، مع ملاحظات حمراء." caption="Pz مع FDR: لا شريط، ولا نقطة تتجاوز العتبة بعد التصحيح" source="D6" />
+
+
 <Callout type="note" title="صندوق الإحصاء في MATLAB">
 الاختبار البارامتري يحتاج الدالة `fcdf` من صندوق أدوات MATLAB المسمّى Statistics and Machine Learning Toolbox. بدون هذا الصندوق يكتب EEGLAB في نافذة الأوامر رسالة تبدأ بـ `statcond(): parametric testing requires fcdf()`، ويجري اختبار التباديل (permutation) بدلاً منه. النتيجة تبقى صحيحة، لكن الحساب أبطأ، وقد تتغير النتيجة قليلاً من تشغيل لآخر.
 </Callout>
@@ -197,7 +200,10 @@ EEGLAB يختبر كل نقطة زمنية وحدها، والـ epoch فيه م
 **ثالثاً: انظر ماذا يفعل التصحيح**
 
 1. اضغط <UiLabel>STATS</UiLabel> مرة أخرى واختر <UiLabel>Do not correct for multiple comparisons</UiLabel>. اضغط <UiLabel>Ok</UiLabel>، ثم <UiLabel>Plot ERPs</UiLabel>.
-2. قارن بالرسم السابق. بلا تصحيح تظهر أشرطة أكثر، وبعضها قصير ومنعزل، وكثيراً ما يكون في فترة الـ baseline قبل ظهور الصورة. الفرق قبل المثير لا يمكن أن يسبّبه المثير: هذه نقاط الصدفة التي يزيلها التصحيح.
+2. قارن بالرسم السابق. بلا تصحيح يظهر شريط داكن، وكان في تجربتنا من نحو 300 إلى 550 ميلي ثانية. وقد ترى في بيانات أخرى أشرطة قصيرة منعزلة، أحياناً في فترة الـ baseline قبل ظهور الصورة. الفرق قبل المثير لا يمكن أن يسبّبه المثير: هذه نقاط الصدفة التي يزيلها التصحيح.
+
+<Figure src="study-statistics/erp-pz-uncorrected-ar.webp" alt="النافذة نفسها بلا تصحيح: شريط أسود من نحو 300 إلى 550 ميلي ثانية تحت المنحنيين، مع ملاحظات حمراء." caption="Pz بلا تصحيح: شريط واحد من نحو 300 إلى 550 ميلي ثانية" source="D6" />
+
 3. أرجع التصحيح إلى <UiLabel>Use FDR correction</UiLabel>.
 
 **رابعاً: اختبر نافذة محددة مسبقاً**
@@ -207,6 +213,9 @@ EEGLAB يختبر كل نقطة زمنية وحدها، والـ epoch فيه م
 1. اضغط <UiLabel>Sel. all</UiLabel> لتحديد كل القنوات.
 2. اضغط <UiLabel>Params</UiLabel> بجانب <UiLabel>Plot ERPs</UiLabel>. اكتب أولاً `150 250` في <UiLabel>Time range (ms) [low high]</UiLabel>، ثم اختر <UiLabel>Plot averaged topography over time range</UiLabel> في <UiLabel>Multiple channels selection</UiLabel>. اضغط <UiLabel>Ok</UiLabel>.
 3. اضغط <UiLabel>Plot ERPs</UiLabel>. تظهر خريطتا رأس، واحدة لكل صورة، وخريطة ثالثة للاختبار في كل قناة. هنا يصحّح FDR عبر كل القنوات، لأن كل قناة أصبحت اختباراً واحداً. لاحظ أن Thorpe وزملاءه وصفوا الأثر فوق المناطق الأمامية، بينما اختبرت في «ثانياً» قناة Pz وحدها. لا تناقض هنا: هذان تحليلان منفصلان. خريطة الاختبار تريك أين يظهر الفرق فعلاً.
+
+<Figure src="study-statistics/topo-150-250-fdr-ar.webp" alt="نافذة EEGLAB الحقيقية لثلاث خرائط: animal و distractor وخريطة الاختبار، والنقاط الحمراء فيها قنوات فيها فرق دالّ بعد FDR." caption="خرائط 150 إلى 250 ميلي ثانية مع خريطة الاختبار (FDR)" source="D6" />
+
 4. بعد ذلك أرجع <UiLabel>Multiple channels selection</UiLabel> إلى <UiLabel>Plot channels individually</UiLabel> وامسح <UiLabel>Time range (ms) [low high]</UiLabel>.
 
 **خامساً: تصحيح العناقيد (يحتاج Fieldtrip-lite)**
@@ -221,6 +230,9 @@ EEGLAB يختبر كل نقطة زمنية وحدها، والـ epoch فيه م
 1. غيّر <UiLabel>Select design:</UiLabel> إلى `image x gender`، و`Pz` ما زالت محددة.
 2. افتح <UiLabel>STATS</UiLabel> وفعّل أيضاً <UiLabel>Compute 2nd independent variable statistics if any</UiLabel>. أبقِ <UiLabel>Use FDR correction</UiLabel> والعتبة `0.05`. اضغط <UiLabel>Ok</UiLabel>.
 3. اضغط <UiLabel>Plot ERPs</UiLabel>. تظهر في نافذة الأوامر الرسالة `Warning: cannot plot condition/group on the same panel while using a fixed`، ويرسم EEGLAB كل خلية في لوحة وحدها، مع لوحات إضافية لأثر الصورة وأثر الجنس والتفاعل بينهما.
+
+<Figure src="study-statistics/erp-pz-2x2-ar.webp" alt="نافذة EEGLAB الحقيقية للتصميم 2×2 في PZ: أربع لوحات ERP وثلاث لوحات إحصاء فارغة لنوع الصورة والجنس والتفاعل." caption="التصميم 2×2 في Pz: أربع خلايا وثلاث لوحات اختبار فارغة" source="D6" />
+
 4. ألغِ تفعيل <UiLabel>Compute 2nd independent variable statistics if any</UiLabel> عندما تنتهي.
 
 قبل أن تفسّر لوحة التفاعل، اقرأ قسم «هل أثق باختبار التصميم المختلط 2×2 في EEGLAB؟» أدناه.

@@ -131,6 +131,8 @@ So how do you plot group ERPs, maps and spectra from the precomputed measures, a
 
 ## What do the group ERP and the scalp maps look like?
 
+<Figure src="study-plot-channels/erp-group-pz-en.webp" alt="The real EEGLAB window of the group ERP at PZ with design 2: one panel for F and one for M, each with a blue animal curve and a green distractor curve." caption="Group ERP at Pz (design 2)" source="D6" />
+
 <Figure src="study-plot-channels/erp-subjects-pz-en.webp" alt="The real EEGLAB window of the ERP at PZ for each participant with design 2: four panels for the two genders and two picture types, thin blue lines for participants and a black line for the average, with red notes." caption="ERP at Pz for each participant (design 2): the black line is the average" source="D6" />
 
 <Figure src="study-plot-channels/topo-150-250-en.webp" alt="The real EEGLAB window of two scalp maps, animal and distractor, for the 150 to 250 ms mean: red at the back and blue at the front, with red notes." caption="Scalp maps from 150 to 250 ms (design 3)" source="D6" />
@@ -157,6 +159,9 @@ The average hides differences between people. One participant with a very large 
 
 1. Choose `Pz` in the left list.
 2. Press <UiLabel>Params</UiLabel> next to <UiLabel>Plot ERPs</UiLabel>. The <UiLabel>ERP plotting options -- pop_erpparams()</UiLabel> window opens.
+
+<EeglabWindow id="erpparams" use={{ plotconditions: "tick it", multiplechan: "`Plot channels individually`" }} />
+
 3. Tick <UiLabel>Plot first variable on the same panel</UiLabel>, so animal and distractor appear in one panel. Leave <UiLabel>Plot second variable on the same panel</UiLabel> unticked, so each group has its own panel. Leave <UiLabel>Time range (ms) [low high]</UiLabel> empty for the whole epoch. Press <UiLabel>Ok</UiLabel>.
 4. Press <UiLabel>Plot ERPs</UiLabel>. Two panels appear, F and M, each with the curves of both pictures.
 5. Read them as in the channel ERP lesson: look first at the y axis and its direction. Then ask: where do the two curves start to separate? Is the difference similar in both panels?
@@ -231,8 +236,6 @@ STUDY = std_erspplot(STUDY, ALLEEG, 'channels', pz, 'design', 3);
 <Figure src="study-plot-channels/spectrum-oz-en.webp" alt="The real EEGLAB window of the group spectrum at OZ: two close curves for animal and distractor with an alpha peak near 10 Hz." caption="Group spectrum at Oz (design 3)" source="D6" />
 
 <Figure src="study-plot-channels/ersp-pz-en.webp" alt="The real EEGLAB window of the ERSP at PZ: two time-frequency images for animal and distractor, red below 7 Hz and blue near 10 Hz after zero." caption="ERSP at Pz (design 3)" source="D6" />
-
-Note: the first group ERP window (two curves per panel) looks like the participants plot above, without the thin lines.
 
 ## Common mistakes when plotting group results
 

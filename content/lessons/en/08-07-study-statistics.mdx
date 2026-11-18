@@ -190,6 +190,9 @@ In this task, the animal pictures are the go trials (the participant lifts a fin
 5. In the correction list choose <UiLabel>Use FDR correction</UiLabel>. Press <UiLabel>Ok</UiLabel>.
 6. Press <UiLabel>Plot ERPs</UiLabel>. The two curves appear on one panel. Times where the difference passes the corrected threshold appear as dark bars along the bottom of the panel. In D6 at Pz you may see no bar after FDR: in our run dozens of points passed before correction and none after it. This is a correct result, not a mistake in your steps: the difference at Pz alone does not survive the correction.
 
+<Figure src="study-statistics/erp-pz-fdr-en.webp" alt="The real EEGLAB window of the ERP at PZ for animal and distractor with the FDR test: the statistics strip under the curves is empty, with red notes." caption="Pz with FDR: no bar, nothing passes after correction" source="D6" />
+
+
 <Callout type="note" title="The MATLAB statistics toolbox">
 The parametric test needs the `fcdf` function from the MATLAB Statistics and Machine Learning Toolbox. Without this toolbox, EEGLAB prints a message in the command window that starts with `statcond(): parametric testing requires fcdf()` and runs a permutation test instead. The result is still valid, but it is slower and can change slightly from one run to the next.
 </Callout>
@@ -197,7 +200,10 @@ The parametric test needs the `fcdf` function from the MATLAB Statistics and Mac
 **3. See what the correction does**
 
 1. Press <UiLabel>STATS</UiLabel> again and choose <UiLabel>Do not correct for multiple comparisons</UiLabel>. Press <UiLabel>Ok</UiLabel>, then <UiLabel>Plot ERPs</UiLabel>.
-2. Compare with the previous plot. Without correction there are more bars, and some are short isolated bars, often in the baseline before the picture appears. A difference before the stimulus cannot be caused by the stimulus: these are the chance points the correction removes.
+2. Compare with the previous plot. Without correction a dark bar appears, in our run from about 300 to 550 ms. In other data you may also see short isolated bars, sometimes in the baseline before the picture appears. A difference before the stimulus cannot be caused by the stimulus: these are the chance points the correction removes.
+
+<Figure src="study-statistics/erp-pz-uncorrected-en.webp" alt="The same window without correction: a black bar from about 300 to 550 ms under the curves, with red notes." caption="Pz without correction: one bar from about 300 to 550 ms" source="D6" />
+
 3. Set the correction back to <UiLabel>Use FDR correction</UiLabel>.
 
 **4. Test a window chosen in advance**
@@ -207,6 +213,9 @@ The window is 150 to 250 ms. The section "Why choose the time window before look
 1. Press <UiLabel>Sel. all</UiLabel> to select every channel.
 2. Press <UiLabel>Params</UiLabel> next to <UiLabel>Plot ERPs</UiLabel>. Type `150 250` in <UiLabel>Time range (ms) [low high]</UiLabel> first, then choose <UiLabel>Plot averaged topography over time range</UiLabel> in <UiLabel>Multiple channels selection</UiLabel>. Press <UiLabel>Ok</UiLabel>.
 3. Press <UiLabel>Plot ERPs</UiLabel>. Two scalp maps appear, one per picture, with a third map of the test at each channel. Here FDR corrects across all the channels, because each channel is now one test. Note that Thorpe and colleagues described the effect over frontal sites, while in part 2 you tested Pz alone. This is not a contradiction: they are two separate analyses. The test map shows you where the difference actually appears.
+
+<Figure src="study-statistics/topo-150-250-fdr-en.webp" alt="The real EEGLAB window of three maps: animal, distractor, and the test map where red dots mark channels with a significant difference after FDR." caption="Maps from 150 to 250 ms with the test map (FDR)" source="D6" />
+
 4. Afterwards set <UiLabel>Multiple channels selection</UiLabel> back to <UiLabel>Plot channels individually</UiLabel> and clear <UiLabel>Time range (ms) [low high]</UiLabel>.
 
 **5. Cluster correction (requires Fieldtrip-lite)**
@@ -221,6 +230,9 @@ The window is 150 to 250 ms. The section "Why choose the time window before look
 1. Change <UiLabel>Select design:</UiLabel> to `image x gender`, with `Pz` selected.
 2. Open <UiLabel>STATS</UiLabel> and tick <UiLabel>Compute 2nd independent variable statistics if any</UiLabel> as well. Keep <UiLabel>Use FDR correction</UiLabel> and the threshold `0.05`. Press <UiLabel>Ok</UiLabel>.
 3. Press <UiLabel>Plot ERPs</UiLabel>. The command window shows `Warning: cannot plot condition/group on the same panel while using a fixed`, and EEGLAB draws each cell on its own panel, with extra panels for the picture effect, the gender effect and their interaction.
+
+<Figure src="study-statistics/erp-pz-2x2-en.webp" alt="The real EEGLAB window of the 2x2 design at PZ: four ERP panels and three empty statistics panels for picture, gender and interaction." caption="The 2×2 design at Pz: four cells and three empty test panels" source="D6" />
+
 4. Untick <UiLabel>Compute 2nd independent variable statistics if any</UiLabel> when you are done.
 
 Before you interpret the interaction panel, read the section "Can I trust EEGLAB's test for the 2×2 mixed design?" below.

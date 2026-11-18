@@ -165,9 +165,10 @@ EEG_lp.setname = 'D1 hp0.1 lp30';
    - أثر الـ <En>high-pass</En> عند 0.1 هرتز لا يظهر في هذا الطيف، لأن دقته الترددية حوالي 1 هرتز. تتحقق منه في الخطوة التالية.
 3. **انظر إلى الإشارة نفسها.** افتح <MenuPath>Plot > Channel data (scroll)</MenuPath> على الأصلية ثم على `D1 hp0.1`. يجب أن تبقى كل قناة حول خط أفقي ثابت بدل أن تصعد وتنزل ببطء.
 
-<ImageSpec optional>
-طيف D1 لكل القنوات قبل الفلترة وبعدها، من نافذة Plot > Channel spectra and maps بنطاق رسم من 1 إلى 64 هرتز. قبل: قمة ألفا قرب 10 هرتز، وقمة حادة عند 60 هرتز. بعد high-pass 0.1 و low-pass 30: انخفاض واضح فوق 34 هرتز تقريباً واختفاء قمة 60، وقمة ألفا كما هي.
-</ImageSpec>
+<BeforeAfter>
+<Figure src="filtering/spectopo-before-ar.webp" alt="طيف EEGLAB الحقيقي لكل قنوات D1 من 1 إلى 64 هرتز قبل الفلترة: قمة ألفا قرب 10 هرتز وقمة حادة عند 60 هرتز." caption="قبل" source="D1" />
+<Figure src="filtering/spectopo-after-ar.webp" alt="الطيف نفسه بعد مرشّح 0.1 هرتز ومرشّح 30 هرتز: هبوط حاد فوق نحو 34 هرتز، ولا قمة عند 60 هرتز، وقمة ألفا كما هي." caption="بعد" source="D1" />
+</BeforeAfter>
 
 <Methods>
 Data were high-pass filtered using a zero-phase Hamming-windowed sinc FIR filter (passband edge 0.1 Hz, cutoff frequency [0.05] Hz at −6 dB, transition bandwidth [0.1] Hz, filter length [4225] points; pop_eegfiltnew, firfilt plugin 2.8, EEGLAB 2026.1; Widmann et al., 2015).

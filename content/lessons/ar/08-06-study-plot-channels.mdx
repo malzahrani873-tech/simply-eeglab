@@ -131,6 +131,8 @@ updated: 2026-10-28
 
 ## كيف يبدو ERP المجموعة وخريطة الرأس؟
 
+<Figure src="study-plot-channels/erp-group-pz-ar.webp" alt="نافذة EEGLAB الحقيقية لـ ERP المجموعة في PZ بالتصميم 2: لوحة لـ F وأخرى لـ M، وفي كل منهما منحنى أزرق لـ animal وأخضر لـ distractor." caption="ERP المجموعة في Pz (التصميم 2)" source="D6" />
+
 <Figure src="study-plot-channels/erp-subjects-pz-ar.webp" alt="نافذة EEGLAB الحقيقية لـ ERP في PZ لكل مشارك بالتصميم 2، أربع لوحات للجنسين ونوعي الصورة، وفيها خطوط زرقاء رفيعة للمشاركين وخط أسود للمتوسط، مع ملاحظات حمراء." caption="ERP في Pz لكل مشارك (التصميم 2): الخط الأسود هو المتوسط" source="D6" />
 
 <Figure src="study-plot-channels/topo-150-250-ar.webp" alt="نافذة EEGLAB الحقيقية لخريطتي رأس animal و distractor لمتوسط 150 إلى 250 ميلي ثانية، أحمر في الخلف وأزرق في الأمام، مع ملاحظات حمراء." caption="خريطتا الرأس من 150 إلى 250 ميلي ثانية (التصميم 3)" source="D6" />
@@ -157,6 +159,9 @@ updated: 2026-10-28
 
 1. اختر `Pz` في القائمة اليسرى.
 2. اضغط <UiLabel>Params</UiLabel> بجانب <UiLabel>Plot ERPs</UiLabel>. تفتح <UiLabel>ERP plotting options -- pop_erpparams()</UiLabel>.
+
+<EeglabWindow id="erpparams" use={{ plotconditions: "اختره", multiplechan: "`Plot channels individually`" }} />
+
 3. فعّل <UiLabel>Plot first variable on the same panel</UiLabel>، فيظهر animal و distractor في لوحة واحدة. اترك <UiLabel>Plot second variable on the same panel</UiLabel> غير مفعّل، فتظهر كل مجموعة في لوحة. اترك <UiLabel>Time range (ms) [low high]</UiLabel> فارغاً لكل الـ epoch. اضغط <UiLabel>Ok</UiLabel>.
 4. اضغط <UiLabel>Plot ERPs</UiLabel>. تظهر لوحتان: F و M، وفي كل منهما منحنيا الصورتين.
 5. اقرأها كما في درس رسم ERP للقنوات: انظر أولاً إلى محور y واتجاهه. ثم اسأل: أين يبدأ المنحنيان بالافتراق؟ وهل الفرق متشابه في اللوحتين؟
@@ -231,8 +236,6 @@ STUDY = std_erspplot(STUDY, ALLEEG, 'channels', pz, 'design', 3);
 <Figure src="study-plot-channels/spectrum-oz-ar.webp" alt="نافذة EEGLAB الحقيقية لطيف المجموعة في OZ، منحنيان متقاربان لـ animal و distractor مع قمة ألفا قرب 10 هرتز." caption="طيف المجموعة في Oz (التصميم 3)" source="D6" />
 
 <Figure src="study-plot-channels/ersp-pz-ar.webp" alt="نافذة EEGLAB الحقيقية لـ ERSP في PZ، صورتا زمن وتردد لـ animal و distractor، أحمر تحت 7 هرتز وأزرق قرب 10 هرتز بعد الصفر." caption="ERSP في Pz (التصميم 3)" source="D6" />
-
-ملاحظة: نافذة ERP المجموعة الأولى (منحنيان في كل لوحة) تشبه رسم المشاركين أعلاه لكن بلا الخطوط الرفيعة.
 
 ## أخطاء شائعة عند رسم نتائج المجموعة
 
