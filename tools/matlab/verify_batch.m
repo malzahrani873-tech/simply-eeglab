@@ -296,6 +296,8 @@ txt = regexprep(txt, '^([ \t]*)eeglab([ \t]+redraw|[ \t]*\([ \t]*''redraw''[ \t]
 txt = regexprep(txt, '^([ \t]*\[[^\]\n]*\][ \t]*=[ \t]*)eeglab[ \t]*;?(?=[ \t]*(%|$))', ...
     '$1eeglab(''nogui'');', opts{:});
 txt = regexprep(txt, '^([ \t]*)eeglab[ \t]*;?(?=[ \t]*(%|$))', '$1eeglab nogui', opts{:});
+% ERPLAB's 'UpdateMainGui','on' needs the main EEGLAB window, which nogui does not open.
+txt = regexprep(txt, '''UpdateMainGui''([ \t]*,[ \t]*)''on''', '''UpdateMainGui''$1''off''', 'ignorecase');
 end
 
 % -------------------------------------------------------------------------------------------------
